@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PANINI — Copa do Mundo FIFA 2026</title>
+  <meta name="description" content="Site oficial da tabela da Copa do Mundo FIFA 2026 apresentado pela PANINI. Confrontos, grupos, classificação e mata-mata.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
+</head>
+
+<body data-bs-spy="scroll" data-bs-target="#mainNav" data-bs-offset="90" tabindex="0">
+
+  <nav id="mainNav" class="navbar navbar-expand-lg navbar-dark fixed-top panini-navbar shadow-sm">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center gap-3" href="#hero">
+        <img src="assets/panini-logo.png" alt="PANINI" class="panini-logo-img panini-logo-nav">
+        <span class="brand-divider d-none d-md-inline"></span>
+        <img src="assets/fifa-2026-logo.png" alt="FIFA 2026" class="fifa-logo-nav d-none d-md-inline">
+        <span class="brand-title d-none d-lg-inline">Copa do Mundo da FIFA 2026<sup>™</sup></span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" aria-controls="navMenu" aria-expanded="false" aria-label="Abrir menu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="#sobre">Sobre</a></li>
+          <li class="nav-item"><a class="nav-link" href="#grupos">Grupos</a></li>
+          <li class="nav-item"><a class="nav-link" href="#jogos">Jogos</a></li>
+          <li class="nav-item"><a class="nav-link" href="#classificacao">Classificação</a></li>
+          <li class="nav-item"><a class="nav-link" href="#terceiros">3ºs</a></li>
+          <li class="nav-item"><a class="nav-link" href="#mata-mata">Mata-mata</a></li>
+          <li class="nav-item d-flex align-items-center ms-lg-3"><button id="btnReset" class="btn btn-reset" type="button"><i class="bi bi-arrow-counterclockwise"></i> Resetar</button></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <header id="hero" class="panini-hero d-flex align-items-center text-center text-white">
+    <div class="container py-5">
+      <div class="hero-brand-stack mb-3">
+        <img src="assets/panini-logo.png" alt="PANINI" class="panini-logo-img panini-logo-hero">
+        <img src="assets/fifa-2026-logo.png" alt="FIFA 2026" class="fifa-logo-hero">
+      </div>
+      <p class="hero-kicker mb-2">PANINI apresenta</p>
+      <h1 class="hero-title">Copa do Mundo da FIFA 2026<sup>™</sup></h1>
+      <p class="hero-subtitle">11 de junho a 19 de julho · EUA · Canadá · México · 48 seleções · 104 jogos</p>
+    </div>
+  </header>
+
+  <section id="sobre" class="py-5 bg-light">
+    <div class="container">
+      <div class="row g-4 align-items-center">
+        <div class="col-lg-6">
+          <h2 class="section-title">A Copa que muda tudo</h2>
+          <p class="lead">A primeira Copa do Mundo com <strong>48 seleções</strong>, distribuídas em <strong>12 grupos de 4 equipes</strong>. Pela primeira vez, o torneio terá uma fase de <strong>32 avos</strong> antes das oitavas — totalizando <strong>104 partidas</strong> em 16 cidades-sede.</p>
+          <ul class="list-unstyled fact-list">
+            <li><i class="bi bi-geo-alt-fill"></i> 16 sedes — 11 nos EUA, 3 no México e 2 no Canadá</li>
+            <li><i class="bi bi-calendar3"></i> Abertura: 11/jun/2026 (Estádio Azteca, Cidade do México)</li>
+            <li><i class="bi bi-trophy-fill"></i> Final: 19/jul/2026 (MetLife Stadium, New Jersey)</li>
+          </ul>
+        </div>
+        <div class="col-lg-6">
+          <div class="stat-grid">
+            <div class="stat-card"><span class="stat-num">48</span><span class="stat-label">Seleções</span></div>
+            <div class="stat-card"><span class="stat-num">12</span><span class="stat-label">Grupos</span></div>
+            <div class="stat-card"><span class="stat-num">104</span><span class="stat-label">Jogos</span></div>
+            <div class="stat-card"><span class="stat-num">16</span><span class="stat-label">Cidades</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="grupos" class="py-5">
+    <div class="container">
+      <h2 class="section-title text-center">Fase de Grupos</h2>
+      <p class="text-center text-muted mb-4">Grupos A a L · clique em qualquer seleção para filtrar os jogos</p>
+      <div id="groupsContainer" class="row g-4"></div>
+    </div>
+  </section>
+
+  <section id="jogos" class="py-5 bg-light">
+    <div class="container">
+      <h2 class="section-title text-center">Confrontos</h2>
+      <div class="row g-2 justify-content-center mb-4">
+        <div class="col-md-4">
+          <select id="filterGroup" class="form-select">
+            <option value="">Todos os grupos</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <select id="filterTeam" class="form-select">
+            <option value="">Todas as seleções</option>
+          </select>
+        </div>
+      </div>
+      <div id="matchesContainer" class="row g-3"></div>
+    </div>
+  </section>
+
+  <section id="classificacao" class="py-5">
+    <div class="container">
+      <h2 class="section-title text-center">Classificação por Grupo</h2>
+      <p class="text-center text-muted mb-4">Pts · SG · GP (critérios de desempate) — preencha os placares na seção <em>Jogos</em></p>
+      <div id="standingsContainer" class="row g-4"></div>
+    </div>
+  </section>
+
+  <section id="terceiros" class="py-5 bg-light">
+    <div class="container">
+      <h2 class="section-title text-center">Ranking dos 3º Colocados</h2>
+      <p class="text-center text-muted mb-4">Os 8 melhores entre os 12 terceiros se classificam para os 32 avos</p>
+      <div id="thirdsContainer"></div>
+    </div>
+  </section>
+
+  <section id="mata-mata" class="py-5 bg-dark text-white">
+    <div class="container">
+      <h2 class="section-title text-center text-white">Mata-mata</h2>
+      <p class="text-center text-white-50 mb-4">32 avos → Oitavas → Quartas → Semis → Final</p>
+      <div class="bracket-scroll">
+        <div id="bracketContainer" class="bracket"></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="panini-footer text-white text-center py-4">
+    <div class="container">
+      <p class="mb-1"><img src="assets/panini-logo.png" alt="PANINI" class="panini-logo-img"> · Copa do Mundo FIFA 2026</p>
+      <p class="small mb-0 opacity-75">Projeto acadêmico — CEUB · Desenvolvimento Web</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
