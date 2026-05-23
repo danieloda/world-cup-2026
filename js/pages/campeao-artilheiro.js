@@ -105,16 +105,16 @@ function renderPage() {
       </div>
     </section>
 
+    <div class="note" style="margin-bottom:20px; padding:12px 16px; background:var(--card); border-left:3px solid var(--gold); border-radius:0 6px 6px 0; font-size:12px; color:var(--text-dim);">
+      <strong style="color:var(--gold);">Como funciona:</strong>
+      <strong>Campeão</strong> = +30 pts se a sua seleção levantar a taça.
+      <strong>Artilheiro</strong> = +2 pts × multiplicador da fase por gol
+      (grupos ×1, oitavas ×2, quartas ×2.5, semis ×3, final ×4).
+    </div>
+
     <div class="cs-split">
       ${renderChampionCard(locked)}
       ${renderScorerCard(locked)}
-    </div>
-
-    <div class="note" style="margin-top:36px; padding:14px 18px; background:var(--card); border-left:3px solid var(--gold); border-radius:0 6px 6px 0; font-size:12px; color:var(--text-dim);">
-      <strong style="color:var(--gold);">Como funciona:</strong>
-      <strong>Campeão</strong> = +30 pts se a sua seleção levantar a taça.
-      <strong>Artilheiro</strong> = +2 pts × multiplicador da fase por gol do seu jogador
-      (grupos ×1, oitavas ×2, quartas ×2.5, semis ×3, final ×4).
     </div>
   `;
 }
@@ -179,7 +179,7 @@ function renderScorerCard(locked) {
 
   return `
     <div class="cs-card" id="cardScorer">
-      <div class="cs-card-icon">⭐</div>
+      <div class="cs-card-icon">⚽</div>
       <div class="cs-card-kicker">Aposta 2 · +2 pts × multiplicador por gol</div>
       <h3>Artilheiro do Bolão</h3>
       <p class="desc">Escolha 1 jogador. Cada gol dele vale +2 pts (escalando até ×4 na final).</p>

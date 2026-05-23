@@ -108,6 +108,12 @@ function renderPage() {
 // ============================================================
 function renderPalpitesTab(counts) {
   return `
+    <div class="note" style="margin-bottom:20px; padding:12px 16px; background:var(--card); border-left:3px solid var(--gold); border-radius:0 6px 6px 0; font-size:12px; color:var(--text-dim);">
+      <strong style="color:var(--gold);">Como funciona:</strong>
+      Cada palpite trava no apito inicial do jogo. Salva sozinho conforme você digita.
+      <strong>Pontuação:</strong> placar exato = 5pts · vencedor+saldo = 3pts · só vencedor = 2pts · gols de um lado = 1pt.
+    </div>
+
     ${renderKpisPalpites(counts)}
 
     <div class="chips" id="chips">
@@ -117,13 +123,6 @@ function renderPalpitesTab(counts) {
 
     <div id="matchesList">
       ${renderPalpitesList()}
-    </div>
-
-    <div class="note" style="margin-top:36px; padding:14px 18px; background:var(--card); border-left:3px solid var(--gold); border-radius:0 6px 6px 0; font-size:12px; color:var(--text-dim);">
-      <strong style="color:var(--gold);">Como funciona:</strong>
-      Cada palpite trava automaticamente no apito inicial do jogo.
-      Salva sozinho conforme você digita.
-      Pontuação: <b>placar exato = 5pts</b> · vencedor + saldo = 3pts · só vencedor = 2pts · gols de um lado = 1pt.
     </div>
   `;
 }

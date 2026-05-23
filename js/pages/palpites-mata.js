@@ -4,6 +4,7 @@ import { supabase } from '../supabase.js';
 import {
   flag, escapeHtml, formatTime, isLocked, showToast,
   attachTeamTooltips, loadRecentMatches, teamPt,
+  computeStandings as utilComputeStandings,
 } from '../util.js';
 
 // ============================================================
@@ -103,34 +104,65 @@ function isRealTeam(name) {
  */
 function computeSlotResolution() {
   const res = new Map();
+  const thirdsRanked = [];  // [{ group, team, pts, sg, gp, source }]
 
-  // === 1) Group winners (1X) e runners-up (2X) ===
+  // === 1) Group winners (1X), runners-up (2X) e third (3X) ===
   const groupLetters = [...new Set(allMatches.filter(m => m.group_name).map(m => m.group_name))];
   for (const g of groupLetters) {
     const groupMatches = allMatches.filter(m => m.group_name === g && m.stage === 'group');
-    // Se algum jogo do grupo já tem resultado REAL, prefere usar o real
     const allFinished = groupMatches.every(m => m.finished);
+    const allPredicted = groupMatches.every(m => predsByMatch.has(m.id));
 
+    let standings, source;
     if (allFinished) {
-      // Usa standings reais (computa do banco mesmo)
-      const standings = computeStandings(groupMatches, /* useReal= */ true);
-      if (standings.length >= 2) {
-        res.set('1' + g, { team: standings[0].team, source: 'real' });
-        res.set('2' + g, { team: standings[1].team, source: 'real' });
-        if (standings[2]) res.set('3' + g, { team: standings[2].team, source: 'real' });
-      }
-      continue;
+      standings = computeStandings(groupMatches, /* useReal= */ true);
+      source = 'real';
+    } else if (allPredicted) {
+      standings = computeStandings(groupMatches, /* useReal= */ false);
+      source = 'pred-group';
+    } else {
+      continue;  // dados incompletos pra esse grupo
     }
 
-    // Senão, usa palpites — precisa de TODOS os 6 jogos palpitados
-    const allPredicted = groupMatches.every(m => predsByMatch.has(m.id));
-    if (!allPredicted) continue;
-
-    const standings = computeStandings(groupMatches, /* useReal= */ false);
     if (standings.length >= 2) {
-      res.set('1' + g, { team: standings[0].team, source: 'pred-group' });
-      res.set('2' + g, { team: standings[1].team, source: 'pred-group' });
-      if (standings[2]) res.set('3' + g, { team: standings[2].team, source: 'pred-group' });
+      res.set('1' + g, { team: standings[0].team, source });
+      res.set('2' + g, { team: standings[1].team, source });
+    }
+    if (standings[2]) {
+      res.set('3' + g, { team: standings[2].team, source });
+      thirdsRanked.push({
+        group: g,
+        team: standings[2].team,
+        pts: standings[2].pts,
+        sg: standings[2].sg,
+        gp: standings[2].gp,
+        source,
+      });
+    }
+  }
+
+  // === 1.5) Slots compostos de 3ºs lugares (3A/B/C/D/F, 3C/D/F/G/H, etc.) ===
+  // Ordena os 3ºs por critério FIFA: PTS → SG → GP
+  thirdsRanked.sort((a, b) =>
+    b.pts - a.pts || b.sg - a.sg || b.gp - a.gp
+  );
+  // Greedy: pra cada slot composto, atribui o melhor 3º disponível cujo grupo está na lista
+  const usedThirds = new Set();
+  // Ordena slots por match_id (R32 vem primeiro)
+  const koMatchesSorted = [...matches].sort((a, b) => a.id - b.id);
+  for (const m of koMatchesSorted) {
+    for (const side of ['team_home', 'team_away']) {
+      const slot = m[side];
+      if (!slot || !slot.startsWith('3') || !slot.includes('/')) continue;
+      // Slot tipo "3A/B/C/D/F"
+      const validGroups = slot.slice(1).split('/');
+      const candidate = thirdsRanked.find(t =>
+        validGroups.includes(t.group) && !usedThirds.has(t.team)
+      );
+      if (candidate) {
+        res.set(slot, { team: candidate.team, source: candidate.source });
+        usedThirds.add(candidate.team);
+      }
     }
   }
 
@@ -182,35 +214,10 @@ function resolveSlotToTeam(slot, res) {
 }
 
 /**
- * Computa standings de um grupo. useReal = usa actual_*; senão, pred_*.
- * Retorna lista ordenada por: PTS desc, SG desc, GP desc.
+ * Adapter: chama computeStandings do util com formato esperado aqui.
  */
 function computeStandings(groupMatches, useReal) {
-  const stats = new Map();  // team -> { team, pts, gf, ga, gd }
-  for (const m of groupMatches) {
-    let h, a;
-    if (useReal) { h = m.actual_home; a = m.actual_away; }
-    else {
-      const p = predsByMatch.get(m.id);
-      if (!p) continue;
-      h = p.pred_home; a = p.pred_away;
-    }
-    if (h == null || a == null) continue;
-
-    addTeamStat(stats, m.team_home, h, a);
-    addTeamStat(stats, m.team_away, a, h);
-  }
-  return [...stats.values()].sort((x, y) =>
-    y.pts - x.pts || y.gd - x.gd || y.gf - x.gf
-  );
-}
-
-function addTeamStat(map, team, gf, ga) {
-  if (!map.has(team)) map.set(team, { team, pts: 0, gf: 0, ga: 0, gd: 0 });
-  const s = map.get(team);
-  s.gf += gf; s.ga += ga; s.gd = s.gf - s.ga;
-  if (gf > ga) s.pts += 3;
-  else if (gf === ga) s.pts += 1;
+  return utilComputeStandings(groupMatches, useReal ? 'real' : 'sim', predsByMatch);
 }
 
 function teamDisplay(slot) {
@@ -267,26 +274,21 @@ function renderPage() {
   `;
 }
 
+
 function renderPalpitesTab(counts) {
   const grouped = groupByStage();
   return `
-    ${renderKpis(counts)}
-
-    <div style="font-size:11px; color:var(--text-mute); letter-spacing:.15em; text-transform:uppercase; font-weight:700; margin-bottom:8px;">
-      Bracket completo · slots resolvem após fase de grupos
+    <div class="note" style="margin-bottom:20px; padding:12px 16px; background:var(--card); border-left:3px solid var(--gold); border-radius:0 6px 6px 0; font-size:12px; color:var(--text-dim);">
+      <strong style="color:var(--gold);">Como funciona:</strong>
+      Palpites travam no apito de cada jogo. Slots (1º A, 2º B, etc.) viram times reais quando os grupos terminam. Empate → escolha o vencedor dos pênaltis.
     </div>
+
+    ${renderKpis(counts)}
 
     <div class="bracket-wrap">
       <div class="bracket">
         ${STAGES.map(stage => renderStageColumn(stage, grouped)).join('')}
       </div>
-    </div>
-
-    <div class="note" style="margin-top:36px; padding:14px 18px; background:var(--card); border-left:3px solid var(--gold); border-radius:0 6px 6px 0; font-size:12px; color:var(--text-dim);">
-      <strong style="color:var(--gold);">Como funciona:</strong>
-      Palpites travam no apito de cada jogo (igual aos grupos).
-      Antes da fase de grupos terminar, você palpita pelos slots (1º A, 2º B, etc.) — eles resolvem para times reais quando o admin lança os resultados dos grupos.
-      <strong>Empate na fase eliminatória → escolha o vencedor dos pênaltis</strong> (vale como vencedor pra pontuação).
     </div>
   `;
 }

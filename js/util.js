@@ -230,6 +230,57 @@ export function stageLabel(s) {
 }
 
 /**
+ * Computa standings de um grupo a partir de uma lista de jogos.
+ * @param matches  jogos do grupo (12 grupos × 6 = 72 total)
+ * @param mode     'real' = usa actual_home/away; 'sim' = usa pred_home/away
+ * @param preds    Map<match_id, prediction> (necessário se mode='sim')
+ * @returns [{ team, j, v, e, d, gp, gc, sg, pts }] ordenado por pts/sg/gp
+ */
+export function computeStandings(matches, mode, preds) {
+  const stats = new Map();
+  function ensure(team) {
+    if (!stats.has(team)) {
+      stats.set(team, { team, j: 0, v: 0, e: 0, d: 0, gp: 0, gc: 0, sg: 0, pts: 0 });
+    }
+    return stats.get(team);
+  }
+
+  for (const m of matches) {
+    let h, a;
+    if (mode === 'real') {
+      if (!m.finished) continue;
+      h = m.actual_home; a = m.actual_away;
+    } else {
+      const p = preds?.get(m.id);
+      if (!p) continue;
+      h = p.pred_home; a = p.pred_away;
+    }
+    if (h == null || a == null) continue;
+
+    const sh = ensure(m.team_home);
+    const sa = ensure(m.team_away);
+    sh.j++; sa.j++;
+    sh.gp += h; sh.gc += a;
+    sa.gp += a; sa.gc += h;
+
+    if (h > a)       { sh.v++; sa.d++; sh.pts += 3; }
+    else if (a > h)  { sa.v++; sh.d++; sa.pts += 3; }
+    else             { sh.e++; sa.e++; sh.pts += 1; sa.pts += 1; }
+  }
+
+  // Compute SG
+  for (const s of stats.values()) s.sg = s.gp - s.gc;
+
+  // Sort: pts desc, sg desc, gp desc, name asc
+  return [...stats.values()].sort((x, y) =>
+    y.pts - x.pts
+    || y.sg - x.sg
+    || y.gp - x.gp
+    || x.team.localeCompare(y.team)
+  );
+}
+
+/**
  * Match está acontecendo agora (entre kickoff e kickoff + 2.5h).
  */
 export function isLive(m) {
