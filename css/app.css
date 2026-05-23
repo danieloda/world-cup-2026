@@ -679,6 +679,146 @@ img { max-width: 100%; height: auto; }
   animation: spin 1s linear infinite;
 }
 
+/* ===== Champion & Top Scorer cards ===== */
+.cs-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+@media (max-width: 900px) {
+  .cs-split { grid-template-columns: 1fr; }
+}
+.cs-card {
+  background: linear-gradient(160deg, #1f1f1f, #0d0d0d);
+  border-radius: 12px;
+  padding: 28px;
+  border: 1px solid var(--line);
+  position: relative;
+  overflow: hidden;
+}
+.cs-card-icon {
+  position: absolute; top: 16px; right: 16px;
+  font-size: 80px; opacity: .08; line-height: 1;
+  pointer-events: none;
+}
+.cs-card-kicker {
+  font-size: 10px; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--green); font-weight: 800;
+  margin-bottom: 12px;
+}
+.cs-card h3 {
+  font-size: 28px; font-weight: 900;
+  letter-spacing: -.03em; line-height: 1.05;
+  margin-bottom: 6px;
+}
+.cs-card .desc {
+  font-size: 13px; color: var(--text-dim);
+  margin-bottom: 20px;
+}
+.cs-card-pts {
+  font-size: 11px; color: var(--gold);
+  font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; margin-bottom: 24px;
+}
+.cs-pick-box {
+  background: rgba(255, 255, 255, .05);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 14px;
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 12px;
+  transition: background .15s;
+}
+.cs-pick-box.empty {
+  border: 2px dashed var(--line-strong);
+  background: transparent;
+  color: var(--text-mute);
+  justify-content: center;
+  padding: 22px;
+  font-style: italic;
+  font-size: 14px;
+}
+.cs-pick-flag { font-size: 32px; line-height: 1; }
+.cs-pick-info { flex: 1; min-width: 0; }
+.cs-pick-name {
+  font-size: 18px; font-weight: 800;
+  letter-spacing: -.01em;
+}
+.cs-pick-sub {
+  font-size: 12px; color: var(--text-dim);
+}
+.cs-search {
+  position: relative; margin-top: 6px;
+}
+.cs-search input {
+  width: 100%;
+  padding: 12px 14px 12px 40px;
+  background: rgba(255, 255, 255, .05);
+  border: 1px solid var(--line);
+  border-radius: 500px;
+  font-size: 13px; color: var(--text);
+}
+.cs-search input::placeholder { color: var(--text-mute); }
+.cs-search input:focus { outline: 2px solid var(--green); outline-offset: -1px; }
+.cs-search::before {
+  content: '🔍';
+  position: absolute; left: 14px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  pointer-events: none;
+}
+.cs-search.locked input {
+  opacity: .5; cursor: not-allowed;
+}
+.cs-list {
+  max-height: 360px;
+  overflow-y: auto;
+  margin-top: 12px;
+  border-radius: 8px;
+}
+.cs-list::-webkit-scrollbar { width: 8px; }
+.cs-list::-webkit-scrollbar-track { background: transparent; }
+.cs-list::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 4px; }
+.cs-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background .12s;
+}
+.cs-row:hover { background: rgba(255, 255, 255, .05); }
+.cs-row.selected { background: rgba(29, 185, 84, .15); }
+.cs-row.selected .nm { color: var(--green); font-weight: 800; }
+.cs-row .flag { font-size: 18px; width: 26px; }
+.cs-row .nm {
+  flex: 1; font-weight: 600;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.cs-row .meta {
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  color: var(--text-mute);
+  letter-spacing: .08em;
+}
+.cs-row .check {
+  color: var(--green);
+  font-size: 16px;
+  font-weight: 900;
+}
+.cs-deadline {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  font-size: 11px;
+  color: var(--text-mute);
+  display: flex; align-items: center; gap: 8px;
+  font-weight: 600;
+  letter-spacing: .03em;
+}
+.cs-deadline strong { color: var(--gold); font-weight: 800; }
+.cs-deadline.locked strong { color: var(--red); }
+
 /* ===== Today's matches grid ===== */
 .today-grid {
   display: grid;
