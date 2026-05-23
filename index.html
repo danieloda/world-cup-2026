@@ -18,7 +18,10 @@
   </div>
   <script type="module">
     import { getSession } from './js/auth.js';
-    const session = await getSession();
+    const [session] = await Promise.all([
+      getSession(),
+      new Promise(r => setTimeout(r, 400)),
+    ]);
     window.location.replace(session ? 'inicio.html' : 'login.html');
   </script>
 </body>

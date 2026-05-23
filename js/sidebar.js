@@ -42,8 +42,19 @@ const COLLAPSED_KEY = 'bolao-sidebar-collapsed';
 
 /**
  * Renderiza a estrutura completa da página com sidebar + topbar.
+ *
+ * Garante que o loader FIFA fique visível por no mínimo MIN_DELAY ms.
+ * Se a página carrega em 50ms, espera mais 350ms. Se carrega em 600ms,
+ * vai direto. Evita "flash" do loader desaparecendo instantaneamente.
  */
+const MIN_LOADER_MS = 400;
+
 export async function renderShell({ active, profile, stats, stageLabel }) {
+  const elapsed = performance.now();
+  if (elapsed < MIN_LOADER_MS) {
+    await new Promise(r => setTimeout(r, MIN_LOADER_MS - elapsed));
+  }
+
   const app = document.getElementById('app');
   if (!app) throw new Error('Elemento #app não encontrado.');
 
