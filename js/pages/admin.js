@@ -45,7 +45,7 @@ try {
     <div style="padding:40px; max-width:720px; margin:40px auto; background:#181818; border-radius:12px; color:#fff; font-family:sans-serif;">
       <h1 style="color:#f15e6c">⚠️ Erro</h1>
       <pre style="background:#000; padding:16px; border-radius:8px; overflow:auto; white-space:pre-wrap; word-break:break-word; color:#f15e6c;">${err.stack || err.message || err}</pre>
-      <p style="margin-top:20px;"><a href="inicio.html" style="color:#1DB954">← Voltar</a></p>
+      <p style="margin-top:20px;"><a href="inicio.html" style="color:#f4c430">← Voltar</a></p>
     </div>
   `;
 }
@@ -389,7 +389,8 @@ function renderResultRow(m) {
   const totalGoals = (parseInt(homeVal, 10) || 0) + (parseInt(awayVal, 10) || 0);
   const scoreFilled = homeVal !== '' && awayVal !== '';
   const goalsValid = scoreFilled && goalsAttributed === totalGoals;
-  const canSave = scoreFilled && goalsValid && (!isKO || !isDraw || m.pen_winner);
+  // Score basta para salvar; gols são opcionais (apenas pontuam top scorer).
+  const canSave = scoreFilled && (!isKO || !isDraw || m.pen_winner);
 
   // Filtra jogadores que possam ter marcado (do home ou away team)
   const eligible = (cache.players ?? []).filter(p => p.team === m.team_home || p.team === m.team_away);
@@ -409,10 +410,10 @@ function renderResultRow(m) {
           ${escapeHtml(teamPt(m.team_home))}
         </div>
         <div class="score-cell" style="justify-content:center;">
-          <input class="score-input" type="number" min="0" max="20" inputmode="numeric"
+          <input class="score-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2"
                  id="rh_${m.id}" value="${homeVal}" placeholder="–">
           <span class="score-sep">–</span>
-          <input class="score-input" type="number" min="0" max="20" inputmode="numeric"
+          <input class="score-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2"
                  id="ra_${m.id}" value="${awayVal}" placeholder="–">
         </div>
         <div class="team-disp right">

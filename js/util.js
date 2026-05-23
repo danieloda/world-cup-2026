@@ -416,6 +416,13 @@ function renderRecentMatch(m) {
   const resultClass = { W: 'win', D: 'draw', L: 'loss' }[result];
   const resultText  = { W: 'V', D: 'E', L: 'D' }[result];
 
+  // Trunca competição: se tiver "·" pega só a primeira parte
+  // (ex: "Copa Árabe 25 · Quartas" → "Copa Árabe 25")
+  const compFull = m.competition;
+  const compShort = compFull.split('·')[0].trim();
+  const tooLong = compFull.length > 18;
+  const compDisplay = tooLong ? compShort : compFull;
+
   return `
     <div class="tt-match">
       <div class="when">
@@ -423,10 +430,10 @@ function renderRecentMatch(m) {
         <span class="tt-result ${resultClass}">${resultText}</span>
       </div>
       <div class="opp">
-        <span style="display:inline-flex; align-items:center; gap:6px;">
-          ${venueBadge}${oppFlag} ${escapeHtml(teamPt(m.opponent))}
+        <span class="opp-line">
+          ${venueBadge}${oppFlag} <span class="opp-name">${escapeHtml(teamPt(m.opponent))}</span>
         </span>
-        <span class="pred">${escapeHtml(m.competition)}</span>
+        <span class="pred" title="${escapeHtml(compFull)}">${escapeHtml(compDisplay)}</span>
       </div>
       <span class="res finished">${escapeHtml(m.score)}</span>
     </div>

@@ -9,7 +9,13 @@
   <link href="css/app.css" rel="stylesheet">
 </head>
 <body>
-  <div class="init-screen"></div>
+  <div class="init-screen">
+    <div class="init-loader">
+      <div class="init-ring"></div>
+      <img src="assets/fifa-2026-logo.png" class="init-fifa" alt="FIFA 2026">
+    </div>
+    <div class="init-label">Carregando</div>
+  </div>
   <script type="module">
     import { getSession } from './js/auth.js';
     const session = await getSession();

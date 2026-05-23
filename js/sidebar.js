@@ -1,63 +1,91 @@
-// Sidebar component — renderiza a barra lateral fixa em todas as páginas do app.
-// Uso: import { renderShell } from './sidebar.js'; renderShell({ active: 'inicio', profile, stats });
+// Sidebar component — barra lateral fixa em todas as páginas do app.
+// Uso: renderShell({ active: 'inicio', profile, stats })
 
 import { signOut } from './auth.js';
-import { supabase } from './supabase.js';
 
-const NAV = [
-  { id: 'inicio',     href: 'inicio.html',     label: 'Início',                  icon: iconHome },
-  { id: 'grupos',     href: 'grupos.html',     label: 'Grupos & Classificação',  icon: iconGrid },
-  { id: 'palpites-g', href: 'palpites-grupos.html', label: 'Palpites — Grupos',   icon: iconTarget },
-  { id: 'terceiros',  href: 'terceiros.html',  label: '3ºs Lugares',             icon: iconStar },
-  { id: 'palpites-k', href: 'palpites-mata.html', label: 'Palpites — Mata-mata', icon: iconBracket },
-  { id: 'campeao',    href: 'campeao-artilheiro.html', label: 'Campeão & Artilheiro', icon: iconTrophy },
-  { id: 'historico',  href: 'historico.html',  label: 'Histórico do Bolão',      icon: iconClock },
-  { id: 'ranking',    href: 'ranking.html',    label: 'Ranking',                 icon: iconChart },
+// Agrupamento de navegação por seção
+const NAV_SECTIONS = [
+  {
+    label: 'Principal',
+    items: [
+      { id: 'inicio', href: 'inicio.html', label: 'Início', icon: iconHome },
+    ],
+  },
+  {
+    label: 'Bolão',
+    items: [
+      { id: 'grupos',     href: 'grupos.html',     label: 'Grupos & Classificação', icon: iconGrid },
+      { id: 'terceiros',  href: 'terceiros.html',  label: '3ºs Lugares',            icon: iconPodium },
+      { id: 'historico',  href: 'historico.html',  label: 'Histórico',              icon: iconClock },
+      { id: 'ranking',    href: 'ranking.html',    label: 'Ranking',                icon: iconChart },
+    ],
+  },
+  {
+    label: 'Palpites',
+    items: [
+      { id: 'palpites-g', href: 'palpites-grupos.html',    label: 'Grupos',              icon: iconClipboard },
+      { id: 'palpites-k', href: 'palpites-mata.html',      label: 'Mata-mata',           icon: iconBracket },
+      { id: 'campeao',    href: 'campeao-artilheiro.html', label: 'Campeão & Artilheiro', icon: iconTrophy },
+    ],
+  },
 ];
 
-const ADMIN_LINK = {
-  id: 'admin', href: 'admin.html', label: 'Admin', icon: iconGear, admin: true,
+const ADMIN_SECTION = {
+  label: 'Administração',
+  items: [
+    { id: 'admin', href: 'admin.html', label: 'Admin', icon: iconGear, admin: true },
+  ],
 };
+
+const COLLAPSED_KEY = 'bolao-sidebar-collapsed';
 
 /**
  * Renderiza a estrutura completa da página com sidebar + topbar.
- * Esperado o body conter <div id="app"></div>; o conteúdo da página vai em <main id="pageBody"></main>.
- *
- * @param {Object} opts
- * @param {string} opts.active            — id do item ativo (ex: 'inicio')
- * @param {Object} opts.profile           — profile do usuário (full_name, is_admin, ...)
- * @param {Object} [opts.stats]           — pool stats (pct_played, finished_matches, total_matches)
- * @param {string} [opts.stageLabel]      — fase atual (ex: 'Fase de Grupos')
  */
 export async function renderShell({ active, profile, stats, stageLabel }) {
   const app = document.getElementById('app');
   if (!app) throw new Error('Elemento #app não encontrado.');
 
-  const adminClass = profile?.is_admin ? 'admin' : '';
+  const sections = profile?.is_admin ? [...NAV_SECTIONS, ADMIN_SECTION] : NAV_SECTIONS;
   const initials = getInitials(profile?.full_name || profile?.email || '?');
-  const items = profile?.is_admin ? [...NAV, ADMIN_LINK] : NAV;
-  const navHtml = items.map(item => navItem(item, active)).join('');
+  const adminClass = profile?.is_admin ? 'admin' : '';
 
   const pct = stats?.pct_played ?? 0;
   const finished = stats?.finished_matches ?? 0;
   const total = stats?.total_matches ?? 104;
   const stageTxt = stageLabel || stageFromProgress(pct);
 
+  const startCollapsed = localStorage.getItem(COLLAPSED_KEY) === '1';
+
   app.innerHTML = `
-    <aside class="sidebar" id="sidebar">
+    <aside class="sidebar ${startCollapsed ? 'collapsed' : ''}" id="sidebar">
       <div class="sb-brand">
-        <div class="sb-brand-logo">⚽</div>
-        Bolão 2026
+        <a href="inicio.html" class="sb-brand-link">
+          <img src="assets/fifa-2026-logo.png" alt="FIFA 2026" class="sb-fifa-logo">
+        </a>
       </div>
-      <div class="sb-section">${navHtml}</div>
+
+      <nav class="sb-nav">
+        ${sections.map(section => renderSection(section, active)).join('')}
+      </nav>
+
       <div class="sb-progress">
         <div class="sb-progress-label">Copa 2026</div>
-        <div class="sb-progress-title">${pct}% disputada</div>
         <div class="sb-progress-bar"><span style="width:${pct}%"></span></div>
-        <div class="sb-progress-text">${finished}/${total} jogos · ${stageTxt}</div>
+        <div class="sb-progress-stats">
+          <strong>${pct}%</strong>
+          <span>${finished}/${total} jogos</span>
+        </div>
+        <div class="sb-progress-stage">${stageTxt}</div>
       </div>
     </aside>
+
+    <button class="sb-collapse-btn" id="sbCollapseBtn" aria-label="Recolher menu" title="Recolher menu">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+
     <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
     <div class="main">
       <div class="topbar">
         <div style="display:flex; align-items:center;">
@@ -76,13 +104,20 @@ export async function renderShell({ active, profile, stats, stageLabel }) {
     </div>
   `;
 
-  // Mobile menu
+  // Collapse toggle
   const sidebar = document.getElementById('sidebar');
+  document.getElementById('sbCollapseBtn').addEventListener('click', () => {
+    sidebar.classList.toggle('collapsed');
+    const isCollapsed = sidebar.classList.contains('collapsed');
+    localStorage.setItem(COLLAPSED_KEY, isCollapsed ? '1' : '0');
+  });
+
+  // Mobile menu
   const backdrop = document.getElementById('sidebarBackdrop');
   document.getElementById('menuToggle')?.addEventListener('click', () => sidebar.classList.toggle('open'));
   backdrop?.addEventListener('click', () => sidebar.classList.remove('open'));
 
-  // Click no avatar / nome → menu de logout
+  // Click no nome → menu de logout
   document.getElementById('topbarUser')?.addEventListener('click', async () => {
     if (confirm('Sair da conta?')) await signOut();
   });
@@ -90,12 +125,26 @@ export async function renderShell({ active, profile, stats, stageLabel }) {
   return document.getElementById('pageBody');
 }
 
-function navItem(item, activeId) {
+function renderSection(section, activeId) {
+  return `
+    <div class="sb-section-group">
+      <div class="sb-section-label">${escapeHtml(section.label)}</div>
+      ${section.items.map(item => renderNavItem(item, activeId)).join('')}
+    </div>
+  `;
+}
+
+function renderNavItem(item, activeId) {
   const isActive = item.id === activeId;
   const cls = ['sb-link'];
   if (item.admin) cls.push('admin');
   if (isActive) cls.push('active');
-  return `<a class="${cls.join(' ')}" href="${item.href}">${item.icon()}${escapeHtml(item.label)}</a>`;
+  return `
+    <a class="${cls.join(' ')}" href="${item.href}" title="${escapeHtml(item.label)}">
+      ${item.icon()}
+      <span class="sb-link-label">${escapeHtml(item.label)}</span>
+    </a>
+  `;
 }
 
 function getInitials(s) {
@@ -114,14 +163,50 @@ function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
-// ===== Ícones SVG (inline, sem dependência) =====
+// ===== Ícones SVG (Lucide-inspired, outlines limpos) =====
 function svg(d) { return `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`; }
-function iconHome()    { return svg('<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/>'); }
-function iconGrid()    { return svg('<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>'); }
-function iconTarget()  { return svg('<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>'); }
-function iconStar()    { return svg('<path d="M12 2l2 7h7l-6 4 2 7-7-4-7 4 2-7-6-4h7z"/>'); }
-function iconBracket() { return svg('<path d="M6 9l6 6 6-6"/>'); }
-function iconTrophy()  { return svg('<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/>'); }
-function iconClock()   { return svg('<path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/>'); }
-function iconChart()   { return svg('<path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 6-6"/>'); }
-function iconGear()    { return svg('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>'); }
+
+// Casa
+function iconHome() {
+  return svg('<path d="M3 9.5L12 2l9 7.5V21a2 2 0 0 1-2 2h-3v-7h-8v7H5a2 2 0 0 1-2-2z"/>');
+}
+
+// Grupos & Classificação — tabela de standings
+function iconGrid() {
+  return svg('<rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/>');
+}
+
+// 3ºs Lugares — pódio com 3 degraus
+function iconPodium() {
+  return svg('<rect x="9" y="8" width="6" height="13"/><rect x="2" y="13" width="6" height="8"/><rect x="16" y="11" width="6" height="10"/><path d="M3 21h18"/>');
+}
+
+// Histórico — relógio com seta
+function iconClock() {
+  return svg('<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><polyline points="3 3 3 8 8 8"/><path d="M12 7v5l3 2"/>');
+}
+
+// Ranking — barras crescentes
+function iconChart() {
+  return svg('<line x1="6" y1="20" x2="6" y2="14"/><line x1="12" y1="20" x2="12" y2="8"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="3" y1="20" x2="21" y2="20"/>');
+}
+
+// Palpites Grupos — clipboard com check
+function iconClipboard() {
+  return svg('<rect x="5" y="4" width="14" height="18" rx="2"/><path d="M9 4h6v3H9z"/><polyline points="9 14 11 16 15 12"/>');
+}
+
+// Palpites Mata-mata — bracket clássico (igual a referência)
+function iconBracket() {
+  return svg('<path d="M3 5v3a2 2 0 0 0 2 2h2a2 2 0 0 1 2 2v4M3 19v-3a2 2 0 0 1 2-2h2a2 2 0 0 0 2-2v-4"/><path d="M21 5v3a2 2 0 0 1-2 2h-2a2 2 0 0 0-2 2v4M21 19v-3a2 2 0 0 0-2-2h-2a2 2 0 0 1-2-2v-4"/><line x1="9" y1="12" x2="15" y2="12"/>');
+}
+
+// Campeão & Artilheiro — troféu (filled bowl)
+function iconTrophy() {
+  return svg('<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 4h3v2a3 3 0 0 1-3 3M7 4H4v2a3 3 0 0 0 3 3"/>');
+}
+
+// Admin — engrenagem
+function iconGear() {
+  return svg('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>');
+}
