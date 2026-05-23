@@ -404,8 +404,21 @@ img { max-width: 100%; height: auto; }
   background: var(--green);
   color: #000; font-weight: 800; font-size: 11px;
   display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.topbar-user .av img,
+.av-mini img,
+.podium-av img,
+.profile-av img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
 }
 .topbar-user.admin .av { background: var(--red); color: #fff; }
+.av-mini { overflow: hidden; }
+.podium-av { overflow: hidden; }
+.profile-av { overflow: hidden; }
 .body { padding: 24px 28px; }
 
 /* ===== Hero ===== */

@@ -3,6 +3,7 @@ import { renderShell } from '../sidebar.js';
 import { supabase } from '../supabase.js';
 import {
   flag, escapeHtml, teamPt, formatBrShort, formatTime, showToast,
+  avatarHtml, getInitials,
 } from '../util.js';
 
 // ============================================================
@@ -46,13 +47,14 @@ try {
 // Data
 // ============================================================
 async function loadData() {
-  const [statsRes, leaderRes, scorerRes, settingsRes, champRes, sPickRes] = await Promise.all([
+  const [statsRes, leaderRes, scorerRes, settingsRes, champRes, sPickRes, profilesRes] = await Promise.all([
     supabase.from('v_pool_stats').select('*').single(),
     supabase.from('v_leaderboard').select('*'),
     supabase.from('v_scorer_ranking').select('*'),
     supabase.from('settings').select('key, value'),
     supabase.from('champion_picks').select('*'),
     supabase.from('top_scorer_picks').select('*, players(full_name, team)'),
+    supabase.from('profiles').select('id, avatar_url'),
   ]);
 
   if (leaderRes.error) throw leaderRes.error;
@@ -60,6 +62,10 @@ async function loadData() {
   stats = statsRes.data ?? { finished_matches: 0, total_matches: 104, pct_played: 0, paid_users: 0, total_pot: 0 };
   leaderboard = leaderRes.data ?? [];
   scorerRanking = scorerRes.data ?? [];
+
+  // Merge avatar_url no leaderboard
+  const avatarMap = new Map((profilesRes.data ?? []).map(p => [p.id, p.avatar_url]));
+  leaderboard = leaderboard.map(u => ({ ...u, avatar_url: avatarMap.get(u.user_id) }));
 
   championPicksByUser = new Map((champRes.data ?? []).map(p => [p.user_id, p]));
   scorerPicksByUser   = new Map((sPickRes.data ?? []).map(p => [p.user_id, p]));
@@ -185,7 +191,7 @@ function renderPodium(totalPot, split) {
         return `
           <div class="podium-card ${place === 1 ? 'first' : ''}" data-user-id="${u.user_id}">
             <div class="podium-place">${place}º</div>
-            <div class="podium-av">${getInitials(u.full_name)}</div>
+            <div class="podium-av">${avatarHtml(u)}</div>
             <div class="podium-name">${escapeHtml(u.full_name)}</div>
             <div class="podium-pts">${u.total_pts} pts · ${u.exact_count} exatos</div>
             <div class="podium-prize">${formatBRL(prizes[idx])}</div>
@@ -230,7 +236,7 @@ function renderRankRow(u, idx) {
       <td class="left"><span class="${posClass}">${pos}</span></td>
       <td class="left">
         <div class="user-cell">
-          <div class="av-mini">${getInitials(u.full_name)}</div>
+          <div class="av-mini">${avatarHtml(u)}</div>
           <div style="min-width:0;">
             <div class="nm">${escapeHtml(u.full_name)}${isMe ? '<span class="me-badge">VOCÊ</span>' : ''}</div>
             <div class="em">${escapeHtml(u.email)}</div>
@@ -316,7 +322,7 @@ function renderDrill(u, payload) {
   return `
     <div class="profile-drill">
       <div class="profile-head">
-        <div class="profile-av">${getInitials(u.full_name)}</div>
+        <div class="profile-av">${avatarHtml(u)}</div>
         <div class="profile-info">
           <h3>${escapeHtml(u.full_name)}</h3>
           <p>${u.total_pts} pts · ${preds.length} palpites · ${u.paid ? 'pagou' : 'pendente'}</p>
@@ -440,6 +446,3 @@ function formatBRL(value) {
   return `R$ ${Number(value).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 }
 
-function getInitials(s) {
-  return (s || '?').trim().split(/\s+/).slice(0, 2).map(p => p[0]?.toUpperCase() || '').join('') || '?';
-}

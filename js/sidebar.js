@@ -2,6 +2,7 @@
 // Uso: renderShell({ active: 'inicio', profile, stats })
 
 import { signOut } from './auth.js';
+import { avatarHtml } from './util.js';
 
 // Agrupamento de navegação por seção
 const NAV_SECTIONS = [
@@ -47,7 +48,7 @@ export async function renderShell({ active, profile, stats, stageLabel }) {
   if (!app) throw new Error('Elemento #app não encontrado.');
 
   const sections = profile?.is_admin ? [...NAV_SECTIONS, ADMIN_SECTION] : NAV_SECTIONS;
-  const initials = getInitials(profile?.full_name || profile?.email || '?');
+  const avatar = avatarHtml(profile);
   const adminClass = profile?.is_admin ? 'admin' : '';
 
   const pct = stats?.pct_played ?? 0;
@@ -97,7 +98,7 @@ export async function renderShell({ active, profile, stats, stageLabel }) {
         </div>
         <div class="topbar-user ${adminClass}" id="topbarUser">
           <span>${escapeHtml(profile?.full_name || 'Usuário')}</span>
-          <div class="av">${initials}</div>
+          <div class="av">${avatar}</div>
         </div>
       </div>
       <div class="body" id="pageBody"></div>
@@ -145,10 +146,6 @@ function renderNavItem(item, activeId) {
       <span class="sb-link-label">${escapeHtml(item.label)}</span>
     </a>
   `;
-}
-
-function getInitials(s) {
-  return s.trim().split(/\s+/).slice(0, 2).map(p => p[0]?.toUpperCase() || '').join('') || '?';
 }
 
 function stageFromProgress(pct) {

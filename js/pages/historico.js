@@ -3,7 +3,7 @@ import { renderShell } from '../sidebar.js';
 import { supabase } from '../supabase.js';
 import {
   flag, escapeHtml, teamPt, formatBrShort, formatTime, stageLabel,
-  attachTeamTooltips, loadRecentMatches,
+  attachTeamTooltips, loadRecentMatches, avatarHtml,
 } from '../util.js';
 
 // ============================================================
@@ -63,7 +63,7 @@ async function loadData() {
   const matchIds = finishedMatches.map(m => m.id);
   const [predsRes, goalsRes] = await Promise.all([
     supabase.from('predictions')
-      .select('*, profiles(full_name, email, paid)')
+      .select('*, profiles(full_name, email, paid, avatar_url)')
       .in('match_id', matchIds),
     supabase.from('player_goals')
       .select('*, players(full_name, team)')
@@ -258,12 +258,11 @@ function renderBetCell(bet) {
   const ptsClass = pts === 5 ? 'exact' : pts > 0 ? 'partial' : 'zero';
   const cellClass = pts === 5 ? 'win-exact' : pts > 0 ? 'win-partial' : '';
   const cls = ['hb-cell', cellClass, isMe ? 'me' : ''].filter(Boolean).join(' ');
-  const initials = getInitials(bet.profiles?.full_name || '?');
   const displayName = isMe ? 'Você' : (bet.profiles?.full_name || '?').split(' ')[0];
 
   return `
     <div class="${cls}">
-      <div class="av-mini">${initials}</div>
+      <div class="av-mini">${avatarHtml(bet.profiles)}</div>
       <div class="nm">${escapeHtml(displayName)}</div>
       <div class="pred-and-pts">
         <span class="pred">${bet.pred_home}-${bet.pred_away}</span>
@@ -289,6 +288,3 @@ function attachEventListeners() {
   });
 }
 
-function getInitials(s) {
-  return (s || '?').trim().split(/\s+/).slice(0, 2).map(p => p[0]?.toUpperCase() || '').join('') || '?';
-}

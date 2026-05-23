@@ -162,6 +162,29 @@ export function roundLabelPt(label) {
   }
 }
 
+// ===== Avatar helper =====
+/**
+ * Retorna HTML pra renderizar dentro de um .av/.av-mini/.podium-av/.profile-av:
+ *   - se profile tem avatar_url: <img>
+ *   - senão: iniciais (texto)
+ */
+export function avatarHtml(profileLike) {
+  const url = profileLike?.avatar_url;
+  if (url) {
+    const name = profileLike?.full_name || profileLike?.email || '';
+    return `<img src="${escapeAttr(url)}" alt="${escapeAttr(name)}">`;
+  }
+  return getInitials(profileLike?.full_name || profileLike?.email || '?');
+}
+
+export function getInitials(s) {
+  return (s || '?').trim().split(/\s+/).slice(0, 2).map(p => p[0]?.toUpperCase() || '').join('') || '?';
+}
+
+function escapeAttr(s) {
+  return String(s ?? '').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
 // ===== Escape HTML =====
 export function escapeHtml(s) {
   return String(s ?? '').replace(/[&<>"']/g, c => ({
