@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login · Bolão Copa 2026</title>
+  <meta name="description" content="Entre no Bolão Copa 2026.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="css/app.css" rel="stylesheet">
+</head>
+<body>
+
+<main class="login-page">
+  <form id="loginForm" class="login-card" autocomplete="on">
+    <div class="login-brand">
+      <div class="login-brand-logo">⚽</div>
+      <h1>Bolão Copa <span style="color:var(--green)">2026</span></h1>
+      <p>FIFA World Cup · Pool Privado</p>
+    </div>
+
+    <div class="login-field">
+      <label for="email">Email</label>
+      <input id="email" name="email" type="email" required autocomplete="email" autofocus>
+    </div>
+
+    <div class="login-field">
+      <label for="password">Senha</label>
+      <input id="password" name="password" type="password" required autocomplete="current-password" minlength="6">
+    </div>
+
+    <div id="errorBox" class="login-error" hidden></div>
+
+    <button type="submit" id="submitBtn" class="btn btn-green">Entrar</button>
+
+    <div class="login-foot">
+      Sem conta? Peça um convite ao administrador.
+    </div>
+  </form>
+</main>
+
+<script type="module" src="js/pages/login.js"></script>
+</body>
+</html>
