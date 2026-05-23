@@ -60,6 +60,7 @@ export async function signOut() {
 
 /**
  * Route guard: redireciona pra login se não autenticado.
+ * Auto-cria profile no primeiro login (com defaults seguros).
  * Use no início de cada página protegida.
  *
  * Opções:
@@ -71,19 +72,44 @@ export async function requireAuth(options = {}) {
     window.location.replace('login.html');
     return null;
   }
-  const profile = await getProfile();
+  let profile = await getProfile();
   if (!profile) {
-    // Usuário autenticado mas sem profile (estado inválido). Loga e força login.
-    console.error('Usuário autenticado mas sem profile. Verifique tabela profiles.');
-    await supabase.auth.signOut();
-    window.location.replace('login.html?error=profile');
-    return null;
+    // Primeiro login — auto-criar profile com defaults seguros.
+    profile = await createMyProfile(session.user);
+    if (!profile) {
+      console.error('Falha ao criar profile auto.');
+      await supabase.auth.signOut();
+      window.location.replace('login.html?error=profile');
+      return null;
+    }
   }
   if (options.adminOnly && !profile.is_admin) {
     window.location.replace('inicio.html');
     return null;
   }
   return { session, profile };
+}
+
+async function createMyProfile(user) {
+  const name = user.user_metadata?.full_name
+            || user.user_metadata?.name
+            || user.email.split('@')[0];
+  const { data, error } = await supabase
+    .from('profiles')
+    .insert({
+      id: user.id,
+      full_name: name,
+      email: user.email,
+      is_admin: false,
+      paid: false,
+    })
+    .select()
+    .single();
+  if (error) {
+    console.error('createMyProfile:', error);
+    return null;
+  }
+  return data;
 }
 
 /**

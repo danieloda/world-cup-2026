@@ -819,6 +819,260 @@ img { max-width: 100%; height: auto; }
 .cs-deadline strong { color: var(--gold); font-weight: 800; }
 .cs-deadline.locked strong { color: var(--red); }
 
+/* ===== Admin tabs ===== */
+.admin-tabs {
+  display: inline-flex; gap: 4px;
+  background: #0a0a0a;
+  border-radius: 500px;
+  padding: 4px;
+  margin-bottom: 24px;
+  border: 1px solid var(--line);
+}
+.admin-tab {
+  padding: 8px 16px;
+  border-radius: 500px;
+  font-size: 12px; font-weight: 700;
+  color: var(--text-dim);
+  display: inline-flex; gap: 6px; align-items: center;
+  border: none; background: none;
+  cursor: pointer;
+  font-family: var(--font);
+}
+.admin-tab .ct {
+  font-size: 10px;
+  padding: 1px 6px;
+  background: rgba(255, 255, 255, .08);
+  border-radius: 500px;
+  color: var(--text-mute);
+}
+.admin-tab.active { background: var(--green); color: #000; }
+.admin-tab.active .ct { background: rgba(0, 0, 0, .2); color: #000; }
+
+/* ===== Admin tables ===== */
+.admin-table {
+  width: 100%;
+  background: var(--card);
+  border-radius: 10px;
+  overflow: hidden;
+  border-collapse: collapse;
+}
+.admin-table thead th {
+  background: rgba(0, 0, 0, .2);
+  font-size: 10px; letter-spacing: .15em;
+  text-transform: uppercase; color: var(--text-mute);
+  font-weight: 700;
+  padding: 12px 14px;
+  text-align: left;
+}
+.admin-table tbody td {
+  padding: 12px 14px;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+  vertical-align: middle;
+}
+.admin-table tbody tr:hover { background: rgba(255, 255, 255, .03); }
+.admin-table .em-cell {
+  font-family: ui-monospace, monospace;
+  color: var(--text-dim);
+  font-size: 12px;
+}
+.admin-action {
+  font-size: 12px; font-weight: 600;
+  color: var(--text-dim);
+  margin-right: 10px;
+  cursor: pointer;
+  background: none; border: none;
+  font-family: var(--font);
+  padding: 0;
+}
+.admin-action:hover { color: var(--text); }
+.admin-action.danger:hover { color: var(--red); }
+.admin-action.green:hover { color: var(--green); }
+.admin-action.green-active { color: var(--green); font-weight: 800; }
+
+/* ===== Result entry rows ===== */
+.result-row {
+  background: var(--card);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  padding: 12px 16px;
+}
+.result-row.done { border-left: 3px solid var(--green); }
+.result-row-top {
+  display: grid;
+  grid-template-columns: 80px 1fr 140px 1fr 120px;
+  gap: 14px;
+  align-items: center;
+}
+.result-row .when {
+  font-size: 11px;
+  color: var(--text-mute);
+  font-weight: 600;
+}
+.result-row .when strong {
+  display: block; color: var(--text); font-size: 14px;
+}
+.result-row .team-disp {
+  display: flex; align-items: center; gap: 8px;
+  font-weight: 600; font-size: 14px;
+}
+.result-row .team-disp.right { justify-content: flex-end; }
+
+/* ===== Scorer section inside result-row ===== */
+.scorers {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.scorers-head {
+  display: flex; align-items: center; gap: 12px;
+  font-size: 11px; letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text-mute); font-weight: 700;
+  margin-bottom: 10px;
+}
+.scorers-head .count {
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0;
+  color: var(--text);
+  text-transform: none;
+}
+.scorers-head .count.ok { color: var(--green); }
+.scorers-head .count.warn { color: var(--red); }
+.scorer-list {
+  display: flex; flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+.scorer-row {
+  display: grid;
+  grid-template-columns: 24px 1fr auto 32px;
+  gap: 10px; align-items: center;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, .03);
+  border-radius: 6px;
+  font-size: 13px;
+}
+.scorer-row .flag { font-size: 16px; }
+.scorer-row .name { font-weight: 600; }
+.scorer-row .name small { color: var(--text-mute); font-weight: 500; }
+.scorer-row .qty {
+  font-family: ui-monospace, monospace;
+  font-weight: 800;
+  font-size: 13px;
+  color: var(--gold);
+}
+.scorer-row .remove {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: rgba(255, 255, 255, .05);
+  color: var(--text-dim);
+  font-size: 16px; font-weight: 700;
+  border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font);
+  transition: background .12s, color .12s;
+}
+.scorer-row .remove:hover { background: var(--red); color: #fff; }
+
+.scorer-add {
+  display: grid;
+  grid-template-columns: 1fr 80px 100px;
+  gap: 8px; align-items: center;
+  padding: 6px 0;
+}
+.scorer-add select {
+  width: 100%;
+  padding: 8px 12px;
+  background: #0a0a0a;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--text);
+  font-family: var(--font);
+}
+.scorer-add input {
+  width: 100%;
+  padding: 8px 12px;
+  background: #0a0a0a;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--text);
+  font-family: var(--font);
+}
+.scorer-add select:focus,
+.scorer-add input:focus { outline: 2px solid var(--green); outline-offset: -1px; }
+.scorer-add .btn-sm {
+  padding: 8px 12px;
+  font-size: 12px;
+}
+
+/* ===== Pen winner toggle (for KO) ===== */
+.pen-toggle {
+  display: flex; gap: 4px;
+  background: var(--bg-main);
+  border-radius: 500px;
+  padding: 3px;
+  border: 1px solid var(--line);
+  margin-top: 6px;
+}
+.pen-toggle button {
+  padding: 4px 10px;
+  border-radius: 500px;
+  font-size: 10px; font-weight: 700;
+  color: var(--text-dim);
+  letter-spacing: .05em;
+  background: none; border: none;
+  cursor: pointer;
+  font-family: var(--font);
+}
+.pen-toggle button.active { background: var(--gold); color: #000; }
+
+/* ===== Setting form ===== */
+.setting-form {
+  background: var(--card);
+  border-radius: 10px;
+  padding: 24px;
+  max-width: 640px;
+}
+.setting-form .field { margin-bottom: 16px; }
+.setting-form label {
+  display: block;
+  font-size: 12px; font-weight: 700;
+  color: var(--text);
+  margin-bottom: 6px;
+  letter-spacing: .02em;
+}
+.setting-form label small {
+  display: block;
+  color: var(--text-mute);
+  font-weight: 500;
+  font-size: 11px;
+  margin-top: 2px;
+  letter-spacing: 0;
+}
+.setting-form input[type="text"],
+.setting-form input[type="number"],
+.setting-form input[type="datetime-local"] {
+  width: 100%;
+  padding: 11px 14px;
+  background: #0a0a0a;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  font-size: 14px;
+  color: var(--text);
+  font-family: var(--font);
+}
+.setting-form input:focus { outline: 2px solid var(--green); outline-offset: -1px; }
+.setting-form .triple {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+}
+
 /* ===== Today's matches grid ===== */
 .today-grid {
   display: grid;
