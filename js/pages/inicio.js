@@ -1,26 +1,12 @@
 import { requireAuth } from '../auth.js';
 import { renderShell } from '../sidebar.js';
 import { supabase } from '../supabase.js';
+import {
+  flag, escapeHtml, greeting, firstName, daysToKickoffLabel,
+  formatBrDate, formatTime, formatRelative, shortGround, stageLabel, isLive,
+} from '../util.js';
 
-// ============================================================
-// Constantes
-// ============================================================
-const FLAGS = {
-  Algeria: '🇩🇿', Argentina: '🇦🇷', Australia: '🇦🇺', Austria: '🇦🇹',
-  Belgium: '🇧🇪', 'Bosnia & Herzegovina': '🇧🇦', Brazil: '🇧🇷', Canada: '🇨🇦',
-  'Cape Verde': '🇨🇻', Colombia: '🇨🇴', Croatia: '🇭🇷', 'Curaçao': '🇨🇼',
-  'Czech Republic': '🇨🇿', 'DR Congo': '🇨🇩', Ecuador: '🇪🇨', Egypt: '🇪🇬',
-  England: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', France: '🇫🇷', Germany: '🇩🇪', Ghana: '🇬🇭',
-  Haiti: '🇭🇹', Iran: '🇮🇷', Iraq: '🇮🇶', 'Ivory Coast': '🇨🇮',
-  Japan: '🇯🇵', Jordan: '🇯🇴', Mexico: '🇲🇽', Morocco: '🇲🇦',
-  Netherlands: '🇳🇱', 'New Zealand': '🇳🇿', Norway: '🇳🇴', Panama: '🇵🇦',
-  Paraguay: '🇵🇾', Portugal: '🇵🇹', Qatar: '🇶🇦', 'Saudi Arabia': '🇸🇦',
-  Scotland: '🏴󠁧󠁢󠁳󠁣󠁴󠁿', Senegal: '🇸🇳', 'South Africa': '🇿🇦', 'South Korea': '🇰🇷',
-  Spain: '🇪🇸', Sweden: '🇸🇪', Switzerland: '🇨🇭', Tunisia: '🇹🇳',
-  Turkey: '🇹🇷', Uruguay: '🇺🇾', USA: '🇺🇸', Uzbekistan: '🇺🇿',
-};
-
-// Estado da página (preenchido dentro do main)
+// Estado da página
 let profile, stats, todayMatches, upcomingMatches, myStanding;
 
 // ============================================================
@@ -46,58 +32,6 @@ async function matchesUpcoming(limit) {
     .eq('finished', false)
     .order('match_date')
     .limit(limit);
-}
-
-// ============================================================
-// Formatters
-// ============================================================
-function greeting() {
-  const h = new Date().getHours();
-  if (h < 6)  return 'Boa madrugada';
-  if (h < 12) return 'Bom dia';
-  if (h < 18) return 'Boa tarde';
-  return 'Boa noite';
-}
-function firstName(s) { return (s || 'amigo').trim().split(/\s+/)[0]; }
-function daysToKickoffLabel() {
-  const kickoff = new Date('2026-06-11T13:00:00-06:00');
-  const days = Math.ceil((kickoff - new Date()) / 86400000);
-  if (days <= 0) return 'Copa do Mundo 2026';
-  return `Faltam ${days} dias`;
-}
-function formatBrDate(d) {
-  const dias = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
-  const meses = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
-  return `${dias[d.getDay()]} · ${d.getDate()}/${meses[d.getMonth()]}`;
-}
-function formatTime(iso) {
-  const d = new Date(iso);
-  return d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-}
-function formatRelative(iso) {
-  const diff = new Date(iso) - new Date();
-  const days = Math.floor(diff / 86400000);
-  const hours = Math.floor(diff / 3600000);
-  if (days >= 1) return `Em ${days} dia${days > 1 ? 's' : ''}`;
-  if (hours >= 1) return `Em ${hours}h`;
-  return 'Em breve';
-}
-function shortGround(g) {
-  if (!g) return '';
-  return g.split(' (')[0];
-}
-function stageLabel(s) {
-  return { group: 'Grupos', r32: '32-avos', r16: 'Oitavas', qf: 'Quartas', sf: 'Semis', third: '3º Lugar', final: 'Final' }[s] || s;
-}
-function isLive(m) {
-  if (m.finished) return false;
-  const start = new Date(m.match_date);
-  const now = new Date();
-  return now >= start && now < new Date(start.getTime() + 2.5 * 3600000);
-}
-function flag(team) { return FLAGS[team] || '🏳️'; }
-function escapeHtml(s) {
-  return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
 // ============================================================
@@ -179,7 +113,7 @@ function renderTodayCard(m) {
   return `
     <div class="today-card">
       <div class="today-card-head">
-        <span class="today-card-time">${escapeHtml(shortGround(m.ground) || '')} ${m.group_name ? `· Grupo ${m.group_name}` : ''}</span>
+        <span class="today-card-time">${escapeHtml(shortGround(m.ground))} ${m.group_name ? `· Grupo ${m.group_name}` : ''}</span>
         ${status}
       </div>
       <div class="today-teams">
@@ -278,11 +212,6 @@ try {
     matchesUpcoming(5),
     supabase.from('v_leaderboard').select('*').eq('user_id', profile.id).maybeSingle(),
   ]);
-
-  if (statsRes.error)      console.error('[stats]', statsRes.error);
-  if (todayRes.error)      console.error('[today]', todayRes.error);
-  if (upcomingRes.error)   console.error('[upcoming]', upcomingRes.error);
-  if (myStandingRes.error) console.error('[standing]', myStandingRes.error);
 
   stats = statsRes.data ?? { finished_matches: 0, total_matches: 104, pct_played: 0, paid_users: 0, total_pot: 0 };
   todayMatches = todayRes.data ?? [];

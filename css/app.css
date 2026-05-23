@@ -347,6 +347,94 @@ img { max-width: 100%; height: auto; }
 .pill.done::before { background: var(--gold); }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
 
+/* ===== Filter chips ===== */
+.chips {
+  display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;
+}
+.chip {
+  padding: 8px 14px;
+  border-radius: 500px;
+  background: var(--card);
+  font-size: 12px; font-weight: 700;
+  color: var(--text-dim);
+  display: inline-flex; align-items: center; gap: 6px;
+  border: none; cursor: pointer;
+  font-family: var(--font);
+  transition: background .12s, color .12s;
+}
+.chip:hover { background: var(--card-hover); color: var(--text); }
+.chip.active { background: var(--text); color: #000; }
+.chip .ct {
+  font-size: 10px;
+  background: rgba(0, 0, 0, .2);
+  padding: 1px 6px;
+  border-radius: 500px;
+  font-variant-numeric: tabular-nums;
+}
+.chip.active .ct { background: rgba(0, 0, 0, .15); color: #000; }
+.chip.complete .ct { background: var(--green-dim); color: var(--green); }
+.chip.active.complete .ct { background: var(--green); color: #000; }
+
+/* ===== Save toast (fixed bottom-right) ===== */
+.save-toast {
+  position: fixed;
+  bottom: 24px; right: 24px;
+  background: var(--card-elev);
+  color: var(--text);
+  padding: 10px 18px;
+  border-radius: 500px;
+  font-size: 13px; font-weight: 600;
+  z-index: 200;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .5);
+  opacity: 0; transform: translateY(20px);
+  pointer-events: none;
+  transition: opacity .25s, transform .25s;
+}
+.save-toast.show { opacity: 1; transform: none; }
+.save-toast.success { background: var(--green); color: #000; }
+.save-toast.error { background: var(--red); color: #fff; }
+.save-toast.info { background: var(--card-elev); color: var(--text); }
+
+/* ===== Match row · saved indicator ===== */
+.match.saved {
+  animation: savedFlash 1.2s ease-out;
+}
+@keyframes savedFlash {
+  0%   { box-shadow: 0 0 0 2px var(--green); background: var(--green-dim); }
+  100% { box-shadow: 0 0 0 0 transparent; background: var(--card); }
+}
+.match.saving .score-input { border-color: var(--gold); }
+.match.error  .score-input { border-color: var(--red); }
+
+/* ===== Date section header ===== */
+.date-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin: 28px 0 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+.date-head h4 {
+  font-size: 18px; font-weight: 800; letter-spacing: -.01em;
+}
+.date-head .sub {
+  font-size: 11px; color: var(--text-mute);
+  letter-spacing: .12em; text-transform: uppercase; font-weight: 700;
+}
+
+/* ===== Inline progress (KPI variant) ===== */
+.progress-bar-inline {
+  height: 6px;
+  background: rgba(255, 255, 255, .08);
+  border-radius: 3px; overflow: hidden;
+  margin-top: 10px;
+}
+.progress-bar-inline > span {
+  display: block; height: 100%;
+  background: var(--green);
+  border-radius: 3px;
+  transition: width .4s ease;
+}
+
 /* ===== Empty state ===== */
 .empty {
   background: var(--card);
