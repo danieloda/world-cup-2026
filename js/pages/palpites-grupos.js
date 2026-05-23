@@ -2,8 +2,9 @@ import { requireAuth } from '../auth.js';
 import { renderShell } from '../sidebar.js';
 import { supabase } from '../supabase.js';
 import {
-  flag, escapeHtml, formatBrDate, formatTime, shortGround,
-  isLocked, isLive, showToast,
+  flag, escapeHtml, formatBrDate, formatTime,
+  isLocked, isLive, showToast, attachTeamTooltips, loadRecentMatches,
+  teamPt, groundShort,
 } from '../util.js';
 
 // ============================================================
@@ -26,10 +27,13 @@ try {
 
   await loadData();
 
+  const recentByTeam = await loadRecentMatches();
+
   const pageBody = await renderShell({ active: 'palpites-g', profile, stats });
   pageBody.innerHTML = renderPage();
   pageBody.classList.add('fade-up');
   attachEventListeners();
+  attachTeamTooltips(recentByTeam);
 } catch (err) {
   console.error('[palpites-grupos] FATAL:', err);
   document.body.innerHTML = `
@@ -193,10 +197,11 @@ function renderMatchRow(m) {
     <div class="match ${locked ? 'locked' : ''}" data-match-id="${m.id}">
       <div class="match-when">
         <strong>${formatTime(m.match_date)}</strong>
-        ${escapeHtml(shortGround(m.ground))}
+        ${escapeHtml(groundShort(m.ground))}
       </div>
       <div class="team home">
-        <span class="flag">${flag(m.team_home)}</span> ${escapeHtml(m.team_home)}
+        <span class="flag">${flag(m.team_home)}</span>
+        <span class="team-name" data-team="${escapeHtml(m.team_home)}">${escapeHtml(teamPt(m.team_home))}</span>
       </div>
       <div class="score-cell">
         <input class="score-input" type="number" min="0" max="20" inputmode="numeric"
@@ -208,7 +213,8 @@ function renderMatchRow(m) {
                value="${awayVal}" ${locked ? 'disabled' : ''}>
       </div>
       <div class="team right away">
-        ${escapeHtml(m.team_away)} <span class="flag">${flag(m.team_away)}</span>
+        <span class="team-name" data-team="${escapeHtml(m.team_away)}">${escapeHtml(teamPt(m.team_away))}</span>
+        <span class="flag">${flag(m.team_away)}</span>
       </div>
       <div class="match-tail">
         ${status}
@@ -326,7 +332,7 @@ async function doSave(matchId) {
 function getTeamLabel(matchId) {
   const m = matches.find(mm => mm.id === matchId);
   if (!m) return '';
-  return `${m.team_home} × ${m.team_away}`;
+  return `${teamPt(m.team_home)} × ${teamPt(m.team_away)}`;
 }
 
 function rerenderChipsAndList() {

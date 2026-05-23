@@ -375,6 +375,136 @@ img { max-width: 100%; height: auto; }
 .chip.complete .ct { background: var(--green-dim); color: var(--green); }
 .chip.active.complete .ct { background: var(--green); color: #000; }
 
+/* ===== Team tooltip (hover popover) ===== */
+.team-name {
+  cursor: help;
+  border-bottom: 1px dashed rgba(255, 255, 255, .25);
+  transition: color .12s, border-color .12s;
+}
+.team-name:hover {
+  color: var(--green);
+  border-bottom-color: var(--green);
+}
+.team-tooltip {
+  position: fixed;
+  z-index: 300;
+  background: #1f1f1f;
+  border-radius: 10px;
+  padding: 16px 18px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, .6), 0 0 0 1px var(--line);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .15s ease, transform .15s ease;
+  transform: translateY(4px);
+  min-width: 280px;
+  max-width: 360px;
+  font-family: var(--font);
+}
+.team-tooltip.show {
+  opacity: 1;
+  transform: none;
+}
+.tt-head {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+}
+.tt-head .flag {
+  width: 36px; height: 26px;
+  font-size: 22px;
+  border-radius: 3px;
+  display: flex; align-items: center; justify-content: center;
+}
+.tt-head .info { flex: 1; }
+.tt-head .nm {
+  font-size: 16px; font-weight: 800;
+  letter-spacing: -.01em;
+  line-height: 1.1;
+}
+.tt-head .sub {
+  font-size: 11px; color: var(--text-dim);
+  letter-spacing: .05em;
+  margin-top: 2px;
+}
+.tt-match {
+  display: grid;
+  grid-template-columns: 56px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 8px 0;
+  font-size: 12px;
+}
+.tt-match + .tt-match { border-top: 1px solid var(--line); }
+.tt-match .when {
+  font-size: 10px;
+  color: var(--text-mute);
+  font-weight: 700;
+  letter-spacing: .05em;
+  line-height: 1.3;
+}
+.tt-match .when strong {
+  display: block;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 800;
+}
+.tt-match .opp {
+  font-weight: 600;
+  display: flex; align-items: center; gap: 6px;
+}
+.tt-match .opp .flag { font-size: 14px; }
+.tt-match .opp .pred {
+  display: block;
+  font-size: 10px;
+  color: var(--text-mute);
+  letter-spacing: .05em;
+  font-weight: 600;
+  margin-top: 2px;
+}
+.tt-match .opp .pred b { color: var(--gold); font-weight: 800; }
+.tt-match .opp .pred.empty b { color: var(--text-mute); font-style: italic; }
+.tt-match .res {
+  font-family: ui-monospace, monospace;
+  font-weight: 800;
+  font-size: 14px;
+  text-align: right;
+  color: var(--text);
+}
+.tt-match .res.finished { color: var(--text); }
+.tt-match .res.live { color: var(--red); }
+.tt-match .res.pending { color: var(--text-mute); font-size: 10px; font-weight: 600; }
+.tt-result {
+  display: inline-block;
+  width: 18px; height: 18px;
+  margin-top: 4px;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 900;
+  text-align: center;
+  line-height: 18px;
+  color: #000;
+  background: var(--text-mute);
+}
+.tt-result.win  { background: var(--green); color: #000; }
+.tt-result.draw { background: var(--gold);  color: #000; }
+.tt-result.loss { background: var(--red);   color: #fff; }
+
+/* HOME/AWAY badge no tooltip de histórico */
+.tt-venue {
+  display: inline-flex;
+  align-items: center; justify-content: center;
+  width: 44px; height: 20px;
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .1em;
+  margin-right: 2px;
+  flex-shrink: 0;
+}
+.tt-venue.home { background: var(--green-dim); color: var(--green); }
+.tt-venue.away { background: rgba(255, 255, 255, .08); color: var(--text-dim); }
+
 /* ===== Save toast (fixed bottom-right) ===== */
 .save-toast {
   position: fixed;

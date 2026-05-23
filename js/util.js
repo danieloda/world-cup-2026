@@ -1,7 +1,9 @@
 // Utilitários compartilhados entre páginas.
 
-// ===== Bandeiras (emoji por enquanto) =====
+// ===== Bandeiras (emoji) =====
+// Inclui as 48 seleções da Copa + adversários dos amistosos/eliminatórias em recent.json
 export const FLAGS = {
+  // Copa 2026
   Algeria: '🇩🇿', Argentina: '🇦🇷', Australia: '🇦🇺', Austria: '🇦🇹',
   Belgium: '🇧🇪', 'Bosnia & Herzegovina': '🇧🇦', Brazil: '🇧🇷', Canada: '🇨🇦',
   'Cape Verde': '🇨🇻', Colombia: '🇨🇴', Croatia: '🇭🇷', 'Curaçao': '🇨🇼',
@@ -14,8 +16,151 @@ export const FLAGS = {
   Scotland: '🏴󠁧󠁢󠁳󠁣󠁴󠁿', Senegal: '🇸🇳', 'South Africa': '🇿🇦', 'South Korea': '🇰🇷',
   Spain: '🇪🇸', Sweden: '🇸🇪', Switzerland: '🇨🇭', Tunisia: '🇹🇳',
   Turkey: '🇹🇷', Uruguay: '🇺🇾', USA: '🇺🇸', Uzbekistan: '🇺🇿',
+  // Outros adversários (amistosos / eliminatórias / Copa África)
+  Albania: '🇦🇱', Angola: '🇦🇴', Armenia: '🇦🇲', Azerbaijan: '🇦🇿',
+  Bahrain: '🇧🇭', Belarus: '🇧🇾', Bermuda: '🇧🇲', Bolivia: '🇧🇴',
+  Botswana: '🇧🇼', Bulgaria: '🇧🇬', 'Burkina Faso': '🇧🇫',
+  Cameroon: '🇨🇲', Chile: '🇨🇱', China: '🇨🇳', Comoros: '🇰🇲',
+  'Costa Rica': '🇨🇷', Cyprus: '🇨🇾', Denmark: '🇩🇰',
+  'El Salvador': '🇸🇻', 'Equatorial Guinea': '🇬🇶', Estonia: '🇪🇪',
+  Eswatini: '🇸🇿', 'Faroe Islands': '🇫🇴', Finland: '🇫🇮',
+  Gabon: '🇬🇦', Gambia: '🇬🇲', Georgia: '🇬🇪', Gibraltar: '🇬🇮',
+  Greece: '🇬🇷', Guatemala: '🇬🇹', Honduras: '🇭🇳', Hungary: '🇭🇺',
+  Iceland: '🇮🇸', Ireland: '🇮🇪', Italy: '🇮🇹', Jamaica: '🇯🇲',
+  Kazakhstan: '🇰🇿', Kosovo: '🇽🇰', Latvia: '🇱🇻', Liechtenstein: '🇱🇮',
+  Lithuania: '🇱🇹', Luxembourg: '🇱🇺', Mali: '🇲🇱', Malta: '🇲🇹',
+  Mauritania: '🇲🇷', Montenegro: '🇲🇪', Nicaragua: '🇳🇮', Nigeria: '🇳🇬',
+  'Northern Ireland': '🏴󠁧󠁢󠁮󠁩󠁲󠁿', Palestine: '🇵🇸', Peru: '🇵🇪', Poland: '🇵🇱',
+  'Puerto Rico': '🇵🇷', Romania: '🇷🇴', 'San Marino': '🇸🇲',
+  Serbia: '🇷🇸', Slovakia: '🇸🇰', Slovenia: '🇸🇮', Sudan: '🇸🇩',
+  Syria: '🇸🇾', Tanzania: '🇹🇿', 'Trinidad & Tobago': '🇹🇹',
+  Ukraine: '🇺🇦', 'United Arab Emirates': '🇦🇪', Venezuela: '🇻🇪',
+  Wales: '🏴󠁧󠁢󠁷󠁬󠁳󠁿', Zambia: '🇿🇲', Zimbabwe: '🇿🇼',
+  // Alias para nomes alternativos
+  'United States': '🇺🇸',
 };
-export function flag(team) { return FLAGS[team] || '🏳️'; }
+export function flag(team) { return FLAGS[decodeHtmlEntities(team)] || '🏳️'; }
+
+/**
+ * Decodifica entities HTML básicas — recent.json tem strings como "Bosnia &amp; Herzegovina".
+ */
+export function decodeHtmlEntities(s) {
+  if (!s) return s;
+  return String(s)
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
+}
+
+// ============================================================
+// Traduções PT-BR (display apenas — chaves originais no DB)
+// ============================================================
+
+// ===== Nomes de seleções =====
+const TEAM_PT = {
+  // Copa 2026
+  Algeria: 'Argélia', Argentina: 'Argentina', Australia: 'Austrália', Austria: 'Áustria',
+  Belgium: 'Bélgica', 'Bosnia & Herzegovina': 'Bósnia e Herzegovina', Brazil: 'Brasil', Canada: 'Canadá',
+  'Cape Verde': 'Cabo Verde', Colombia: 'Colômbia', Croatia: 'Croácia', 'Curaçao': 'Curaçao',
+  'Czech Republic': 'Tchéquia', 'DR Congo': 'RD Congo', Ecuador: 'Equador', Egypt: 'Egito',
+  England: 'Inglaterra', France: 'França', Germany: 'Alemanha', Ghana: 'Gana',
+  Haiti: 'Haiti', Iran: 'Irã', Iraq: 'Iraque', 'Ivory Coast': 'Costa do Marfim',
+  Japan: 'Japão', Jordan: 'Jordânia', Mexico: 'México', Morocco: 'Marrocos',
+  Netherlands: 'Países Baixos', 'New Zealand': 'Nova Zelândia', Norway: 'Noruega', Panama: 'Panamá',
+  Paraguay: 'Paraguai', Portugal: 'Portugal', Qatar: 'Catar', 'Saudi Arabia': 'Arábia Saudita',
+  Scotland: 'Escócia', Senegal: 'Senegal', 'South Africa': 'África do Sul', 'South Korea': 'Coreia do Sul',
+  Spain: 'Espanha', Sweden: 'Suécia', Switzerland: 'Suíça', Tunisia: 'Tunísia',
+  Turkey: 'Turquia', Uruguay: 'Uruguai', USA: 'Estados Unidos', 'United States': 'Estados Unidos',
+  Uzbekistan: 'Uzbequistão',
+  // Adversários em amistosos / eliminatórias
+  Albania: 'Albânia', Angola: 'Angola', Armenia: 'Armênia', Azerbaijan: 'Azerbaijão',
+  Bahrain: 'Bahrein', Belarus: 'Belarus', Bermuda: 'Bermudas', Bolivia: 'Bolívia',
+  Botswana: 'Botsuana', Bulgaria: 'Bulgária', 'Burkina Faso': 'Burkina Faso',
+  Cameroon: 'Camarões', Chile: 'Chile', China: 'China', Comoros: 'Comores',
+  'Costa Rica': 'Costa Rica', Cyprus: 'Chipre', Denmark: 'Dinamarca',
+  'El Salvador': 'El Salvador', 'Equatorial Guinea': 'Guiné Equatorial', Estonia: 'Estônia',
+  Eswatini: 'Essuatíni', 'Faroe Islands': 'Ilhas Faroé', Finland: 'Finlândia',
+  Gabon: 'Gabão', Gambia: 'Gâmbia', Georgia: 'Geórgia', Gibraltar: 'Gibraltar',
+  Greece: 'Grécia', Guatemala: 'Guatemala', Honduras: 'Honduras', Hungary: 'Hungria',
+  Iceland: 'Islândia', Ireland: 'Irlanda', Italy: 'Itália', Jamaica: 'Jamaica',
+  Kazakhstan: 'Cazaquistão', Kosovo: 'Kosovo', Latvia: 'Letônia', Liechtenstein: 'Liechtenstein',
+  Lithuania: 'Lituânia', Luxembourg: 'Luxemburgo', Mali: 'Mali', Malta: 'Malta',
+  Mauritania: 'Mauritânia', Montenegro: 'Montenegro', Nicaragua: 'Nicarágua', Nigeria: 'Nigéria',
+  'Northern Ireland': 'Irlanda do Norte', Palestine: 'Palestina', Peru: 'Peru', Poland: 'Polônia',
+  'Puerto Rico': 'Porto Rico', Romania: 'Romênia', 'San Marino': 'San Marino',
+  Serbia: 'Sérvia', Slovakia: 'Eslováquia', Slovenia: 'Eslovênia', Sudan: 'Sudão',
+  Syria: 'Síria', Tanzania: 'Tanzânia', 'Trinidad & Tobago': 'Trinidad e Tobago',
+  Ukraine: 'Ucrânia', 'United Arab Emirates': 'Emirados Árabes Unidos', Venezuela: 'Venezuela',
+  Wales: 'País de Gales', Zambia: 'Zâmbia', Zimbabwe: 'Zimbábue',
+};
+
+/**
+ * Traduz nome do time para PT-BR. Se não encontrar, retorna o original.
+ */
+export function teamPt(name) {
+  if (!name) return name;
+  const decoded = decodeHtmlEntities(name);
+  return TEAM_PT[decoded] || decoded;
+}
+
+// ===== Cidades-sede =====
+const GROUND_PT = {
+  'Atlanta':                           'Atlanta',
+  'Boston (Foxborough)':               'Boston (Foxborough)',
+  'Dallas (Arlington)':                'Dallas (Arlington)',
+  'Guadalajara (Zapopan)':             'Guadalajara (Zapopan)',
+  'Houston':                           'Houston',
+  'Kansas City':                       'Kansas City',
+  'Los Angeles (Inglewood)':           'Los Angeles (Inglewood)',
+  'Mexico City':                       'Cidade do México',
+  'Miami (Miami Gardens)':             'Miami (Miami Gardens)',
+  'Monterrey (Guadalupe)':             'Monterrey (Guadalupe)',
+  'New York/New Jersey (East Rutherford)': 'Nova Iorque/Nova Jersey',
+  'Philadelphia':                      'Filadélfia',
+  'San Francisco Bay Area (Santa Clara)': 'São Francisco (Santa Clara)',
+  'Seattle':                           'Seattle',
+  'Toronto':                           'Toronto',
+  'Vancouver':                         'Vancouver',
+};
+
+export function groundPt(name) {
+  if (!name) return name;
+  return GROUND_PT[name] || name;
+}
+
+// Versão curta (sem parênteses) para espaços apertados
+export function groundShort(name) {
+  const full = groundPt(name);
+  return full.split(' (')[0];
+}
+
+// ===== Fases / round labels =====
+/**
+ * Traduz round_label de inglês para PT-BR.
+ *   Matchday N           → Rodada N
+ *   Round of 32          → 32-avos
+ *   Round of 16          → Oitavas
+ *   Quarter-final        → Quartas
+ *   Semi-final           → Semifinais
+ *   Match for third place→ Disputa do 3º Lugar
+ *   Final                → Final
+ */
+export function roundLabelPt(label) {
+  if (!label) return label;
+  const m = /^Matchday\s+(\d+)$/i.exec(label);
+  if (m) return `Rodada ${m[1]}`;
+  switch (label) {
+    case 'Round of 32':           return '32-avos';
+    case 'Round of 16':           return 'Oitavas';
+    case 'Quarter-final':         return 'Quartas';
+    case 'Semi-final':            return 'Semifinais';
+    case 'Match for third place': return 'Disputa do 3º Lugar';
+    case 'Final':                 return 'Final';
+    default: return label;
+  }
+}
 
 // ===== Escape HTML =====
 export function escapeHtml(s) {
@@ -99,6 +244,201 @@ export function isLive(m) {
  */
 export function isLocked(m) {
   return new Date(m.match_date) <= new Date();
+}
+
+// ============================================================
+// Recent matches loader (últimos jogos reais de cada seleção)
+// ============================================================
+// Carrega assets/data/recent.json e retorna Map<teamName, recentMatches[]>
+// Cada recent match = { date, opponent, home, score, competition }
+// Cacheado em memória para múltiplas chamadas.
+
+let _recentCache = null;
+export async function loadRecentMatches() {
+  if (_recentCache) return _recentCache;
+  try {
+    const res = await fetch('assets/data/recent.json');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const raw = await res.json();
+    const map = new Map();
+    for (const [team, rows] of Object.entries(raw)) {
+      map.set(decodeHtmlEntities(team), rows.map(r => ({
+        date: r[0],
+        opponent: decodeHtmlEntities(r[1]),
+        home: r[2],
+        score: r[3],
+        competition: decodeHtmlEntities(r[4]),
+      })));
+    }
+    _recentCache = map;
+    return map;
+  } catch (err) {
+    console.warn('[loadRecentMatches] failed:', err);
+    return new Map();
+  }
+}
+
+// ============================================================
+// Team Tooltip — hover popover com últimos 5 jogos da seleção
+// ============================================================
+// Uso:
+//   const recentByTeam = await loadRecentMatches();
+//   attachTeamTooltips(recentByTeam);
+//
+// No HTML, envolva o nome do país em:
+//   <span class="team-name" data-team="Brazil">Brazil</span>
+//
+// É seguro chamar múltiplas vezes (limpa handlers antigos).
+
+let tooltipState = null;
+
+export function attachTeamTooltips(recentByTeam) {
+  // Singleton tooltip element
+  let tooltip = document.getElementById('teamTooltip');
+  if (!tooltip) {
+    tooltip = document.createElement('div');
+    tooltip.id = 'teamTooltip';
+    tooltip.className = 'team-tooltip';
+    document.body.appendChild(tooltip);
+  }
+
+  // Remove handlers de invocação anterior
+  if (tooltipState) {
+    document.removeEventListener('mouseover', tooltipState.onMouseOver);
+    document.removeEventListener('mouseout', tooltipState.onMouseOut);
+    window.removeEventListener('scroll', tooltipState.onScroll, true);
+  }
+
+  const onMouseOver = (e) => {
+    const trigger = e.target.closest('.team-name[data-team]');
+    if (!trigger) return;
+    showTooltip(trigger, recentByTeam);
+  };
+  const onMouseOut = (e) => {
+    const trigger = e.target.closest('.team-name[data-team]');
+    if (!trigger) return;
+    if (e.relatedTarget && trigger.contains(e.relatedTarget)) return;
+    hideTooltip();
+  };
+  const onScroll = () => hideTooltip();
+
+  document.addEventListener('mouseover', onMouseOver);
+  document.addEventListener('mouseout', onMouseOut);
+  window.addEventListener('scroll', onScroll, true);
+
+  tooltipState = { onMouseOver, onMouseOut, onScroll };
+}
+
+function showTooltip(trigger, recentByTeam) {
+  const team = trigger.dataset.team;
+  const recent = recentByTeam.get(team);
+  if (!recent || recent.length === 0) {
+    // Time sem histórico carregado — mostra fallback simples
+    const tooltip = document.getElementById('teamTooltip');
+    tooltip.innerHTML = `
+      <div class="tt-head">
+        <span class="flag">${flag(team)}</span>
+        <div class="info">
+          <div class="nm">${escapeHtml(teamPt(team))}</div>
+          <div class="sub">Sem histórico recente disponível</div>
+        </div>
+      </div>
+    `;
+    tooltip.classList.add('show');
+    positionTooltip(trigger, tooltip);
+    return;
+  }
+
+  const tooltip = document.getElementById('teamTooltip');
+  tooltip.innerHTML = renderTooltipContent(team, recent);
+  tooltip.classList.add('show');
+  positionTooltip(trigger, tooltip);
+}
+
+function positionTooltip(trigger, tooltip) {
+  const triggerRect = trigger.getBoundingClientRect();
+  const tooltipRect = tooltip.getBoundingClientRect();
+  const margin = 8;
+
+  let left = triggerRect.left + (triggerRect.width / 2) - (tooltipRect.width / 2);
+  let top  = triggerRect.bottom + margin;
+
+  if (left < margin) left = margin;
+  if (left + tooltipRect.width > window.innerWidth - margin) {
+    left = window.innerWidth - tooltipRect.width - margin;
+  }
+  if (top + tooltipRect.height > window.innerHeight - margin) {
+    top = triggerRect.top - tooltipRect.height - margin;
+  }
+  if (top < margin) top = margin;
+
+  tooltip.style.left = left + 'px';
+  tooltip.style.top  = top  + 'px';
+}
+
+function hideTooltip() {
+  const tooltip = document.getElementById('teamTooltip');
+  if (tooltip) tooltip.classList.remove('show');
+}
+
+function renderTooltipContent(team, recent) {
+  const wins   = recent.filter(r => scoreResult(r.score) === 'W').length;
+  const draws  = recent.filter(r => scoreResult(r.score) === 'D').length;
+  const losses = recent.filter(r => scoreResult(r.score) === 'L').length;
+  return `
+    <div class="tt-head">
+      <span class="flag">${flag(team)}</span>
+      <div class="info">
+        <div class="nm">${escapeHtml(teamPt(team))}</div>
+        <div class="sub">
+          Últimos ${recent.length} jogos ·
+          <span style="color:var(--green)">${wins}V</span>
+          <span style="color:var(--text-dim)">${draws}E</span>
+          <span style="color:var(--red)">${losses}D</span>
+        </div>
+      </div>
+    </div>
+    ${recent.map(renderRecentMatch).join('')}
+  `;
+}
+
+function renderRecentMatch(m) {
+  const result = scoreResult(m.score);
+  const dt = new Date(m.date + 'T12:00:00');
+  const dia = String(dt.getDate()).padStart(2, '0');
+  const mes = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'][dt.getMonth()];
+  const ano = dt.getFullYear() !== new Date().getFullYear() ? `/${String(dt.getFullYear()).slice(2)}` : '';
+  const venueBadge = m.home
+    ? '<span class="tt-venue home">CASA</span>'
+    : '<span class="tt-venue away">FORA</span>';
+  const oppFlag = `<span class="flag">${flag(m.opponent)}</span>`;
+
+  const resultClass = { W: 'win', D: 'draw', L: 'loss' }[result];
+  const resultText  = { W: 'V', D: 'E', L: 'D' }[result];
+
+  return `
+    <div class="tt-match">
+      <div class="when">
+        <strong>${dia}/${mes}${ano}</strong>
+        <span class="tt-result ${resultClass}">${resultText}</span>
+      </div>
+      <div class="opp">
+        <span style="display:inline-flex; align-items:center; gap:6px;">
+          ${venueBadge}${oppFlag} ${escapeHtml(teamPt(m.opponent))}
+        </span>
+        <span class="pred">${escapeHtml(m.competition)}</span>
+      </div>
+      <span class="res finished">${escapeHtml(m.score)}</span>
+    </div>
+  `;
+}
+
+function scoreResult(score) {
+  const [a, b] = String(score).split('-').map(s => parseInt(s, 10));
+  if (isNaN(a) || isNaN(b)) return 'D';
+  if (a > b) return 'W';
+  if (a < b) return 'L';
+  return 'D';
 }
 
 // ===== Toast =====

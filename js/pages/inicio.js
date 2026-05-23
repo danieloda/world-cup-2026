@@ -3,7 +3,8 @@ import { renderShell } from '../sidebar.js';
 import { supabase } from '../supabase.js';
 import {
   flag, escapeHtml, greeting, firstName, daysToKickoffLabel,
-  formatBrDate, formatTime, formatRelative, shortGround, stageLabel, isLive,
+  formatBrDate, formatTime, formatRelative, stageLabel, isLive,
+  teamPt, groundShort,
 } from '../util.js';
 
 // Estado da página
@@ -113,18 +114,18 @@ function renderTodayCard(m) {
   return `
     <div class="today-card">
       <div class="today-card-head">
-        <span class="today-card-time">${escapeHtml(shortGround(m.ground))} ${m.group_name ? `· Grupo ${m.group_name}` : ''}</span>
+        <span class="today-card-time">${escapeHtml(groundShort(m.ground))} ${m.group_name ? `· Grupo ${m.group_name}` : ''}</span>
         ${status}
       </div>
       <div class="today-teams">
         <div class="today-team">
           <div class="flag">${flag(m.team_home)}</div>
-          <div class="nm">${escapeHtml(m.team_home)}</div>
+          <div class="nm">${escapeHtml(teamPt(m.team_home))}</div>
         </div>
         ${score}
         <div class="today-team">
           <div class="flag">${flag(m.team_away)}</div>
-          <div class="nm">${escapeHtml(m.team_away)}</div>
+          <div class="nm">${escapeHtml(teamPt(m.team_away))}</div>
         </div>
       </div>
     </div>
@@ -155,10 +156,10 @@ function renderMatchRow(m) {
     <div class="match">
       <div class="match-when">
         <strong>${formatTime(m.match_date)}</strong>
-        ${escapeHtml(shortGround(m.ground))}
+        ${escapeHtml(groundShort(m.ground))}
       </div>
       <div class="team home">
-        <span class="flag">${flag(m.team_home)}</span> ${escapeHtml(m.team_home)}
+        <span class="flag">${flag(m.team_home)}</span> ${escapeHtml(teamPt(m.team_home))}
       </div>
       <div class="score-cell">
         <span style="color:var(--text-mute); font-size:13px; font-weight:600;">
@@ -166,7 +167,7 @@ function renderMatchRow(m) {
         </span>
       </div>
       <div class="team right away">
-        ${escapeHtml(m.team_away)} <span class="flag">${flag(m.team_away)}</span>
+        ${escapeHtml(teamPt(m.team_away))} <span class="flag">${flag(m.team_away)}</span>
       </div>
       <div class="match-tail">${m.group_name ? 'Grupo ' + m.group_name : stageLabel(m.stage)}</div>
     </div>
