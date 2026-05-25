@@ -1,0 +1,31 @@
+{
+  "name": "bolao-copa-2026",
+  "version": "1.0.0",
+  "description": "World Cup 2026 betting pool",
+  "type": "module",
+  "scripts": {
+    "build:config": "node scripts/build-config.js",
+    "setup": "npm install && npm run build:config",
+    "dev": "npx serve -l 3000",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:all": "npm run test && npm run test:e2e"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.52.0",
+    "@vitest/coverage-v8": "^3.1.0",
+    "dotenv": "^16.6.1",
+    "jsdom": "^26.1.0",
+    "serve": "^14.2.0",
+    "vitest": "^3.1.0"
+  },
+  "keywords": [
+    "world-cup",
+    "betting-pool",
+    "supabase"
+  ],
+  "license": "MIT"
+}

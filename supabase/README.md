@@ -7,9 +7,12 @@ Setup do banco de dados em Supabase para o Bolão Copa 2026.
 ```
 supabase/
 ├── migrations/
-│   ├── 001_schema.sql      — tabelas (profiles, matches, predictions, etc.)
-│   ├── 002_rls.sql         — Row Level Security (quem pode ler/escrever o quê)
-│   └── 003_scoring.sql     — função de pontuação + views de ranking
+│   ├── 001_schema.sql               — tabelas (profiles, matches, predictions, etc.)
+│   ├── 002_rls.sql                  — Row Level Security (quem pode ler/escrever o quê)
+│   ├── 003_scoring.sql              — função de pontuação + views de ranking
+│   ├── 004_profile_self_signup.sql  — permite auto-criação de profile
+│   ├── 005_slot_resolution.sql      — resolve slots do mata-mata
+│   └── 006_avatar.sql               — adiciona coluna avatar_url
 └── seed/
     ├── 01_matches.sql      — 104 jogos da Copa 2026
     ├── 02_players.sql      — ~50 candidatos a artilheiro
@@ -30,9 +33,12 @@ supabase/
 
 Vá em **SQL Editor** (ícone `<>` no menu lateral) e rode os arquivos **nesta ordem**:
 
-1. Copie/cole o conteúdo de `migrations/001_schema.sql` → **Run**
-2. Copie/cole o conteúdo de `migrations/002_rls.sql` → **Run**
-3. Copie/cole o conteúdo de `migrations/003_scoring.sql` → **Run**
+1. `migrations/001_schema.sql` → **Run**
+2. `migrations/002_rls.sql` → **Run**
+3. `migrations/003_scoring.sql` → **Run**
+4. `migrations/004_profile_self_signup.sql` → **Run**
+5. `migrations/005_slot_resolution.sql` → **Run**
+6. `migrations/006_avatar.sql` → **Run**
 
 Cada um deve dar **Success. No rows returned**.
 

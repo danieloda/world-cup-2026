@@ -10,10 +10,10 @@ returns numeric language sql immutable as $$
     when 'group' then 1.0
     when 'r32'   then 1.5
     when 'r16'   then 2.0
-    when 'qf'    then 2.5
-    when 'sf'    then 3.0
+    when 'qf'    then 3.0    -- was 2.5, increased for comeback potential
+    when 'sf'    then 4.0    -- was 3.0, increased for comeback potential
     when 'third' then 2.0
-    when 'final' then 4.0
+    when 'final' then 5.0    -- was 4.0, increased for comeback potential
     else 1.0
   end;
 $$;
@@ -107,7 +107,7 @@ after update on public.matches
 for each row execute function public.on_match_finished();
 
 -- ===== Champion bonus (computed when final ends) =====
--- +30 pts if champion pick matches actual final winner
+-- +50 pts if champion pick matches actual final winner (increased for 48-team format & comeback potential)
 create or replace function public.champion_bonus_for(p_user_id uuid)
 returns int language sql stable as $$
   with final_match as (
@@ -121,10 +121,10 @@ returns int language sql stable as $$
   select case
     when fm.finished = false then 0
     when c.team is null then 0
-    when fm.actual_home > fm.actual_away and c.team = fm.team_home then 30
-    when fm.actual_away > fm.actual_home and c.team = fm.team_away then 30
-    when fm.actual_home = fm.actual_away and fm.pen_winner = 'home' and c.team = fm.team_home then 30
-    when fm.actual_home = fm.actual_away and fm.pen_winner = 'away' and c.team = fm.team_away then 30
+    when fm.actual_home > fm.actual_away and c.team = fm.team_home then 50
+    when fm.actual_away > fm.actual_home and c.team = fm.team_away then 50
+    when fm.actual_home = fm.actual_away and fm.pen_winner = 'home' and c.team = fm.team_home then 50
+    when fm.actual_home = fm.actual_away and fm.pen_winner = 'away' and c.team = fm.team_away then 50
     else 0
   end
   from final_match fm, champion c;

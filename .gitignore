@@ -8,6 +8,11 @@
 # Config do frontend (contém publishable key — gitignored por higiene)
 js/config.js
 
+# Test outputs
+test-results/
+playwright-report/
+coverage/
+
 # Python (scripts/fetch_recent.py)
 __pycache__/
 *.pyc
