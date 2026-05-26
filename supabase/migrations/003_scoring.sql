@@ -108,26 +108,31 @@ for each row execute function public.on_match_finished();
 
 -- ===== Champion bonus (computed when final ends) =====
 -- +50 pts if champion pick matches actual final winner (increased for 48-team format & comeback potential)
+-- IMPORTANT: returns 0 (not NULL) when user has no pick OR final not finished.
+-- The COALESCE wraps the entire query because user without champion_pick → empty c → CROSS JOIN returns 0 rows → NULL.
 create or replace function public.champion_bonus_for(p_user_id uuid)
 returns int language sql stable as $$
-  with final_match as (
-    select team_home, team_away, actual_home, actual_away, pen_winner, finished
-    from public.matches
-    where stage = 'final' limit 1
-  ),
-  champion as (
-    select team from public.champion_picks where user_id = p_user_id
-  )
-  select case
-    when fm.finished = false then 0
-    when c.team is null then 0
-    when fm.actual_home > fm.actual_away and c.team = fm.team_home then 50
-    when fm.actual_away > fm.actual_home and c.team = fm.team_away then 50
-    when fm.actual_home = fm.actual_away and fm.pen_winner = 'home' and c.team = fm.team_home then 50
-    when fm.actual_home = fm.actual_away and fm.pen_winner = 'away' and c.team = fm.team_away then 50
-    else 0
-  end
-  from final_match fm, champion c;
+  select coalesce((
+    with final_match as (
+      select team_home, team_away, actual_home, actual_away, pen_winner, finished
+      from public.matches
+      where stage = 'final' limit 1
+    ),
+    champion as (
+      select team from public.champion_picks where user_id = p_user_id
+    )
+    select case
+      when fm.finished = false then 0
+      when c.team is null then 0
+      when fm.actual_home > fm.actual_away and c.team = fm.team_home then 50
+      when fm.actual_away > fm.actual_home and c.team = fm.team_away then 50
+      when fm.actual_home = fm.actual_away and fm.pen_winner = 'home' and c.team = fm.team_home then 50
+      when fm.actual_home = fm.actual_away and fm.pen_winner = 'away' and c.team = fm.team_away then 50
+      else 0
+    end
+    from final_match fm
+    left join champion c on true
+  ), 0);
 $$;
 
 -- ===== Top scorer bonus (per goal × stage multiplier) =====

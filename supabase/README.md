@@ -7,17 +7,30 @@ Setup do banco de dados em Supabase para o Bolão Copa 2026.
 ```
 supabase/
 ├── migrations/
-│   ├── 001_schema.sql               — tabelas (profiles, matches, predictions, etc.)
-│   ├── 002_rls.sql                  — Row Level Security (quem pode ler/escrever o quê)
-│   ├── 003_scoring.sql              — função de pontuação + views de ranking
-│   ├── 004_profile_self_signup.sql  — permite auto-criação de profile
-│   ├── 005_slot_resolution.sql      — resolve slots do mata-mata
-│   └── 006_avatar.sql               — adiciona coluna avatar_url
+│   ├── 001_schema.sql                       — tabelas (profiles, matches, predictions, etc.)
+│   ├── 002_rls.sql                          — Row Level Security
+│   ├── 003_scoring.sql                      — funções de pontuação + views de ranking
+│   ├── 004_profile_self_signup.sql          — permite auto-criação de profile
+│   ├── 005_slot_resolution.sql              — resolve slots do mata-mata (v2 consolidado)
+│   ├── 006_avatar.sql                       — adiciona coluna avatar_url
+│   ├── 007_alerts.sql                       — alert_log + send_alert + triggers Telegram
+│   ├── 008_admin_reset.sql                  — admin_reset_matches (E2E helper)
+│   ├── 009_admin_reset_picks.sql            — admin_reset_picks (E2E helper)
+│   ├── 010_admin_confirm_test_emails.sql    — confirm test emails (E2E helper)
+│   ├── 011_fix_alert_trigger_order.sql      — historico/no-op (incorporado em 007)
+│   ├── 012_fix_resolve_slots_multipass.sql  — historico/no-op (incorporado em 005)
+│   ├── 013_fix_thirds_uniqueness.sql        — historico/no-op (incorporado em 005)
+│   └── 014_thirds_backtracking.sql          — historico/no-op (incorporado em 005)
 └── seed/
     ├── 01_matches.sql      — 104 jogos da Copa 2026
     ├── 02_players.sql      — ~50 candidatos a artilheiro
-    └── 03_settings.sql     — config inicial (taxa, deadline, prêmios)
+    ├── 03_settings.sql     — config inicial (taxa, deadline, prêmios)
+    └── players_full.sql    — 1380 jogadores completos (todos os 48 times)
 ```
+
+**Ordem de aplicação:** rode em ordem numérica (001 → 014). Migrations 011-014 são
+NO-OPs porque os fixes foram incorporados em 005 (consolidado). Rodá-las é seguro
+(idempotentes) — útil pra preservar histórico de DBs já com elas aplicadas.
 
 ## Passo 1 — Criar projeto Supabase
 
