@@ -79,8 +79,8 @@ function renderPage() {
   const counts = computeCounts();
   return `
     <section class="hero">
-      <div class="hero-kicker">Fase de grupos</div>
-      <h1 class="hero-title">${activeTab === 'palpites' ? 'Seus palpites' : 'Resultados'}</h1>
+      <div class="hero-kicker">Palpitar placares · Fase de grupos</div>
+      <h1 class="hero-title">${activeTab === 'palpites' ? 'Seus palpites' : 'Resultados oficiais'}</h1>
       <div class="hero-meta">
         <b>${matches.length} jogos</b><span class="sep"></span>
         <b>${counts.totalDone}</b> palpitados<span class="sep"></span>
@@ -108,10 +108,13 @@ function renderPage() {
 // ============================================================
 function renderPalpitesTab(counts) {
   return `
-    <div class="note" style="margin-bottom:20px; padding:12px 16px; background:var(--card); border-left:3px solid var(--gold); border-radius:0 6px 6px 0; font-size:12px; color:var(--text-dim);">
-      <strong style="color:var(--gold);">Como funciona:</strong>
-      Cada palpite trava no apito inicial do jogo. Salva sozinho conforme você digita.
-      <strong>Pontuação:</strong> placar exato = 5pts · vencedor+saldo = 3pts · só vencedor = 2pts · gols de um lado = 1pt.
+    <div class="note" style="margin-bottom:20px; padding:12px 16px; background:var(--card); border-left:3px solid var(--green); border-radius:0 6px 6px 0; font-size:12px; color:var(--text-dim);">
+      <strong style="color:var(--green);">Pontuação:</strong>
+      🎯 <strong>5 pts</strong> placar exato ·
+      ⚽ <strong>3 pts</strong> vencedor + saldo de gols ·
+      ✓ <strong>2 pts</strong> só vencedor/empate ·
+      ½ <strong>1 pt</strong> acertou gols de um time.
+      <br><span style="color:var(--text-mute);">Salva automático · Trava no apito</span>
     </div>
 
     ${renderKpisPalpites(counts)}

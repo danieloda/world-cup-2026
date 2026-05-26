@@ -15,6 +15,7 @@ let scorerRanking = [];      // v_scorer_ranking
 let championPicksByUser = new Map();  // user_id -> { team }
 let scorerPicksByUser = new Map();    // user_id -> { player_id, players: {...} }
 let expandedUserId = null;
+let realChampion = null;     // string — campeão real (null se final não terminou)
 const profileCache = new Map();
 
 // ============================================================
@@ -47,7 +48,7 @@ try {
 // Data
 // ============================================================
 async function loadData() {
-  const [statsRes, leaderRes, scorerRes, settingsRes, champRes, sPickRes, profilesRes] = await Promise.all([
+  const [statsRes, leaderRes, scorerRes, settingsRes, champRes, sPickRes, profilesRes, finalRes] = await Promise.all([
     supabase.from('v_pool_stats').select('*').single(),
     supabase.from('v_leaderboard').select('*'),
     supabase.from('v_scorer_ranking').select('*'),
@@ -55,6 +56,7 @@ async function loadData() {
     supabase.from('champion_picks').select('*'),
     supabase.from('top_scorer_picks').select('*, players(full_name, team)'),
     supabase.from('profiles').select('id, avatar_url'),
+    supabase.from('matches').select('team_home, team_away, actual_home, actual_away, pen_winner, finished').eq('stage', 'final').maybeSingle(),
   ]);
 
   if (leaderRes.error) throw leaderRes.error;
@@ -62,6 +64,15 @@ async function loadData() {
   stats = statsRes.data ?? { finished_matches: 0, total_matches: 104, pct_played: 0, paid_users: 0, total_pot: 0 };
   leaderboard = leaderRes.data ?? [];
   scorerRanking = scorerRes.data ?? [];
+
+  // Determina campeão real da Final
+  const fm = finalRes.data;
+  if (fm?.finished) {
+    if (fm.actual_home > fm.actual_away) realChampion = fm.team_home;
+    else if (fm.actual_away > fm.actual_home) realChampion = fm.team_away;
+    else if (fm.pen_winner === 'home') realChampion = fm.team_home;
+    else if (fm.pen_winner === 'away') realChampion = fm.team_away;
+  }
 
   // Merge avatar_url no leaderboard
   const avatarMap = new Map((profilesRes.data ?? []).map(p => [p.id, p.avatar_url]));
@@ -86,12 +97,12 @@ function renderPage() {
 
   return `
     <section class="hero">
-      <div class="hero-kicker">Classificação geral</div>
+      <div class="hero-kicker">Quem está ganhando o bolão</div>
       <h1 class="hero-title">Ranking</h1>
       <div class="hero-meta">
         <b>${leaderboard.length}</b> jogadores<span class="sep"></span>
-        após <b>${stats.finished_matches}</b> jogos<span class="sep"></span>
-        atualizado em tempo real
+        <b>${stats.finished_matches}</b> jogos finalizados<span class="sep"></span>
+        atualiza em tempo real
       </div>
     </section>
 
@@ -101,24 +112,26 @@ function renderPage() {
 
     ${leaderboard.length > 0 ? `
       <div class="section-head"><h3>Tabela completa</h3></div>
-      <table class="rank-table" id="rankTable">
-        <thead>
-          <tr>
-            <th class="left">#</th>
-            <th class="left">Jogador</th>
-            <th>Exatos</th>
-            <th>V+SG</th>
-            <th>V</th>
-            <th>Gols 1L</th>
-            <th>Campeão</th>
-            <th>Artilheiro</th>
-            <th>Pontos</th>
-          </tr>
-        </thead>
-        <tbody id="rankBody">
-          ${leaderboard.map(renderRankRow).join('')}
-        </tbody>
-      </table>
+      <div class="rank-table-wrap">
+        <table class="rank-table" id="rankTable">
+          <thead>
+            <tr>
+              <th class="left col-pos">#</th>
+              <th class="left col-player">Jogador</th>
+              <th class="col-stat">Exatos</th>
+              <th class="col-stat">V+SG</th>
+              <th class="col-stat">V</th>
+              <th class="col-stat">1 Lado</th>
+              <th class="left col-pick">Campeão</th>
+              <th class="left col-pick">Artilheiro</th>
+              <th class="col-pts">Pts</th>
+            </tr>
+          </thead>
+          <tbody id="rankBody">
+            ${leaderboard.map(renderRankRow).join('')}
+          </tbody>
+        </table>
+      </div>
     ` : ''}
 
     <div id="drillDown"></div>
@@ -208,26 +221,45 @@ function renderRankRow(u, idx) {
   const posClass = pos <= 3 ? 'pos pos-top' : 'pos';
   const rowClass = isMe ? 'me-row' : '';
 
-  // Campeão: mostra a escolha + pontos (se houver)
+  // Campeão: mostra a escolha + pontos. Quando a Final terminou e errou, mostra "0" apagado.
   const champPick = championPicksByUser.get(u.user_id);
+  const finalDone = realChampion !== null;
+  let champPtsBadge = '';
+  if (champPick) {
+    if (u.champion_pts > 0) {
+      champPtsBadge = `<span class="pick-pts">+${u.champion_pts}</span>`;
+    } else if (finalDone) {
+      // Final acabou e o palpite errou → mostra 0 apagado
+      champPtsBadge = `<span class="pick-pts zero" title="Não acertou o campeão">0</span>`;
+    }
+  }
   const champCell = champPick
     ? `<div class="pick-cell">
          <span class="flag">${flag(champPick.team)}</span>
          <span class="pick-name">${escapeHtml(teamPt(champPick.team))}</span>
-         ${u.champion_pts > 0 ? `<span class="pick-pts">+${u.champion_pts}</span>` : ''}
+         ${champPtsBadge}
        </div>`
     : '<span style="color:var(--text-mute); font-style:italic;">—</span>';
 
-  // Artilheiro: mesma coisa
+  // Artilheiro: mostra escolha + gols + pontos. Quando torneio acabou e 0 gols, mostra "0" apagado.
   const sPick = scorerPicksByUser.get(u.user_id);
   const scorerStats = scorerRanking.find(s => s.user_id === u.user_id);
   const goals = scorerStats?.goals ?? 0;
+  const tournamentDone = stats?.finished_matches === stats?.total_matches && stats?.total_matches > 0;
+  let scorerPtsBadge = '';
+  if (sPick) {
+    if (u.scorer_pts > 0) {
+      scorerPtsBadge = `<span class="pick-pts">+${u.scorer_pts}</span>`;
+    } else if (tournamentDone) {
+      scorerPtsBadge = `<span class="pick-pts zero" title="Jogador não marcou nenhum gol">0</span>`;
+    }
+  }
   const scorerCell = sPick
     ? `<div class="pick-cell">
          <span class="flag">${flag(sPick.players.team)}</span>
          <span class="pick-name">${escapeHtml(lastName(sPick.players.full_name))}</span>
          ${goals > 0 ? `<span class="pick-pts">${goals}⚽</span>` : ''}
-         ${u.scorer_pts > 0 ? `<span class="pick-pts">+${u.scorer_pts}</span>` : ''}
+         ${scorerPtsBadge}
        </div>`
     : '<span style="color:var(--text-mute); font-style:italic;">—</span>';
 
@@ -239,7 +271,6 @@ function renderRankRow(u, idx) {
           <div class="av-mini">${avatarHtml(u)}</div>
           <div style="min-width:0;">
             <div class="nm">${escapeHtml(u.full_name)}${isMe ? '<span class="me-badge">VOCÊ</span>' : ''}</div>
-            <div class="em">${escapeHtml(u.email)}</div>
           </div>
         </div>
       </td>
@@ -358,15 +389,10 @@ function renderDrill(u, payload) {
       </div>
 
       <div class="profile-section-title">Apostas únicas</div>
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
-        <div class="profile-row" style="grid-template-columns: 1fr auto; cursor: default;">
-          <div class="vs">🏆 Campeão: ${champion ? `<strong>${flag(champion.team)} ${escapeHtml(teamPt(champion.team))}</strong>` : '<em style="color:var(--text-mute);">não escolheu</em>'}</div>
-          <div class="pts-cell ${u.champion_pts > 0 ? 'win' : 'zero'}">${u.champion_pts > 0 ? '+' + u.champion_pts : '—'}</div>
-        </div>
-        <div class="profile-row" style="grid-template-columns: 1fr auto; cursor: default;">
-          <div class="vs">⚽ Artilheiro: ${scorer ? `<strong>${flag(scorer.players.team)} ${escapeHtml(scorer.players.full_name)}</strong>` : '<em style="color:var(--text-mute);">não escolheu</em>'}</div>
-          <div class="pts-cell ${u.scorer_pts > 0 ? 'win' : 'zero'}">${u.scorer_pts > 0 ? '+' + u.scorer_pts : '—'}</div>
-        </div>
+      ${renderChampionResultRow(u, champion)}
+      <div class="profile-row" style="grid-template-columns: 1fr auto; cursor: default; margin-bottom: 12px;">
+        <div class="vs">⚽ Artilheiro: ${scorer ? `<strong>${flag(scorer.players.team)} ${escapeHtml(scorer.players.full_name)}</strong>` : '<em style="color:var(--text-mute);">não escolheu</em>'}</div>
+        <div class="pts-cell ${u.scorer_pts > 0 ? 'win' : 'zero'}">${u.scorer_pts > 0 ? '+' + u.scorer_pts : '—'}</div>
       </div>
 
       ${scored.length > 0 ? `
@@ -383,6 +409,54 @@ function renderDrill(u, payload) {
         </div>
       ` : ''}
     </div>
+  `;
+}
+
+function renderChampionResultRow(u, champion) {
+  const finalDone = realChampion !== null;
+  const hit = finalDone && champion && champion.team === realChampion;
+  const missed = finalDone && champion && champion.team !== realChampion;
+  const isMe = u.user_id === profile.id;
+
+  if (!champion) {
+    return `
+      <div class="profile-row champion-result" style="grid-template-columns: 1fr auto; cursor: default; margin-bottom: 8px;">
+        <div class="vs">🏆 Campeão: <em style="color:var(--text-mute);">não escolheu</em></div>
+        <div class="pts-cell zero">—</div>
+      </div>
+    `;
+  }
+
+  // Caso final ainda não terminou
+  if (!finalDone) {
+    return `
+      <div class="profile-row champion-result" style="grid-template-columns: 1fr auto; cursor: default; margin-bottom: 8px;">
+        <div class="vs">🏆 Campeão: <strong>${flag(champion.team)} ${escapeHtml(teamPt(champion.team))}</strong></div>
+        <div class="pts-cell zero">—</div>
+      </div>
+    `;
+  }
+
+  // Final terminou — mostra acerto/erro com info clara
+  return `
+    <div class="profile-row champion-result ${hit ? 'champion-hit' : 'champion-miss'}" style="grid-template-columns: 1fr auto; cursor: default; margin-bottom: 8px;">
+      <div class="vs">
+        🏆 Campeão: <strong>${flag(champion.team)} ${escapeHtml(teamPt(champion.team))}</strong>
+        ${hit
+          ? `<span class="champion-tag hit">✓ levantou a taça</span>`
+          : `<span class="champion-tag miss">✗ não foi campeão${isMe ? ` — você não ganhou pontos colocando ${escapeHtml(teamPt(champion.team))} como campeão` : ''}</span>`}
+      </div>
+      <div class="pts-cell ${hit ? 'win' : 'zero'}">${hit ? '+' + u.champion_pts : '0'}</div>
+    </div>
+    ${missed ? `
+      <div class="profile-row champion-actual" style="grid-template-columns: 1fr auto; cursor: default; margin-bottom: 12px;">
+        <div class="vs" style="color: var(--text-dim); font-size: 12px;">
+          Campeão real: <strong style="color: var(--text);">${flag(realChampion)} ${escapeHtml(teamPt(realChampion))}</strong>
+          ${isMe ? `<span style="color: var(--red); margin-left: 6px;">· você perdeu ${50} pts de bônus por errar</span>` : ''}
+        </div>
+        <div></div>
+      </div>
+    ` : ''}
   `;
 }
 

@@ -127,6 +127,12 @@ function attachListeners() {
     if (a === 'save-settings') await saveSettings();
     if (a === 'add-scorer')    await addScorer(action.dataset.matchId);
     if (a === 'remove-goal')   await removeGoal(action.dataset.goalId, action.dataset.matchId);
+    if (a === 'load-players') {
+      action.disabled = true;
+      action.textContent = 'Carregando...';
+      await loadPlayersForTeams(action.dataset.home, action.dataset.away);
+      rerenderResultRow(parseInt(action.dataset.matchId, 10));
+    }
   });
 }
 
@@ -315,17 +321,65 @@ async function removeUser(id, name) {
 // RESULTS TAB (com entrada de marcadores integrada)
 // ============================================================
 async function loadMatches() {
-  const [matchesRes, playersRes, goalsRes] = await Promise.all([
+  const [matchesRes, goalsRes] = await Promise.all([
     supabase.from('matches').select('*').order('match_date'),
-    supabase.from('players').select('*').order('full_name'),
     supabase.from('player_goals').select('*, players(full_name, team)').order('created_at'),
   ]);
   if (matchesRes.error) throw matchesRes.error;
-  if (playersRes.error) throw playersRes.error;
   if (goalsRes.error)   throw goalsRes.error;
   cache.matches = matchesRes.data;
-  cache.players = playersRes.data;
-  cache.player_goals = goalsRes.data;
+
+  // Only keep player_goals for finished matches - prevents phantom scorers
+  const finishedIds = new Set(cache.matches.filter(m => m.finished).map(m => m.id));
+  cache.player_goals = (goalsRes.data ?? []).filter(g => finishedIds.has(g.match_id));
+
+  cache.playersByTeam = {}; // Will be loaded on demand
+}
+
+// Alias: alguns times tem nomes diferentes entre matches e players
+// (e.g. matches="USA", players="United States")
+const TEAM_PLAYERS_ALIAS = {
+  USA: 'United States',
+  Türkiye: 'Turkey',
+  Curaçao: 'Curacao',
+  'Cape Verde': 'Cape Verde Islands',
+  'Congo DR': 'DR Congo',
+};
+
+// Load players for specific teams (on demand)
+async function loadPlayersForTeams(homeTeam, awayTeam) {
+  const teams = [homeTeam, awayTeam].filter(Boolean);
+  const missing = teams.filter(t => !cache.playersByTeam[t]);
+
+  if (missing.length === 0) {
+    return [...(cache.playersByTeam[homeTeam] || []), ...(cache.playersByTeam[awayTeam] || [])];
+  }
+
+  // Expande pra incluir aliases (busca tanto "USA" quanto "United States")
+  const teamsToQuery = [...missing];
+  for (const t of missing) {
+    const alias = TEAM_PLAYERS_ALIAS[t];
+    if (alias && !teamsToQuery.includes(alias)) teamsToQuery.push(alias);
+  }
+
+  const { data, error } = await supabase
+    .from('players')
+    .select('*')
+    .in('team', teamsToQuery)
+    .order('full_name');
+
+  if (error) {
+    console.error('[loadPlayersForTeams]', error);
+    return [];
+  }
+
+  // Cache by team (mapeia players de alias pro nome do match)
+  for (const team of missing) {
+    const alias = TEAM_PLAYERS_ALIAS[team];
+    cache.playersByTeam[team] = (data || []).filter(p => p.team === team || p.team === alias);
+  }
+
+  return [...(cache.playersByTeam[homeTeam] || []), ...(cache.playersByTeam[awayTeam] || [])];
 }
 
 async function renderResultsTab() {
@@ -393,9 +447,13 @@ function renderResultRow(m) {
   const canSave = scoreFilled && (!isKO || !isDraw || m.pen_winner);
 
   // Filtra jogadores que possam ter marcado (do home ou away team)
-  const eligible = (cache.players ?? []).filter(p => p.team === m.team_home || p.team === m.team_away);
+  const homePlayers = cache.playersByTeam?.[m.team_home] ?? [];
+  const awayPlayers = cache.playersByTeam?.[m.team_away] ?? [];
+  const eligible = [...homePlayers, ...awayPlayers];
   const already = new Set(scorers.map(s => s.player_id));
   const available = eligible.filter(p => !already.has(p.id));
+  // Check if we've attempted to load (cache key exists), not just if players were found
+  const playersLoaded = cache.playersByTeam?.[m.team_home] !== undefined || cache.playersByTeam?.[m.team_away] !== undefined;
 
   return `
     <div class="result-row ${m.finished ? 'done' : ''}" data-match-id="${m.id}">
@@ -434,7 +492,7 @@ function renderResultRow(m) {
         </div>
       </div>
 
-      ${scoreFilled || scorers.length > 0 ? `
+      ${scoreFilled ? `
         <div class="scorers">
           <div class="scorers-head">
             <span>⚽ Marcadores</span>
@@ -459,21 +517,31 @@ function renderResultRow(m) {
             ${scorers.length === 0 ? '<div style="font-size:12px; color:var(--text-mute); padding:6px 4px; font-style:italic;">Nenhum marcador atribuído ainda.</div>' : ''}
           </div>
 
-          ${goalsAttributed < totalGoals && available.length > 0 ? `
-            <div class="scorer-add">
-              <select id="addPlayer_${m.id}">
-                ${available.map(p => `
-                  <option value="${p.id}">${flag(p.team)} ${escapeHtml(p.full_name)} (${escapeHtml(teamPt(p.team))}${p.shirt_number ? ' · #' + p.shirt_number : ''})</option>
-                `).join('')}
-              </select>
-              <input id="addQty_${m.id}" type="number" min="1" max="${Math.max(1, totalGoals - goalsAttributed)}" value="1">
-              <button class="btn btn-dark btn-sm" data-action="add-scorer" data-match-id="${m.id}">+ Adicionar</button>
-            </div>
-          ` : (goalsAttributed < totalGoals ? `
-            <div style="font-size:12px; color:var(--text-mute); padding:6px 4px; font-style:italic;">
-              Todos os jogadores rastreados já marcaram. Goals não atribuídos serão tratados como "outros".
-            </div>
-          ` : '')}
+          ${goalsAttributed < totalGoals ? (
+            !playersLoaded ? `
+              <div class="scorer-add">
+                <button class="btn btn-dark btn-sm" data-action="load-players" data-match-id="${m.id}" data-home="${escapeHtml(m.team_home)}" data-away="${escapeHtml(m.team_away)}">
+                  Carregar jogadores de ${escapeHtml(teamPt(m.team_home))} e ${escapeHtml(teamPt(m.team_away))}
+                </button>
+              </div>
+            ` : (eligible.length === 0 ? `
+              <div style="font-size:12px; color:var(--yellow); padding:6px 4px; font-style:italic;">
+                ⚠ Nenhum jogador cadastrado para essas seleções. Pode salvar sem atribuir marcadores.
+              </div>
+            ` : (available.length > 0 ? `
+              <div class="scorer-add">
+                <select id="addPlayer_${m.id}">
+                  ${renderPlayerOptions(available, m.team_home, m.team_away)}
+                </select>
+                <input id="addQty_${m.id}" type="number" min="1" max="${Math.max(1, totalGoals - goalsAttributed)}" value="1">
+                <button class="btn btn-dark btn-sm" data-action="add-scorer" data-match-id="${m.id}">+ Adicionar</button>
+              </div>
+            ` : `
+              <div style="font-size:12px; color:var(--text-mute); padding:6px 4px; font-style:italic;">
+                Todos os jogadores já atribuídos.
+              </div>
+            `))
+          ) : ''}
         </div>
       ` : ''}
 
@@ -489,6 +557,45 @@ function renderResultRow(m) {
       </div>
     </div>
   `;
+}
+
+// Position order for sorting (attackers first - more likely to score)
+const POS_ORDER = { ATA: 0, MEI: 1, DEF: 2, GOL: 3 };
+
+function renderPlayerOptions(players, homeTeam, awayTeam) {
+  // Helper: matchear time com alias (ex: 'USA' === 'United States')
+  const isTeam = (playerTeam, target) =>
+    playerTeam === target || TEAM_PLAYERS_ALIAS[target] === playerTeam || TEAM_PLAYERS_ALIAS[playerTeam] === target;
+
+  const homePlayers = players
+    .filter(p => isTeam(p.team, homeTeam))
+    .sort((a, b) => {
+      const posA = POS_ORDER[a.position] ?? 9;
+      const posB = POS_ORDER[b.position] ?? 9;
+      return posA - posB || a.full_name.localeCompare(b.full_name);
+    });
+  const awayPlayers = players
+    .filter(p => isTeam(p.team, awayTeam))
+    .sort((a, b) => {
+      const posA = POS_ORDER[a.position] ?? 9;
+      const posB = POS_ORDER[b.position] ?? 9;
+      return posA - posB || a.full_name.localeCompare(b.full_name);
+    });
+
+  const renderOpt = p => `<option value="${p.id}">${escapeHtml(p.full_name)} ${p.position ? `(${p.position})` : ''} ${p.shirt_number ? '#' + p.shirt_number : ''}</option>`;
+
+  let html = '';
+  if (homePlayers.length > 0) {
+    html += `<optgroup label="🏠 ${escapeHtml(teamPt(homeTeam))} (${homePlayers.length})">`;
+    html += homePlayers.map(renderOpt).join('');
+    html += '</optgroup>';
+  }
+  if (awayPlayers.length > 0) {
+    html += `<optgroup label="✈️ ${escapeHtml(teamPt(awayTeam))} (${awayPlayers.length})">`;
+    html += awayPlayers.map(renderOpt).join('');
+    html += '</optgroup>';
+  }
+  return html;
 }
 
 function setPenWinner(matchId, side) {
@@ -545,19 +652,48 @@ async function saveResult(matchId) {
     return;
   }
 
+  // BLOCKER: nao permitir salvar KO se time ainda eh slot (W##, 1A, 3A/B/C/D/F)
+  const isSlot = (s) => !s || /^[0-9WL]/.test(s) || s.includes('/');
+  if (isSlot(m.team_home) || isSlot(m.team_away)) {
+    showToast(`Aguarde os times serem resolvidos. Atual: ${m.team_home} vs ${m.team_away}`, 'error', 4000);
+    return;
+  }
+
   const isKO = m.stage !== 'group';
   if (isKO && h === a && !m.pen_winner) {
     showToast('Empate no mata-mata: defina o vencedor dos pênaltis', 'error', 3000);
     return;
   }
 
-  // Validação de marcadores: soma deve bater com placar total
+  // Validação de marcadores: gols por time devem bater com placar
+  // Skip validation per-team if that team has no players registered
+  const homePlayers = cache.playersByTeam?.[m.team_home] ?? [];
+  const awayPlayers = cache.playersByTeam?.[m.team_away] ?? [];
   const scorers = cache.player_goals.filter(g => g.match_id === id);
-  const goalsAttributed = scorers.reduce((s, g) => s + g.goals, 0);
-  const totalGoals = h + a;
-  if (goalsAttributed !== totalGoals) {
-    showToast(`Atribua todos os marcadores: ${goalsAttributed}/${totalGoals} gols`, 'error', 3500);
-    return;
+
+  // Compara team com alias (ex: 'USA' === 'United States')
+  const teamMatches = (a, b) => a === b || TEAM_PLAYERS_ALIAS[a] === b || TEAM_PLAYERS_ALIAS[b] === a;
+
+  // Only validate home goals if home team has players
+  if (homePlayers.length > 0) {
+    const homeGoals = scorers
+      .filter(s => teamMatches(s.players?.team, m.team_home))
+      .reduce((sum, s) => sum + s.goals, 0);
+    if (homeGoals !== h) {
+      showToast(`Gols ${teamPt(m.team_home)}: ${homeGoals} atribuídos, esperado ${h}`, 'error', 3500);
+      return;
+    }
+  }
+
+  // Only validate away goals if away team has players
+  if (awayPlayers.length > 0) {
+    const awayGoals = scorers
+      .filter(s => teamMatches(s.players?.team, m.team_away))
+      .reduce((sum, s) => sum + s.goals, 0);
+    if (awayGoals !== a) {
+      showToast(`Gols ${teamPt(m.team_away)}: ${awayGoals} atribuídos, esperado ${a}`, 'error', 3500);
+      return;
+    }
   }
 
   const payload = {

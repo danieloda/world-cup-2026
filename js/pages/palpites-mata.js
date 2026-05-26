@@ -28,7 +28,8 @@ let matches = [];                    // 32 matches KO
 let allMatches = [];                 // 104 matches (incluindo grupos)
 let predsByMatch = new Map();        // match_id -> prediction row (TODAS as predictions)
 let goalsByMatch = new Map();        // match_id -> [{player, goals}]
-let slotResolution = new Map();      // slot string -> { team, source } (baseado nos palpites)
+let slotResolution = new Map();      // slot string -> { team, source } (real-first: resultado real ou palpite)
+let predSlotResolution = new Map();  // slot string -> { team, source } (apenas palpites do user)
 let activeTab = 'palpites';          // 'palpites' | 'resultados'
 const saveTimers = new Map();        // match_id -> setTimeout handle
 
@@ -86,7 +87,8 @@ async function loadData() {
     goalsByMatch.get(g.match_id).push(g);
   }
 
-  slotResolution = computeSlotResolution();
+  slotResolution = computeSlotResolution('real-first');
+  predSlotResolution = computeSlotResolution('pred-only');
 }
 
 // ============================================================
@@ -101,10 +103,14 @@ function isRealTeam(name) {
  * Computa qual time deveria ocupar cada slot ("1A", "W73") com base nos
  * palpites do usuário. Retorna Map<slot, {team, source}>.
  *   source: 'pred-group' | 'pred-ko' | 'real'
+ *
+ * @param {string} mode - 'real-first' (default): usa resultado real se houver, senão palpite.
+ *                       'pred-only': sempre usa o palpite do user (ignora resultado real).
  */
-function computeSlotResolution() {
+function computeSlotResolution(mode = 'real-first') {
   const res = new Map();
   const thirdsRanked = [];  // [{ group, team, pts, sg, gp, source }]
+  const usePredOnly = mode === 'pred-only';
 
   // === 1) Group winners (1X), runners-up (2X) e third (3X) ===
   const groupLetters = [...new Set(allMatches.filter(m => m.group_name).map(m => m.group_name))];
@@ -114,7 +120,7 @@ function computeSlotResolution() {
     const allPredicted = groupMatches.every(m => predsByMatch.has(m.id));
 
     let standings, source;
-    if (allFinished) {
+    if (!usePredOnly && allFinished) {
       standings = computeStandings(groupMatches, /* useReal= */ true);
       source = 'real';
     } else if (allPredicted) {
@@ -142,57 +148,53 @@ function computeSlotResolution() {
   }
 
   // === 1.5) Slots compostos de 3ºs lugares (3A/B/C/D/F, 3C/D/F/G/H, etc.) ===
-  // Ordena os 3ºs por critério FIFA: PTS → SG → GP
   thirdsRanked.sort((a, b) =>
     b.pts - a.pts || b.sg - a.sg || b.gp - a.gp
   );
-  // Greedy: pra cada slot composto, atribui o melhor 3º disponível cujo grupo está na lista
   const usedThirds = new Set();
-  // Ordena slots por match_id (R32 vem primeiro)
   const koMatchesSorted = [...matches].sort((a, b) => a.id - b.id);
   for (const m of koMatchesSorted) {
-    for (const side of ['team_home', 'team_away']) {
-      const slot = m[side];
-      if (!slot || !slot.startsWith('3') || !slot.includes('/')) continue;
-      // Slot tipo "3A/B/C/D/F"
-      const validGroups = slot.slice(1).split('/');
+    // Use slot_home/slot_away (original slot reference) — team_home may already be resolved to a real team
+    for (const slotKey of [m.slot_home, m.slot_away]) {
+      if (!slotKey || !slotKey.startsWith('3') || !slotKey.includes('/')) continue;
+      const validGroups = slotKey.slice(1).split('/');
       const candidate = thirdsRanked.find(t =>
         validGroups.includes(t.group) && !usedThirds.has(t.team)
       );
       if (candidate) {
-        res.set(slot, { team: candidate.team, source: candidate.source });
+        res.set(slotKey, { team: candidate.team, source: candidate.source });
         usedThirds.add(candidate.team);
       }
     }
   }
 
   // === 2) W### e L### dos jogos de mata-mata ===
-  // Itera em ordem de match_date (R32 → R16 → QF → SF → Final) para que
-  // jogos posteriores possam usar resoluções de jogos anteriores.
+  // Use slot_home/slot_away (original slot references) instead of team_home/team_away
+  // (which may have been overwritten with real teams by the DB trigger).
   const koSorted = [...matches].sort((a, b) => new Date(a.match_date) - new Date(b.match_date));
   for (const m of koSorted) {
-    const homeTeam = resolveSlotToTeam(m.team_home, res);
-    const awayTeam = resolveSlotToTeam(m.team_away, res);
+    // Resolve each side using the slot reference (W73, 1A, etc.) when present
+    const homeSlot = m.slot_home || m.team_home;
+    const awaySlot = m.slot_away || m.team_away;
+    const homeTeam = resolveSlotToTeam(homeSlot, res);
+    const awayTeam = resolveSlotToTeam(awaySlot, res);
 
-    // Se algum lado não resolveu, pula
     if (!homeTeam || !awayTeam) continue;
 
-    // Usa resultado real se finalizado
     let winner, loser, source = 'pred-ko';
-    if (m.finished && m.actual_home != null && m.actual_away != null) {
+    if (!usePredOnly && m.finished && m.actual_home != null && m.actual_away != null) {
       if (m.actual_home > m.actual_away) { winner = homeTeam; loser = awayTeam; source = 'real'; }
       else if (m.actual_away > m.actual_home) { winner = awayTeam; loser = homeTeam; source = 'real'; }
       else if (m.pen_winner === 'home') { winner = homeTeam; loser = awayTeam; source = 'real'; }
       else if (m.pen_winner === 'away') { winner = awayTeam; loser = homeTeam; source = 'real'; }
     } else {
-      // Usa palpite do user
       const p = predsByMatch.get(m.id);
       if (!p || p.pred_home == null || p.pred_away == null) continue;
       if (p.pred_home > p.pred_away) { winner = homeTeam; loser = awayTeam; }
       else if (p.pred_away > p.pred_home) { winner = awayTeam; loser = homeTeam; }
       else if (p.pred_pen_winner === 'home') { winner = homeTeam; loser = awayTeam; }
       else if (p.pred_pen_winner === 'away') { winner = awayTeam; loser = homeTeam; }
-      else continue;  // empate sem pen winner
+      else continue;
     }
 
     res.set('W' + m.id, { team: winner, source });
@@ -249,13 +251,12 @@ function renderPage() {
   const counts = computeCounts();
   return `
     <section class="hero">
-      <div class="hero-kicker">Mata-mata</div>
-      <h1 class="hero-title">${activeTab === 'palpites' ? 'Seus palpites' : 'Resultados'}</h1>
+      <div class="hero-kicker">Palpitar placares · Mata-mata</div>
+      <h1 class="hero-title">${activeTab === 'palpites' ? 'Seus palpites' : 'Resultados oficiais'}</h1>
       <div class="hero-meta">
         <b>${matches.length} jogos</b><span class="sep"></span>
-        Multiplicador ×1.5 → ×4 (final)<span class="sep"></span>
-        <b>${counts.totalDone}</b> palpitados<span class="sep"></span>
-        <b>${counts.totalFinished}</b> finalizados
+        Pontos ×1.5 a ×4<span class="sep"></span>
+        <b>${counts.totalDone}</b> palpitados
       </div>
     </section>
 
@@ -278,9 +279,10 @@ function renderPage() {
 function renderPalpitesTab(counts) {
   const grouped = groupByStage();
   return `
-    <div class="note" style="margin-bottom:20px; padding:12px 16px; background:var(--card); border-left:3px solid var(--gold); border-radius:0 6px 6px 0; font-size:12px; color:var(--text-dim);">
-      <strong style="color:var(--gold);">Como funciona:</strong>
-      Palpites travam no apito de cada jogo. Slots (1º A, 2º B, etc.) viram times reais quando os grupos terminam. Empate → escolha o vencedor dos pênaltis.
+    <div class="note" style="margin-bottom:20px; padding:12px 16px; background:var(--card); border-left:3px solid var(--green); border-radius:0 6px 6px 0; font-size:12px; color:var(--text-dim);">
+      <strong style="color:var(--green);">Multiplicadores:</strong>
+      32-avos <strong>×1.5</strong> · Oitavas <strong>×2</strong> · Quartas <strong>×2.5</strong> · Semis <strong>×3</strong> · Final <strong>×4</strong>
+      <br><span style="color:var(--text-mute);">Empate? Escolha quem passa nos pênaltis · Slots viram times reais após os grupos</span>
     </div>
 
     ${renderKpis(counts)}
@@ -294,19 +296,149 @@ function renderPalpitesTab(counts) {
 }
 
 function renderResultadosTab(counts) {
-  const finished = matches.filter(m => m.finished);
-  if (finished.length === 0) {
-    return `
-      <div class="empty">
-        <h3>Nenhum resultado ainda</h3>
-        <p>Os jogos de mata-mata começam em 28 de junho. Os resultados aparecem aqui conforme o admin lança os placares.</p>
-      </div>
-    `;
-  }
+  const grouped = groupByStage();
   return `
     ${renderKpisResultados(counts)}
-    ${renderResultadosList(finished)}
+
+    <div class="bracket-wrap">
+      <div class="bracket">
+        ${STAGES.map(stage => renderResultStageColumn(stage, grouped)).join('')}
+      </div>
+    </div>
   `;
+}
+
+function renderResultStageColumn(stage, grouped) {
+  const list = grouped[stage.id] || [];
+  return `
+    <div class="bracket-col">
+      <h4>
+        ${escapeHtml(stage.label)}
+        <span class="mult">×${stage.mult}</span>
+        <span class="count">${list.length} jogo${list.length !== 1 ? 's' : ''}</span>
+      </h4>
+      ${list.map(renderResultBracketMatch).join('')}
+    </div>
+  `;
+}
+
+function renderResultBracketMatch(m) {
+  const pred = predsByMatch.get(m.id);
+  const pts = pred?.points_earned ?? 0;
+  const mult = STAGES.find(s => s.id === m.stage)?.mult || (m.stage === 'third' ? 2.0 : 1.0);
+
+  const dt = new Date(m.match_date);
+  const dateLabel = `${String(dt.getDate()).padStart(2,'0')}/${MEZES[dt.getMonth()]}`;
+  const timeLabel = formatTime(m.match_date);
+
+  const isFinal = m.stage === 'final';
+  const isThird = m.stage === 'third';
+
+  let resultClass = '';
+  if (m.finished && pred) {
+    if (pts >= Math.round(5 * mult)) resultClass = 'exact';
+    else if (pts > 0) resultClass = 'partial';
+    else resultClass = 'miss';
+  } else if (m.finished && !pred) {
+    resultClass = 'no-pred';
+  }
+
+  const classes = ['bracket-match', 'result-mode'];
+  if (isFinal) classes.push('final-match');
+  if (isThird) classes.push('third-place');
+  if (resultClass) classes.push(resultClass);
+  if (m.finished) classes.push('finished');
+
+  const pointsBadge = m.finished && pred
+    ? renderPointsBadge(pts, mult)
+    : (m.finished && !pred ? '<div class="bm-pts miss">sem palpite</div>' : '');
+
+  return `
+    <div class="${classes.join(' ')}" data-match-id="${m.id}">
+      <div class="bm-id">
+        <span>${isThird ? '🥉 3º Lugar' : isFinal ? '🏆 Final' : `M${m.id}`}</span>
+        <span class="when">${dateLabel} · ${timeLabel}</span>
+      </div>
+
+      ${renderResultTeamRow(m, 'home')}
+      ${renderResultTeamRow(m, 'away')}
+
+      ${m.pen_winner ? `
+        <div class="bm-pen-result">
+          <span>⚽ Pênaltis:</span> ${m.pen_winner === 'home' ? teamPt(m.team_home) : teamPt(m.team_away)}
+        </div>
+      ` : ''}
+
+      ${pred ? `
+        <div class="bm-pred-compare">
+          <span class="label">Seu palpite:</span>
+          <span class="score">${pred.pred_home} – ${pred.pred_away}</span>
+          ${pred.pred_pen_winner ? `<span class="pen">(pen: ${pred.pred_pen_winner === 'home' ? 'casa' : 'fora'})</span>` : ''}
+        </div>
+      ` : ''}
+
+      ${pointsBadge}
+    </div>
+  `;
+}
+
+function renderResultTeamRow(m, side) {
+  const team = side === 'home' ? m.team_home : m.team_away;
+  const slotOriginal = side === 'home' ? m.slot_home : m.slot_away;
+  const score = side === 'home' ? m.actual_home : m.actual_away;
+  const isWinner = m.finished && (
+    (side === 'home' && (m.actual_home > m.actual_away || (m.actual_home === m.actual_away && m.pen_winner === 'home'))) ||
+    (side === 'away' && (m.actual_away > m.actual_home || (m.actual_home === m.actual_away && m.pen_winner === 'away')))
+  );
+
+  const slotBadge = slotOriginal ? `<span class="slot-badge" title="${escapeHtml(teamDisplay(slotOriginal))}">${escapeHtml(formatSlotShort(slotOriginal))}</span>` : '';
+
+  return `
+    <div class="bm-team ${isWinner ? 'winner' : ''}">
+      <span class="flag">${flag(team)}</span>
+      <div class="nm">
+        <div class="team-line">
+          <span class="team-name" data-team="${escapeHtml(team)}">${escapeHtml(teamPt(team))}</span>
+          ${slotBadge}
+        </div>
+      </div>
+      <span class="result-score">${m.finished ? score : '–'}</span>
+    </div>
+  `;
+}
+
+function formatSlotShort(slot) {
+  if (!slot) return '';
+  if (/^\d[A-L]$/.test(slot)) return slot;
+  if (/^3[A-Z/]+$/.test(slot)) return '3º';
+  if (/^[WL]\d+$/.test(slot)) return slot;
+  return slot;
+}
+
+/**
+ * Back-calculates the base points (before multiplier) from the total earned.
+ * Returns null if not calculable (mult <= 1 or pts === 0).
+ */
+function basePts(pts, mult) {
+  if (pts == null || pts === 0 || !mult || mult <= 1) return null;
+  return Math.round(pts / mult);
+}
+
+/**
+ * Renders a points badge with multiplier breakdown: "+2 × 4 = 8 pts"
+ * Falls back to "+N pts" if multiplier doesn't apply.
+ */
+function renderPointsBadge(pts, mult, extraClass = '') {
+  if (pts == null) return '';
+  const cls = `bm-pts ${pts > 0 ? 'win' : ''} ${extraClass}`.trim();
+  const base = basePts(pts, mult);
+  if (base !== null) {
+    return `<div class="${cls}">
+      <span class="formula">${base}<small>×${mult}</small></span>
+      <span class="total">= ${pts} pts</span>
+    </div>`;
+  }
+  return `<div class="${cls}">${pts > 0 ? '+' : ''}${pts} pts</div>`;
 }
 
 function renderKpisResultados(counts) {
@@ -336,75 +468,6 @@ function renderKpisResultados(counts) {
       </div>
     </div>
   `;
-}
-
-function renderResultadosList(finished) {
-  // Ordem: mais recente primeiro
-  const sorted = [...finished].sort((a, b) => new Date(b.match_date) - new Date(a.match_date));
-  return sorted.map(renderResultCard).join('');
-}
-
-function renderResultCard(m) {
-  const pred = predsByMatch.get(m.id);
-  const pts = pred?.points_earned;
-  const mult = STAGES.find(s => s.id === m.stage)?.mult || (m.stage === 'third' ? 2.0 : 1.0);
-  const cardClass = pts >= Math.round(5 * mult) ? 'exact' : (pts > 0 ? 'partial' : 'miss');
-  const ptsLabel = pts >= Math.round(5 * mult) ? 'Exato!' : pts > 0 ? 'Parcial' : (pred ? 'Errou' : 'Sem palpite');
-  // Extra: classe especial pra final/3º lugar
-  const stageClass = m.stage === 'final' ? 'final' : m.stage === 'third' ? 'third' : '';
-
-  const goals = goalsByMatch.get(m.id) ?? [];
-  const homeGoals = goals.filter(g => g.players.team === m.team_home);
-  const awayGoals = goals.filter(g => g.players.team === m.team_away);
-
-  const stageDisplay = m.stage === 'third' ? '🥉 3º Lugar'
-    : m.stage === 'final' ? '🏆 Final'
-    : STAGES.find(s => s.id === m.stage)?.label || m.stage;
-
-  return `
-    <div class="result-card ${cardClass} ${stageClass}">
-      <div class="result-card-head">
-        <div class="result-card-team">
-          <span class="flag">${flag(m.team_home)}</span>
-          <span class="team-name" data-team="${escapeHtml(m.team_home)}">${escapeHtml(teamPt(m.team_home))}</span>
-        </div>
-        <div class="result-card-score">${m.actual_home} — ${m.actual_away}${m.pen_winner ? `<small style="font-size:13px; color:var(--text-mute); display:block; font-weight:700;">pen: ${m.pen_winner === 'home' ? teamPt(m.team_home) : teamPt(m.team_away)}</small>` : ''}</div>
-        <div class="result-card-team right">
-          <span class="team-name" data-team="${escapeHtml(m.team_away)}">${escapeHtml(teamPt(m.team_away))}</span>
-          <span class="flag">${flag(m.team_away)}</span>
-        </div>
-      </div>
-
-      <div class="result-card-bottom">
-        <div class="result-card-info">
-          ${pred
-            ? `<span>Seu palpite:</span> <span class="pred-score">${pred.pred_home} – ${pred.pred_away}</span>${pred.pred_pen_winner ? ` <small style="color:var(--text-mute)">pen: ${pred.pred_pen_winner === 'home' ? 'casa' : 'fora'}</small>` : ''}`
-            : `<span style="color:var(--text-mute); font-style:italic;">Sem palpite</span>`}
-        </div>
-        <div class="result-card-points">
-          <span class="num">${pts != null ? (pts > 0 ? '+' + pts : pts) : '—'}</span>
-          <span class="label">${ptsLabel}</span>
-        </div>
-        <div class="result-card-meta">
-          ${formatBrDateShort(new Date(m.match_date))} · ${formatTime(m.match_date)}
-          <br><span class="stage">${stageDisplay} · ×${mult}</span>
-        </div>
-      </div>
-
-      ${goals.length > 0 ? `
-        <div class="result-card-scorers">
-          <span class="label">⚽ Gols:</span>
-          ${homeGoals.map(g => `<span class="scorer">${escapeHtml(g.players.full_name)} <span class="num">${g.goals}'</span></span>`).join('')}
-          ${homeGoals.length && awayGoals.length ? '<span style="color:var(--text-mute); margin: 0 4px;">·</span>' : ''}
-          ${awayGoals.map(g => `<span class="scorer">${escapeHtml(g.players.full_name)} <span class="num">${g.goals}'</span></span>`).join('')}
-        </div>
-      ` : ''}
-    </div>
-  `;
-}
-
-function formatBrDateShort(d) {
-  return `${String(d.getDate()).padStart(2,'0')}/${MEZES[d.getMonth()]}`;
 }
 
 function renderKpis(counts) {
@@ -484,10 +547,9 @@ function renderBracketMatch(m) {
   if (isFinal) classes.push('final-match');
   if (isThird) classes.push('third-place');
 
+  const mult = STAGES.find(s => s.id === m.stage)?.mult || (m.stage === 'third' ? 2.0 : 1.0);
   const pointsBadge = pred?.points_earned != null
-    ? `<div class="bm-pts ${pred.points_earned > 0 ? 'win' : ''}">
-         ${pred.points_earned > 0 ? '+' : ''}${pred.points_earned} pts
-       </div>`
+    ? renderPointsBadge(pred.points_earned, mult)
     : '';
 
   return `
@@ -508,9 +570,11 @@ function renderBracketMatch(m) {
 }
 
 function renderPenToggle(m, penWinner) {
-  // Pega os times resolvidos pra mostrar bandeira + nome
-  const homeTeam = isRealTeam(m.team_home) ? m.team_home : slotResolution.get(m.team_home)?.team;
-  const awayTeam = isRealTeam(m.team_away) ? m.team_away : slotResolution.get(m.team_away)?.team;
+  // Pega os times resolvidos pra mostrar bandeira + nome (usa palpites do user)
+  const homeSlot = m.slot_home || m.team_home;
+  const awaySlot = m.slot_away || m.team_away;
+  const homeTeam = isRealTeam(homeSlot) ? homeSlot : predSlotResolution.get(homeSlot)?.team;
+  const awayTeam = isRealTeam(awaySlot) ? awaySlot : predSlotResolution.get(awaySlot)?.team;
 
   const homeLabel = homeTeam ? teamPt(homeTeam) : 'Casa';
   const awayLabel = awayTeam ? teamPt(awayTeam) : 'Fora';
@@ -536,29 +600,35 @@ function renderPenToggle(m, penWinner) {
 }
 
 function renderTeamRow(m, side, val, locked) {
-  const slot = side === 'home' ? m.team_home : m.team_away;
+  // Para a aba Palpites, usa SEMPRE o slot original (slot_home/slot_away) e resolve
+  // através do predSlotResolution (baseado APENAS nos palpites do user).
+  // Assim o time mostrado é quem o USUÁRIO previu que avançaria, não o time real.
+  const slotOriginal = side === 'home' ? m.slot_home : m.slot_away;
+  const realTeam = side === 'home' ? m.team_home : m.team_away;
+
+  // Se tem slot_home/away, usa ele; senão, é grupo (sem slot) e usa team_home/away direto
+  const slot = slotOriginal || realTeam;
   const isReal = isRealTeam(slot);
-  const resolved = !isReal ? slotResolution.get(slot) : null;
+  const resolved = !isReal ? predSlotResolution.get(slot) : null;
   const team = isReal ? slot : (resolved?.team ?? null);
   const showFlag = !!team;
   const source = resolved?.source;
   const isPredSource = source === 'pred-group' || source === 'pred-ko';
+
+  const slotBadge = slotOriginal ? `<span class="slot-badge" title="${escapeHtml(teamDisplay(slotOriginal))}">${escapeHtml(formatSlotShort(slotOriginal))}</span>` : '';
 
   let nameHtml;
   if (team) {
     const sourceBadge = isPredSource
       ? '<span class="pred-source" title="Baseado nos seus palpites">P</span>'
       : '';
-    const sublabel = !isReal
-      ? `<div class="slot-sublabel">${escapeHtml(teamDisplay(slot))}</div>`
-      : '';
     nameHtml = `
       <div class="nm">
         <div class="team-line">
           <span class="team-name" data-team="${escapeHtml(team)}">${escapeHtml(teamPt(team))}</span>
+          ${slotBadge}
           ${sourceBadge}
         </div>
-        ${sublabel}
       </div>`;
   } else {
     nameHtml = `<div class="nm slot">${escapeHtml(teamDisplay(slot))}</div>`;
@@ -735,11 +805,14 @@ async function doSave(matchId) {
   card.classList.add('saved');
 
   // Recomputa resolução dos slots (palpite pode ter mudado W{id} / L{id})
-  slotResolution = computeSlotResolution();
+  slotResolution = computeSlotResolution('real-first');
+  predSlotResolution = computeSlotResolution('pred-only');
 
   const m = matches.find(mm => mm.id === matchId);
-  const homeName = resolveSlotToTeam(m.team_home, slotResolution) ?? teamDisplay(m.team_home);
-  const awayName = resolveSlotToTeam(m.team_away, slotResolution) ?? teamDisplay(m.team_away);
+  const homeSlot = m.slot_home || m.team_home;
+  const awaySlot = m.slot_away || m.team_away;
+  const homeName = resolveSlotToTeam(homeSlot, predSlotResolution) ?? teamDisplay(homeSlot);
+  const awayName = resolveSlotToTeam(awaySlot, predSlotResolution) ?? teamDisplay(awaySlot);
   showToast(`Salvo ${teamPt(homeName)} ${h}–${a} ${teamPt(awayName)}`, 'success', 1500);
   updateKpis();
   rerenderAllBracketRows();

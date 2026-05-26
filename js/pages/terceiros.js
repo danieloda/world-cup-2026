@@ -121,11 +121,11 @@ function renderPage() {
 
   return `
     <section class="hero">
-      <div class="hero-kicker">Vagas extras</div>
+      <div class="hero-kicker">Quais 3ºs colocados passam?</div>
       <h1 class="hero-title">Melhores 3ºs</h1>
       <div class="hero-meta">
-        <b>${ADVANCE_COUNT} dos 12 avançam</b><span class="sep"></span>
-        Critério: PTS · SG · GP
+        <b>${ADVANCE_COUNT} de 12</b> avançam aos 32-avos<span class="sep"></span>
+        Critério: PTS → SG → GP
       </div>
     </section>
 
@@ -146,9 +146,9 @@ function renderPage() {
     </div>
 
     <div class="note" style="margin-bottom:20px; padding:12px 16px; background:var(--card); border-left:3px solid var(--green); border-radius:0 6px 6px 0; font-size:12px; color:var(--text-dim);">
-      <strong style="color:var(--green);">Como funciona:</strong>
-      Os <strong>8 melhores</strong> 3ºs entre os 12 grupos avançam pros 32-avos.
-      Critério: PTS → SG → GP.
+      <span style="color:#1DB954; font-weight:700;">● Verde</span> = avança aos 32-avos ·
+      <span style="color:var(--text-mute);">● Cinza</span> = eliminado
+      <br><span style="color:var(--text-mute);">8 de 12 passam · Desempate: Pontos → Saldo → Gols pró</span>
     </div>
 
     ${completeCount === 0

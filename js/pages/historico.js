@@ -130,19 +130,18 @@ function renderPage() {
 
   return `
     <section class="hero">
-      <div class="hero-kicker">Tudo já jogado</div>
+      <div class="hero-kicker">Resultados e palpites de todos</div>
       <h1 class="hero-title">Histórico</h1>
       <div class="hero-meta">
-        <b>${stats.finished_matches}</b> jogos disputados<span class="sep"></span>
-        <b>${totalPaid}</b> jogadores no bolão<span class="sep"></span>
+        <b>${stats.finished_matches}</b> jogos finalizados<span class="sep"></span>
+        <b>${totalPaid}</b> jogadores<span class="sep"></span>
         <b>${stats.pct_played}%</b> da Copa
       </div>
     </section>
 
-    <div class="note" style="margin-bottom:20px; padding:12px 16px; background:var(--card); border-left:3px solid var(--gold); border-radius:0 6px 6px 0; font-size:12px; color:var(--text-dim);">
-      <strong style="color:var(--gold);">Histórico auditável:</strong>
-      todos os palpites dos jogadores pagos são públicos após cada jogo finalizado.
-      Use os filtros pra navegar.
+    <div class="note" style="margin-bottom:20px; padding:12px 16px; background:var(--card); border-left:3px solid var(--green); border-radius:0 6px 6px 0; font-size:12px; color:var(--text-dim);">
+      <strong style="color:var(--green);">Transparência total:</strong>
+      Veja o palpite de cada jogador após o apito final. Quem acertou? Quem errou feio? Confira tudo aqui.
     </div>
 
     <div class="chips" id="chips">

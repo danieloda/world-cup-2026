@@ -1,45 +1,56 @@
 // Utilitários compartilhados entre páginas.
 
-// ===== Bandeiras (emoji) =====
-// Inclui as 48 seleções da Copa + adversários dos amistosos/eliminatórias em recent.json
+// ===== Bandeiras (flag-icons) =====
+// Mapa de países para códigos ISO 3166-1 alpha-2 (lowercase)
+// Inclui as 48 seleções da Copa + adversários dos amistosos/eliminatórias
 export const FLAGS = {
   // Copa 2026
-  Algeria: '🇩🇿', Argentina: '🇦🇷', Australia: '🇦🇺', Austria: '🇦🇹',
-  Belgium: '🇧🇪', 'Bosnia & Herzegovina': '🇧🇦', Brazil: '🇧🇷', Canada: '🇨🇦',
-  'Cape Verde': '🇨🇻', Colombia: '🇨🇴', Croatia: '🇭🇷', 'Curaçao': '🇨🇼',
-  'Czech Republic': '🇨🇿', 'DR Congo': '🇨🇩', Ecuador: '🇪🇨', Egypt: '🇪🇬',
-  England: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', France: '🇫🇷', Germany: '🇩🇪', Ghana: '🇬🇭',
-  Haiti: '🇭🇹', Iran: '🇮🇷', Iraq: '🇮🇶', 'Ivory Coast': '🇨🇮',
-  Japan: '🇯🇵', Jordan: '🇯🇴', Mexico: '🇲🇽', Morocco: '🇲🇦',
-  Netherlands: '🇳🇱', 'New Zealand': '🇳🇿', Norway: '🇳🇴', Panama: '🇵🇦',
-  Paraguay: '🇵🇾', Portugal: '🇵🇹', Qatar: '🇶🇦', 'Saudi Arabia': '🇸🇦',
-  Scotland: '🏴󠁧󠁢󠁳󠁣󠁴󠁿', Senegal: '🇸🇳', 'South Africa': '🇿🇦', 'South Korea': '🇰🇷',
-  Spain: '🇪🇸', Sweden: '🇸🇪', Switzerland: '🇨🇭', Tunisia: '🇹🇳',
-  Turkey: '🇹🇷', Uruguay: '🇺🇾', USA: '🇺🇸', Uzbekistan: '🇺🇿',
+  Algeria: 'dz', Argentina: 'ar', Australia: 'au', Austria: 'at',
+  Belgium: 'be', 'Bosnia & Herzegovina': 'ba', Brazil: 'br', Canada: 'ca',
+  'Cape Verde': 'cv', Colombia: 'co', Croatia: 'hr', 'Curaçao': 'cw',
+  'Czech Republic': 'cz', 'DR Congo': 'cd', Ecuador: 'ec', Egypt: 'eg',
+  England: 'gb-eng', France: 'fr', Germany: 'de', Ghana: 'gh',
+  Haiti: 'ht', Iran: 'ir', Iraq: 'iq', 'Ivory Coast': 'ci',
+  Japan: 'jp', Jordan: 'jo', Mexico: 'mx', Morocco: 'ma',
+  Netherlands: 'nl', 'New Zealand': 'nz', Norway: 'no', Panama: 'pa',
+  Paraguay: 'py', Portugal: 'pt', Qatar: 'qa', 'Saudi Arabia': 'sa',
+  Scotland: 'gb-sct', Senegal: 'sn', 'South Africa': 'za', 'South Korea': 'kr',
+  Spain: 'es', Sweden: 'se', Switzerland: 'ch', Tunisia: 'tn',
+  Turkey: 'tr', Uruguay: 'uy', USA: 'us', Uzbekistan: 'uz',
   // Outros adversários (amistosos / eliminatórias / Copa África)
-  Albania: '🇦🇱', Angola: '🇦🇴', Armenia: '🇦🇲', Azerbaijan: '🇦🇿',
-  Bahrain: '🇧🇭', Belarus: '🇧🇾', Bermuda: '🇧🇲', Bolivia: '🇧🇴',
-  Botswana: '🇧🇼', Bulgaria: '🇧🇬', 'Burkina Faso': '🇧🇫',
-  Cameroon: '🇨🇲', Chile: '🇨🇱', China: '🇨🇳', Comoros: '🇰🇲',
-  'Costa Rica': '🇨🇷', Cyprus: '🇨🇾', Denmark: '🇩🇰',
-  'El Salvador': '🇸🇻', 'Equatorial Guinea': '🇬🇶', Estonia: '🇪🇪',
-  Eswatini: '🇸🇿', 'Faroe Islands': '🇫🇴', Finland: '🇫🇮',
-  Gabon: '🇬🇦', Gambia: '🇬🇲', Georgia: '🇬🇪', Gibraltar: '🇬🇮',
-  Greece: '🇬🇷', Guatemala: '🇬🇹', Honduras: '🇭🇳', Hungary: '🇭🇺',
-  Iceland: '🇮🇸', Ireland: '🇮🇪', Italy: '🇮🇹', Jamaica: '🇯🇲',
-  Kazakhstan: '🇰🇿', Kosovo: '🇽🇰', Latvia: '🇱🇻', Liechtenstein: '🇱🇮',
-  Lithuania: '🇱🇹', Luxembourg: '🇱🇺', Mali: '🇲🇱', Malta: '🇲🇹',
-  Mauritania: '🇲🇷', Montenegro: '🇲🇪', Nicaragua: '🇳🇮', Nigeria: '🇳🇬',
-  'Northern Ireland': '🏴󠁧󠁢󠁮󠁩󠁲󠁿', Palestine: '🇵🇸', Peru: '🇵🇪', Poland: '🇵🇱',
-  'Puerto Rico': '🇵🇷', Romania: '🇷🇴', 'San Marino': '🇸🇲',
-  Serbia: '🇷🇸', Slovakia: '🇸🇰', Slovenia: '🇸🇮', Sudan: '🇸🇩',
-  Syria: '🇸🇾', Tanzania: '🇹🇿', 'Trinidad & Tobago': '🇹🇹',
-  Ukraine: '🇺🇦', 'United Arab Emirates': '🇦🇪', Venezuela: '🇻🇪',
-  Wales: '🏴󠁧󠁢󠁷󠁬󠁳󠁿', Zambia: '🇿🇲', Zimbabwe: '🇿🇼',
+  Albania: 'al', Angola: 'ao', Armenia: 'am', Azerbaijan: 'az',
+  Bahrain: 'bh', Belarus: 'by', Bermuda: 'bm', Bolivia: 'bo',
+  Botswana: 'bw', Bulgaria: 'bg', 'Burkina Faso': 'bf',
+  Cameroon: 'cm', Chile: 'cl', China: 'cn', Comoros: 'km',
+  'Costa Rica': 'cr', Cyprus: 'cy', Denmark: 'dk',
+  'El Salvador': 'sv', 'Equatorial Guinea': 'gq', Estonia: 'ee',
+  Eswatini: 'sz', 'Faroe Islands': 'fo', Finland: 'fi',
+  Gabon: 'ga', Gambia: 'gm', Georgia: 'ge', Gibraltar: 'gi',
+  Greece: 'gr', Guatemala: 'gt', Honduras: 'hn', Hungary: 'hu',
+  Iceland: 'is', Ireland: 'ie', Italy: 'it', Jamaica: 'jm',
+  Kazakhstan: 'kz', Kosovo: 'xk', Latvia: 'lv', Liechtenstein: 'li',
+  Lithuania: 'lt', Luxembourg: 'lu', Mali: 'ml', Malta: 'mt',
+  Mauritania: 'mr', Montenegro: 'me', Nicaragua: 'ni', Nigeria: 'ng',
+  'Northern Ireland': 'gb-nir', Palestine: 'ps', Peru: 'pe', Poland: 'pl',
+  'Puerto Rico': 'pr', Romania: 'ro', 'San Marino': 'sm',
+  Serbia: 'rs', Slovakia: 'sk', Slovenia: 'si', Sudan: 'sd',
+  Syria: 'sy', Tanzania: 'tz', 'Trinidad & Tobago': 'tt',
+  Ukraine: 'ua', 'United Arab Emirates': 'ae', Venezuela: 've',
+  Wales: 'gb-wls', Zambia: 'zm', Zimbabwe: 'zw',
   // Alias para nomes alternativos
-  'United States': '🇺🇸',
+  'United States': 'us',
 };
-export function flag(team) { return FLAGS[decodeHtmlEntities(team)] || '🏳️'; }
+
+/**
+ * Retorna HTML de bandeira usando flag-icons.
+ * @param {string} team - Nome do país
+ * @returns {string} HTML span com classe flag-icons
+ */
+export function flag(team) {
+  const code = FLAGS[decodeHtmlEntities(team)];
+  if (!code) return '<span class="fi fi-xx"></span>'; // fallback
+  return `<span class="fi fi-${code}"></span>`;
+}
 
 /**
  * Decodifica entities HTML básicas — recent.json tem strings como "Bosnia &amp; Herzegovina".
@@ -268,6 +279,12 @@ export function computeStandings(matches, mode, preds) {
     return stats.get(team);
   }
 
+  // Initialize ALL teams from the group (even if they haven't played yet)
+  for (const m of matches) {
+    ensure(m.team_home);
+    ensure(m.team_away);
+  }
+
   for (const m of matches) {
     let h, a;
     if (mode === 'real') {
@@ -466,8 +483,8 @@ function renderTooltipContent(team, recent) {
         <div class="nm">${escapeHtml(teamPt(team))}</div>
         <div class="sub">
           Últimos ${recent.length} jogos ·
-          <span style="color:var(--green)">${wins}V</span>
-          <span style="color:var(--text-dim)">${draws}E</span>
+          <span style="color:var(--gold)">${wins}V</span>
+          <span style="color:var(--text-mute)">${draws}E</span>
           <span style="color:var(--red)">${losses}D</span>
         </div>
       </div>

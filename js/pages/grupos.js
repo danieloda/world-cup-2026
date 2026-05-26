@@ -76,12 +76,12 @@ function renderPage() {
 
   return `
     <section class="hero">
-      <div class="hero-kicker">Fase de grupos</div>
+      <div class="hero-kicker">Tabelas e posições</div>
       <h1 class="hero-title">Classificação</h1>
       <div class="hero-meta">
         <b>12 grupos</b><span class="sep"></span>
         48 seleções<span class="sep"></span>
-        2 melhores + 8 melhores 3ºs avançam
+        1º e 2º avançam + 8 melhores 3ºs
       </div>
     </section>
 
@@ -102,11 +102,10 @@ function renderPage() {
     </div>
 
     <div class="note" style="margin-bottom:20px; padding:12px 16px; background:var(--card); border-left:3px solid var(--green); border-radius:0 6px 6px 0; font-size:12px; color:var(--text-dim);">
-      <strong style="color:var(--green);">Legenda:</strong>
-      <span style="color:var(--green); font-weight:700;">verde</span> = classificado (1º e 2º) ·
-      <span style="color:var(--medal-bronze); font-weight:700;">bronze</span> = candidato a 3º melhor ·
-      cinza = eliminado.
-      <strong style="color:var(--text);">Critério:</strong> PTS → SG → GP.
+      <span style="color:#1DB954; font-weight:700;">● Verde</span> = classificado direto (1º e 2º) ·
+      <span style="color:var(--medal-bronze); font-weight:700;">● Bronze</span> = disputa vaga de 3º melhor ·
+      <span style="color:var(--text-mute);">● Cinza</span> = eliminado
+      <br><span style="color:var(--text-mute);">Critério de desempate: Pontos → Saldo de gols → Gols pró</span>
     </div>
 
     <div class="groups-grid" id="groupsGrid">
