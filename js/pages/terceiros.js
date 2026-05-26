@@ -5,6 +5,7 @@ import {
   flag, escapeHtml, teamPt, computeStandings,
   attachTeamTooltips, loadRecentMatches,
 } from '../util.js';
+import { fifaRank } from '../fifa-rank.js';
 
 // ============================================================
 // Estado
@@ -102,13 +103,14 @@ function computeThirds() {
     }
   }
 
-  // Ordenar: completos primeiro, depois por PTS/SG/GP
+  // Ordenar: completos primeiro, depois por PTS → SG → GP → FIFA rank (oficial)
   return thirds.sort((x, y) => {
     if (x.complete !== y.complete) return x.complete ? -1 : 1;
     if (!x.complete && !y.complete) return 0;
     return (y.pts ?? 0) - (x.pts ?? 0)
         || (y.sg  ?? 0) - (x.sg  ?? 0)
-        || (y.gp  ?? 0) - (x.gp  ?? 0);
+        || (y.gp  ?? 0) - (x.gp  ?? 0)
+        || fifaRank(x.team) - fifaRank(y.team);
   });
 }
 
@@ -125,7 +127,7 @@ function renderPage() {
       <h1 class="hero-title">Melhores 3ºs</h1>
       <div class="hero-meta">
         <b>${ADVANCE_COUNT} de 12</b> avançam aos 32-avos<span class="sep"></span>
-        Critério: PTS → SG → GP
+        Critério: PTS → SG → GP → Ranking FIFA
       </div>
     </section>
 
@@ -148,7 +150,7 @@ function renderPage() {
     <div class="note" style="margin-bottom:20px; padding:12px 16px; background:var(--card); border-left:3px solid var(--green); border-radius:0 6px 6px 0; font-size:12px; color:var(--text-dim);">
       <span style="color:#1DB954; font-weight:700;">● Verde</span> = avança aos 32-avos ·
       <span style="color:var(--text-mute);">● Cinza</span> = eliminado
-      <br><span style="color:var(--text-mute);">8 de 12 passam · Desempate: Pontos → Saldo → Gols pró</span>
+      <br><span style="color:var(--text-mute);">8 de 12 passam · Desempate: Pontos → Saldo → Gols pró → Ranking FIFA</span>
     </div>
 
     ${completeCount === 0

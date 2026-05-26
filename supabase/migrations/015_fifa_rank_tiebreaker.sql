@@ -42,6 +42,14 @@ $$;
 grant execute on function public.fifa_rank(text) to authenticated;
 grant select on public.team_fifa_rank to authenticated;
 
+-- RLS: leitura pública (autenticados). Sem write policy → admins via service role.
+alter table public.team_fifa_rank enable row level security;
+drop policy if exists "team_fifa_rank_select_all" on public.team_fifa_rank;
+create policy "team_fifa_rank_select_all"
+  on public.team_fifa_rank for select
+  to authenticated
+  using (true);
+
 -- ============================================================
 -- Atualiza resolve_match_slots pra usar fifa_rank como tiebreaker
 -- ============================================================

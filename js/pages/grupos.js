@@ -105,7 +105,7 @@ function renderPage() {
       <span style="color:#1DB954; font-weight:700;">● Verde</span> = classificado direto (1º e 2º) ·
       <span style="color:var(--medal-bronze); font-weight:700;">● Bronze</span> = disputa vaga de 3º melhor ·
       <span style="color:var(--text-mute);">● Cinza</span> = eliminado
-      <br><span style="color:var(--text-mute);">Critério de desempate: Pontos → Saldo de gols → Gols pró</span>
+      <br><span style="color:var(--text-mute);">Critério de desempate: Pontos → Saldo de gols → Gols pró → Ranking FIFA</span>
     </div>
 
     <div class="groups-grid" id="groupsGrid">

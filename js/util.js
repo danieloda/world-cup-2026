@@ -1,5 +1,7 @@
 // Utilitários compartilhados entre páginas.
 
+import { fifaRank } from './fifa-rank.js';
+
 // ===== Bandeiras (flag-icons) =====
 // Mapa de países para códigos ISO 3166-1 alpha-2 (lowercase)
 // Inclui as 48 seleções da Copa + adversários dos amistosos/eliminatórias
@@ -306,12 +308,13 @@ export function computeStandings(matches, mode, preds) {
   // Compute SG
   for (const s of stats.values()) s.sg = s.gp - s.gc;
 
-  // Sort: pts desc, sg desc, gp desc, name asc
+  // Sort: PTS desc → SG desc → GP desc → FIFA rank asc (oficial)
+  // Mesmo critério do SQL (resolve_match_slots): pts/sg/gf + fifa_rank tiebreaker.
   return [...stats.values()].sort((x, y) =>
     y.pts - x.pts
     || y.sg - x.sg
     || y.gp - x.gp
-    || x.team.localeCompare(y.team)
+    || fifaRank(x.team) - fifaRank(y.team)
   );
 }
 
