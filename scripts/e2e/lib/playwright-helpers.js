@@ -16,22 +16,6 @@ export async function login(page, email, password, tracker) {
   tracker?.clearContext(['step']);
 }
 
-export async function logout(page) {
-  // O app usa supabase.auth.signOut() — pode invocar diretamente
-  await page.evaluate(async () => {
-    if (window.supabase) {
-      await window.supabase.auth.signOut();
-    } else {
-      // Tenta clicar no botão de logout se existir
-      const btn = document.querySelector('[data-action="logout"], #logout, .logout');
-      if (btn) btn.click();
-    }
-    sessionStorage.clear();
-    localStorage.clear();
-  });
-  await page.context().clearCookies();
-}
-
 /**
  * Vai pra palpites-grupos.html e palpita 72 jogos.
  * @param predictions array de { match_id, pred_home, pred_away }

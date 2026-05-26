@@ -1,7 +1,7 @@
 // Tracker centralizado de TODOS os erros durante o E2E.
 // Captura: UI errors (pageerror, console.error, request failures), API errors (supabase), DB errors (alert_log).
 
-import { writeFileSync, readFileSync, existsSync } from 'fs';
+import { writeFileSync } from 'fs';
 
 export class ErrorTracker {
   constructor(outputPath) {
@@ -170,7 +170,3 @@ export class ErrorTracker {
   }
 }
 
-export function loadErrors(outputPath) {
-  if (!existsSync(outputPath)) return null;
-  return JSON.parse(readFileSync(outputPath, 'utf8'));
-}

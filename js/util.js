@@ -251,11 +251,6 @@ export function formatRelative(iso) {
 }
 
 // ===== Match helpers =====
-export function shortGround(g) {
-  if (!g) return '';
-  return g.split(' (')[0];
-}
-
 export function stageLabel(s) {
   return {
     group: 'Grupos', r32: '32-avos', r16: 'Oitavas', qf: 'Quartas',

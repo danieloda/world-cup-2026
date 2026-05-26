@@ -25,19 +25,3 @@ export async function loginAs(client, email, password) {
   return user;
 }
 
-export async function signupViaApi(client, email, password, fullName) {
-  // Tenta signup direto. Se falhar (email exists), tenta login.
-  const { data, error } = await client.auth.signUp({
-    email,
-    password,
-    options: { data: { full_name: fullName } },
-  });
-  if (error) {
-    if (error.message.includes('already registered')) {
-      // Email ja existe: faz login
-      return await loginAs(client, email, password);
-    }
-    throw new Error(`Signup ${email}: ${error.message}`);
-  }
-  return data.user;
-}
