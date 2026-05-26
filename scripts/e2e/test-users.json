@@ -1,0 +1,128 @@
+{
+  "_meta": {
+    "description": "10 test user profiles para o E2E final. Cada perfil eh deterministico (dado o expected-results, da pra prever pontos exatos).",
+    "version": 1,
+    "deadline_simulated": "2026-06-10T23:59:00-03:00"
+  },
+  "users": [
+    {
+      "key": "perfect",
+      "name": "Perfeito (Player 1)",
+      "strategy": "exact_all",
+      "champion": "match_winner",
+      "topScorer": "actual_top",
+      "paid": true,
+      "predictions_pct": 100,
+      "expected_summary": "Acerta TODOS os 104 placares exatos + campeao + artilheiro"
+    },
+    {
+      "key": "perfect_no_champ",
+      "name": "Quase-Perfeito A (Player 2)",
+      "strategy": "exact_all",
+      "champion": "non_winner",
+      "topScorer": "actual_top",
+      "paid": true,
+      "predictions_pct": 100,
+      "expected_summary": "Acerta TODOS os placares + artilheiro, mas erra campeao"
+    },
+    {
+      "key": "perfect_no_scorer",
+      "name": "Quase-Perfeito B (Player 3)",
+      "strategy": "exact_all",
+      "champion": "match_winner",
+      "topScorer": "no_goals",
+      "paid": true,
+      "predictions_pct": 100,
+      "expected_summary": "Acerta TODOS os placares + campeao, mas escolhe artilheiro que nao marca gols"
+    },
+    {
+      "key": "half_predictor",
+      "name": "Metade (Player 4)",
+      "strategy": "mixed_50",
+      "champion": "non_winner",
+      "topScorer": "no_goals",
+      "paid": true,
+      "predictions_pct": 50,
+      "expected_summary": "Palpita apenas 50% dos jogos, erra ambos bonus. Cobre cenario 'usuario meia-boca'"
+    },
+    {
+      "key": "no_champion_pick",
+      "name": "Sem Campeao (Player 5)",
+      "strategy": "winner_only",
+      "champion": null,
+      "topScorer": "actual_top",
+      "paid": true,
+      "predictions_pct": 100,
+      "expected_summary": "Acerta vencedor (sem placar exato), esquece campeao, artilheiro OK"
+    },
+    {
+      "key": "no_scorer_pick",
+      "name": "Sem Artilheiro (Player 6)",
+      "strategy": "winner_sg",
+      "champion": "match_winner",
+      "topScorer": null,
+      "paid": true,
+      "predictions_pct": 100,
+      "expected_summary": "Acerta vencedor+SG, acerta campeao, esquece artilheiro"
+    },
+    {
+      "key": "not_paid",
+      "name": "Nao Pagou (Player 7)",
+      "strategy": "exact_all",
+      "champion": "match_winner",
+      "topScorer": "actual_top",
+      "paid": false,
+      "predictions_pct": 100,
+      "expected_summary": "Tem palpites perfeitos mas paid=false. NAO deve aparecer no leaderboard."
+    },
+    {
+      "key": "last_minute",
+      "name": "Ultima Hora (Player 8)",
+      "strategy": "random",
+      "champion": "non_winner",
+      "topScorer": "no_goals",
+      "paid": true,
+      "predictions_pct": 100,
+      "expected_summary": "Palpita tudo na ultima hora (5 min antes do deadline). Cobre stress test."
+    },
+    {
+      "key": "groups_only",
+      "name": "So Grupos (Player 9)",
+      "strategy": "exact_groups_only",
+      "champion": "match_winner",
+      "topScorer": "actual_top",
+      "paid": true,
+      "predictions_pct": 69.2,
+      "expected_summary": "Palpita os 72 grupos com placar exato, esquece todos os 32 KO. Cobre cenario 'desistiu na metade'."
+    },
+    {
+      "key": "wrong_winner_partial",
+      "name": "Vencedor Errado (Player 10)",
+      "strategy": "one_side_only",
+      "champion": "non_winner",
+      "topScorer": "no_goals",
+      "paid": true,
+      "predictions_pct": 100,
+      "expected_summary": "Erra todos os vencedores mas acerta gols de um lado em 50% dos jogos. Cobre regra 'parcial' (1pt)."
+    }
+  ],
+  "strategies_doc": {
+    "exact_all": "Para CADA match com finished=true, palpita exatamente actual_home-actual_away (e pen_winner se aplicavel). Pontos esperados: 5 * stage_mult em cada.",
+    "winner_only": "Palpita o vencedor correto, mas com placar diferente (sem saldo). Ex: real 2-0 → palpite 1-0 do vencedor. Pontos: 2 * stage_mult.",
+    "winner_sg": "Palpita o vencedor + saldo correto mas placar diferente. Ex: real 2-0 → palpite 3-1. Pontos: 3 * stage_mult.",
+    "one_side_only": "Acerta gols de um lado apenas, erra vencedor. Ex: real 2-1 → palpite 0-2 (acerta gols away mas erra vencedor). Pontos: 1 * stage_mult.",
+    "mixed_50": "Palpita 50% (gera placares semi-aleatorios). Pontos variaveis.",
+    "exact_groups_only": "Palpita exato em grupos, deixa KO em branco.",
+    "random": "Placares aleatorios com seed."
+  },
+  "champion_strategies_doc": {
+    "match_winner": "Escolhe o campeao real (vencedor da Final). Bonus +50.",
+    "non_winner": "Escolhe um time que NAO foi campeao. Bonus 0.",
+    "null": "Nao escolhe campeao (esquece). Bonus 0."
+  },
+  "scorer_strategies_doc": {
+    "actual_top": "Escolhe o jogador real que mais marcou. Bonus = sum(gols * 2 * stage_mult).",
+    "no_goals": "Escolhe um goalkeeper qualquer que nao vai marcar. Bonus 0.",
+    "null": "Nao escolhe (esquece). Bonus 0."
+  }
+}
