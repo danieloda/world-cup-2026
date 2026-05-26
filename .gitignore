@@ -13,6 +13,18 @@ test-results/
 playwright-report/
 coverage/
 
+# E2E test artifacts (regenerados a cada run)
+scripts/e2e/screenshots/
+scripts/e2e/errors.json
+scripts/e2e/user-tokens.json
+scripts/e2e/expected-tournament.json
+scripts/e2e/audit-report.json
+error-screenshot.png
+
+# Supabase local
+supabase/.temp/
+supabase/.branches/
+
 # Python (scripts/fetch_recent.py)
 __pycache__/
 *.pyc

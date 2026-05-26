@@ -1,0 +1,5484 @@
+{
+  "fixtures": [
+    {
+      "id": 1489369,
+      "date": "2026-06-11T19:00:00+00:00",
+      "venue": "Estadio Azteca",
+      "city": "Mexico City",
+      "round": "Group Stage - 1",
+      "status": "NS",
+      "homeTeam": {
+        "id": 16,
+        "name": "Mexico",
+        "logo": "https://media.api-sports.io/football/teams/16.png"
+      },
+      "awayTeam": {
+        "id": 1531,
+        "name": "South Africa",
+        "logo": "https://media.api-sports.io/football/teams/1531.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1538999,
+      "date": "2026-06-12T02:00:00+00:00",
+      "venue": "Estadio Akron",
+      "city": "Zapopan",
+      "round": "Group Stage - 1",
+      "status": "NS",
+      "homeTeam": {
+        "id": 17,
+        "name": "South Korea",
+        "logo": "https://media.api-sports.io/football/teams/17.png"
+      },
+      "awayTeam": {
+        "id": 770,
+        "name": "Czech Republic",
+        "logo": "https://media.api-sports.io/football/teams/770.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1539000,
+      "date": "2026-06-12T19:00:00+00:00",
+      "venue": "BMO Field",
+      "city": null,
+      "round": "Group Stage - 1",
+      "status": "NS",
+      "homeTeam": {
+        "id": 5529,
+        "name": "Canada",
+        "logo": "https://media.api-sports.io/football/teams/5529.png"
+      },
+      "awayTeam": {
+        "id": 1113,
+        "name": "Bosnia & Herzegovina",
+        "logo": "https://media.api-sports.io/football/teams/1113.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489370,
+      "date": "2026-06-13T01:00:00+00:00",
+      "venue": "SoFi Stadium",
+      "city": null,
+      "round": "Group Stage - 1",
+      "status": "NS",
+      "homeTeam": {
+        "id": 2384,
+        "name": "USA",
+        "logo": "https://media.api-sports.io/football/teams/2384.png"
+      },
+      "awayTeam": {
+        "id": 2380,
+        "name": "Paraguay",
+        "logo": "https://media.api-sports.io/football/teams/2380.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489373,
+      "date": "2026-06-13T19:00:00+00:00",
+      "venue": null,
+      "city": null,
+      "round": "Group Stage - 1",
+      "status": "NS",
+      "homeTeam": {
+        "id": 1569,
+        "name": "Qatar",
+        "logo": "https://media.api-sports.io/football/teams/1569.png"
+      },
+      "awayTeam": {
+        "id": 15,
+        "name": "Switzerland",
+        "logo": "https://media.api-sports.io/football/teams/15.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489371,
+      "date": "2026-06-13T22:00:00+00:00",
+      "venue": "MetLife Stadium",
+      "city": null,
+      "round": "Group Stage - 1",
+      "status": "NS",
+      "homeTeam": {
+        "id": 6,
+        "name": "Brazil",
+        "logo": "https://media.api-sports.io/football/teams/6.png"
+      },
+      "awayTeam": {
+        "id": 31,
+        "name": "Morocco",
+        "logo": "https://media.api-sports.io/football/teams/31.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489372,
+      "date": "2026-06-14T01:00:00+00:00",
+      "venue": "Gillette Stadium",
+      "city": null,
+      "round": "Group Stage - 1",
+      "status": "NS",
+      "homeTeam": {
+        "id": 2386,
+        "name": "Haiti",
+        "logo": "https://media.api-sports.io/football/teams/2386.png"
+      },
+      "awayTeam": {
+        "id": 1108,
+        "name": "Scotland",
+        "logo": "https://media.api-sports.io/football/teams/1108.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1539001,
+      "date": "2026-06-14T04:00:00+00:00",
+      "venue": "BC Place",
+      "city": null,
+      "round": "Group Stage - 1",
+      "status": "NS",
+      "homeTeam": {
+        "id": 20,
+        "name": "Australia",
+        "logo": "https://media.api-sports.io/football/teams/20.png"
+      },
+      "awayTeam": {
+        "id": 777,
+        "name": "Türkiye",
+        "logo": "https://media.api-sports.io/football/teams/777.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489374,
+      "date": "2026-06-14T17:00:00+00:00",
+      "venue": "NRG Stadium",
+      "city": null,
+      "round": "Group Stage - 1",
+      "status": "NS",
+      "homeTeam": {
+        "id": 25,
+        "name": "Germany",
+        "logo": "https://media.api-sports.io/football/teams/25.png"
+      },
+      "awayTeam": {
+        "id": 5530,
+        "name": "Curaçao",
+        "logo": "https://media.api-sports.io/football/teams/5530.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489376,
+      "date": "2026-06-14T20:00:00+00:00",
+      "venue": null,
+      "city": null,
+      "round": "Group Stage - 1",
+      "status": "NS",
+      "homeTeam": {
+        "id": 1118,
+        "name": "Netherlands",
+        "logo": "https://media.api-sports.io/football/teams/1118.png"
+      },
+      "awayTeam": {
+        "id": 12,
+        "name": "Japan",
+        "logo": "https://media.api-sports.io/football/teams/12.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489375,
+      "date": "2026-06-14T23:00:00+00:00",
+      "venue": "Lincoln Financial Field",
+      "city": null,
+      "round": "Group Stage - 1",
+      "status": "NS",
+      "homeTeam": {
+        "id": 1501,
+        "name": "Ivory Coast",
+        "logo": "https://media.api-sports.io/football/teams/1501.png"
+      },
+      "awayTeam": {
+        "id": 2382,
+        "name": "Ecuador",
+        "logo": "https://media.api-sports.io/football/teams/2382.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1539002,
+      "date": "2026-06-15T02:00:00+00:00",
+      "venue": "Estadio BBVA",
+      "city": "Monterrey",
+      "round": "Group Stage - 1",
+      "status": "NS",
+      "homeTeam": {
+        "id": 5,
+        "name": "Sweden",
+        "logo": "https://media.api-sports.io/football/teams/5.png"
+      },
+      "awayTeam": {
+        "id": 28,
+        "name": "Tunisia",
+        "logo": "https://media.api-sports.io/football/teams/28.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489380,
+      "date": "2026-06-15T16:00:00+00:00",
+      "venue": "Mercedes-Benz Stadium",
+      "city": null,
+      "round": "Group Stage - 1",
+      "status": "NS",
+      "homeTeam": {
+        "id": 9,
+        "name": "Spain",
+        "logo": "https://media.api-sports.io/football/teams/9.png"
+      },
+      "awayTeam": {
+        "id": 1533,
+        "name": "Cape Verde Islands",
+        "logo": "https://media.api-sports.io/football/teams/1533.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489377,
+      "date": "2026-06-15T19:00:00+00:00",
+      "venue": "Lumen Field",
+      "city": null,
+      "round": "Group Stage - 1",
+      "status": "NS",
+      "homeTeam": {
+        "id": 1,
+        "name": "Belgium",
+        "logo": "https://media.api-sports.io/football/teams/1.png"
+      },
+      "awayTeam": {
+        "id": 32,
+        "name": "Egypt",
+        "logo": "https://media.api-sports.io/football/teams/32.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489379,
+      "date": "2026-06-15T22:00:00+00:00",
+      "venue": "Hard Rock Stadium",
+      "city": null,
+      "round": "Group Stage - 1",
+      "status": "NS",
+      "homeTeam": {
+        "id": 23,
+        "name": "Saudi Arabia",
+        "logo": "https://media.api-sports.io/football/teams/23.png"
+      },
+      "awayTeam": {
+        "id": 7,
+        "name": "Uruguay",
+        "logo": "https://media.api-sports.io/football/teams/7.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489378,
+      "date": "2026-06-16T01:00:00+00:00",
+      "venue": "SoFi Stadium",
+      "city": null,
+      "round": "Group Stage - 1",
+      "status": "NS",
+      "homeTeam": {
+        "id": 22,
+        "name": "Iran",
+        "logo": "https://media.api-sports.io/football/teams/22.png"
+      },
+      "awayTeam": {
+        "id": 4673,
+        "name": "New Zealand",
+        "logo": "https://media.api-sports.io/football/teams/4673.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489383,
+      "date": "2026-06-16T19:00:00+00:00",
+      "venue": "MetLife Stadium",
+      "city": null,
+      "round": "Group Stage - 1",
+      "status": "NS",
+      "homeTeam": {
+        "id": 2,
+        "name": "France",
+        "logo": "https://media.api-sports.io/football/teams/2.png"
+      },
+      "awayTeam": {
+        "id": 13,
+        "name": "Senegal",
+        "logo": "https://media.api-sports.io/football/teams/13.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1539016,
+      "date": "2026-06-16T22:00:00+00:00",
+      "venue": "Gillette Stadium",
+      "city": null,
+      "round": "Group Stage - 1",
+      "status": "NS",
+      "homeTeam": {
+        "id": 1567,
+        "name": "Iraq",
+        "logo": "https://media.api-sports.io/football/teams/1567.png"
+      },
+      "awayTeam": {
+        "id": 1090,
+        "name": "Norway",
+        "logo": "https://media.api-sports.io/football/teams/1090.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489381,
+      "date": "2026-06-17T01:00:00+00:00",
+      "venue": "Arrowhead Stadium",
+      "city": null,
+      "round": "Group Stage - 1",
+      "status": "NS",
+      "homeTeam": {
+        "id": 26,
+        "name": "Argentina",
+        "logo": "https://media.api-sports.io/football/teams/26.png"
+      },
+      "awayTeam": {
+        "id": 1532,
+        "name": "Algeria",
+        "logo": "https://media.api-sports.io/football/teams/1532.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489382,
+      "date": "2026-06-17T04:00:00+00:00",
+      "venue": null,
+      "city": null,
+      "round": "Group Stage - 1",
+      "status": "NS",
+      "homeTeam": {
+        "id": 775,
+        "name": "Austria",
+        "logo": "https://media.api-sports.io/football/teams/775.png"
+      },
+      "awayTeam": {
+        "id": 1548,
+        "name": "Jordan",
+        "logo": "https://media.api-sports.io/football/teams/1548.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1539003,
+      "date": "2026-06-17T17:00:00+00:00",
+      "venue": "NRG Stadium",
+      "city": null,
+      "round": "Group Stage - 1",
+      "status": "NS",
+      "homeTeam": {
+        "id": 27,
+        "name": "Portugal",
+        "logo": "https://media.api-sports.io/football/teams/27.png"
+      },
+      "awayTeam": {
+        "id": 1508,
+        "name": "Congo DR",
+        "logo": "https://media.api-sports.io/football/teams/1508.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489384,
+      "date": "2026-06-17T20:00:00+00:00",
+      "venue": null,
+      "city": null,
+      "round": "Group Stage - 1",
+      "status": "NS",
+      "homeTeam": {
+        "id": 10,
+        "name": "England",
+        "logo": "https://media.api-sports.io/football/teams/10.png"
+      },
+      "awayTeam": {
+        "id": 3,
+        "name": "Croatia",
+        "logo": "https://media.api-sports.io/football/teams/3.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489385,
+      "date": "2026-06-17T23:00:00+00:00",
+      "venue": "BMO Field",
+      "city": null,
+      "round": "Group Stage - 1",
+      "status": "NS",
+      "homeTeam": {
+        "id": 1504,
+        "name": "Ghana",
+        "logo": "https://media.api-sports.io/football/teams/1504.png"
+      },
+      "awayTeam": {
+        "id": 11,
+        "name": "Panama",
+        "logo": "https://media.api-sports.io/football/teams/11.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489386,
+      "date": "2026-06-18T02:00:00+00:00",
+      "venue": "Estadio Azteca",
+      "city": "Mexico City",
+      "round": "Group Stage - 1",
+      "status": "NS",
+      "homeTeam": {
+        "id": 1568,
+        "name": "Uzbekistan",
+        "logo": "https://media.api-sports.io/football/teams/1568.png"
+      },
+      "awayTeam": {
+        "id": 8,
+        "name": "Colombia",
+        "logo": "https://media.api-sports.io/football/teams/8.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1539004,
+      "date": "2026-06-18T16:00:00+00:00",
+      "venue": "Mercedes-Benz Stadium",
+      "city": null,
+      "round": "Group Stage - 2",
+      "status": "NS",
+      "homeTeam": {
+        "id": 770,
+        "name": "Czech Republic",
+        "logo": "https://media.api-sports.io/football/teams/770.png"
+      },
+      "awayTeam": {
+        "id": 1531,
+        "name": "South Africa",
+        "logo": "https://media.api-sports.io/football/teams/1531.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1539005,
+      "date": "2026-06-18T19:00:00+00:00",
+      "venue": "SoFi Stadium",
+      "city": null,
+      "round": "Group Stage - 2",
+      "status": "NS",
+      "homeTeam": {
+        "id": 15,
+        "name": "Switzerland",
+        "logo": "https://media.api-sports.io/football/teams/15.png"
+      },
+      "awayTeam": {
+        "id": 1113,
+        "name": "Bosnia & Herzegovina",
+        "logo": "https://media.api-sports.io/football/teams/1113.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489387,
+      "date": "2026-06-18T22:00:00+00:00",
+      "venue": "BC Place",
+      "city": null,
+      "round": "Group Stage - 2",
+      "status": "NS",
+      "homeTeam": {
+        "id": 5529,
+        "name": "Canada",
+        "logo": "https://media.api-sports.io/football/teams/5529.png"
+      },
+      "awayTeam": {
+        "id": 1569,
+        "name": "Qatar",
+        "logo": "https://media.api-sports.io/football/teams/1569.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489388,
+      "date": "2026-06-19T01:00:00+00:00",
+      "venue": "Estadio Akron",
+      "city": "Zapopan",
+      "round": "Group Stage - 2",
+      "status": "NS",
+      "homeTeam": {
+        "id": 16,
+        "name": "Mexico",
+        "logo": "https://media.api-sports.io/football/teams/16.png"
+      },
+      "awayTeam": {
+        "id": 17,
+        "name": "South Korea",
+        "logo": "https://media.api-sports.io/football/teams/17.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489391,
+      "date": "2026-06-19T19:00:00+00:00",
+      "venue": "Lumen Field",
+      "city": null,
+      "round": "Group Stage - 2",
+      "status": "NS",
+      "homeTeam": {
+        "id": 2384,
+        "name": "USA",
+        "logo": "https://media.api-sports.io/football/teams/2384.png"
+      },
+      "awayTeam": {
+        "id": 20,
+        "name": "Australia",
+        "logo": "https://media.api-sports.io/football/teams/20.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489390,
+      "date": "2026-06-19T22:00:00+00:00",
+      "venue": "Gillette Stadium",
+      "city": null,
+      "round": "Group Stage - 2",
+      "status": "NS",
+      "homeTeam": {
+        "id": 1108,
+        "name": "Scotland",
+        "logo": "https://media.api-sports.io/football/teams/1108.png"
+      },
+      "awayTeam": {
+        "id": 31,
+        "name": "Morocco",
+        "logo": "https://media.api-sports.io/football/teams/31.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489389,
+      "date": "2026-06-20T00:30:00+00:00",
+      "venue": "Lincoln Financial Field",
+      "city": null,
+      "round": "Group Stage - 2",
+      "status": "NS",
+      "homeTeam": {
+        "id": 6,
+        "name": "Brazil",
+        "logo": "https://media.api-sports.io/football/teams/6.png"
+      },
+      "awayTeam": {
+        "id": 2386,
+        "name": "Haiti",
+        "logo": "https://media.api-sports.io/football/teams/2386.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1539006,
+      "date": "2026-06-20T03:00:00+00:00",
+      "venue": null,
+      "city": null,
+      "round": "Group Stage - 2",
+      "status": "NS",
+      "homeTeam": {
+        "id": 777,
+        "name": "Türkiye",
+        "logo": "https://media.api-sports.io/football/teams/777.png"
+      },
+      "awayTeam": {
+        "id": 2380,
+        "name": "Paraguay",
+        "logo": "https://media.api-sports.io/football/teams/2380.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1539007,
+      "date": "2026-06-20T17:00:00+00:00",
+      "venue": "NRG Stadium",
+      "city": null,
+      "round": "Group Stage - 2",
+      "status": "NS",
+      "homeTeam": {
+        "id": 1118,
+        "name": "Netherlands",
+        "logo": "https://media.api-sports.io/football/teams/1118.png"
+      },
+      "awayTeam": {
+        "id": 5,
+        "name": "Sweden",
+        "logo": "https://media.api-sports.io/football/teams/5.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489393,
+      "date": "2026-06-20T20:00:00+00:00",
+      "venue": "BMO Field",
+      "city": null,
+      "round": "Group Stage - 2",
+      "status": "NS",
+      "homeTeam": {
+        "id": 25,
+        "name": "Germany",
+        "logo": "https://media.api-sports.io/football/teams/25.png"
+      },
+      "awayTeam": {
+        "id": 1501,
+        "name": "Ivory Coast",
+        "logo": "https://media.api-sports.io/football/teams/1501.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489392,
+      "date": "2026-06-21T00:00:00+00:00",
+      "venue": "Arrowhead Stadium",
+      "city": null,
+      "round": "Group Stage - 2",
+      "status": "NS",
+      "homeTeam": {
+        "id": 2382,
+        "name": "Ecuador",
+        "logo": "https://media.api-sports.io/football/teams/2382.png"
+      },
+      "awayTeam": {
+        "id": 5530,
+        "name": "Curaçao",
+        "logo": "https://media.api-sports.io/football/teams/5530.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489394,
+      "date": "2026-06-21T04:00:00+00:00",
+      "venue": "Estadio BBVA",
+      "city": "Monterrey",
+      "round": "Group Stage - 2",
+      "status": "NS",
+      "homeTeam": {
+        "id": 28,
+        "name": "Tunisia",
+        "logo": "https://media.api-sports.io/football/teams/28.png"
+      },
+      "awayTeam": {
+        "id": 12,
+        "name": "Japan",
+        "logo": "https://media.api-sports.io/football/teams/12.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489397,
+      "date": "2026-06-21T16:00:00+00:00",
+      "venue": "Mercedes-Benz Stadium",
+      "city": null,
+      "round": "Group Stage - 2",
+      "status": "NS",
+      "homeTeam": {
+        "id": 9,
+        "name": "Spain",
+        "logo": "https://media.api-sports.io/football/teams/9.png"
+      },
+      "awayTeam": {
+        "id": 23,
+        "name": "Saudi Arabia",
+        "logo": "https://media.api-sports.io/football/teams/23.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489395,
+      "date": "2026-06-21T19:00:00+00:00",
+      "venue": "SoFi Stadium",
+      "city": null,
+      "round": "Group Stage - 2",
+      "status": "NS",
+      "homeTeam": {
+        "id": 1,
+        "name": "Belgium",
+        "logo": "https://media.api-sports.io/football/teams/1.png"
+      },
+      "awayTeam": {
+        "id": 22,
+        "name": "Iran",
+        "logo": "https://media.api-sports.io/football/teams/22.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489398,
+      "date": "2026-06-21T22:00:00+00:00",
+      "venue": "Hard Rock Stadium",
+      "city": null,
+      "round": "Group Stage - 2",
+      "status": "NS",
+      "homeTeam": {
+        "id": 7,
+        "name": "Uruguay",
+        "logo": "https://media.api-sports.io/football/teams/7.png"
+      },
+      "awayTeam": {
+        "id": 1533,
+        "name": "Cape Verde Islands",
+        "logo": "https://media.api-sports.io/football/teams/1533.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489396,
+      "date": "2026-06-22T01:00:00+00:00",
+      "venue": "BC Place",
+      "city": null,
+      "round": "Group Stage - 2",
+      "status": "NS",
+      "homeTeam": {
+        "id": 4673,
+        "name": "New Zealand",
+        "logo": "https://media.api-sports.io/football/teams/4673.png"
+      },
+      "awayTeam": {
+        "id": 32,
+        "name": "Egypt",
+        "logo": "https://media.api-sports.io/football/teams/32.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489399,
+      "date": "2026-06-22T17:00:00+00:00",
+      "venue": null,
+      "city": null,
+      "round": "Group Stage - 2",
+      "status": "NS",
+      "homeTeam": {
+        "id": 26,
+        "name": "Argentina",
+        "logo": "https://media.api-sports.io/football/teams/26.png"
+      },
+      "awayTeam": {
+        "id": 775,
+        "name": "Austria",
+        "logo": "https://media.api-sports.io/football/teams/775.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1539017,
+      "date": "2026-06-22T21:00:00+00:00",
+      "venue": "Lincoln Financial Field",
+      "city": null,
+      "round": "Group Stage - 2",
+      "status": "NS",
+      "homeTeam": {
+        "id": 2,
+        "name": "France",
+        "logo": "https://media.api-sports.io/football/teams/2.png"
+      },
+      "awayTeam": {
+        "id": 1567,
+        "name": "Iraq",
+        "logo": "https://media.api-sports.io/football/teams/1567.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489401,
+      "date": "2026-06-23T00:00:00+00:00",
+      "venue": "MetLife Stadium",
+      "city": null,
+      "round": "Group Stage - 2",
+      "status": "NS",
+      "homeTeam": {
+        "id": 1090,
+        "name": "Norway",
+        "logo": "https://media.api-sports.io/football/teams/1090.png"
+      },
+      "awayTeam": {
+        "id": 13,
+        "name": "Senegal",
+        "logo": "https://media.api-sports.io/football/teams/13.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489400,
+      "date": "2026-06-23T03:00:00+00:00",
+      "venue": null,
+      "city": null,
+      "round": "Group Stage - 2",
+      "status": "NS",
+      "homeTeam": {
+        "id": 1548,
+        "name": "Jordan",
+        "logo": "https://media.api-sports.io/football/teams/1548.png"
+      },
+      "awayTeam": {
+        "id": 1532,
+        "name": "Algeria",
+        "logo": "https://media.api-sports.io/football/teams/1532.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489404,
+      "date": "2026-06-23T17:00:00+00:00",
+      "venue": "NRG Stadium",
+      "city": null,
+      "round": "Group Stage - 2",
+      "status": "NS",
+      "homeTeam": {
+        "id": 27,
+        "name": "Portugal",
+        "logo": "https://media.api-sports.io/football/teams/27.png"
+      },
+      "awayTeam": {
+        "id": 1568,
+        "name": "Uzbekistan",
+        "logo": "https://media.api-sports.io/football/teams/1568.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489402,
+      "date": "2026-06-23T20:00:00+00:00",
+      "venue": "Gillette Stadium",
+      "city": null,
+      "round": "Group Stage - 2",
+      "status": "NS",
+      "homeTeam": {
+        "id": 10,
+        "name": "England",
+        "logo": "https://media.api-sports.io/football/teams/10.png"
+      },
+      "awayTeam": {
+        "id": 1504,
+        "name": "Ghana",
+        "logo": "https://media.api-sports.io/football/teams/1504.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489403,
+      "date": "2026-06-23T23:00:00+00:00",
+      "venue": "BMO Field",
+      "city": null,
+      "round": "Group Stage - 2",
+      "status": "NS",
+      "homeTeam": {
+        "id": 11,
+        "name": "Panama",
+        "logo": "https://media.api-sports.io/football/teams/11.png"
+      },
+      "awayTeam": {
+        "id": 3,
+        "name": "Croatia",
+        "logo": "https://media.api-sports.io/football/teams/3.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1539008,
+      "date": "2026-06-24T02:00:00+00:00",
+      "venue": "Estadio Akron",
+      "city": "Zapopan",
+      "round": "Group Stage - 2",
+      "status": "NS",
+      "homeTeam": {
+        "id": 8,
+        "name": "Colombia",
+        "logo": "https://media.api-sports.io/football/teams/8.png"
+      },
+      "awayTeam": {
+        "id": 1508,
+        "name": "Congo DR",
+        "logo": "https://media.api-sports.io/football/teams/1508.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489408,
+      "date": "2026-06-24T19:00:00+00:00",
+      "venue": "BC Place",
+      "city": null,
+      "round": "Group Stage - 3",
+      "status": "NS",
+      "homeTeam": {
+        "id": 15,
+        "name": "Switzerland",
+        "logo": "https://media.api-sports.io/football/teams/15.png"
+      },
+      "awayTeam": {
+        "id": 5529,
+        "name": "Canada",
+        "logo": "https://media.api-sports.io/football/teams/5529.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1539009,
+      "date": "2026-06-24T19:00:00+00:00",
+      "venue": "Lumen Field",
+      "city": null,
+      "round": "Group Stage - 3",
+      "status": "NS",
+      "homeTeam": {
+        "id": 1113,
+        "name": "Bosnia & Herzegovina",
+        "logo": "https://media.api-sports.io/football/teams/1113.png"
+      },
+      "awayTeam": {
+        "id": 1569,
+        "name": "Qatar",
+        "logo": "https://media.api-sports.io/football/teams/1569.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489405,
+      "date": "2026-06-24T22:00:00+00:00",
+      "venue": "Mercedes-Benz Stadium",
+      "city": null,
+      "round": "Group Stage - 3",
+      "status": "NS",
+      "homeTeam": {
+        "id": 31,
+        "name": "Morocco",
+        "logo": "https://media.api-sports.io/football/teams/31.png"
+      },
+      "awayTeam": {
+        "id": 2386,
+        "name": "Haiti",
+        "logo": "https://media.api-sports.io/football/teams/2386.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489406,
+      "date": "2026-06-24T22:00:00+00:00",
+      "venue": "Hard Rock Stadium",
+      "city": null,
+      "round": "Group Stage - 3",
+      "status": "NS",
+      "homeTeam": {
+        "id": 1108,
+        "name": "Scotland",
+        "logo": "https://media.api-sports.io/football/teams/1108.png"
+      },
+      "awayTeam": {
+        "id": 6,
+        "name": "Brazil",
+        "logo": "https://media.api-sports.io/football/teams/6.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1539010,
+      "date": "2026-06-25T01:00:00+00:00",
+      "venue": "Estadio Azteca",
+      "city": "Mexico City",
+      "round": "Group Stage - 3",
+      "status": "NS",
+      "homeTeam": {
+        "id": 770,
+        "name": "Czech Republic",
+        "logo": "https://media.api-sports.io/football/teams/770.png"
+      },
+      "awayTeam": {
+        "id": 16,
+        "name": "Mexico",
+        "logo": "https://media.api-sports.io/football/teams/16.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489407,
+      "date": "2026-06-25T01:00:00+00:00",
+      "venue": "Estadio BBVA",
+      "city": "Monterrey",
+      "round": "Group Stage - 3",
+      "status": "NS",
+      "homeTeam": {
+        "id": 1531,
+        "name": "South Africa",
+        "logo": "https://media.api-sports.io/football/teams/1531.png"
+      },
+      "awayTeam": {
+        "id": 17,
+        "name": "South Korea",
+        "logo": "https://media.api-sports.io/football/teams/17.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489410,
+      "date": "2026-06-25T20:00:00+00:00",
+      "venue": "MetLife Stadium",
+      "city": null,
+      "round": "Group Stage - 3",
+      "status": "NS",
+      "homeTeam": {
+        "id": 2382,
+        "name": "Ecuador",
+        "logo": "https://media.api-sports.io/football/teams/2382.png"
+      },
+      "awayTeam": {
+        "id": 25,
+        "name": "Germany",
+        "logo": "https://media.api-sports.io/football/teams/25.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489409,
+      "date": "2026-06-25T20:00:00+00:00",
+      "venue": "Lincoln Financial Field",
+      "city": null,
+      "round": "Group Stage - 3",
+      "status": "NS",
+      "homeTeam": {
+        "id": 5530,
+        "name": "Curaçao",
+        "logo": "https://media.api-sports.io/football/teams/5530.png"
+      },
+      "awayTeam": {
+        "id": 1501,
+        "name": "Ivory Coast",
+        "logo": "https://media.api-sports.io/football/teams/1501.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1539011,
+      "date": "2026-06-25T23:00:00+00:00",
+      "venue": null,
+      "city": null,
+      "round": "Group Stage - 3",
+      "status": "NS",
+      "homeTeam": {
+        "id": 12,
+        "name": "Japan",
+        "logo": "https://media.api-sports.io/football/teams/12.png"
+      },
+      "awayTeam": {
+        "id": 5,
+        "name": "Sweden",
+        "logo": "https://media.api-sports.io/football/teams/5.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489412,
+      "date": "2026-06-25T23:00:00+00:00",
+      "venue": "Arrowhead Stadium",
+      "city": null,
+      "round": "Group Stage - 3",
+      "status": "NS",
+      "homeTeam": {
+        "id": 28,
+        "name": "Tunisia",
+        "logo": "https://media.api-sports.io/football/teams/28.png"
+      },
+      "awayTeam": {
+        "id": 1118,
+        "name": "Netherlands",
+        "logo": "https://media.api-sports.io/football/teams/1118.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1539012,
+      "date": "2026-06-26T02:00:00+00:00",
+      "venue": "SoFi Stadium",
+      "city": null,
+      "round": "Group Stage - 3",
+      "status": "NS",
+      "homeTeam": {
+        "id": 777,
+        "name": "Türkiye",
+        "logo": "https://media.api-sports.io/football/teams/777.png"
+      },
+      "awayTeam": {
+        "id": 2384,
+        "name": "USA",
+        "logo": "https://media.api-sports.io/football/teams/2384.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489411,
+      "date": "2026-06-26T02:00:00+00:00",
+      "venue": null,
+      "city": null,
+      "round": "Group Stage - 3",
+      "status": "NS",
+      "homeTeam": {
+        "id": 2380,
+        "name": "Paraguay",
+        "logo": "https://media.api-sports.io/football/teams/2380.png"
+      },
+      "awayTeam": {
+        "id": 20,
+        "name": "Australia",
+        "logo": "https://media.api-sports.io/football/teams/20.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1539074,
+      "date": "2026-06-26T19:00:00+00:00",
+      "venue": "BMO Field",
+      "city": null,
+      "round": "Group Stage - 3",
+      "status": "NS",
+      "homeTeam": {
+        "id": 13,
+        "name": "Senegal",
+        "logo": "https://media.api-sports.io/football/teams/13.png"
+      },
+      "awayTeam": {
+        "id": 1567,
+        "name": "Iraq",
+        "logo": "https://media.api-sports.io/football/teams/1567.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489416,
+      "date": "2026-06-26T19:00:00+00:00",
+      "venue": "Gillette Stadium",
+      "city": null,
+      "round": "Group Stage - 3",
+      "status": "NS",
+      "homeTeam": {
+        "id": 1090,
+        "name": "Norway",
+        "logo": "https://media.api-sports.io/football/teams/1090.png"
+      },
+      "awayTeam": {
+        "id": 2,
+        "name": "France",
+        "logo": "https://media.api-sports.io/football/teams/2.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489417,
+      "date": "2026-06-27T00:00:00+00:00",
+      "venue": "Estadio Akron",
+      "city": "Zapopan",
+      "round": "Group Stage - 3",
+      "status": "NS",
+      "homeTeam": {
+        "id": 7,
+        "name": "Uruguay",
+        "logo": "https://media.api-sports.io/football/teams/7.png"
+      },
+      "awayTeam": {
+        "id": 9,
+        "name": "Spain",
+        "logo": "https://media.api-sports.io/football/teams/9.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489413,
+      "date": "2026-06-27T00:00:00+00:00",
+      "venue": "NRG Stadium",
+      "city": null,
+      "round": "Group Stage - 3",
+      "status": "NS",
+      "homeTeam": {
+        "id": 1533,
+        "name": "Cape Verde Islands",
+        "logo": "https://media.api-sports.io/football/teams/1533.png"
+      },
+      "awayTeam": {
+        "id": 23,
+        "name": "Saudi Arabia",
+        "logo": "https://media.api-sports.io/football/teams/23.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489414,
+      "date": "2026-06-27T03:00:00+00:00",
+      "venue": "Lumen Field",
+      "city": null,
+      "round": "Group Stage - 3",
+      "status": "NS",
+      "homeTeam": {
+        "id": 32,
+        "name": "Egypt",
+        "logo": "https://media.api-sports.io/football/teams/32.png"
+      },
+      "awayTeam": {
+        "id": 22,
+        "name": "Iran",
+        "logo": "https://media.api-sports.io/football/teams/22.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489415,
+      "date": "2026-06-27T03:00:00+00:00",
+      "venue": "BC Place",
+      "city": null,
+      "round": "Group Stage - 3",
+      "status": "NS",
+      "homeTeam": {
+        "id": 4673,
+        "name": "New Zealand",
+        "logo": "https://media.api-sports.io/football/teams/4673.png"
+      },
+      "awayTeam": {
+        "id": 1,
+        "name": "Belgium",
+        "logo": "https://media.api-sports.io/football/teams/1.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489420,
+      "date": "2026-06-27T21:00:00+00:00",
+      "venue": "Lincoln Financial Field",
+      "city": null,
+      "round": "Group Stage - 3",
+      "status": "NS",
+      "homeTeam": {
+        "id": 3,
+        "name": "Croatia",
+        "logo": "https://media.api-sports.io/football/teams/3.png"
+      },
+      "awayTeam": {
+        "id": 1504,
+        "name": "Ghana",
+        "logo": "https://media.api-sports.io/football/teams/1504.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489422,
+      "date": "2026-06-27T21:00:00+00:00",
+      "venue": "MetLife Stadium",
+      "city": null,
+      "round": "Group Stage - 3",
+      "status": "NS",
+      "homeTeam": {
+        "id": 11,
+        "name": "Panama",
+        "logo": "https://media.api-sports.io/football/teams/11.png"
+      },
+      "awayTeam": {
+        "id": 10,
+        "name": "England",
+        "logo": "https://media.api-sports.io/football/teams/10.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489419,
+      "date": "2026-06-27T23:30:00+00:00",
+      "venue": "Hard Rock Stadium",
+      "city": null,
+      "round": "Group Stage - 3",
+      "status": "NS",
+      "homeTeam": {
+        "id": 8,
+        "name": "Colombia",
+        "logo": "https://media.api-sports.io/football/teams/8.png"
+      },
+      "awayTeam": {
+        "id": 27,
+        "name": "Portugal",
+        "logo": "https://media.api-sports.io/football/teams/27.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1539013,
+      "date": "2026-06-27T23:30:00+00:00",
+      "venue": "Mercedes-Benz Stadium",
+      "city": null,
+      "round": "Group Stage - 3",
+      "status": "NS",
+      "homeTeam": {
+        "id": 1508,
+        "name": "Congo DR",
+        "logo": "https://media.api-sports.io/football/teams/1508.png"
+      },
+      "awayTeam": {
+        "id": 1568,
+        "name": "Uzbekistan",
+        "logo": "https://media.api-sports.io/football/teams/1568.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489418,
+      "date": "2026-06-28T02:00:00+00:00",
+      "venue": "Arrowhead Stadium",
+      "city": null,
+      "round": "Group Stage - 3",
+      "status": "NS",
+      "homeTeam": {
+        "id": 1532,
+        "name": "Algeria",
+        "logo": "https://media.api-sports.io/football/teams/1532.png"
+      },
+      "awayTeam": {
+        "id": 775,
+        "name": "Austria",
+        "logo": "https://media.api-sports.io/football/teams/775.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    },
+    {
+      "id": 1489421,
+      "date": "2026-06-28T02:00:00+00:00",
+      "venue": null,
+      "city": null,
+      "round": "Group Stage - 3",
+      "status": "NS",
+      "homeTeam": {
+        "id": 1548,
+        "name": "Jordan",
+        "logo": "https://media.api-sports.io/football/teams/1548.png"
+      },
+      "awayTeam": {
+        "id": 26,
+        "name": "Argentina",
+        "logo": "https://media.api-sports.io/football/teams/26.png"
+      },
+      "score": {
+        "home": null,
+        "away": null,
+        "halftime": {
+          "home": null,
+          "away": null
+        },
+        "fulltime": {
+          "home": null,
+          "away": null
+        },
+        "extratime": {
+          "home": null,
+          "away": null
+        },
+        "penalty": {
+          "home": null,
+          "away": null
+        }
+      }
+    }
+  ],
+  "byRound": {
+    "Group Stage - 1": [
+      {
+        "id": 1489369,
+        "date": "2026-06-11T19:00:00+00:00",
+        "venue": "Estadio Azteca",
+        "city": "Mexico City",
+        "round": "Group Stage - 1",
+        "status": "NS",
+        "homeTeam": {
+          "id": 16,
+          "name": "Mexico",
+          "logo": "https://media.api-sports.io/football/teams/16.png"
+        },
+        "awayTeam": {
+          "id": 1531,
+          "name": "South Africa",
+          "logo": "https://media.api-sports.io/football/teams/1531.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1538999,
+        "date": "2026-06-12T02:00:00+00:00",
+        "venue": "Estadio Akron",
+        "city": "Zapopan",
+        "round": "Group Stage - 1",
+        "status": "NS",
+        "homeTeam": {
+          "id": 17,
+          "name": "South Korea",
+          "logo": "https://media.api-sports.io/football/teams/17.png"
+        },
+        "awayTeam": {
+          "id": 770,
+          "name": "Czech Republic",
+          "logo": "https://media.api-sports.io/football/teams/770.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1539000,
+        "date": "2026-06-12T19:00:00+00:00",
+        "venue": "BMO Field",
+        "city": null,
+        "round": "Group Stage - 1",
+        "status": "NS",
+        "homeTeam": {
+          "id": 5529,
+          "name": "Canada",
+          "logo": "https://media.api-sports.io/football/teams/5529.png"
+        },
+        "awayTeam": {
+          "id": 1113,
+          "name": "Bosnia & Herzegovina",
+          "logo": "https://media.api-sports.io/football/teams/1113.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489370,
+        "date": "2026-06-13T01:00:00+00:00",
+        "venue": "SoFi Stadium",
+        "city": null,
+        "round": "Group Stage - 1",
+        "status": "NS",
+        "homeTeam": {
+          "id": 2384,
+          "name": "USA",
+          "logo": "https://media.api-sports.io/football/teams/2384.png"
+        },
+        "awayTeam": {
+          "id": 2380,
+          "name": "Paraguay",
+          "logo": "https://media.api-sports.io/football/teams/2380.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489373,
+        "date": "2026-06-13T19:00:00+00:00",
+        "venue": null,
+        "city": null,
+        "round": "Group Stage - 1",
+        "status": "NS",
+        "homeTeam": {
+          "id": 1569,
+          "name": "Qatar",
+          "logo": "https://media.api-sports.io/football/teams/1569.png"
+        },
+        "awayTeam": {
+          "id": 15,
+          "name": "Switzerland",
+          "logo": "https://media.api-sports.io/football/teams/15.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489371,
+        "date": "2026-06-13T22:00:00+00:00",
+        "venue": "MetLife Stadium",
+        "city": null,
+        "round": "Group Stage - 1",
+        "status": "NS",
+        "homeTeam": {
+          "id": 6,
+          "name": "Brazil",
+          "logo": "https://media.api-sports.io/football/teams/6.png"
+        },
+        "awayTeam": {
+          "id": 31,
+          "name": "Morocco",
+          "logo": "https://media.api-sports.io/football/teams/31.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489372,
+        "date": "2026-06-14T01:00:00+00:00",
+        "venue": "Gillette Stadium",
+        "city": null,
+        "round": "Group Stage - 1",
+        "status": "NS",
+        "homeTeam": {
+          "id": 2386,
+          "name": "Haiti",
+          "logo": "https://media.api-sports.io/football/teams/2386.png"
+        },
+        "awayTeam": {
+          "id": 1108,
+          "name": "Scotland",
+          "logo": "https://media.api-sports.io/football/teams/1108.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1539001,
+        "date": "2026-06-14T04:00:00+00:00",
+        "venue": "BC Place",
+        "city": null,
+        "round": "Group Stage - 1",
+        "status": "NS",
+        "homeTeam": {
+          "id": 20,
+          "name": "Australia",
+          "logo": "https://media.api-sports.io/football/teams/20.png"
+        },
+        "awayTeam": {
+          "id": 777,
+          "name": "Türkiye",
+          "logo": "https://media.api-sports.io/football/teams/777.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489374,
+        "date": "2026-06-14T17:00:00+00:00",
+        "venue": "NRG Stadium",
+        "city": null,
+        "round": "Group Stage - 1",
+        "status": "NS",
+        "homeTeam": {
+          "id": 25,
+          "name": "Germany",
+          "logo": "https://media.api-sports.io/football/teams/25.png"
+        },
+        "awayTeam": {
+          "id": 5530,
+          "name": "Curaçao",
+          "logo": "https://media.api-sports.io/football/teams/5530.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489376,
+        "date": "2026-06-14T20:00:00+00:00",
+        "venue": null,
+        "city": null,
+        "round": "Group Stage - 1",
+        "status": "NS",
+        "homeTeam": {
+          "id": 1118,
+          "name": "Netherlands",
+          "logo": "https://media.api-sports.io/football/teams/1118.png"
+        },
+        "awayTeam": {
+          "id": 12,
+          "name": "Japan",
+          "logo": "https://media.api-sports.io/football/teams/12.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489375,
+        "date": "2026-06-14T23:00:00+00:00",
+        "venue": "Lincoln Financial Field",
+        "city": null,
+        "round": "Group Stage - 1",
+        "status": "NS",
+        "homeTeam": {
+          "id": 1501,
+          "name": "Ivory Coast",
+          "logo": "https://media.api-sports.io/football/teams/1501.png"
+        },
+        "awayTeam": {
+          "id": 2382,
+          "name": "Ecuador",
+          "logo": "https://media.api-sports.io/football/teams/2382.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1539002,
+        "date": "2026-06-15T02:00:00+00:00",
+        "venue": "Estadio BBVA",
+        "city": "Monterrey",
+        "round": "Group Stage - 1",
+        "status": "NS",
+        "homeTeam": {
+          "id": 5,
+          "name": "Sweden",
+          "logo": "https://media.api-sports.io/football/teams/5.png"
+        },
+        "awayTeam": {
+          "id": 28,
+          "name": "Tunisia",
+          "logo": "https://media.api-sports.io/football/teams/28.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489380,
+        "date": "2026-06-15T16:00:00+00:00",
+        "venue": "Mercedes-Benz Stadium",
+        "city": null,
+        "round": "Group Stage - 1",
+        "status": "NS",
+        "homeTeam": {
+          "id": 9,
+          "name": "Spain",
+          "logo": "https://media.api-sports.io/football/teams/9.png"
+        },
+        "awayTeam": {
+          "id": 1533,
+          "name": "Cape Verde Islands",
+          "logo": "https://media.api-sports.io/football/teams/1533.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489377,
+        "date": "2026-06-15T19:00:00+00:00",
+        "venue": "Lumen Field",
+        "city": null,
+        "round": "Group Stage - 1",
+        "status": "NS",
+        "homeTeam": {
+          "id": 1,
+          "name": "Belgium",
+          "logo": "https://media.api-sports.io/football/teams/1.png"
+        },
+        "awayTeam": {
+          "id": 32,
+          "name": "Egypt",
+          "logo": "https://media.api-sports.io/football/teams/32.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489379,
+        "date": "2026-06-15T22:00:00+00:00",
+        "venue": "Hard Rock Stadium",
+        "city": null,
+        "round": "Group Stage - 1",
+        "status": "NS",
+        "homeTeam": {
+          "id": 23,
+          "name": "Saudi Arabia",
+          "logo": "https://media.api-sports.io/football/teams/23.png"
+        },
+        "awayTeam": {
+          "id": 7,
+          "name": "Uruguay",
+          "logo": "https://media.api-sports.io/football/teams/7.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489378,
+        "date": "2026-06-16T01:00:00+00:00",
+        "venue": "SoFi Stadium",
+        "city": null,
+        "round": "Group Stage - 1",
+        "status": "NS",
+        "homeTeam": {
+          "id": 22,
+          "name": "Iran",
+          "logo": "https://media.api-sports.io/football/teams/22.png"
+        },
+        "awayTeam": {
+          "id": 4673,
+          "name": "New Zealand",
+          "logo": "https://media.api-sports.io/football/teams/4673.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489383,
+        "date": "2026-06-16T19:00:00+00:00",
+        "venue": "MetLife Stadium",
+        "city": null,
+        "round": "Group Stage - 1",
+        "status": "NS",
+        "homeTeam": {
+          "id": 2,
+          "name": "France",
+          "logo": "https://media.api-sports.io/football/teams/2.png"
+        },
+        "awayTeam": {
+          "id": 13,
+          "name": "Senegal",
+          "logo": "https://media.api-sports.io/football/teams/13.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1539016,
+        "date": "2026-06-16T22:00:00+00:00",
+        "venue": "Gillette Stadium",
+        "city": null,
+        "round": "Group Stage - 1",
+        "status": "NS",
+        "homeTeam": {
+          "id": 1567,
+          "name": "Iraq",
+          "logo": "https://media.api-sports.io/football/teams/1567.png"
+        },
+        "awayTeam": {
+          "id": 1090,
+          "name": "Norway",
+          "logo": "https://media.api-sports.io/football/teams/1090.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489381,
+        "date": "2026-06-17T01:00:00+00:00",
+        "venue": "Arrowhead Stadium",
+        "city": null,
+        "round": "Group Stage - 1",
+        "status": "NS",
+        "homeTeam": {
+          "id": 26,
+          "name": "Argentina",
+          "logo": "https://media.api-sports.io/football/teams/26.png"
+        },
+        "awayTeam": {
+          "id": 1532,
+          "name": "Algeria",
+          "logo": "https://media.api-sports.io/football/teams/1532.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489382,
+        "date": "2026-06-17T04:00:00+00:00",
+        "venue": null,
+        "city": null,
+        "round": "Group Stage - 1",
+        "status": "NS",
+        "homeTeam": {
+          "id": 775,
+          "name": "Austria",
+          "logo": "https://media.api-sports.io/football/teams/775.png"
+        },
+        "awayTeam": {
+          "id": 1548,
+          "name": "Jordan",
+          "logo": "https://media.api-sports.io/football/teams/1548.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1539003,
+        "date": "2026-06-17T17:00:00+00:00",
+        "venue": "NRG Stadium",
+        "city": null,
+        "round": "Group Stage - 1",
+        "status": "NS",
+        "homeTeam": {
+          "id": 27,
+          "name": "Portugal",
+          "logo": "https://media.api-sports.io/football/teams/27.png"
+        },
+        "awayTeam": {
+          "id": 1508,
+          "name": "Congo DR",
+          "logo": "https://media.api-sports.io/football/teams/1508.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489384,
+        "date": "2026-06-17T20:00:00+00:00",
+        "venue": null,
+        "city": null,
+        "round": "Group Stage - 1",
+        "status": "NS",
+        "homeTeam": {
+          "id": 10,
+          "name": "England",
+          "logo": "https://media.api-sports.io/football/teams/10.png"
+        },
+        "awayTeam": {
+          "id": 3,
+          "name": "Croatia",
+          "logo": "https://media.api-sports.io/football/teams/3.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489385,
+        "date": "2026-06-17T23:00:00+00:00",
+        "venue": "BMO Field",
+        "city": null,
+        "round": "Group Stage - 1",
+        "status": "NS",
+        "homeTeam": {
+          "id": 1504,
+          "name": "Ghana",
+          "logo": "https://media.api-sports.io/football/teams/1504.png"
+        },
+        "awayTeam": {
+          "id": 11,
+          "name": "Panama",
+          "logo": "https://media.api-sports.io/football/teams/11.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489386,
+        "date": "2026-06-18T02:00:00+00:00",
+        "venue": "Estadio Azteca",
+        "city": "Mexico City",
+        "round": "Group Stage - 1",
+        "status": "NS",
+        "homeTeam": {
+          "id": 1568,
+          "name": "Uzbekistan",
+          "logo": "https://media.api-sports.io/football/teams/1568.png"
+        },
+        "awayTeam": {
+          "id": 8,
+          "name": "Colombia",
+          "logo": "https://media.api-sports.io/football/teams/8.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      }
+    ],
+    "Group Stage - 2": [
+      {
+        "id": 1539004,
+        "date": "2026-06-18T16:00:00+00:00",
+        "venue": "Mercedes-Benz Stadium",
+        "city": null,
+        "round": "Group Stage - 2",
+        "status": "NS",
+        "homeTeam": {
+          "id": 770,
+          "name": "Czech Republic",
+          "logo": "https://media.api-sports.io/football/teams/770.png"
+        },
+        "awayTeam": {
+          "id": 1531,
+          "name": "South Africa",
+          "logo": "https://media.api-sports.io/football/teams/1531.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1539005,
+        "date": "2026-06-18T19:00:00+00:00",
+        "venue": "SoFi Stadium",
+        "city": null,
+        "round": "Group Stage - 2",
+        "status": "NS",
+        "homeTeam": {
+          "id": 15,
+          "name": "Switzerland",
+          "logo": "https://media.api-sports.io/football/teams/15.png"
+        },
+        "awayTeam": {
+          "id": 1113,
+          "name": "Bosnia & Herzegovina",
+          "logo": "https://media.api-sports.io/football/teams/1113.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489387,
+        "date": "2026-06-18T22:00:00+00:00",
+        "venue": "BC Place",
+        "city": null,
+        "round": "Group Stage - 2",
+        "status": "NS",
+        "homeTeam": {
+          "id": 5529,
+          "name": "Canada",
+          "logo": "https://media.api-sports.io/football/teams/5529.png"
+        },
+        "awayTeam": {
+          "id": 1569,
+          "name": "Qatar",
+          "logo": "https://media.api-sports.io/football/teams/1569.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489388,
+        "date": "2026-06-19T01:00:00+00:00",
+        "venue": "Estadio Akron",
+        "city": "Zapopan",
+        "round": "Group Stage - 2",
+        "status": "NS",
+        "homeTeam": {
+          "id": 16,
+          "name": "Mexico",
+          "logo": "https://media.api-sports.io/football/teams/16.png"
+        },
+        "awayTeam": {
+          "id": 17,
+          "name": "South Korea",
+          "logo": "https://media.api-sports.io/football/teams/17.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489391,
+        "date": "2026-06-19T19:00:00+00:00",
+        "venue": "Lumen Field",
+        "city": null,
+        "round": "Group Stage - 2",
+        "status": "NS",
+        "homeTeam": {
+          "id": 2384,
+          "name": "USA",
+          "logo": "https://media.api-sports.io/football/teams/2384.png"
+        },
+        "awayTeam": {
+          "id": 20,
+          "name": "Australia",
+          "logo": "https://media.api-sports.io/football/teams/20.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489390,
+        "date": "2026-06-19T22:00:00+00:00",
+        "venue": "Gillette Stadium",
+        "city": null,
+        "round": "Group Stage - 2",
+        "status": "NS",
+        "homeTeam": {
+          "id": 1108,
+          "name": "Scotland",
+          "logo": "https://media.api-sports.io/football/teams/1108.png"
+        },
+        "awayTeam": {
+          "id": 31,
+          "name": "Morocco",
+          "logo": "https://media.api-sports.io/football/teams/31.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489389,
+        "date": "2026-06-20T00:30:00+00:00",
+        "venue": "Lincoln Financial Field",
+        "city": null,
+        "round": "Group Stage - 2",
+        "status": "NS",
+        "homeTeam": {
+          "id": 6,
+          "name": "Brazil",
+          "logo": "https://media.api-sports.io/football/teams/6.png"
+        },
+        "awayTeam": {
+          "id": 2386,
+          "name": "Haiti",
+          "logo": "https://media.api-sports.io/football/teams/2386.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1539006,
+        "date": "2026-06-20T03:00:00+00:00",
+        "venue": null,
+        "city": null,
+        "round": "Group Stage - 2",
+        "status": "NS",
+        "homeTeam": {
+          "id": 777,
+          "name": "Türkiye",
+          "logo": "https://media.api-sports.io/football/teams/777.png"
+        },
+        "awayTeam": {
+          "id": 2380,
+          "name": "Paraguay",
+          "logo": "https://media.api-sports.io/football/teams/2380.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1539007,
+        "date": "2026-06-20T17:00:00+00:00",
+        "venue": "NRG Stadium",
+        "city": null,
+        "round": "Group Stage - 2",
+        "status": "NS",
+        "homeTeam": {
+          "id": 1118,
+          "name": "Netherlands",
+          "logo": "https://media.api-sports.io/football/teams/1118.png"
+        },
+        "awayTeam": {
+          "id": 5,
+          "name": "Sweden",
+          "logo": "https://media.api-sports.io/football/teams/5.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489393,
+        "date": "2026-06-20T20:00:00+00:00",
+        "venue": "BMO Field",
+        "city": null,
+        "round": "Group Stage - 2",
+        "status": "NS",
+        "homeTeam": {
+          "id": 25,
+          "name": "Germany",
+          "logo": "https://media.api-sports.io/football/teams/25.png"
+        },
+        "awayTeam": {
+          "id": 1501,
+          "name": "Ivory Coast",
+          "logo": "https://media.api-sports.io/football/teams/1501.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489392,
+        "date": "2026-06-21T00:00:00+00:00",
+        "venue": "Arrowhead Stadium",
+        "city": null,
+        "round": "Group Stage - 2",
+        "status": "NS",
+        "homeTeam": {
+          "id": 2382,
+          "name": "Ecuador",
+          "logo": "https://media.api-sports.io/football/teams/2382.png"
+        },
+        "awayTeam": {
+          "id": 5530,
+          "name": "Curaçao",
+          "logo": "https://media.api-sports.io/football/teams/5530.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489394,
+        "date": "2026-06-21T04:00:00+00:00",
+        "venue": "Estadio BBVA",
+        "city": "Monterrey",
+        "round": "Group Stage - 2",
+        "status": "NS",
+        "homeTeam": {
+          "id": 28,
+          "name": "Tunisia",
+          "logo": "https://media.api-sports.io/football/teams/28.png"
+        },
+        "awayTeam": {
+          "id": 12,
+          "name": "Japan",
+          "logo": "https://media.api-sports.io/football/teams/12.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489397,
+        "date": "2026-06-21T16:00:00+00:00",
+        "venue": "Mercedes-Benz Stadium",
+        "city": null,
+        "round": "Group Stage - 2",
+        "status": "NS",
+        "homeTeam": {
+          "id": 9,
+          "name": "Spain",
+          "logo": "https://media.api-sports.io/football/teams/9.png"
+        },
+        "awayTeam": {
+          "id": 23,
+          "name": "Saudi Arabia",
+          "logo": "https://media.api-sports.io/football/teams/23.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489395,
+        "date": "2026-06-21T19:00:00+00:00",
+        "venue": "SoFi Stadium",
+        "city": null,
+        "round": "Group Stage - 2",
+        "status": "NS",
+        "homeTeam": {
+          "id": 1,
+          "name": "Belgium",
+          "logo": "https://media.api-sports.io/football/teams/1.png"
+        },
+        "awayTeam": {
+          "id": 22,
+          "name": "Iran",
+          "logo": "https://media.api-sports.io/football/teams/22.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489398,
+        "date": "2026-06-21T22:00:00+00:00",
+        "venue": "Hard Rock Stadium",
+        "city": null,
+        "round": "Group Stage - 2",
+        "status": "NS",
+        "homeTeam": {
+          "id": 7,
+          "name": "Uruguay",
+          "logo": "https://media.api-sports.io/football/teams/7.png"
+        },
+        "awayTeam": {
+          "id": 1533,
+          "name": "Cape Verde Islands",
+          "logo": "https://media.api-sports.io/football/teams/1533.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489396,
+        "date": "2026-06-22T01:00:00+00:00",
+        "venue": "BC Place",
+        "city": null,
+        "round": "Group Stage - 2",
+        "status": "NS",
+        "homeTeam": {
+          "id": 4673,
+          "name": "New Zealand",
+          "logo": "https://media.api-sports.io/football/teams/4673.png"
+        },
+        "awayTeam": {
+          "id": 32,
+          "name": "Egypt",
+          "logo": "https://media.api-sports.io/football/teams/32.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489399,
+        "date": "2026-06-22T17:00:00+00:00",
+        "venue": null,
+        "city": null,
+        "round": "Group Stage - 2",
+        "status": "NS",
+        "homeTeam": {
+          "id": 26,
+          "name": "Argentina",
+          "logo": "https://media.api-sports.io/football/teams/26.png"
+        },
+        "awayTeam": {
+          "id": 775,
+          "name": "Austria",
+          "logo": "https://media.api-sports.io/football/teams/775.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1539017,
+        "date": "2026-06-22T21:00:00+00:00",
+        "venue": "Lincoln Financial Field",
+        "city": null,
+        "round": "Group Stage - 2",
+        "status": "NS",
+        "homeTeam": {
+          "id": 2,
+          "name": "France",
+          "logo": "https://media.api-sports.io/football/teams/2.png"
+        },
+        "awayTeam": {
+          "id": 1567,
+          "name": "Iraq",
+          "logo": "https://media.api-sports.io/football/teams/1567.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489401,
+        "date": "2026-06-23T00:00:00+00:00",
+        "venue": "MetLife Stadium",
+        "city": null,
+        "round": "Group Stage - 2",
+        "status": "NS",
+        "homeTeam": {
+          "id": 1090,
+          "name": "Norway",
+          "logo": "https://media.api-sports.io/football/teams/1090.png"
+        },
+        "awayTeam": {
+          "id": 13,
+          "name": "Senegal",
+          "logo": "https://media.api-sports.io/football/teams/13.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489400,
+        "date": "2026-06-23T03:00:00+00:00",
+        "venue": null,
+        "city": null,
+        "round": "Group Stage - 2",
+        "status": "NS",
+        "homeTeam": {
+          "id": 1548,
+          "name": "Jordan",
+          "logo": "https://media.api-sports.io/football/teams/1548.png"
+        },
+        "awayTeam": {
+          "id": 1532,
+          "name": "Algeria",
+          "logo": "https://media.api-sports.io/football/teams/1532.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489404,
+        "date": "2026-06-23T17:00:00+00:00",
+        "venue": "NRG Stadium",
+        "city": null,
+        "round": "Group Stage - 2",
+        "status": "NS",
+        "homeTeam": {
+          "id": 27,
+          "name": "Portugal",
+          "logo": "https://media.api-sports.io/football/teams/27.png"
+        },
+        "awayTeam": {
+          "id": 1568,
+          "name": "Uzbekistan",
+          "logo": "https://media.api-sports.io/football/teams/1568.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489402,
+        "date": "2026-06-23T20:00:00+00:00",
+        "venue": "Gillette Stadium",
+        "city": null,
+        "round": "Group Stage - 2",
+        "status": "NS",
+        "homeTeam": {
+          "id": 10,
+          "name": "England",
+          "logo": "https://media.api-sports.io/football/teams/10.png"
+        },
+        "awayTeam": {
+          "id": 1504,
+          "name": "Ghana",
+          "logo": "https://media.api-sports.io/football/teams/1504.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489403,
+        "date": "2026-06-23T23:00:00+00:00",
+        "venue": "BMO Field",
+        "city": null,
+        "round": "Group Stage - 2",
+        "status": "NS",
+        "homeTeam": {
+          "id": 11,
+          "name": "Panama",
+          "logo": "https://media.api-sports.io/football/teams/11.png"
+        },
+        "awayTeam": {
+          "id": 3,
+          "name": "Croatia",
+          "logo": "https://media.api-sports.io/football/teams/3.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1539008,
+        "date": "2026-06-24T02:00:00+00:00",
+        "venue": "Estadio Akron",
+        "city": "Zapopan",
+        "round": "Group Stage - 2",
+        "status": "NS",
+        "homeTeam": {
+          "id": 8,
+          "name": "Colombia",
+          "logo": "https://media.api-sports.io/football/teams/8.png"
+        },
+        "awayTeam": {
+          "id": 1508,
+          "name": "Congo DR",
+          "logo": "https://media.api-sports.io/football/teams/1508.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      }
+    ],
+    "Group Stage - 3": [
+      {
+        "id": 1489408,
+        "date": "2026-06-24T19:00:00+00:00",
+        "venue": "BC Place",
+        "city": null,
+        "round": "Group Stage - 3",
+        "status": "NS",
+        "homeTeam": {
+          "id": 15,
+          "name": "Switzerland",
+          "logo": "https://media.api-sports.io/football/teams/15.png"
+        },
+        "awayTeam": {
+          "id": 5529,
+          "name": "Canada",
+          "logo": "https://media.api-sports.io/football/teams/5529.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1539009,
+        "date": "2026-06-24T19:00:00+00:00",
+        "venue": "Lumen Field",
+        "city": null,
+        "round": "Group Stage - 3",
+        "status": "NS",
+        "homeTeam": {
+          "id": 1113,
+          "name": "Bosnia & Herzegovina",
+          "logo": "https://media.api-sports.io/football/teams/1113.png"
+        },
+        "awayTeam": {
+          "id": 1569,
+          "name": "Qatar",
+          "logo": "https://media.api-sports.io/football/teams/1569.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489405,
+        "date": "2026-06-24T22:00:00+00:00",
+        "venue": "Mercedes-Benz Stadium",
+        "city": null,
+        "round": "Group Stage - 3",
+        "status": "NS",
+        "homeTeam": {
+          "id": 31,
+          "name": "Morocco",
+          "logo": "https://media.api-sports.io/football/teams/31.png"
+        },
+        "awayTeam": {
+          "id": 2386,
+          "name": "Haiti",
+          "logo": "https://media.api-sports.io/football/teams/2386.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489406,
+        "date": "2026-06-24T22:00:00+00:00",
+        "venue": "Hard Rock Stadium",
+        "city": null,
+        "round": "Group Stage - 3",
+        "status": "NS",
+        "homeTeam": {
+          "id": 1108,
+          "name": "Scotland",
+          "logo": "https://media.api-sports.io/football/teams/1108.png"
+        },
+        "awayTeam": {
+          "id": 6,
+          "name": "Brazil",
+          "logo": "https://media.api-sports.io/football/teams/6.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1539010,
+        "date": "2026-06-25T01:00:00+00:00",
+        "venue": "Estadio Azteca",
+        "city": "Mexico City",
+        "round": "Group Stage - 3",
+        "status": "NS",
+        "homeTeam": {
+          "id": 770,
+          "name": "Czech Republic",
+          "logo": "https://media.api-sports.io/football/teams/770.png"
+        },
+        "awayTeam": {
+          "id": 16,
+          "name": "Mexico",
+          "logo": "https://media.api-sports.io/football/teams/16.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489407,
+        "date": "2026-06-25T01:00:00+00:00",
+        "venue": "Estadio BBVA",
+        "city": "Monterrey",
+        "round": "Group Stage - 3",
+        "status": "NS",
+        "homeTeam": {
+          "id": 1531,
+          "name": "South Africa",
+          "logo": "https://media.api-sports.io/football/teams/1531.png"
+        },
+        "awayTeam": {
+          "id": 17,
+          "name": "South Korea",
+          "logo": "https://media.api-sports.io/football/teams/17.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489410,
+        "date": "2026-06-25T20:00:00+00:00",
+        "venue": "MetLife Stadium",
+        "city": null,
+        "round": "Group Stage - 3",
+        "status": "NS",
+        "homeTeam": {
+          "id": 2382,
+          "name": "Ecuador",
+          "logo": "https://media.api-sports.io/football/teams/2382.png"
+        },
+        "awayTeam": {
+          "id": 25,
+          "name": "Germany",
+          "logo": "https://media.api-sports.io/football/teams/25.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489409,
+        "date": "2026-06-25T20:00:00+00:00",
+        "venue": "Lincoln Financial Field",
+        "city": null,
+        "round": "Group Stage - 3",
+        "status": "NS",
+        "homeTeam": {
+          "id": 5530,
+          "name": "Curaçao",
+          "logo": "https://media.api-sports.io/football/teams/5530.png"
+        },
+        "awayTeam": {
+          "id": 1501,
+          "name": "Ivory Coast",
+          "logo": "https://media.api-sports.io/football/teams/1501.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1539011,
+        "date": "2026-06-25T23:00:00+00:00",
+        "venue": null,
+        "city": null,
+        "round": "Group Stage - 3",
+        "status": "NS",
+        "homeTeam": {
+          "id": 12,
+          "name": "Japan",
+          "logo": "https://media.api-sports.io/football/teams/12.png"
+        },
+        "awayTeam": {
+          "id": 5,
+          "name": "Sweden",
+          "logo": "https://media.api-sports.io/football/teams/5.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489412,
+        "date": "2026-06-25T23:00:00+00:00",
+        "venue": "Arrowhead Stadium",
+        "city": null,
+        "round": "Group Stage - 3",
+        "status": "NS",
+        "homeTeam": {
+          "id": 28,
+          "name": "Tunisia",
+          "logo": "https://media.api-sports.io/football/teams/28.png"
+        },
+        "awayTeam": {
+          "id": 1118,
+          "name": "Netherlands",
+          "logo": "https://media.api-sports.io/football/teams/1118.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1539012,
+        "date": "2026-06-26T02:00:00+00:00",
+        "venue": "SoFi Stadium",
+        "city": null,
+        "round": "Group Stage - 3",
+        "status": "NS",
+        "homeTeam": {
+          "id": 777,
+          "name": "Türkiye",
+          "logo": "https://media.api-sports.io/football/teams/777.png"
+        },
+        "awayTeam": {
+          "id": 2384,
+          "name": "USA",
+          "logo": "https://media.api-sports.io/football/teams/2384.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489411,
+        "date": "2026-06-26T02:00:00+00:00",
+        "venue": null,
+        "city": null,
+        "round": "Group Stage - 3",
+        "status": "NS",
+        "homeTeam": {
+          "id": 2380,
+          "name": "Paraguay",
+          "logo": "https://media.api-sports.io/football/teams/2380.png"
+        },
+        "awayTeam": {
+          "id": 20,
+          "name": "Australia",
+          "logo": "https://media.api-sports.io/football/teams/20.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1539074,
+        "date": "2026-06-26T19:00:00+00:00",
+        "venue": "BMO Field",
+        "city": null,
+        "round": "Group Stage - 3",
+        "status": "NS",
+        "homeTeam": {
+          "id": 13,
+          "name": "Senegal",
+          "logo": "https://media.api-sports.io/football/teams/13.png"
+        },
+        "awayTeam": {
+          "id": 1567,
+          "name": "Iraq",
+          "logo": "https://media.api-sports.io/football/teams/1567.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489416,
+        "date": "2026-06-26T19:00:00+00:00",
+        "venue": "Gillette Stadium",
+        "city": null,
+        "round": "Group Stage - 3",
+        "status": "NS",
+        "homeTeam": {
+          "id": 1090,
+          "name": "Norway",
+          "logo": "https://media.api-sports.io/football/teams/1090.png"
+        },
+        "awayTeam": {
+          "id": 2,
+          "name": "France",
+          "logo": "https://media.api-sports.io/football/teams/2.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489417,
+        "date": "2026-06-27T00:00:00+00:00",
+        "venue": "Estadio Akron",
+        "city": "Zapopan",
+        "round": "Group Stage - 3",
+        "status": "NS",
+        "homeTeam": {
+          "id": 7,
+          "name": "Uruguay",
+          "logo": "https://media.api-sports.io/football/teams/7.png"
+        },
+        "awayTeam": {
+          "id": 9,
+          "name": "Spain",
+          "logo": "https://media.api-sports.io/football/teams/9.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489413,
+        "date": "2026-06-27T00:00:00+00:00",
+        "venue": "NRG Stadium",
+        "city": null,
+        "round": "Group Stage - 3",
+        "status": "NS",
+        "homeTeam": {
+          "id": 1533,
+          "name": "Cape Verde Islands",
+          "logo": "https://media.api-sports.io/football/teams/1533.png"
+        },
+        "awayTeam": {
+          "id": 23,
+          "name": "Saudi Arabia",
+          "logo": "https://media.api-sports.io/football/teams/23.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489414,
+        "date": "2026-06-27T03:00:00+00:00",
+        "venue": "Lumen Field",
+        "city": null,
+        "round": "Group Stage - 3",
+        "status": "NS",
+        "homeTeam": {
+          "id": 32,
+          "name": "Egypt",
+          "logo": "https://media.api-sports.io/football/teams/32.png"
+        },
+        "awayTeam": {
+          "id": 22,
+          "name": "Iran",
+          "logo": "https://media.api-sports.io/football/teams/22.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489415,
+        "date": "2026-06-27T03:00:00+00:00",
+        "venue": "BC Place",
+        "city": null,
+        "round": "Group Stage - 3",
+        "status": "NS",
+        "homeTeam": {
+          "id": 4673,
+          "name": "New Zealand",
+          "logo": "https://media.api-sports.io/football/teams/4673.png"
+        },
+        "awayTeam": {
+          "id": 1,
+          "name": "Belgium",
+          "logo": "https://media.api-sports.io/football/teams/1.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489420,
+        "date": "2026-06-27T21:00:00+00:00",
+        "venue": "Lincoln Financial Field",
+        "city": null,
+        "round": "Group Stage - 3",
+        "status": "NS",
+        "homeTeam": {
+          "id": 3,
+          "name": "Croatia",
+          "logo": "https://media.api-sports.io/football/teams/3.png"
+        },
+        "awayTeam": {
+          "id": 1504,
+          "name": "Ghana",
+          "logo": "https://media.api-sports.io/football/teams/1504.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489422,
+        "date": "2026-06-27T21:00:00+00:00",
+        "venue": "MetLife Stadium",
+        "city": null,
+        "round": "Group Stage - 3",
+        "status": "NS",
+        "homeTeam": {
+          "id": 11,
+          "name": "Panama",
+          "logo": "https://media.api-sports.io/football/teams/11.png"
+        },
+        "awayTeam": {
+          "id": 10,
+          "name": "England",
+          "logo": "https://media.api-sports.io/football/teams/10.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489419,
+        "date": "2026-06-27T23:30:00+00:00",
+        "venue": "Hard Rock Stadium",
+        "city": null,
+        "round": "Group Stage - 3",
+        "status": "NS",
+        "homeTeam": {
+          "id": 8,
+          "name": "Colombia",
+          "logo": "https://media.api-sports.io/football/teams/8.png"
+        },
+        "awayTeam": {
+          "id": 27,
+          "name": "Portugal",
+          "logo": "https://media.api-sports.io/football/teams/27.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1539013,
+        "date": "2026-06-27T23:30:00+00:00",
+        "venue": "Mercedes-Benz Stadium",
+        "city": null,
+        "round": "Group Stage - 3",
+        "status": "NS",
+        "homeTeam": {
+          "id": 1508,
+          "name": "Congo DR",
+          "logo": "https://media.api-sports.io/football/teams/1508.png"
+        },
+        "awayTeam": {
+          "id": 1568,
+          "name": "Uzbekistan",
+          "logo": "https://media.api-sports.io/football/teams/1568.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489418,
+        "date": "2026-06-28T02:00:00+00:00",
+        "venue": "Arrowhead Stadium",
+        "city": null,
+        "round": "Group Stage - 3",
+        "status": "NS",
+        "homeTeam": {
+          "id": 1532,
+          "name": "Algeria",
+          "logo": "https://media.api-sports.io/football/teams/1532.png"
+        },
+        "awayTeam": {
+          "id": 775,
+          "name": "Austria",
+          "logo": "https://media.api-sports.io/football/teams/775.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      },
+      {
+        "id": 1489421,
+        "date": "2026-06-28T02:00:00+00:00",
+        "venue": null,
+        "city": null,
+        "round": "Group Stage - 3",
+        "status": "NS",
+        "homeTeam": {
+          "id": 1548,
+          "name": "Jordan",
+          "logo": "https://media.api-sports.io/football/teams/1548.png"
+        },
+        "awayTeam": {
+          "id": 26,
+          "name": "Argentina",
+          "logo": "https://media.api-sports.io/football/teams/26.png"
+        },
+        "score": {
+          "home": null,
+          "away": null,
+          "halftime": {
+            "home": null,
+            "away": null
+          },
+          "fulltime": {
+            "home": null,
+            "away": null
+          },
+          "extratime": {
+            "home": null,
+            "away": null
+          },
+          "penalty": {
+            "home": null,
+            "away": null
+          }
+        }
+      }
+    ]
+  }
+}
