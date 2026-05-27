@@ -955,6 +955,17 @@ img { max-width: 100%; height: auto; }
   margin-bottom: 4px;
   line-height: 1.45;
 }
+.signup-step-note {
+  background: rgba(255, 255, 255, 0.04);
+  border-left: 3px solid var(--green);
+  border-radius: 0 6px 6px 0;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.5;
+  margin-top: 16px;
+}
+.signup-step-note strong { color: var(--text); }
 
 /* ===== Avatar upload (complete-profile) ===== */
 .avatar-upload {

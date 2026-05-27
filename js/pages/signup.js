@@ -40,7 +40,7 @@ form.addEventListener('submit', async (e) => {
   if (result.needsConfirmation) {
     // Email confirmation ON — usuário precisa confirmar antes de entrar
     form.querySelectorAll('input, button').forEach((el) => { el.disabled = true; });
-    showSuccess(`Conta criada! Enviamos um email de confirmação para ${email}. Clique no link para ativar sua conta e depois faça login.`);
+    showSuccess(`Conta criada! 📩 Enviamos um email de confirmação para ${email}. Clique no link, faça login e escolha sua foto de avatar pra começar.`);
   } else {
     // Sem email confirmation (caso desligado) — vai direto pro perfil
     window.location.href = 'complete-profile.html';
