@@ -113,7 +113,7 @@ function renderPalpitesTab(counts) {
       🎯 <strong>5 pts</strong> placar exato ·
       ⚽ <strong>3 pts</strong> vencedor + saldo de gols ·
       ✓ <strong>2 pts</strong> só vencedor/empate ·
-      ½ <strong>1 pt</strong> acertou gols de um time.
+      🥅 <strong>1 pt</strong> acertou gols de um time.
       <br><span style="color:var(--text-mute);">Salva automático · Trava no apito</span>
     </div>
 
