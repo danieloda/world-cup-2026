@@ -2,7 +2,7 @@ import { requireAuth } from '../auth.js';
 import { renderShell } from '../sidebar.js';
 import { supabase } from '../supabase.js';
 import {
-  flag, escapeHtml, teamPt, groundShort, formatTime, formatBrDate,
+  flag, flagEmoji, escapeHtml, teamPt, groundShort, formatTime, formatBrDate,
   stageLabel, roundLabelPt, showToast,
 } from '../util.js';
 
@@ -11,6 +11,7 @@ import {
 // ============================================================
 let profile, stats;
 let activeTab = 'users';   // 'users' | 'results' | 'settings'
+let resultsSubTab = 'pending';  // 'pending' | 'launched'
 
 // Data por aba (lazy-loaded)
 const cache = {
@@ -107,6 +108,12 @@ function attachListeners() {
     }
   });
 
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.flag-select')) {
+      document.querySelectorAll('.flag-select-list').forEach(l => l.setAttribute('hidden', ''));
+    }
+  });
+
   document.addEventListener('click', async (e) => {
     const tabBtn = e.target.closest('[data-tab]');
     if (tabBtn) {
@@ -121,6 +128,37 @@ function attachListeners() {
     if (a === 'toggle-paid')   await togglePaid(action.dataset.id);
     if (a === 'toggle-admin')  await toggleAdmin(action.dataset.id);
     if (a === 'remove-user')   await removeUser(action.dataset.id, action.dataset.name);
+    if (a === 'flag-select-toggle') {
+      const targetId = action.dataset.target;
+      const root = document.querySelector(`.flag-select[data-target="${targetId}"]`);
+      const list = root?.querySelector('.flag-select-list');
+      const willOpen = list && list.hasAttribute('hidden');
+      document.querySelectorAll('.flag-select-list').forEach(l => l.setAttribute('hidden', ''));
+      if (willOpen) list.removeAttribute('hidden');
+      return;
+    }
+    if (a === 'flag-select-pick') {
+      const targetId = action.dataset.target;
+      const value = action.dataset.value;
+      const display = action.dataset.display;
+      const team = action.dataset.team;
+      const position = action.dataset.position;
+      const hidden = document.getElementById(targetId);
+      const root = document.querySelector(`.flag-select[data-target="${targetId}"]`);
+      const trigger = root?.querySelector('.flag-select-display');
+      if (hidden) hidden.value = value;
+      if (trigger) {
+        const posBadge = position ? `<span class="pos-badge pos-${position}">${position}</span>` : '';
+        trigger.innerHTML = `<span class="flag">${flag(team)}</span> ${posBadge} <span class="name">${display}</span>`;
+      }
+      root?.querySelector('.flag-select-list')?.setAttribute('hidden', '');
+      return;
+    }
+    if (a === 'results-subtab') {
+      resultsSubTab = action.dataset.sub;
+      document.getElementById('tabBody').innerHTML = await renderResultsTab();
+      return;
+    }
     if (a === 'save-result')   await saveResult(action.dataset.matchId);
     if (a === 'clear-result')  await clearResult(action.dataset.matchId);
     if (a === 'set-pen')       setPenWinner(action.dataset.matchId, action.dataset.side);
@@ -340,7 +378,7 @@ async function loadMatches() {
 // (e.g. matches="USA", players="United States")
 const TEAM_PLAYERS_ALIAS = {
   USA: 'United States',
-  Türkiye: 'Turkey',
+  // Türkiye já está como 'Türkiye' em ambos players e matches (migration 018)
   Curaçao: 'Curacao',
   'Cape Verde': 'Cape Verde Islands',
   'Congo DR': 'DR Congo',
@@ -391,15 +429,17 @@ async function renderResultsTab() {
   const today = new Date(); today.setHours(0,0,0,0);
   const todayKey = today.toISOString().slice(0,10);
 
-  // Mostra: jogos NÃO finalizados (foco em pendentes), ordenado por data
   const pending = matches.filter(m => !m.finished);
-  const recent = matches.filter(m => m.finished).slice(-5).reverse();
+  const launched = matches.filter(m => m.finished)
+    .sort((a, b) => new Date(b.finished_at || b.match_date) - new Date(a.finished_at || a.match_date));
+
+  const showing = resultsSubTab === 'pending' ? pending : launched;
 
   return `
     <div class="kpis">
       <div class="kpi green">
         <div class="kpi-label">Finalizados</div>
-        <div class="kpi-num">${matches.filter(m => m.finished).length}<small>/${matches.length}</small></div>
+        <div class="kpi-num">${launched.length}<small>/${matches.length}</small></div>
       </div>
       <div class="kpi red">
         <div class="kpi-label">Pendentes</div>
@@ -411,13 +451,27 @@ async function renderResultsTab() {
       </div>
     </div>
 
-    <div class="section-head"><h3>Lançar resultados</h3></div>
-    <p style="color:var(--text-dim); margin-bottom:16px; font-size:13px;">
-      ${pending.length === 0 ? 'Todos os jogos finalizados. 🎉' : `${pending.length} jogo${pending.length > 1 ? 's' : ''} pendente${pending.length > 1 ? 's' : ''}.`}
-      Preencha os placares e clique <strong>Lançar</strong>. Pontos dos usuários são recalculados automaticamente.
-    </p>
+    <div class="toggle" id="resultsSubTabs" style="margin-bottom:18px;">
+      <button class="${resultsSubTab === 'pending' ? 'active' : ''}" data-action="results-subtab" data-sub="pending">
+        Lançar (${pending.length})
+      </button>
+      <button class="${resultsSubTab === 'launched' ? 'active' : ''}" data-action="results-subtab" data-sub="launched">
+        Lançados (${launched.length})
+      </button>
+    </div>
 
-    ${groupMatchesByDate(pending.slice(0, 30)).map(([dateKey, list]) => `
+    ${resultsSubTab === 'pending' ? `
+      <p style="color:var(--text-dim); margin-bottom:16px; font-size:13px;">
+        ${pending.length === 0 ? 'Todos os jogos finalizados. 🎉' : `${pending.length} jogo${pending.length > 1 ? 's' : ''} pendente${pending.length > 1 ? 's' : ''}.`}
+        Preencha os placares e clique <strong>Lançar</strong>. Pontos dos usuários são recalculados automaticamente.
+      </p>
+    ` : `
+      <p style="color:var(--text-dim); margin-bottom:16px; font-size:13px;">
+        Resultados já lançados. Edite o placar ou marcadores e clique <strong>Atualizar</strong> para corrigir inserções erradas. Use <strong>Limpar resultado</strong> para zerar.
+      </p>
+    `}
+
+    ${groupMatchesByDate(showing.slice(0, 60)).map(([dateKey, list]) => `
       <div class="date-head">
         <h4>${formatBrDate(new Date(dateKey + 'T12:00:00'))}</h4>
         <div class="sub">${list.length} jogo${list.length > 1 ? 's' : ''}</div>
@@ -425,10 +479,8 @@ async function renderResultsTab() {
       ${list.map(renderResultRow).join('')}
     `).join('')}
 
-    ${recent.length > 0 ? `
-      <div class="section-head" style="margin-top:36px;"><h3>Últimos lançados</h3></div>
-      ${recent.map(renderResultRow).join('')}
-    ` : ''}
+    ${showing.length > 60 ? `<p style="color:var(--text-mute); font-size:12px; text-align:center; margin:20px 0;">Mostrando primeiros 60 de ${showing.length}.</p>` : ''}
+    ${showing.length === 0 ? `<p style="color:var(--text-mute); text-align:center; margin:40px 0; font-style:italic;">Nenhum jogo nesta aba.</p>` : ''}
   `;
 }
 
@@ -530,9 +582,7 @@ function renderResultRow(m) {
               </div>
             ` : (available.length > 0 ? `
               <div class="scorer-add">
-                <select id="addPlayer_${m.id}">
-                  ${renderPlayerOptions(available, m.team_home, m.team_away)}
-                </select>
+                ${renderPlayerSelect(m.id, available, m.team_home, m.team_away)}
                 <input id="addQty_${m.id}" type="number" min="1" max="${Math.max(1, totalGoals - goalsAttributed)}" value="1">
                 <button class="btn btn-dark btn-sm" data-action="add-scorer" data-match-id="${m.id}">+ Adicionar</button>
               </div>
@@ -562,40 +612,50 @@ function renderResultRow(m) {
 // Position order for sorting (attackers first - more likely to score)
 const POS_ORDER = { ATA: 0, MEI: 1, DEF: 2, GOL: 3 };
 
-function renderPlayerOptions(players, homeTeam, awayTeam) {
-  // Helper: matchear time com alias (ex: 'USA' === 'United States')
+function renderPlayerSelect(matchId, players, homeTeam, awayTeam) {
   const isTeam = (playerTeam, target) =>
     playerTeam === target || TEAM_PLAYERS_ALIAS[target] === playerTeam || TEAM_PLAYERS_ALIAS[playerTeam] === target;
 
-  const homePlayers = players
-    .filter(p => isTeam(p.team, homeTeam))
-    .sort((a, b) => {
-      const posA = POS_ORDER[a.position] ?? 9;
-      const posB = POS_ORDER[b.position] ?? 9;
-      return posA - posB || a.full_name.localeCompare(b.full_name);
-    });
-  const awayPlayers = players
-    .filter(p => isTeam(p.team, awayTeam))
-    .sort((a, b) => {
-      const posA = POS_ORDER[a.position] ?? 9;
-      const posB = POS_ORDER[b.position] ?? 9;
-      return posA - posB || a.full_name.localeCompare(b.full_name);
-    });
+  const sortFn = (a, b) => {
+    const posA = POS_ORDER[a.position] ?? 9;
+    const posB = POS_ORDER[b.position] ?? 9;
+    return posA - posB || a.full_name.localeCompare(b.full_name);
+  };
+  const homePlayers = players.filter(p => isTeam(p.team, homeTeam)).sort(sortFn);
+  const awayPlayers = players.filter(p => isTeam(p.team, awayTeam)).sort(sortFn);
 
-  const renderOpt = p => `<option value="${p.id}">${escapeHtml(p.full_name)} ${p.position ? `(${p.position})` : ''} ${p.shirt_number ? '#' + p.shirt_number : ''}</option>`;
+  const renderItem = p => `
+    <div class="flag-select-item" data-action="flag-select-pick" data-target="addPlayer_${matchId}" data-value="${p.id}" data-display="${escapeHtml(p.full_name)}${p.shirt_number ? ' #' + p.shirt_number : ''}" data-team="${escapeHtml(p.team)}" data-position="${p.position || ''}">
+      <span class="flag">${flag(p.team)}</span>
+      ${p.position ? `<span class="pos-badge pos-${p.position}" title="${p.position}">${p.position}</span>` : '<span class="pos-badge"></span>'}
+      <span class="name">${escapeHtml(p.full_name)}</span>
+      <span class="meta">${p.shirt_number ? '#' + p.shirt_number : ''}</span>
+    </div>
+  `;
 
-  let html = '';
-  if (homePlayers.length > 0) {
-    html += `<optgroup label="🏠 ${escapeHtml(teamPt(homeTeam))} (${homePlayers.length})">`;
-    html += homePlayers.map(renderOpt).join('');
-    html += '</optgroup>';
-  }
-  if (awayPlayers.length > 0) {
-    html += `<optgroup label="✈️ ${escapeHtml(teamPt(awayTeam))} (${awayPlayers.length})">`;
-    html += awayPlayers.map(renderOpt).join('');
-    html += '</optgroup>';
-  }
-  return html;
+  const renderGroup = (team, list) => list.length === 0 ? '' : `
+    <div class="flag-select-group">
+      <div class="flag-select-group-label">
+        <span class="flag">${flag(team)}</span>
+        ${escapeHtml(teamPt(team))} <small>(${list.length})</small>
+      </div>
+      ${list.map(renderItem).join('')}
+    </div>
+  `;
+
+  return `
+    <div class="flag-select" data-target="addPlayer_${matchId}">
+      <input type="hidden" id="addPlayer_${matchId}" value="">
+      <button type="button" class="flag-select-trigger" data-action="flag-select-toggle" data-target="addPlayer_${matchId}">
+        <span class="flag-select-display"><em>Selecione um jogador...</em></span>
+        <span class="flag-select-caret">▾</span>
+      </button>
+      <div class="flag-select-list" hidden>
+        ${renderGroup(homeTeam, homePlayers)}
+        ${renderGroup(awayTeam, awayPlayers)}
+      </div>
+    </div>
+  `;
 }
 
 function setPenWinner(matchId, side) {

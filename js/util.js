@@ -18,7 +18,8 @@ export const FLAGS = {
   Paraguay: 'py', Portugal: 'pt', Qatar: 'qa', 'Saudi Arabia': 'sa',
   Scotland: 'gb-sct', Senegal: 'sn', 'South Africa': 'za', 'South Korea': 'kr',
   Spain: 'es', Sweden: 'se', Switzerland: 'ch', Tunisia: 'tn',
-  Turkey: 'tr', Uruguay: 'uy', USA: 'us', Uzbekistan: 'uz',
+  Türkiye: 'tr', Turkey: 'tr',  // alias antigo, mantém pra retrocompat
+  Uruguay: 'uy', USA: 'us', Uzbekistan: 'uz',
   // Outros adversários (amistosos / eliminatórias / Copa África)
   Albania: 'al', Angola: 'ao', Armenia: 'am', Azerbaijan: 'az',
   Bahrain: 'bh', Belarus: 'by', Bermuda: 'bm', Bolivia: 'bo',
@@ -55,6 +56,18 @@ export function flag(team) {
 }
 
 /**
+ * Retorna emoji unicode da bandeira — pra usar em <option> onde HTML não renderiza.
+ * Pares de regional indicators (A-Z → U+1F1E6 - U+1F1FF). Códigos compostos (gb-wls)
+ * fallback pra 🏴.
+ */
+export function flagEmoji(team) {
+  const code = FLAGS[decodeHtmlEntities(team)];
+  if (!code || code.length !== 2) return '🏴';
+  const A = 0x1F1E6;
+  return String.fromCodePoint(A + code.charCodeAt(0) - 97, A + code.charCodeAt(1) - 97);
+}
+
+/**
  * Decodifica entities HTML básicas — recent.json tem strings como "Bosnia &amp; Herzegovina".
  */
 export function decodeHtmlEntities(s) {
@@ -85,7 +98,8 @@ const TEAM_PT = {
   Paraguay: 'Paraguai', Portugal: 'Portugal', Qatar: 'Catar', 'Saudi Arabia': 'Arábia Saudita',
   Scotland: 'Escócia', Senegal: 'Senegal', 'South Africa': 'África do Sul', 'South Korea': 'Coreia do Sul',
   Spain: 'Espanha', Sweden: 'Suécia', Switzerland: 'Suíça', Tunisia: 'Tunísia',
-  Turkey: 'Turquia', Uruguay: 'Uruguai', USA: 'Estados Unidos', 'United States': 'Estados Unidos',
+  Türkiye: 'Turquia', Turkey: 'Turquia',  // alias antigo
+  Uruguay: 'Uruguai', USA: 'Estados Unidos', 'United States': 'Estados Unidos',
   Uzbekistan: 'Uzbequistão',
   // Adversários em amistosos / eliminatórias
   Albania: 'Albânia', Angola: 'Angola', Armenia: 'Armênia', Azerbaijan: 'Azerbaijão',
@@ -389,6 +403,21 @@ export function attachTeamTooltips(recentByTeam) {
     tooltip.id = 'teamTooltip';
     tooltip.className = 'team-tooltip';
     document.body.appendChild(tooltip);
+  }
+
+  // Dica visível pro usuário descobrir o tooltip
+  if (!document.getElementById('teamTooltipHint')) {
+    const firstTeam = document.querySelector('.team-name[data-team]');
+    if (firstTeam) {
+      const hint = document.createElement('div');
+      hint.id = 'teamTooltipHint';
+      hint.className = 'tooltip-hint';
+      hint.innerHTML = '💡 Passe o mouse sobre o nome de uma seleção para ver as <b>últimas 10 partidas</b>.';
+      const main = document.querySelector('main') || document.body;
+      const hero = main.querySelector('.hero');
+      if (hero && hero.parentNode) hero.parentNode.insertBefore(hint, hero.nextSibling);
+      else main.insertBefore(hint, main.firstChild);
+    }
   }
 
   // Remove handlers de invocação anterior
