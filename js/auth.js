@@ -51,6 +51,32 @@ export async function signIn(email, password) {
 }
 
 /**
+ * Cadastro: email + senha + nome de exibição.
+ * O nome vai pro user_metadata (full_name) e é usado quando o profile
+ * é auto-criado no primeiro login (após confirmar email).
+ * Com "Confirm email" ON no Supabase, NÃO há sessão até confirmar.
+ * Retorna { ok, error, needsConfirmation }.
+ */
+export async function signUp(email, password, fullName) {
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: { full_name: fullName },
+      emailRedirectTo: `${window.location.origin}/login.html?confirmed=1`,
+    },
+  });
+  if (error) return { ok: false, error: humanizeAuthError(error) };
+  // Se identities vazio = email já cadastrado (Supabase não revela por segurança)
+  const alreadyExists = data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0;
+  if (alreadyExists) {
+    return { ok: false, error: 'Este email já está cadastrado. Tente entrar.' };
+  }
+  // session null = precisa confirmar email
+  return { ok: true, needsConfirmation: !data.session };
+}
+
+/**
  * Logout e redireciona pra /login.
  */
 export async function signOut() {
@@ -63,8 +89,13 @@ export async function signOut() {
  * Auto-cria profile no primeiro login (com defaults seguros).
  * Use no início de cada página protegida.
  *
+ * Gate de avatar: se o profile não tem avatar_url, redireciona pra
+ * complete-profile.html (avatar é obrigatório). Pule esse gate passando
+ * { skipAvatarGate: true } na própria complete-profile.html.
+ *
  * Opções:
- *   { adminOnly: true }  — exige is_admin no profile
+ *   { adminOnly: true }       — exige is_admin no profile
+ *   { skipAvatarGate: true }  — não redireciona mesmo sem avatar
  */
 export async function requireAuth(options = {}) {
   const session = await getSession();
@@ -85,6 +116,11 @@ export async function requireAuth(options = {}) {
   }
   if (options.adminOnly && !profile.is_admin) {
     window.location.replace('inicio.html');
+    return null;
+  }
+  // Gate de avatar obrigatório (admins isentos — já têm avatar local)
+  if (!options.skipAvatarGate && !profile.avatar_url && !profile.is_admin) {
+    window.location.replace('complete-profile.html');
     return null;
   }
   return { session, profile };
@@ -129,8 +165,12 @@ export async function redirectIfAuthed() {
 function humanizeAuthError(error) {
   const msg = (error.message || '').toLowerCase();
   if (msg.includes('invalid login credentials')) return 'Email ou senha incorretos.';
-  if (msg.includes('email not confirmed')) return 'Confirme seu email antes de entrar.';
-  if (msg.includes('rate limit')) return 'Muitas tentativas. Espere alguns minutos.';
-  if (msg.includes('network')) return 'Sem conexão. Verifique sua internet.';
-  return error.message || 'Erro ao fazer login. Tente novamente.';
+  if (msg.includes('email not confirmed')) return 'Confirme seu email antes de entrar. Veja sua caixa de entrada.';
+  if (msg.includes('rate limit') || msg.includes('too many')) return 'Muitas tentativas. Espere alguns minutos.';
+  if (msg.includes('already registered') || msg.includes('already been registered')) return 'Este email já está cadastrado. Tente entrar.';
+  if (msg.includes('password') && msg.includes('least')) return 'A senha precisa ter no mínimo 6 caracteres.';
+  if (msg.includes('weak password') || msg.includes('password is too')) return 'Senha muito fraca. Use ao menos 6 caracteres.';
+  if (msg.includes('unable to validate email') || msg.includes('invalid format') || msg.includes('email address') && msg.includes('invalid')) return 'Email inválido.';
+  if (msg.includes('network') || msg.includes('failed to fetch')) return 'Sem conexão. Verifique sua internet.';
+  return error.message || 'Erro. Tente novamente.';
 }

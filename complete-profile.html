@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Complete seu perfil · Bolão Copa 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="css/app.css" rel="stylesheet">
+</head>
+<body>
+
+<main class="login-page">
+  <form id="profileForm" class="login-card" autocomplete="off">
+    <div class="login-brand">
+      <div class="login-brand-logo">📸</div>
+      <h1>Quase lá!</h1>
+      <p>Escolha uma foto de avatar pra continuar</p>
+    </div>
+
+    <div class="avatar-upload">
+      <div class="avatar-preview" id="avatarPreview">
+        <span id="previewInitials"></span>
+        <img id="previewImg" hidden alt="preview">
+      </div>
+      <label for="avatarFile" class="btn btn-dark btn-sm" style="cursor:pointer;">
+        Escolher imagem
+      </label>
+      <input id="avatarFile" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+      <p class="avatar-hint">PNG, JPG ou WEBP · máx 2MB</p>
+    </div>
+
+    <div id="errorBox" class="login-error" hidden></div>
+
+    <button type="submit" id="submitBtn" class="btn btn-green" disabled>Salvar e entrar</button>
+
+    <div class="login-foot">
+      <a href="#" id="logoutLink" style="color:var(--text-mute);">Sair</a>
+    </div>
+  </form>
+</main>
+
+<script type="module" src="js/pages/complete-profile.js"></script>
+</body>
+</html>

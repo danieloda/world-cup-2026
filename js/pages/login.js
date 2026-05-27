@@ -8,11 +8,15 @@ const emailInput = document.getElementById('email');
 const passwordInput = document.getElementById('password');
 const submitBtn = document.getElementById('submitBtn');
 const errorBox = document.getElementById('errorBox');
+const successBox = document.getElementById('successBox');
 
-// Mostra erro vindo de redirect (?error=profile)
+// Mensagens vindas de redirect
 const urlParams = new URLSearchParams(window.location.search);
 if (urlParams.get('error') === 'profile') {
   showError('Sua conta existe, mas o perfil não foi configurado. Contate o admin.');
+}
+if (urlParams.get('confirmed') === '1') {
+  showSuccess('Email confirmado! Agora entre com seu email e senha.');
 }
 
 form.addEventListener('submit', async (e) => {
@@ -39,6 +43,14 @@ function setLoading(loading) {
 function showError(msg) {
   errorBox.textContent = msg;
   errorBox.hidden = false;
+  if (successBox) successBox.hidden = true;
+}
+
+function showSuccess(msg) {
+  if (!successBox) return;
+  successBox.textContent = msg;
+  successBox.hidden = false;
+  errorBox.hidden = true;
 }
 
 function hideError() {

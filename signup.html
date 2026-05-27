@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Login · Bolão Copa 2026</title>
-  <meta name="description" content="Entre no Bolão Copa 2026.">
+  <title>Criar conta · Bolão Copa 2026</title>
+  <meta name="description" content="Crie sua conta no Bolão Copa 2026.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -13,34 +13,41 @@
 <body>
 
 <main class="login-page">
-  <form id="loginForm" class="login-card" autocomplete="on">
+  <form id="signupForm" class="login-card" autocomplete="on">
     <div class="login-brand">
       <div class="login-brand-logo">⚽</div>
       <h1>Bolão Copa <span style="color:var(--green)">2026</span></h1>
-      <p>FIFA World Cup · Pool Privado</p>
+      <p>Criar conta</p>
+    </div>
+
+    <div class="login-field">
+      <label for="fullName">Nome de exibição</label>
+      <input id="fullName" name="fullName" type="text" required autocomplete="name"
+             maxlength="40" placeholder="Como você aparece no ranking" autofocus>
     </div>
 
     <div class="login-field">
       <label for="email">Email</label>
-      <input id="email" name="email" type="email" required autocomplete="email" autofocus>
+      <input id="email" name="email" type="email" required autocomplete="email">
     </div>
 
     <div class="login-field">
       <label for="password">Senha</label>
-      <input id="password" name="password" type="password" required autocomplete="current-password" minlength="6">
+      <input id="password" name="password" type="password" required
+             autocomplete="new-password" minlength="6" placeholder="Mínimo 6 caracteres">
     </div>
 
     <div id="errorBox" class="login-error" hidden></div>
     <div id="successBox" class="login-success" hidden></div>
 
-    <button type="submit" id="submitBtn" class="btn btn-green">Entrar</button>
+    <button type="submit" id="submitBtn" class="btn btn-green">Criar conta</button>
 
     <div class="login-foot">
-      Sem conta? <a href="signup.html" style="color:var(--green); font-weight:700;">Criar conta</a>
+      Já tem conta? <a href="login.html" style="color:var(--green); font-weight:700;">Entrar</a>
     </div>
   </form>
 </main>
 
-<script type="module" src="js/pages/login.js"></script>
+<script type="module" src="js/pages/signup.js"></script>
 </body>
 </html>
