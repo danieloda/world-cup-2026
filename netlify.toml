@@ -2,23 +2,39 @@
 # https://docs.netlify.com/configure-builds/file-based-configuration/
 
 [build]
-  # Build command - generates config.js from environment variables
+  # Build command - generates js/config.js a partir de env vars
   command = "npm run build:config"
 
-  # Directory to deploy (root since this is a static site)
+  # Diretório a deployar (root pq é site estático puro)
   publish = "."
 
-# Environment variables needed (set these in Netlify UI):
-# - SUPABASE_URL
-# - SUPABASE_PUBLISHABLE_KEY
+# ============================================================
+# ENV VARS — configurar no Netlify UI (Site Settings → Env)
+# ============================================================
+# Required:
+#   SUPABASE_URL=https://YOUR-PROJECT.supabase.co
+#   SUPABASE_PUBLISHABLE_KEY=eyJhbGciOiJIUzI1NiIs...
+#
+# Do NOT set in Netlify (são server-side only):
+#   SUPABASE_SERVICE_ROLE_KEY  (admin, secret)
+#   TELEGRAM_TOKEN             (bot, secret)
+#   API_FOOTBALL_KEY           (3rd party API)
+#   ADMIN_EMAIL/PASSWORD       (test admin)
 
-# Redirects for SPA-like behavior (optional, if needed)
-# [[redirects]]
-#   from = "/*"
-#   to = "/index.html"
-#   status = 200
+# ============================================================
+# Pretty URLs — /login → /login.html (Netlify faz auto)
+# Funciona mesmo sem redirect explícito por causa do "Pretty URLs" default.
+# ============================================================
 
+# Fallback 404 (mostra index.html se path não existe)
+[[redirects]]
+  from = "/*"
+  to = "/inicio.html"
+  status = 404
+
+# ============================================================
 # Security headers
+# ============================================================
 [[headers]]
   for = "/*"
   [headers.values]
@@ -26,19 +42,38 @@
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    # CSP permissivo o suficiente pra Supabase + flag-icons + Google Fonts
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https://cdn.jsdelivr.net https://flagcdn.com https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; frame-ancestors 'none';"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
 
-# Cache static assets
+# ============================================================
+# Cache strategy
+# ============================================================
+# Assets versionados (imagens, etc.) — 1 ano + immutable
 [[headers]]
-  for = "/assets/*"
+  for = "/assets/img/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
+# Dados JSON (fixtures, recent, etc.) — 5 min (podem atualizar)
+[[headers]]
+  for = "/assets/data/*"
+  [headers.values]
+    Cache-Control = "public, max-age=300, must-revalidate"
+
+# CSS/JS — 5 min (atualizamos com frequência)
 [[headers]]
   for = "*.css"
   [headers.values]
-    Cache-Control = "public, max-age=86400"
+    Cache-Control = "public, max-age=300, must-revalidate"
 
 [[headers]]
-  for = "*.js"
+  for = "/js/*"
   [headers.values]
-    Cache-Control = "public, max-age=86400"
+    Cache-Control = "public, max-age=300, must-revalidate"
+
+# HTML — sem cache (sempre buscar versão fresh)
+[[headers]]
+  for = "*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"

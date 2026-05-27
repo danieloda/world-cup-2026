@@ -1,5 +1,5 @@
-/* Flag icons */
-@import '../node_modules/flag-icons/css/flag-icons.min.css';
+/* Flag icons — CDN (em vez de node_modules que não existe em produção) */
+@import url('https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.5.0/css/flag-icons.min.css');
 
 /* Default size for inline flags (when not inside .flag container) */
 .fi {
