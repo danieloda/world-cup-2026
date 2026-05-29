@@ -159,6 +159,7 @@ export function groundPt(name) {
 
 // Versão curta (sem parênteses) para espaços apertados
 export function groundShort(name) {
+  if (!name) return '';
   const full = groundPt(name);
   return full.split(' (')[0];
 }

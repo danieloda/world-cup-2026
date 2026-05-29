@@ -12,7 +12,6 @@ import {
   firstName,
   formatBrShort,
   formatTime,
-  shortGround,
   stageLabel,
   computeStandings,
   isLive,
@@ -20,25 +19,27 @@ import {
 } from '../../js/util.js';
 
 describe('flag', () => {
-  it('returns correct flag for known teams', () => {
-    expect(flag('Brazil')).toBe('🇧🇷');
-    expect(flag('Argentina')).toBe('🇦🇷');
-    expect(flag('England')).toBe('🏴󠁧󠁢󠁥󠁮󠁧󠁿');
-    expect(flag('USA')).toBe('🇺🇸');
+  // flag() retorna HTML da lib flag-icons (<span class="fi fi-xx">), não emoji.
+  // Pra emoji unicode usa flagEmoji() (não testado aqui).
+  it('returns correct flag-icons HTML for known teams', () => {
+    expect(flag('Brazil')).toBe('<span class="fi fi-br"></span>');
+    expect(flag('Argentina')).toBe('<span class="fi fi-ar"></span>');
+    expect(flag('England')).toBe('<span class="fi fi-gb-eng"></span>');
+    expect(flag('USA')).toBe('<span class="fi fi-us"></span>');
   });
 
-  it('returns default flag for unknown teams', () => {
-    expect(flag('Unknown Country')).toBe('🏳️');
-    expect(flag('Atlantis')).toBe('🏳️');
+  it('returns fallback for unknown teams', () => {
+    expect(flag('Unknown Country')).toBe('<span class="fi fi-xx"></span>');
+    expect(flag('Atlantis')).toBe('<span class="fi fi-xx"></span>');
   });
 
   it('handles HTML entities in team names', () => {
-    expect(flag('Bosnia &amp; Herzegovina')).toBe('🇧🇦');
+    expect(flag('Bosnia &amp; Herzegovina')).toBe('<span class="fi fi-ba"></span>');
   });
 
   it('handles null/undefined', () => {
-    expect(flag(null)).toBe('🏳️');
-    expect(flag(undefined)).toBe('🏳️');
+    expect(flag(null)).toBe('<span class="fi fi-xx"></span>');
+    expect(flag(undefined)).toBe('<span class="fi fi-xx"></span>');
   });
 });
 
@@ -250,19 +251,19 @@ describe('formatTime', () => {
   });
 });
 
-describe('shortGround', () => {
+describe('groundShort', () => {
   it('removes parenthetical part', () => {
-    expect(shortGround('Dallas (Arlington)')).toBe('Dallas');
-    expect(shortGround('Boston (Foxborough)')).toBe('Boston');
+    expect(groundShort('Dallas (Arlington)')).toBe('Dallas');
+    expect(groundShort('Boston (Foxborough)')).toBe('Boston');
   });
 
   it('handles venues without parentheses', () => {
-    expect(shortGround('Atlanta')).toBe('Atlanta');
+    expect(groundShort('Atlanta')).toBe('Atlanta');
   });
 
   it('handles empty/null', () => {
-    expect(shortGround('')).toBe('');
-    expect(shortGround(null)).toBe('');
+    expect(groundShort('')).toBe('');
+    expect(groundShort(null)).toBe('');
   });
 });
 
@@ -320,15 +321,26 @@ describe('computeStandings', () => {
     expect(standings[2].pts).toBe(0);
   });
 
-  it('ignores unfinished matches in real mode', () => {
+  it('ignores stats of unfinished matches in real mode', () => {
     const matches = [
       makeMatch(1, 'Brazil', 'Argentina', 2, 1, true),
       makeMatch(2, 'Brazil', 'Germany', null, null, false),
     ];
 
     const standings = computeStandings(matches, 'real');
-    expect(standings.length).toBe(2);
-    expect(standings.find(s => s.team === 'Germany')).toBeUndefined();
+    // Inicializa todos os times do grupo (intencional — ver comentário em util.js
+    // "Initialize ALL teams from the group"), incluindo Germany. Mas não conta
+    // stats do jogo não-finalizado.
+    expect(standings.length).toBe(3);
+    const germany = standings.find((s) => s.team === 'Germany');
+    expect(germany).toBeDefined();
+    expect(germany.j).toBe(0);
+    expect(germany.pts).toBe(0);
+    expect(germany.gp).toBe(0);
+
+    const brazil = standings.find((s) => s.team === 'Brazil');
+    expect(brazil.j).toBe(1);
+    expect(brazil.pts).toBe(3); // só conta o match finalizado
   });
 
   it('computes standings from predictions in sim mode', () => {
