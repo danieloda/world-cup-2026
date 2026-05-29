@@ -10,7 +10,7 @@ test.describe('Authentication Flow', () => {
     await page.goto('/inicio.html');
 
     // Should redirect to login
-    await expect(page).toHaveURL(/login\.html/);
+    await expect(page).toHaveURL(/\/login(\.html)?$/);
   });
 
   test('login page renders correctly', async ({ page }) => {
@@ -29,9 +29,8 @@ test.describe('Authentication Flow', () => {
     await page.fill('input[type="password"]', 'wrongpassword');
     await page.click('button[type="submit"]');
 
-    // Should show error message (implementation-specific)
-    // Wait for either error toast or error state
-    await expect(page.locator('.error, .toast, [role="alert"]')).toBeVisible({ timeout: 5000 });
+    // Should show error message — login.js usa #errorBox (class .login-error)
+    await expect(page.locator('#errorBox, .error, .toast, [role="alert"]')).toBeVisible({ timeout: 5000 });
   });
 
   test('login form validates email format', async ({ page }) => {
@@ -71,7 +70,7 @@ test.describe('Protected Routes', () => {
       await browserPage.goto(page);
 
       // Should redirect to login
-      await expect(browserPage).toHaveURL(/login\.html/);
+      await expect(browserPage).toHaveURL(/\/login(\.html)?$/);
     });
   }
 });
@@ -81,6 +80,6 @@ test.describe('Admin Access', () => {
     await page.goto('/admin.html');
 
     // Should redirect to login
-    await expect(page).toHaveURL(/login\.html/);
+    await expect(page).toHaveURL(/\/login(\.html)?$/);
   });
 });
