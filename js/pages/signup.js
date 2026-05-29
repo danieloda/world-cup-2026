@@ -1,4 +1,5 @@
 import { signUp, redirectIfAuthed } from '../auth.js';
+import { supabase } from '../supabase.js';
 
 // Se já tem sessão, vai pra Início.
 redirectIfAuthed();
@@ -20,11 +21,15 @@ form.addEventListener('submit', async (e) => {
   const password = passwordInput.value;
 
   if (fullName.length < 2) {
-    showError('Digite seu nome de exibição (mínimo 2 caracteres).');
+    const msg = 'Digite seu nome de exibição (mínimo 2 caracteres).';
+    showError(msg);
+    supabase.rpc('report_signup_failure', { p_email: email || '(vazio)', p_reason: msg }).then(() => {}, () => {});
     return;
   }
   if (password.length < 6) {
-    showError('A senha precisa ter no mínimo 6 caracteres.');
+    const msg = 'A senha precisa ter no mínimo 6 caracteres.';
+    showError(msg);
+    supabase.rpc('report_signup_failure', { p_email: email || '(vazio)', p_reason: msg }).then(() => {}, () => {});
     return;
   }
 
@@ -34,6 +39,7 @@ form.addEventListener('submit', async (e) => {
 
   if (!result.ok) {
     showError(result.error);
+    supabase.rpc('report_signup_failure', { p_email: email, p_reason: result.error }).then(() => {}, () => {});
     return;
   }
 
