@@ -3,9 +3,9 @@
  * Aplica rosters finais oficiais do ESPN ao squads.json
  * (https://www.espn.com/soccer/story/_/id/48757621)
  *
- * 35 seleções com Final Roster Announced.
- * Outros 13 (Canada, Australia, Ecuador, Iraq, Algeria, Saudi Arabia, Uruguay,
- * Uzbekistan, Colombia, Croatia, Ghana, Panama, England) ficam como estão.
+ * Seleções com Final Roster Announced (inclui Argentina 28/05 e Panama 26/05).
+ * Outros (Canada, Australia, Ecuador, Iraq, Algeria, Saudi Arabia, Uruguay,
+ * Uzbekistan, Colombia, Croatia, Ghana, England) ficam como estão.
  */
 
 import { readFileSync, writeFileSync } from 'fs';
@@ -26,8 +26,20 @@ const TEAM_MAP = {
 
 const POS_MAP = { Goalkeepers: 'GOL', Defenders: 'DEF', Midfielders: 'MEI', Forwards: 'ATA' };
 
+// Nomes que NÃO podem virar inicial (colidiriam com outro jogador do mesmo time).
+// Ex.: Lisandro e Lautaro Martínez ambos virariam "L. Martínez" (Argentina).
+const KEEP_FULL = new Set([
+  'Lisandro Martínez',                          // Argentina (vs Lautaro Martínez)
+  'Douglas Santos', 'Danilo Santos',            // Brazil
+  'Edson Álvarez', 'Efrain Álvarez',            // Mexico
+  'Mohannad Abu Taha', 'Mohammad Abu Taha',     // Jordan
+  'Alan Benitez', 'Alcides Benitez',            // Paraguay
+  'Mario Pašalić', 'Marco Pašalić',             // Croatia (não está no ESPN, mas documenta a colisão)
+]);
+
 // Converte "Cristiano Ronaldo" → "C. Ronaldo". Monônimos preservados.
 function toInitial(fullName) {
+  if (KEEP_FULL.has(fullName)) return fullName;
   if (!fullName.includes(' ')) return fullName;
   const parts = fullName.split(' ');
   const first = parts[0];
@@ -217,11 +229,12 @@ const ESPN = {
     Midfielders: ['Martin Ødegaard','Sander Berge','Patrick Berg','Kristian Thorstvedt','Morten Thorsby','Thelo Aasgaard','Andreas Schjelderup','Jens Petter Hauge','Fredrik Aursnes','Oscar Bobb','Antonio Nusa'],
     Forwards: ['Erling Haaland','Alexander Sørloth','Jørgen Strand Larsen'],
   },
+  // Final 26-man roster announced May 28, 2026 (Mastantuono & Acuña cut)
   Argentina: {
-    Goalkeepers: ['Emiliano Martínez','Gerónimo Rulli','Juan Musso','Walter Benítez','Facundo Cambeses','Santiago Beltran'],
-    Defenders: ['Agustín Giay','Gonzalo Montiel','Nahuel Molina','Nicolás Capaldo','Kevin Mac Allister','Lucas Martínez Quarta','Marcos Senesi','Lisandro Martínez','Nicolás Otamendi','Germán Pezzella','Leonardo Balerdi','Cristian Romero','Lautaro Di Lollo','Zaid Romero','Facundo Medina','Marcos Acuña','Nicolás Tagliafico','Gabriel Rojas'],
-    Midfielders: ['Máximo Perrone','Leandro Paredes','Guido Rodríguez','Anibal Moreno','Milton Delgado','Alan Varela','Ezequiel Fernández','Rodrigo De Paul','Exequiel Palacios','Enzo Fernández','Alexis Mac Allister','Giovani Lo Celso','Nicolas Domínguez','Emiliano Buendía','Valentín Barco'],
-    Forwards: ['Lionel Messi','Nicolas Paz','Franco Mastantuono','Thiago Almada','Tomas Aranda','Nicolás González','Alejandro Garnacho','Giuliano Simeone','Matías Soule','Claudio Echeverri','Gianluca Prestianni','Santiago Castro','Lautaro Martínez','Jose Manuel Lopez','Julián Álvarez','Mateo Pellegrino'],
+    Goalkeepers: ['Emiliano Martínez','Gerónimo Rulli','Juan Musso'],
+    Defenders: ['Nahuel Molina','Nicolás Tagliafico','Gonzalo Montiel','Lisandro Martínez','Cristian Romero','Nicolás Otamendi','Leonardo Balerdi','Facundo Medina'],
+    Midfielders: ['Rodrigo De Paul','Leandro Paredes','Giovani Lo Celso','Alexis Mac Allister','Enzo Fernández','Exequiel Palacios','Valentín Barco'],
+    Forwards: ['Lionel Messi','Lautaro Martínez','Julián Álvarez','Nicolás González','Thiago Almada','Giuliano Simeone','Nicolas Paz','Jose Manuel Lopez'],
   },
   Austria: {
     Goalkeepers: ['Alexander Schlager','Florian Wiegele','Patrick Pentz'],
@@ -240,6 +253,13 @@ const ESPN = {
     Defenders: ['Rúben Dias','João Cancelo','Diogo Dalot','Nuno Mendes','Nélson Semedo','Matheus Nunes','Gonçalo Inacio','Renato Veiga','Tomás Araújo'],
     Midfielders: ['Bruno Fernandes','Bernardo Silva','Vitinha','João Neves','Rúben Neves','Samú Costa'],
     Forwards: ['Cristiano Ronaldo','Rafael Leão','João Félix','Gonçalo Ramos','Pedro Neto','Francisco Conceição','Gonçalo Guedes','Francisco Trincão'],
+  },
+  // Final 26-man roster announced May 26, 2026
+  Panama: {
+    Goalkeepers: ['Orlando Mosquera','Luis Mejía','César Samudio'],
+    Defenders: ['César Blackman','Jorge Gutiérrez','Amir Murillo','Fidel Escobar','Andrés Andrade','Edgardo Fariña','José Córdoba','Éric Davis','Jiovany Ramos','Roderick Miller'],
+    Midfielders: ['Aníbal Godoy','Carlos Harvey','Cristian Martinez','José Rodríguez','César Yanis','Yoel Bárcenas','Azarías Londoño','Adalberto Carrasquilla','Alberto Quintero'],
+    Forwards: ['Ismael Díaz','Cecilio Waterman','José Fajardo','Tomás Rodríguez'],
   },
   'Congo DR': {
     Goalkeepers: ['Lionel Mpasi','Timothy Fayulu','Matthieu Epolo'],
