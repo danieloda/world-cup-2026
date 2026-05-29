@@ -14,6 +14,7 @@ let profile, stats;
 let matches = [];                    // 72 group-stage matches, ordered by date
 let predsByMatch = new Map();        // match_id -> prediction row
 let goalsByMatch = new Map();        // match_id -> [{player, goals}]
+let oddsByMatch = new Map();         // match_id -> { odd_home, odd_draw, odd_away, bookmaker_name }
 let activeTab = 'palpites';          // 'palpites' | 'resultados'
 let activeGroup = 'all';             // 'all' | 'A'..'L'
 const saveTimers = new Map();        // match_id -> setTimeout handle
@@ -51,11 +52,12 @@ try {
 // Data
 // ============================================================
 async function loadData() {
-  const [statsRes, matchesRes, predsRes, goalsRes] = await Promise.all([
+  const [statsRes, matchesRes, predsRes, goalsRes, oddsRes] = await Promise.all([
     supabase.from('v_pool_stats').select('*').single(),
     supabase.from('matches').select('*').eq('stage', 'group').order('match_date'),
     supabase.from('predictions').select('*').eq('user_id', profile.id),
     supabase.from('player_goals').select('*, players(full_name, team)'),
+    supabase.from('match_odds').select('match_id, odd_home, odd_draw, odd_away, bookmaker_name'),
   ]);
 
   if (matchesRes.error) throw matchesRes.error;
@@ -64,6 +66,7 @@ async function loadData() {
   stats = statsRes.data ?? { finished_matches: 0, total_matches: 104, pct_played: 0, paid_users: 0 };
   matches = matchesRes.data ?? [];
   predsByMatch = new Map((predsRes.data ?? []).map(p => [p.match_id, p]));
+  oddsByMatch = new Map((oddsRes.data ?? []).map(o => [o.match_id, o]));
 
   goalsByMatch = new Map();
   for (const g of (goalsRes.data ?? [])) {
@@ -174,6 +177,22 @@ function renderPalpitesList() {
   return renderGroupedByDate(filtered, renderPalpiteRow);
 }
 
+function oddTip(o, label) {
+  return `${label} · Betano: ${escapeHtml(o.bookmaker_name || 'Casa')}`;
+}
+function renderOddSide(matchId, side) {
+  const o = oddsByMatch.get(matchId);
+  if (!o) return '';
+  const odd = side === 'home' ? o.odd_home : o.odd_away;
+  const label = side === 'home' ? '1' : '2';
+  return `<span class="odd odd-${side}" title="${oddTip(o, label)}">${Number(odd).toFixed(2)}</span>`;
+}
+function renderOddDraw(matchId) {
+  const o = oddsByMatch.get(matchId);
+  if (!o) return '';
+  return `<span class="odd odd-draw" title="${oddTip(o, 'X')}">X ${Number(o.odd_draw).toFixed(2)}</span>`;
+}
+
 function renderPalpiteRow(m) {
   const pred = predsByMatch.get(m.id);
   const locked = isLocked(m);
@@ -193,19 +212,24 @@ function renderPalpiteRow(m) {
       </div>
       <div class="team home">
         <span class="flag">${flag(m.team_home)}</span>
+        ${renderOddSide(m.id, 'home')}
         <span class="team-name" data-team="${escapeHtml(m.team_home)}">${escapeHtml(teamPt(m.team_home))}</span>
       </div>
       <div class="score-cell">
-        <input class="score-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2"
-               data-match="${m.id}" data-side="home"
-               value="${homeVal}" ${locked ? 'disabled' : ''}>
-        <span class="score-sep">–</span>
-        <input class="score-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2"
-               data-match="${m.id}" data-side="away"
-               value="${awayVal}" ${locked ? 'disabled' : ''}>
+        <div class="score-inputs">
+          <input class="score-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2"
+                 data-match="${m.id}" data-side="home"
+                 value="${homeVal}" ${locked ? 'disabled' : ''}>
+          <span class="score-sep">–</span>
+          <input class="score-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2"
+                 data-match="${m.id}" data-side="away"
+                 value="${awayVal}" ${locked ? 'disabled' : ''}>
+        </div>
+        ${renderOddDraw(m.id)}
       </div>
       <div class="team right away">
         <span class="team-name" data-team="${escapeHtml(m.team_away)}">${escapeHtml(teamPt(m.team_away))}</span>
+        ${renderOddSide(m.id, 'away')}
         <span class="flag">${flag(m.team_away)}</span>
       </div>
       <div class="match-tail">

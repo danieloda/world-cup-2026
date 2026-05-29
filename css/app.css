@@ -585,7 +585,28 @@ img { max-width: 100%; height: auto; }
   background-size: cover;
   background-position: center;
 }
-.score-cell { display: flex; align-items: center; gap: 8px; }
+.score-cell {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.score-inputs { display: flex; align-items: center; gap: 8px; }
+.odd {
+  display: inline-block;
+  font-size: 11px; font-weight: 700; line-height: 1;
+  color: var(--text-dim);
+  background: rgba(255,255,255,.05);
+  border: 1px solid var(--line);
+  padding: 4px 7px; border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+  user-select: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.odd-draw {
+  font-size: 10px; padding: 3px 7px;
+  color: var(--text-mute);
+  background: transparent;
+  border-color: transparent;
+}
 .score-input {
   width: 44px; height: 40px;
   background: #0a0a0a;

@@ -1,0 +1,49 @@
+name: Refresh Odds
+
+# Roda diariamente para puxar as odds pre-match (Betano · Match Winner)
+# de cada partida da fase de grupos via API-Football e gravar em match_odds.
+#
+# Pré-requisitos (Settings → Secrets and variables → Actions):
+#   Secrets:
+#     - API_FOOTBALL_KEY
+#     - SUPABASE_SERVICE_ROLE_KEY
+#   Variables:
+#     - SUPABASE_URL
+
+on:
+  schedule:
+    # 06:00 UTC = 03:00 BRT, todo dia
+    - cron: '0 6 * * *'
+  workflow_dispatch:        # botão "Run workflow" no GitHub UI
+
+concurrency:
+  group: refresh-odds
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    name: Fetch odds & upsert
+    runs-on: ubuntu-latest
+    # Só roda se houver credenciais (evita falhar em forks)
+    if: ${{ vars.SUPABASE_URL != '' }}
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run fetch-odds
+        env:
+          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/fetch-odds.js
