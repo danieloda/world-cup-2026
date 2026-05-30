@@ -85,9 +85,11 @@ export async function fillSingleResult(page, match, tracker) {
     const loadBtn = await page.$(loadBtnSel);
     if (loadBtn) {
       await page.click(loadBtnSel);
-      // O #addPlayer_${id} é um <input hidden> — espera ATTACHED (não visível)
+      // load-players faz fetch ASYNC dos jogadores. Esperar só o .flag-select "attached"
+      // é uma race: o componente pode montar antes dos <pick> popularem. Espera um PICK
+      // realmente existir (garante que a lista de jogadores renderizou).
       try {
-        await page.waitForSelector(`${rowSel} .flag-select[data-target="addPlayer_${id}"]`, { timeout: 8000, state: 'attached' });
+        await page.waitForSelector(`${rowSel} [data-action="flag-select-pick"]`, { timeout: 10000, state: 'attached' });
       } catch {
         tracker?.track('assertion', `Carregar jogadores falhou match #${id}`, { match_id: id });
       }
@@ -106,16 +108,26 @@ export async function fillSingleResult(page, match, tracker) {
         tracker?.track('info', `Sem flag-select pra match #${id}, skipping ${s.full_name}`, { match_id: id });
         break;
       }
-      await page.click(toggleSel);  // abre a lista
-      const pick = await page.$(pickSel);
-      if (!pick) {
+      // Espera o pick existir no DOM (tolera fetch/re-render tardio).
+      try {
+        await page.waitForSelector(pickSel, { timeout: 5000, state: 'attached' });
+      } catch {
         tracker?.track('assertion', `Player ${s.player_id} (${s.full_name}) não na lista match #${id}`, {
           match_id: id, player_id: s.player_id,
         });
-        await page.click(toggleSel).catch(() => {});  // fecha
         continue;
       }
-      await page.click(pickSel);
+      // O handler de flag-select-pick é DELEGADO no document — despachar o clique direto
+      // no elemento dispara a seleção mesmo se a lista estiver oculta/fora da viewport
+      // (robusto contra problemas de scroll/posição numa página com 60 linhas).
+      const dispatched = await page.$eval(pickSel, (el) => {
+        el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+        return true;
+      }).catch(() => false);
+      if (!dispatched) {
+        tracker?.track('assertion', `Falha ao selecionar player ${s.player_id} match #${id}`, { match_id: id, player_id: s.player_id });
+        continue;
+      }
       await page.fill(qtySel, String(s.goals));
       await page.click(addBtnSel);
       await page.waitForTimeout(300);  // espera a UI re-renderizar com o scorer adicionado

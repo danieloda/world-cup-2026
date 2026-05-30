@@ -12,6 +12,7 @@ import {
 let profile, stats;
 let activeTab = 'users';   // 'users' | 'results' | 'settings'
 let resultsSubTab = 'pending';  // 'pending' | 'launched'
+let resultsFilter = '';         // busca por time/sede na lista de resultados
 
 // Data por aba (lazy-loaded)
 const cache = {
@@ -95,8 +96,16 @@ function renderPage() {
 
 function attachListeners() {
   // Score inputs: atualiza linha quando user digita (para validar marcadores)
-  document.addEventListener('input', (e) => {
+  document.addEventListener('input', async (e) => {
     const t = e.target;
+    if (t.id === 'resultsSearch') {
+      resultsFilter = t.value;
+      document.getElementById('tabBody').innerHTML = await renderResultsTab();
+      // re-render troca o input; refoca e põe o caret no fim
+      const s = document.getElementById('resultsSearch');
+      if (s) { s.focus(); const v = s.value; s.value = ''; s.value = v; }
+      return;
+    }
     if (t.id && (t.id.startsWith('rh_') || t.id.startsWith('ra_'))) {
       const matchId = parseInt(t.id.slice(3), 10);
       const m = cache.matches?.find(x => x.id === matchId);
@@ -433,7 +442,20 @@ async function renderResultsTab() {
   const launched = matches.filter(m => m.finished)
     .sort((a, b) => new Date(b.finished_at || b.match_date) - new Date(a.finished_at || a.match_date));
 
-  const showing = resultsSubTab === 'pending' ? pending : launched;
+  let showing = resultsSubTab === 'pending' ? pending : launched;
+
+  // Filtro de busca (time pt/raw ou sede). Com busca ativa, mostra TODOS os jogos
+  // que casam (sem o cap de 60) — assim qualquer resultado antigo é alcançável p/ corrigir.
+  const filter = resultsFilter.trim().toLowerCase();
+  if (filter) {
+    showing = showing.filter(m =>
+      [m.team_home, m.team_away, teamPt(m.team_home), teamPt(m.team_away), m.ground]
+        .some(v => (v || '').toLowerCase().includes(filter))
+    );
+  }
+  const CAP = 60;
+  const capped = !filter && showing.length > CAP;
+  const visible = capped ? showing.slice(0, CAP) : showing;
 
   return `
     <div class="kpis">
@@ -471,7 +493,11 @@ async function renderResultsTab() {
       </p>
     `}
 
-    ${groupMatchesByDate(showing.slice(0, 60)).map(([dateKey, list]) => `
+    <input id="resultsSearch" type="search" placeholder="🔎 Buscar por time ou sede…" autocomplete="off"
+           value="${escapeHtml(resultsFilter)}"
+           style="width:100%; margin-bottom:16px; padding:10px 14px; background:var(--card); border:1px solid var(--line); border-radius:8px; color:var(--text); font-size:14px;">
+
+    ${groupMatchesByDate(visible).map(([dateKey, list]) => `
       <div class="date-head">
         <h4>${formatBrDate(new Date(dateKey + 'T12:00:00'))}</h4>
         <div class="sub">${list.length} jogo${list.length > 1 ? 's' : ''}</div>
@@ -479,8 +505,8 @@ async function renderResultsTab() {
       ${list.map(renderResultRow).join('')}
     `).join('')}
 
-    ${showing.length > 60 ? `<p style="color:var(--text-mute); font-size:12px; text-align:center; margin:20px 0;">Mostrando primeiros 60 de ${showing.length}.</p>` : ''}
-    ${showing.length === 0 ? `<p style="color:var(--text-mute); text-align:center; margin:40px 0; font-style:italic;">Nenhum jogo nesta aba.</p>` : ''}
+    ${capped ? `<p style="color:var(--text-mute); font-size:12px; text-align:center; margin:20px 0;">Mostrando os ${CAP} mais recentes de ${showing.length}. Use a busca acima para achar os demais.</p>` : ''}
+    ${showing.length === 0 ? `<p style="color:var(--text-mute); text-align:center; margin:40px 0; font-style:italic;">${filter ? 'Nenhum jogo casa com a busca.' : 'Nenhum jogo nesta aba.'}</p>` : ''}
   `;
 }
 
@@ -504,8 +530,10 @@ function renderResultRow(m) {
   const eligible = [...homePlayers, ...awayPlayers];
   const already = new Set(scorers.map(s => s.player_id));
   const available = eligible.filter(p => !already.has(p.id));
-  // Check if we've attempted to load (cache key exists), not just if players were found
-  const playersLoaded = cache.playersByTeam?.[m.team_home] !== undefined || cache.playersByTeam?.[m.team_away] !== undefined;
+  // Check if we've attempted to load (cache key exists), not just if players were found.
+  // AMBOS os times precisam estar em cache — senão o dropdown renderiza só com o time
+  // já cacheado e os jogadores do outro (recém-encontrado num jogo anterior) somem.
+  const playersLoaded = cache.playersByTeam?.[m.team_home] !== undefined && cache.playersByTeam?.[m.team_away] !== undefined;
 
   return `
     <div class="result-row ${m.finished ? 'done' : ''}" data-match-id="${m.id}">
