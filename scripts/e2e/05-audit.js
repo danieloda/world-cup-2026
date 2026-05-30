@@ -236,7 +236,7 @@ async function main() {
   log('blue', '\n🎯 Estado final dos matches:');
 
   // Matches com slot ainda no team_home/away (não resolveu)
-  const { data: allMatches } = await admin.from('matches').select('id, stage, team_home, team_away, actual_home, actual_away, finished');
+  const { data: allMatches } = await admin.from('matches').select('id, stage, team_home, team_away, actual_home, actual_away, pen_winner, finished');
   const stuckOnSlot = allMatches.filter((m) =>
     /^[0-9LW]/.test(m.team_home) || /^[0-9LW]/.test(m.team_away) ||
     m.team_home.includes('/') || m.team_away.includes('/')
@@ -258,9 +258,14 @@ async function main() {
 
   // Champion real
   const finalMatch = allMatches.find((m) => m.stage === 'final');
-  const actualChampionDb = finalMatch && finalMatch.finished
-    ? (finalMatch.actual_home > finalMatch.actual_away ? finalMatch.team_home : finalMatch.team_away)
-    : null;
+  // Campeão: se empate na regulamentar, decide pelo pen_winner (igual champion_bonus_for no DB)
+  let actualChampionDb = null;
+  if (finalMatch && finalMatch.finished) {
+    if (finalMatch.actual_home > finalMatch.actual_away) actualChampionDb = finalMatch.team_home;
+    else if (finalMatch.actual_away > finalMatch.actual_home) actualChampionDb = finalMatch.team_away;
+    else if (finalMatch.pen_winner === 'home') actualChampionDb = finalMatch.team_home;
+    else if (finalMatch.pen_winner === 'away') actualChampionDb = finalMatch.team_away;
+  }
   const championMatch = actualChampionDb === tournament.champion;
   log(championMatch ? 'green' : 'red',
     `   Campeão DB (${actualChampionDb}) == expected (${tournament.champion}): ${championMatch}`);

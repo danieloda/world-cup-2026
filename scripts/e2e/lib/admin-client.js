@@ -16,6 +16,21 @@ if (!SERVICE_ROLE) {
   throw new Error('SUPABASE_SERVICE_ROLE_KEY nao encontrado em .env');
 }
 
+// GUARD-RAIL: estes scripts E2E sao destrutivos (time-warp de datas, reset de dados).
+// Abortam se a URL nao for local, a menos que E2E_ALLOW_REMOTE=1 seja setado explicitamente.
+assertLocalTarget(SUPABASE_URL);
+
+export function assertLocalTarget(url) {
+  const isLocal = /^https?:\/\/(127\.0\.0\.1|localhost|0\.0\.0\.0|\[::1\])(:\d+)?/i.test(url || '');
+  if (!isLocal && process.env.E2E_ALLOW_REMOTE !== '1') {
+    throw new Error(
+      `RECUSANDO RODAR: SUPABASE_URL nao e local (${url}). ` +
+      `Os scripts E2E fazem time-warp/reset e nunca devem tocar producao. ` +
+      `Para forcar (NAO recomendado), defina E2E_ALLOW_REMOTE=1.`
+    );
+  }
+}
+
 export function makeAdminClient() {
   return createClient(SUPABASE_URL, SERVICE_ROLE, {
     auth: { persistSession: false, autoRefreshToken: false },
@@ -58,6 +73,7 @@ export async function adminCreateProfile(adminClient, user, fullName, options = 
     email: user.email,
     is_admin: options.is_admin ?? false,
     paid: options.paid ?? false,
+    ...(options.avatar_url ? { avatar_url: options.avatar_url } : {}),
   });
   if (error) throw new Error(`adminCreateProfile ${user.email}: ${error.message}`);
 }

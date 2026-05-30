@@ -1,0 +1,98 @@
+# E2E local — runbook (sem tocar produção)
+
+Roda o bolão inteiro contra um Supabase **local** (Docker), isolado de produção.
+O `.env` (produção) nunca é alterado: redirecionamos as vars via `.env.e2e.local`
+(gitignored), e `dotenv` não sobrescreve env já setado no shell.
+
+## Pré-requisitos
+- Docker rodando
+- `npx supabase` (CLI) — sem instalação global necessária
+- Browsers do Playwright (`npx playwright install chromium`)
+
+## 1. Subir o stack local
+```bash
+npx supabase start
+npx supabase status -o env     # pega API_URL, ANON/PUBLISHABLE_KEY, SERVICE_ROLE_KEY locais
+```
+
+## 2. Aplicar o seed (NÃO é auto-aplicado)
+`config.toml` aponta `[db.seed]` pra um `seed.sql` inexistente, então aplique à mão:
+```bash
+CID=supabase_db_world-cup-2026
+docker exec -i $CID psql -U postgres -d postgres < supabase/seed/01_matches.sql      # 104 jogos + backfill de slots
+docker exec -i $CID psql -U postgres -d postgres < supabase/seed/players_full.sql    # 1380 jogadores
+docker exec -i $CID psql -U postgres -d postgres < supabase/seed/03_settings.sql     # settings
+```
+> O `01_matches.sql` já faz o backfill de `slot_home/away` no final — sem isso o
+> mata-mata não resolve (a migration 005 backfilla antes do seed, em tabela vazia).
+
+## 3. (Opcional) Desativar triggers de alerta localmente
+Evita POSTs ao edge de produção (Telegram). Inofensivos sem a key, mas para zero
+contato externo:
+```bash
+docker exec -i $CID psql -U postgres -d postgres -c "
+alter table public.matches        disable trigger trg_z_alert_orphan_predictions;
+alter table public.matches        disable trigger trg_z_alert_unresolved_slots;
+alter table public.predictions     disable trigger trg_z_alert_pred_overwrite;
+alter table public.profiles        disable trigger trg_alert_signup_success;
+alter table public.champion_picks  disable trigger trg_alert_champion_change;
+alter table public.top_scorer_picks disable trigger trg_alert_scorer_change;
+alter table public.predictions     disable trigger trg_alert_picks_complete;"
+```
+
+## 4. Apontar os scripts ao local
+Crie `.env.e2e.local` (gitignored) com as credenciais do passo 1:
+```bash
+export SUPABASE_URL="http://127.0.0.1:54321"
+export SUPABASE_PUBLISHABLE_KEY="<ANON_KEY local>"
+export SUPABASE_SERVICE_ROLE_KEY="<SERVICE_ROLE_KEY local>"
+export BASE_URL="http://localhost:3000"
+```
+Os scripts E2E têm guard-rail: **abortam** se `SUPABASE_URL` não for local
+(`lib/admin-client.js`), salvo `E2E_ALLOW_REMOTE=1`.
+
+## 5. Gerar o frontend + servir
+```bash
+source .env.e2e.local && npm run build:config   # js/config.js aponta local
+npx serve -l 3000 .                              # em outro terminal/bg
+```
+
+## 6. Rodar
+```bash
+source .env.e2e.local
+
+node scripts/e2e/00-setup-local.js          # cria admin local (ADMIN_EMAIL/PASSWORD do .env)
+node scripts/e2e/01-generate-tournament.js  # oráculo expected-tournament.json
+node scripts/e2e/03-palpitar.js             # 10 users palpitam via UI
+node scripts/e2e/04-admin-results.js        # time-warp + admin lança 104 resultados via UI
+node scripts/e2e/05-audit.js                # audita a matemática vs v_leaderboard  (exit 0 = ok)
+node scripts/e2e/06-ui-assert.js            # asserções no DOM (grupos/terceiros/ranking/histórico)
+
+# Cenários determinísticos de empate + desempate FIFA (transação com rollback):
+docker exec -i $CID psql -U postgres -d postgres < scripts/e2e/scenarios/tiebreak.sql
+
+# Locks por horário + segurança:
+node scripts/e2e/test-date-locks.js
+node scripts/e2e/test-rls-hostile.js
+node scripts/e2e/test-signup-flow.js        # exige enable_confirmations=true (já no config.toml)
+node scripts/e2e/test-avatar-upload.js
+
+# Unit + specs:
+npm test
+BASE_URL=http://localhost:3000 npx playwright test
+```
+
+## 7. Cleanup
+```bash
+npm run build:config        # REGENERA js/config.js de volta pra PRODUÇÃO (lê .env)
+npx supabase stop           # mantém volume; --no-backup pra descartar
+```
+
+## Gotchas resolvidos (por que algo pode falhar num ambiente novo)
+- **slot_home NULL** → backfill agora no `01_matches.sql` (passo 2).
+- **Gate de avatar**: users sem `avatar_url` são barrados em `complete-profile.html`.
+  `03-palpitar.js` já seta um avatar default nos test users.
+- **Picker de artilheiro** (admin) é um componente custom `.flag-select` (não `<select>`);
+  `lib/admin-helpers.js` dirige via toggle+pick.
+- **enable_confirmations** local: ligado em `config.toml` p/ espelhar prod (signup flow).
+  Emails locais caem no Mailpit (http://127.0.0.1:54324).

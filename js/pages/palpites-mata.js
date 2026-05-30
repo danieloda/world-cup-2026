@@ -6,6 +6,7 @@ import {
   attachTeamTooltips, loadRecentMatches, teamPt,
   computeStandings as utilComputeStandings,
 } from '../util.js';
+import { fifaRank } from '../fifa-rank.js';
 
 // ============================================================
 // Constantes
@@ -13,9 +14,9 @@ import {
 const STAGES = [
   { id: 'r32',   label: '32-avos',        mult: 1.5 },
   { id: 'r16',   label: 'Oitavas',        mult: 2.0 },
-  { id: 'qf',    label: 'Quartas',        mult: 2.5 },
-  { id: 'sf',    label: 'Semifinais',     mult: 3.0 },
-  { id: 'final', label: 'Final · 3º Lugar', mult: 4.0 },  // agrupa Final + 3º na mesma coluna
+  { id: 'qf',    label: 'Quartas',        mult: 3.0 },
+  { id: 'sf',    label: 'Semifinais',     mult: 4.0 },
+  { id: 'final', label: 'Final · 3º Lugar', mult: 5.0 },  // agrupa Final (×5) + 3º (×2) na mesma coluna
 ];
 
 const MEZES = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
@@ -148,8 +149,9 @@ function computeSlotResolution(mode = 'real-first') {
   }
 
   // === 1.5) Slots compostos de 3ºs lugares (3A/B/C/D/F, 3C/D/F/G/H, etc.) ===
+  // Desempate oficial: pts → SG → GF → FIFA rank (igual DB resolve_match_slots e terceiros.js)
   thirdsRanked.sort((a, b) =>
-    b.pts - a.pts || b.sg - a.sg || b.gp - a.gp
+    b.pts - a.pts || b.sg - a.sg || b.gp - a.gp || fifaRank(a.team) - fifaRank(b.team)
   );
   const usedThirds = new Set();
   const koMatchesSorted = [...matches].sort((a, b) => a.id - b.id);
@@ -281,7 +283,7 @@ function renderPalpitesTab(counts) {
   return `
     <div class="note" style="margin-bottom:20px; padding:12px 16px; background:var(--card); border-left:3px solid var(--green); border-radius:0 6px 6px 0; font-size:12px; color:var(--text-dim);">
       <strong style="color:var(--green);">Multiplicadores:</strong>
-      32-avos <strong>×1.5</strong> · Oitavas <strong>×2</strong> · Quartas <strong>×2.5</strong> · Semis <strong>×3</strong> · Final <strong>×4</strong>
+      32-avos <strong>×1.5</strong> · Oitavas <strong>×2</strong> · Quartas <strong>×3</strong> · Semis <strong>×4</strong> · Final <strong>×5</strong> · 3º Lugar <strong>×2</strong>
       <br><span style="color:var(--text-mute);">Empate? Escolha quem passa nos pênaltis · Slots viram times reais após os grupos</span>
     </div>
 

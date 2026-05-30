@@ -81,7 +81,9 @@ async function createUsers(admin, profiles, tournament) {
     const tag = `[${i + 1}/${profiles.length}]`;
 
     const user = await adminCreateUser(admin, email, PASSWORD, p.name);
-    await adminCreateProfile(admin, user, p.name, { paid: p.paid });
+    // avatar_url default satisfaz o gate de avatar (js/auth.js) — senao o app
+    // redireciona pra complete-profile.html e nenhuma pagina de palpite carrega.
+    await adminCreateProfile(admin, user, p.name, { paid: p.paid, avatar_url: 'assets/avatars/daniel.png' });
 
     tokens.push({
       key: p.key, name: p.name, email, password: PASSWORD,

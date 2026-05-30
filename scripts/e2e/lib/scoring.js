@@ -2,14 +2,15 @@
 // Usado pra calcular pontuacao ESPERADA antes do E2E rodar, pra depois
 // comparar contra o que o trigger SQL calculou.
 
+// KEEP IN SYNC com public.stage_multiplier (003_scoring.sql) e js/scoring.js.
 export const STAGE_MULT = {
   group: 1.0,
   r32: 1.5,
   r16: 2.0,
-  qf: 2.5,
-  sf: 3.0,
+  qf: 3.0,    // increased from 2.5 for comeback potential
+  sf: 4.0,    // increased from 3.0 for comeback potential
   third: 2.0,
-  final: 4.0,
+  final: 5.0, // increased from 4.0 for comeback potential
 };
 
 export const CHAMPION_BONUS = 50;

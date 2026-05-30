@@ -80,41 +80,42 @@ export async function fillSingleResult(page, match, tracker) {
     // Pequena espera pra UI re-renderizar
     await page.waitForTimeout(300);
 
-    // Clica "Carregar jogadores" se aparecer
+    // Clica "Carregar jogadores" se aparecer (renderiza o componente flag-select)
     const loadBtnSel = `${rowSel} [data-action="load-players"]`;
     const loadBtn = await page.$(loadBtnSel);
     if (loadBtn) {
       await page.click(loadBtnSel);
-      // Aguarda players carregar (vai mostrar select)
+      // O #addPlayer_${id} é um <input hidden> — espera ATTACHED (não visível)
       try {
-        await page.waitForSelector(`${rowSel} #addPlayer_${id}`, { timeout: 5000 });
+        await page.waitForSelector(`${rowSel} .flag-select[data-target="addPlayer_${id}"]`, { timeout: 8000, state: 'attached' });
       } catch {
         tracker?.track('assertion', `Carregar jogadores falhou match #${id}`, { match_id: id });
-        // Pode salvar sem scorers? Continua
       }
     }
 
-    // Adiciona cada scorer (loop: select player → qty → add)
+    // Adiciona cada scorer via componente custom flag-select:
+    //   abre o dropdown (toggle) → clica no item (pick) → qty → add-scorer
     for (const s of scorers) {
-      const selectSel = `${rowSel} #addPlayer_${id}`;
+      const toggleSel = `${rowSel} [data-action="flag-select-toggle"][data-target="addPlayer_${id}"]`;
+      const pickSel = `${rowSel} [data-action="flag-select-pick"][data-target="addPlayer_${id}"][data-value="${s.player_id}"]`;
       const qtySel = `${rowSel} #addQty_${id}`;
       const addBtnSel = `${rowSel} [data-action="add-scorer"]`;
 
-      const selectExists = await page.$(selectSel);
-      if (!selectExists) {
-        // Sem players cadastrados pra esse time (skip)
-        tracker?.track('info', `Sem select de player pra match #${id}, skipping ${s.full_name}`, { match_id: id });
+      const toggle = await page.$(toggleSel);
+      if (!toggle) {
+        tracker?.track('info', `Sem flag-select pra match #${id}, skipping ${s.full_name}`, { match_id: id });
         break;
       }
-
-      try {
-        await page.selectOption(selectSel, String(s.player_id));
-      } catch (e) {
-        tracker?.track('assertion', `Player ${s.player_id} (${s.full_name}) não no select match #${id}: ${e.message}`, {
+      await page.click(toggleSel);  // abre a lista
+      const pick = await page.$(pickSel);
+      if (!pick) {
+        tracker?.track('assertion', `Player ${s.player_id} (${s.full_name}) não na lista match #${id}`, {
           match_id: id, player_id: s.player_id,
         });
+        await page.click(toggleSel).catch(() => {});  // fecha
         continue;
       }
+      await page.click(pickSel);
       await page.fill(qtySel, String(s.goals));
       await page.click(addBtnSel);
       await page.waitForTimeout(300);  // espera a UI re-renderizar com o scorer adicionado

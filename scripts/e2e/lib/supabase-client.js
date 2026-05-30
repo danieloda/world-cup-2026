@@ -9,8 +9,12 @@ import { dirname, join } from 'path';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 config({ path: join(__dirname, '..', '..', '..', '.env') });
 
+import { assertLocalTarget } from './admin-client.js';
+
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const ANON_KEY = process.env.SUPABASE_PUBLISHABLE_KEY;
+
+assertLocalTarget(SUPABASE_URL);
 
 export function makeClient() {
   return createClient(SUPABASE_URL, ANON_KEY, {

@@ -9,6 +9,7 @@
 // Output: { matches: [com actual_home/away/pen_winner + scorers], topScorer }
 
 import { mulberry32, hashSeed } from './prng.js';
+import { fifaRank } from '../../../js/fifa-rank.js';
 
 const REALISTIC_SCORES = [
   [0, 0], [1, 0], [0, 1], [1, 1], [2, 0], [0, 2],
@@ -44,8 +45,8 @@ function computeGroupStandings(groupMatches) {
   }
   for (const s of stats.values()) s.sg = s.gp - s.gc;
   return [...stats.values()].sort((x, y) =>
-    // Tiebreaker: pts → SG → GF (igual ao SQL que sorta alfabético no final)
-    y.pts - x.pts || y.sg - x.sg || y.gp - x.gp || x.team.localeCompare(y.team)
+    // Tiebreaker oficial: pts → SG → GF → FIFA rank (igual ao SQL resolve_match_slots / migration 015)
+    y.pts - x.pts || y.sg - x.sg || y.gp - x.gp || fifaRank(x.team) - fifaRank(y.team)
   );
 }
 
@@ -177,8 +178,8 @@ export function simulateTournament(matches, players, seed = 'wc2026-e2e-v1') {
   }
 
   // === STEP 3: Resolve slots compostos 3X/Y/Z usando BACKTRACKING ===
-  // Mesmo tiebreaker do SQL: pts → SG → GF → group_name alfabético
-  thirds.sort((a, b) => b.pts - a.pts || b.sg - a.sg || b.gp - a.gp || a.group.localeCompare(b.group));
+  // Mesmo tiebreaker do SQL (migration 015): pts → SG → GF → FIFA rank
+  thirds.sort((a, b) => b.pts - a.pts || b.sg - a.sg || b.gp - a.gp || fifaRank(a.team) - fifaRank(b.team));
 
   // Lista de slots compostos a resolver (ordem do id)
   const koMatches = matches.filter((m) => m.stage !== 'group').sort((a, b) => a.id - b.id);

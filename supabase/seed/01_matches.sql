@@ -26,10 +26,10 @@ insert into public.matches (id, stage, round_label, group_name, match_date, grou
   (17, 'group', 'Matchday 14', 'C', '2026-06-24T18:00:00-04:00'::timestamptz, 'Miami (Miami Gardens)', 'Scotland', 'Brazil'),
   (18, 'group', 'Matchday 14', 'C', '2026-06-24T18:00:00-04:00'::timestamptz, 'Atlanta', 'Morocco', 'Haiti'),
   (19, 'group', 'Matchday 2', 'D', '2026-06-12T18:00:00-07:00'::timestamptz, 'Los Angeles (Inglewood)', 'USA', 'Paraguay'),
-  (20, 'group', 'Matchday 3', 'D', '2026-06-13T21:00:00-07:00'::timestamptz, 'Vancouver', 'Australia', 'Turkey'),
+  (20, 'group', 'Matchday 3', 'D', '2026-06-13T21:00:00-07:00'::timestamptz, 'Vancouver', 'Australia', 'Türkiye'),
   (21, 'group', 'Matchday 9', 'D', '2026-06-19T12:00:00-07:00'::timestamptz, 'Seattle', 'USA', 'Australia'),
-  (22, 'group', 'Matchday 9', 'D', '2026-06-19T20:00:00-07:00'::timestamptz, 'San Francisco Bay Area (Santa Clara)', 'Turkey', 'Paraguay'),
-  (23, 'group', 'Matchday 15', 'D', '2026-06-25T19:00:00-07:00'::timestamptz, 'Los Angeles (Inglewood)', 'Turkey', 'USA'),
+  (22, 'group', 'Matchday 9', 'D', '2026-06-19T20:00:00-07:00'::timestamptz, 'San Francisco Bay Area (Santa Clara)', 'Türkiye', 'Paraguay'),
+  (23, 'group', 'Matchday 15', 'D', '2026-06-25T19:00:00-07:00'::timestamptz, 'Los Angeles (Inglewood)', 'Türkiye', 'USA'),
   (24, 'group', 'Matchday 15', 'D', '2026-06-25T19:00:00-07:00'::timestamptz, 'San Francisco Bay Area (Santa Clara)', 'Paraguay', 'Australia'),
   (25, 'group', 'Matchday 4', 'E', '2026-06-14T12:00:00-05:00'::timestamptz, 'Houston', 'Germany', 'Curaçao'),
   (26, 'group', 'Matchday 4', 'E', '2026-06-14T19:00:00-04:00'::timestamptz, 'Philadelphia', 'Ivory Coast', 'Ecuador'),
@@ -112,5 +112,18 @@ insert into public.matches (id, stage, round_label, group_name, match_date, grou
   (103, 'third', 'Match for third place', NULL, '2026-07-18T17:00:00-04:00'::timestamptz, 'Miami (Miami Gardens)', 'L101', 'L102'),
   (104, 'final', 'Final', NULL, '2026-07-19T15:00:00-04:00'::timestamptz, 'New York/New Jersey (East Rutherford)', 'W101', 'W102');
 
+-- ============================================================
+-- Backfill slot_home / slot_away (CRÍTICO p/ o mata-mata resolver)
+-- ============================================================
+-- As colunas slot_home/away são criadas pela migration 005, cujo backfill roda
+-- ANTES deste seed (tabela vazia) → não copia nada. Sem isso, resolve_match_slots()
+-- não tem o que casar ('1A','3A/B/...','W101') e o chaveamento nunca resolve.
+-- Idempotente: só preenche quando o team_home/away ainda é um slot (número/W/L ou composto).
+update public.matches set slot_home = team_home
+  where slot_home is null and (team_home ~ '^[0-9LW]' or team_home like '%/%');
+update public.matches set slot_away = team_away
+  where slot_away is null and (team_away ~ '^[0-9LW]' or team_away like '%/%');
+
 -- Verify
 -- select stage, count(*) from public.matches group by stage order by stage;
+-- select count(*) from public.matches where stage<>'group' and slot_home is not null;  -- esperado: 32

@@ -372,6 +372,19 @@ describe('computeStandings', () => {
     expect(standings[0].team).toBe('A');
     expect(standings[1].team).toBe('C');
   });
+
+  it('breaks ties by FIFA rank when pts, SG and GF are all equal', () => {
+    // Argentina(3) e Austria(24) empatam tudo (1-0 cada). Melhor FIFA = Argentina vem 1º.
+    // Prova o tiebreaker oficial (migration 015) no front: pts→SG→GF→fifaRank.
+    const matches = [
+      makeMatch(1, 'Argentina', 'Jordan', 1, 0),
+      makeMatch(2, 'Austria', 'Algeria', 1, 0),
+    ];
+    const standings = computeStandings(matches, 'real');
+    // Argentina e Austria: ambos 3pts, +1 SG, 1 GF → desempate por FIFA (3 < 24)
+    expect(standings[0].team).toBe('Argentina');
+    expect(standings[1].team).toBe('Austria');
+  });
 });
 
 describe('isLive', () => {
