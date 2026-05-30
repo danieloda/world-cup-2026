@@ -284,6 +284,25 @@ async function main() {
     `   Sem over-attribution: ${totalScorerGoals <= totalGoals}`);
   if (totalScorerGoals > totalGoals) allOk = false;
 
+  // Scorers esperados (oráculo) vs DB — pega atribuições FALTANDO (o check DB-vs-DB
+  // acima não pegava: missing scorers passavam silenciosos e mexem no bônus de artilheiro).
+  const dbByMatchPlayer = new Map();
+  {
+    const { data: rawGoals } = await admin.from('player_goals').select('match_id, player_id, goals');
+    for (const g of (rawGoals || [])) dbByMatchPlayer.set(`${g.match_id}:${g.player_id}`, g.goals);
+  }
+  const missingScorers = [];
+  for (const m of tournament.matches) {
+    for (const s of (m.scorers || [])) {
+      const got = dbByMatchPlayer.get(`${m.id}:${s.player_id}`) ?? 0;
+      if (got < s.goals) missingScorers.push(`m#${m.id} p${s.player_id} esperado=${s.goals} db=${got}`);
+    }
+  }
+  log(missingScorers.length === 0 ? 'green' : 'red',
+    `   Scorers esperados presentes no DB: ${missingScorers.length === 0 ? 'todos' : missingScorers.length + ' faltando'}`);
+  for (const mm of missingScorers.slice(0, 5)) log('red', `     ${mm}`);
+  if (missingScorers.length > 0) allOk = false;
+
   // ============================================================
   // Alert log: criticos novos desde Step 4
   // ============================================================

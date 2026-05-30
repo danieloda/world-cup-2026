@@ -25,14 +25,14 @@ test.describe('Predictions Page', () => {
     await page.click('button[type="submit"]');
 
     // Wait for redirect to inicio
-    await expect(page).toHaveURL(/inicio\.html/, { timeout: 10000 });
+    await expect(page).toHaveURL(/inicio(\.html)?/, { timeout: 10000 });
   });
 
   test('can navigate to group predictions page', async ({ page }) => {
     await page.goto('/palpites-grupos.html');
 
-    // Should see match cards
-    await expect(page.locator('.match-card, .match-row')).toBeVisible({ timeout: 10000 });
+    // Tolerante às fases: .match (fase de palpites aberta) OU .empty (Copa encerrada)
+    await expect(page.locator('.match, .empty').first()).toBeVisible({ timeout: 10000 });
   });
 
   test('can navigate to knockout predictions page', async ({ page }) => {
@@ -58,22 +58,25 @@ test.describe('Prediction Input', () => {
     await page.fill('input[type="email"]', TEST_EMAIL);
     await page.fill('input[type="password"]', TEST_PASSWORD);
     await page.click('button[type="submit"]');
-    await expect(page).toHaveURL(/inicio\.html/, { timeout: 10000 });
+    await expect(page).toHaveURL(/inicio(\.html)?/, { timeout: 10000 });
   });
 
   test('score inputs accept only valid numbers (0-20)', async ({ page }) => {
     await page.goto('/palpites-grupos.html');
 
-    // Wait for inputs to load
-    const scoreInput = page.locator('input[type="number"]').first();
-    await expect(scoreInput).toBeVisible({ timeout: 10000 });
+    // Espera a página renderizar (inputs abertos OU estado encerrado)
+    await expect(page.locator('.score-input, .empty').first()).toBeVisible({ timeout: 10000 });
 
-    // Check min/max attributes if present
-    const min = await scoreInput.getAttribute('min');
-    const max = await scoreInput.getAttribute('max');
-
-    if (min !== null) expect(parseInt(min)).toBeGreaterThanOrEqual(0);
-    if (max !== null) expect(parseInt(max)).toBeLessThanOrEqual(20);
+    const scoreInput = page.locator('.score-input').first();
+    if (await scoreInput.count() === 0) {
+      test.skip(true, 'Sem jogos abertos para palpitar (Copa encerrada) — fase de palpites não testável neste estado');
+      return;
+    }
+    // Constrangimento numérico: inputmode numérico + maxlength curto (limite real é a CHECK do DB)
+    expect(await scoreInput.getAttribute('inputmode')).toBe('numeric');
+    const maxlen = parseInt(await scoreInput.getAttribute('maxlength'));
+    expect(maxlen).toBeGreaterThan(0);
+    expect(maxlen).toBeLessThanOrEqual(2);
   });
 
   test('shows locked state for past matches', async ({ page }) => {
@@ -102,20 +105,20 @@ test.describe('Sidebar Navigation', () => {
     await page.fill('input[type="email"]', TEST_EMAIL);
     await page.fill('input[type="password"]', TEST_PASSWORD);
     await page.click('button[type="submit"]');
-    await expect(page).toHaveURL(/inicio\.html/, { timeout: 10000 });
+    await expect(page).toHaveURL(/inicio(\.html)?/, { timeout: 10000 });
   });
 
   test('sidebar shows all navigation items', async ({ page }) => {
     await page.goto('/inicio.html');
 
-    // Check for main navigation items
-    const sidebar = page.locator('.sidebar, nav');
+    // Check for main navigation items (.sidebar evita strict-mode com o <nav> interno)
+    const sidebar = page.locator('.sidebar').first();
     await expect(sidebar).toBeVisible();
 
-    // Should have links to main pages
-    await expect(sidebar.locator('a[href*="inicio"]')).toBeVisible();
-    await expect(sidebar.locator('a[href*="palpites"]')).toBeVisible();
-    await expect(sidebar.locator('a[href*="ranking"]')).toBeVisible();
+    // Should have links to main pages (.first() — palpites casa 2 links: grupos + mata)
+    await expect(sidebar.locator('a[href*="inicio"]').first()).toBeVisible();
+    await expect(sidebar.locator('a[href*="palpites"]').first()).toBeVisible();
+    await expect(sidebar.locator('a[href*="ranking"]').first()).toBeVisible();
   });
 
   test('sidebar highlights current page', async ({ page }) => {
@@ -135,7 +138,7 @@ test.describe('Leaderboard', () => {
     await page.fill('input[type="email"]', TEST_EMAIL);
     await page.fill('input[type="password"]', TEST_PASSWORD);
     await page.click('button[type="submit"]');
-    await expect(page).toHaveURL(/inicio\.html/, { timeout: 10000 });
+    await expect(page).toHaveURL(/inicio(\.html)?/, { timeout: 10000 });
   });
 
   test('ranking page shows leaderboard', async ({ page }) => {

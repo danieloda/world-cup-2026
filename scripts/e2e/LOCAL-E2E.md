@@ -77,10 +77,27 @@ node scripts/e2e/test-rls-hostile.js
 node scripts/e2e/test-signup-flow.js        # exige enable_confirmations=true (já no config.toml)
 node scripts/e2e/test-avatar-upload.js
 
+# Cobertura estendida (cada um faz snapshot/restore do que mexe):
+node scripts/e2e/test-storage-and-validation.js   # RLS de avatar Storage + validação de placar
+node scripts/e2e/test-admin-ui-penalty.js         # campeão via pênaltis (UI) + clear/update-result
+node scripts/e2e/test-fifa-tie-dom.js             # empate total no Grupo A → ordem FIFA no DOM
+node scripts/e2e/test-odds.js                     # match_odds: RLS + badge no DOM
+node scripts/e2e/test-concurrency-alerts.js       # writes paralelos (UNIQUE) + send_alert→alert_log
+node scripts/e2e/test-cross-browser.js            # Chromium/Firefox/WebKit + viewport mobile
+node scripts/e2e/test-session.js                  # persistência, token inválido, logout
+
 # Unit + specs:
 npm test
-BASE_URL=http://localhost:3000 npx playwright test
+# Os specs em tests/e2e/predictions.spec.js exigem um usuário de teste confirmado COM avatar:
+#   crie 'spec-user@testuser.com' (paid=false p/ não poluir o leaderboard) via Admin API,
+#   depois rode com as env vars:
+TEST_USER_EMAIL=spec-user@testuser.com TEST_USER_PASSWORD=SpecUser2026! \
+  BASE_URL=http://localhost:3000 npx playwright test
 ```
+
+> Nota de UX (admin): a aba "Resultados → lançados" mostra só os **60 jogos mais recentes**
+> (`admin.js`, `slice(0,60)`). Num torneio de 104, os ~44 resultados mais antigos não são
+> editáveis/limpáveis pela UI — só via DB. Sem busca/paginação além de 60.
 
 ## 7. Cleanup
 ```bash
