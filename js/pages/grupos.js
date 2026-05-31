@@ -105,7 +105,10 @@ function renderPage() {
       <span style="color:#1DB954; font-weight:700;">● Verde</span> = classificado direto (1º e 2º) ·
       <span style="color:var(--medal-bronze); font-weight:700;">● Bronze</span> = disputa vaga de 3º melhor ·
       <span style="color:var(--text-mute);">● Cinza</span> = eliminado
-      <br><span style="color:var(--text-mute);">Critério de desempate: Pontos → Saldo de gols → Gols pró → Ranking FIFA</span>
+      <br><span style="color:var(--text-mute);">Formato 2026: em cada um dos 12 grupos, <strong style="color:var(--text-dim);">1º e 2º avançam direto</strong>; os <strong style="color:var(--text-dim);">8 melhores 3ºs colocados</strong> também passam (veja a aba 3ºs Lugares). Total: 32 times nos 32-avos.</span>
+      <br><span style="color:var(--text-mute);">Use <strong style="color:var(--text-dim);">Real (oficial)</strong> para ver a classificação pelos resultados que já saíram, ou <strong style="color:var(--text-dim);">Minha simulação</strong> para projetar a tabela com os seus palpites.</span>
+      <br><span style="color:var(--text-mute);">Desempate: Pontos → Saldo de gols → Gols pró → Ranking FIFA (melhor posição passa).</span>
+      <a href="regras.html" style="color:var(--green); font-weight:700;"> Regras completas →</a>
     </div>
 
     <div class="groups-grid" id="groupsGrid">

@@ -111,3 +111,33 @@ export function championBonus(correct) {
 export function scorerBonus(goals, stage) {
   return Math.round(goals * 2 * stageMultiplier(stage));
 }
+
+/**
+ * Qualified-team bonus (BPE/BP) for a single knockout slot.
+ * Awarded per KO slot when the user correctly predicts WHICH team reaches it.
+ *   - exact === true  → BPE: predicted team is in that exact slot.
+ *   - exact === false → BP : predicted team reached that phase, wrong slot (= half BPE).
+ *
+ * KEEP IN SYNC with public.qualifier_bonus_pts in 021_qualifier_bonus.sql.
+ * BP in r32 is 0 (almost every team is "in the r32", so it's a luck floor, not skill).
+ * "Escala Equilibrada" — calibrated so the bonus is ~14% of total (rewards bold
+ * bracket calls without overturning the score-driven leaderboard).
+ *
+ * @param {string} stage - 'r32' | 'r16' | 'qf' | 'sf' | 'third' | 'final'
+ * @param {boolean} exact - true for BPE (exact slot), false for BP (right team, wrong slot)
+ * @returns {number} Bonus points for this slot
+ */
+export function qualifierBonus(stage, exact) {
+  const bpe = {
+    r32: 1,
+    r16: 2,
+    qf: 3,
+    sf: 4,
+    third: 3,
+    final: 6,
+  };
+  const base = bpe[stage] ?? 0;
+  if (exact) return base;
+  if (stage === 'r32') return 0; // no BP in round of 32
+  return Math.round(base / 2);
+}

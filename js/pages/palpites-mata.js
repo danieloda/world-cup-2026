@@ -31,6 +31,7 @@ let predsByMatch = new Map();        // match_id -> prediction row (TODAS as pre
 let goalsByMatch = new Map();        // match_id -> [{player, goals}]
 let slotResolution = new Map();      // slot string -> { team, source } (real-first: resultado real ou palpite)
 let predSlotResolution = new Map();  // slot string -> { team, source } (apenas palpites do user)
+let qualifierBySide = new Map();     // "matchId:side" -> { kind:'bpe'|'bp', pts, pred, actual } (do cache SQL)
 let activeTab = 'palpites';          // 'palpites' | 'resultados'
 const saveTimers = new Map();        // match_id -> setTimeout handle
 
@@ -67,11 +68,12 @@ try {
 // Data
 // ============================================================
 async function loadData() {
-  const [statsRes, matchesRes, predsRes, goalsRes] = await Promise.all([
+  const [statsRes, matchesRes, predsRes, goalsRes, qualRes] = await Promise.all([
     supabase.from('v_pool_stats').select('*').single(),
     supabase.from('matches').select('*').order('match_date'),
     supabase.from('predictions').select('*').eq('user_id', profile.id),
     supabase.from('player_goals').select('*, players(full_name, team)'),
+    supabase.from('user_qualifier_points').select('breakdown').eq('user_id', profile.id).maybeSingle(),
   ]);
 
   if (matchesRes.error) throw matchesRes.error;
@@ -90,6 +92,14 @@ async function loadData() {
 
   slotResolution = computeSlotResolution('real-first');
   predSlotResolution = computeSlotResolution('pred-only');
+
+  // Bônus de classificado (BPE/BP) — fonte da verdade é o cache SQL (user_qualifier_points).
+  // Só exibimos o que foi gravado; não recalculamos no cliente.
+  qualifierBySide = new Map();
+  const items = qualRes.data?.breakdown?.items ?? [];
+  for (const it of items) {
+    qualifierBySide.set(`${it.match_id}:${it.side}`, it);
+  }
 }
 
 // ============================================================
@@ -282,9 +292,11 @@ function renderPalpitesTab(counts) {
   const grouped = groupByStage();
   return `
     <div class="note" style="margin-bottom:20px; padding:12px 16px; background:var(--card); border-left:3px solid var(--green); border-radius:0 6px 6px 0; font-size:12px; color:var(--text-dim);">
-      <strong style="color:var(--green);">Multiplicadores:</strong>
+      <strong style="color:var(--green);">Multiplicadores (sobre os mesmos pontos dos grupos):</strong>
       32-avos <strong>×1.5</strong> · Oitavas <strong>×2</strong> · Quartas <strong>×3</strong> · Semis <strong>×4</strong> · Final <strong>×5</strong> · 3º Lugar <strong>×2</strong>
-      <br><span style="color:var(--text-mute);">Empate? Escolha quem passa nos pênaltis · Slots viram times reais após os grupos</span>
+      <br><span style="color:var(--text-mute);"><strong style="color:var(--text-dim);">Regra da vaga:</strong> aqui você aposta no placar de uma posição do chaveamento (ex.: "1º A × 2º B"). Seu palpite de gols vale para <strong style="color:var(--text-dim);">quem realmente se classificar naquela vaga</strong> — as bandeiras mostradas são só um guia baseado nos seus palpites.</span>
+      <br><span style="color:var(--text-mute);">Previu empate? <strong style="color:var(--text-dim);">Escolha quem passa nos pênaltis.</strong> O placar do tempo normal é o que conta para o acerto; as vagas viram times reais assim que os grupos terminam.</span>
+      <a href="regras.html" style="color:var(--green); font-weight:700;"> Regras completas →</a>
     </div>
 
     ${renderKpis(counts)}
@@ -403,10 +415,21 @@ function renderResultTeamRow(m, side) {
           <span class="team-name" data-team="${escapeHtml(team)}">${escapeHtml(teamPt(team))}</span>
           ${slotBadge}
         </div>
+        ${renderQualBadge(m.id, side)}
       </div>
       <span class="result-score">${m.finished ? score : '–'}</span>
     </div>
   `;
+}
+
+// Selo de bônus de classificado (lê o breakdown gravado pelo SQL).
+function renderQualBadge(matchId, side) {
+  const q = qualifierBySide.get(`${matchId}:${side}`);
+  if (!q) return '';
+  if (q.kind === 'bpe') {
+    return `<span class="qual-badge bpe" title="Acertou a seleção classificada nesta vaga">✓ classificado +${q.pts}</span>`;
+  }
+  return `<span class="qual-badge bp" title="Time certo na fase, vaga errada">~ time certo, vaga errada +${q.pts}</span>`;
 }
 
 function formatSlotShort(slot) {

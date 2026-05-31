@@ -375,6 +375,10 @@ function renderDrill(u, payload) {
           <div class="l">Pts artilheiro</div>
         </div>
         <div class="profile-stat">
+          <div class="v gold">${u.qualifier_pts ?? 0}</div>
+          <div class="l">Pts classificados</div>
+        </div>
+        <div class="profile-stat">
           <div class="v green">${exactos}</div>
           <div class="l">Placares exatos</div>
         </div>

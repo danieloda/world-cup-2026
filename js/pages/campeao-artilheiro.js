@@ -200,9 +200,11 @@ function renderPage() {
 
     <div class="note" style="margin-bottom:20px; padding:12px 16px; background:var(--card); border-left:3px solid var(--green); border-radius:0 6px 6px 0; font-size:12px; color:var(--text-dim);">
       <strong style="color:var(--green);">Pontuação bônus:</strong>
-      🏆 <strong>Campeão certo = +30 pts</strong> ·
-      ⚽ <strong>Artilheiro = +2 pts por gol</strong> do seu jogador (×1 a ×4 conforme a fase)
-      <br><span style="color:var(--text-mute);">Escolha única · Não pode mudar depois que travar</span>
+      🏆 <strong>Campeão certo = +${CHAMPION_BONUS_PTS} pts</strong> (valor fixo) ·
+      ⚽ <strong>Artilheiro = +2 pts por gol</strong> do seu jogador, multiplicado pela fase (×1 nos grupos até ×${STAGE_MULT.final} na final)
+      <br><span style="color:var(--text-mute);">São duas escolhas únicas, feitas uma só vez antes da Copa e travadas no prazo — não dá pra mudar depois.
+      O bônus de campeão equivale a ${Math.round(CHAMPION_BONUS_PTS / 5)} placares exatos da fase de grupos: pense bem.</span>
+      <br><a href="regras.html" style="color:var(--green); font-weight:700;">Ver todas as regras →</a>
     </div>
 
     <div class="cs-split">
@@ -360,7 +362,7 @@ function renderScorerCard(locked) {
       <div class="cs-card-icon">⚽</div>
       <div class="cs-card-kicker">Aposta 2 · +2 pts × multiplicador por gol</div>
       <h3>Artilheiro do Bolão</h3>
-      <p class="desc">Escolha 1 jogador. Cada gol dele vale +2 pts (escalando até ×4 na final).</p>
+      <p class="desc">Escolha 1 jogador. Cada gol dele vale +2 pts (escalando até ×${STAGE_MULT.final} na final).</p>
 
       ${current
         ? `<div class="cs-pick-box">

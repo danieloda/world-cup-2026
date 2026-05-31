@@ -112,12 +112,13 @@ function renderPage() {
 function renderPalpitesTab(counts) {
   return `
     <div class="note" style="margin-bottom:20px; padding:12px 16px; background:var(--card); border-left:3px solid var(--green); border-radius:0 6px 6px 0; font-size:12px; color:var(--text-dim);">
-      <strong style="color:var(--green);">Pontuação:</strong>
+      <strong style="color:var(--green);">Pontuação (vale o melhor acerto, não soma):</strong>
       🎯 <strong>5 pts</strong> placar exato ·
       ⚽ <strong>3 pts</strong> vencedor + saldo de gols ·
-      ✓ <strong>2 pts</strong> só vencedor/empate ·
-      🥅 <strong>1 pt</strong> acertou gols de um time.
-      <br><span style="color:var(--text-mute);">Salva automático · Trava no apito</span>
+      ✓ <strong>2 pts</strong> só o vencedor/empate ·
+      🥅 <strong>1 pt</strong> acertou os gols de um dos times.
+      <br><span style="color:var(--text-mute);">Aqui (fase de grupos) o multiplicador é ×1. Digite o placar e pronto: <strong style="color:var(--text-dim);">salva sozinho</strong>. Dá pra editar quantas vezes quiser até o jogo começar — <strong style="color:var(--text-dim);">cada palpite trava no apito inicial</strong> daquele jogo.</span>
+      <a href="regras.html" style="color:var(--green); font-weight:700;"> Regras completas →</a>
     </div>
 
     ${renderKpisPalpites(counts)}

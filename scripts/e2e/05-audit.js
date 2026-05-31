@@ -122,14 +122,18 @@ async function main() {
     const scorer = scorerByUser[userId];
     const scorerPtsCalc = scorer ? scorerBonus(scorer.player_id, goalsByPlayer) : 0;
 
-    const totalCalc = matchPtsCalc + champPtsCalc + scorerPtsCalc;
-
     // 4. Comparar com leaderboard (se paid; senao não aparece la)
     const lb = lbByUser[userId];
     const matchPtsDb = lb?.match_pts ?? 0;
     const champPtsDb = lb?.champion_pts ?? 0;
     const scorerPtsDb = lb?.scorer_pts ?? 0;
+    // Bônus de classificado (BPE/BP): a correção própria é verificada por
+    // scenarios/qualifier-bonus.sql. Aqui usamos o valor do DB para conferir
+    // a ARITMÉTICA do v_leaderboard (total = match + champ + scorer + qualifier).
+    const qualifierPtsDb = lb?.qualifier_pts ?? 0;
     const totalDb = lb?.total_pts ?? 0;
+
+    const totalCalc = matchPtsCalc + champPtsCalc + scorerPtsCalc + qualifierPtsDb;
     const inLeaderboard = !!lb;
 
     const matchOk = matchPtsCalc === matchPtsDb;
@@ -197,6 +201,7 @@ async function main() {
         match_pts: matchPtsDb,
         champion_pts: champPtsDb,
         scorer_pts: scorerPtsDb,
+        qualifier_pts: qualifierPtsDb,
         total_pts: totalDb,
       },
       checks: { matchOk, champOk, scorerOk, totalOk },
@@ -387,7 +392,7 @@ async function main() {
   for (let i = 0; i < Math.min(3, leaderboard.length); i++) {
     const u = leaderboard[i];
     const tok = tokens.find(t => t.user_id === u.user_id);
-    log('blue', `   ${i+1}. ${u.full_name.padEnd(28)} ${u.total_pts} pts (match=${u.match_pts}, champ=${u.champion_pts}, scorer=${u.scorer_pts}) [${tok?.key}]`);
+    log('blue', `   ${i+1}. ${u.full_name.padEnd(28)} ${u.total_pts} pts (match=${u.match_pts}, champ=${u.champion_pts}, scorer=${u.scorer_pts}, qualif=${u.qualifier_pts ?? 0}) [${tok?.key}]`);
   }
 
   // ============================================================

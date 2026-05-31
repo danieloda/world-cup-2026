@@ -10,6 +10,7 @@ const NAV_SECTIONS = [
     label: 'Principal',
     items: [
       { id: 'inicio', href: 'inicio.html', label: 'Início', icon: iconHome },
+      { id: 'regras', href: 'regras.html', label: 'Regras & Pontuação', icon: iconBook },
     ],
   },
   {
@@ -207,6 +208,11 @@ function iconClipboard() {
 // Palpites Mata-mata — bracket clássico (igual a referência)
 function iconBracket() {
   return svg('<path d="M3 5v3a2 2 0 0 0 2 2h2a2 2 0 0 1 2 2v4M3 19v-3a2 2 0 0 1 2-2h2a2 2 0 0 0 2-2v-4"/><path d="M21 5v3a2 2 0 0 1-2 2h-2a2 2 0 0 0-2 2v4M21 19v-3a2 2 0 0 0-2-2h-2a2 2 0 0 1-2-2v-4"/><line x1="9" y1="12" x2="15" y2="12"/>');
+}
+
+// Regras & Pontuação — livro aberto
+function iconBook() {
+  return svg('<path d="M2 4h6a3 3 0 0 1 3 3v13a2.5 2.5 0 0 0-2.5-2.5H2zM22 4h-6a3 3 0 0 0-3 3v13a2.5 2.5 0 0 1 2.5-2.5H22z"/>');
 }
 
 // Campeão & Artilheiro — troféu (filled bowl)
