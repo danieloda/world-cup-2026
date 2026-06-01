@@ -343,11 +343,30 @@ export function isLive(m) {
   return now >= start && now < new Date(start.getTime() + 2.5 * 3600000);
 }
 
+// Horário de Brasília (UTC-3, sem horário de verão desde 2019).
+const BRT_OFFSET_MS = 3 * 3600000;
+
 /**
- * Match está travado para palpites (já começou ou já acabou).
+ * Prazo do palpite: 23h59 (horário de Brasília) da VÉSPERA do jogo.
+ * Ex.: jogo 15/jun 16h → fecha 14/jun 23h59. KEEP IN SYNC com
+ * public.prediction_deadline() (migration 023).
+ * @param {string|Date} matchDate
+ * @returns {Date} instante em que o palpite trava
+ */
+export function predictionDeadline(matchDate) {
+  // Desloca para o relógio de Brasília lendo os campos UTC.
+  const brt = new Date(new Date(matchDate).getTime() - BRT_OFFSET_MS);
+  // 23h59 do dia anterior, no relógio de Brasília...
+  const wallMs = Date.UTC(brt.getUTCFullYear(), brt.getUTCMonth(), brt.getUTCDate() - 1, 23, 59, 0);
+  // ...convertido de volta para o instante UTC real.
+  return new Date(wallMs + BRT_OFFSET_MS);
+}
+
+/**
+ * Match travado para palpites: passou das 23h59 (Brasília) da véspera do jogo.
  */
 export function isLocked(m) {
-  return new Date(m.match_date) <= new Date();
+  return new Date() >= predictionDeadline(m.match_date);
 }
 
 // ============================================================

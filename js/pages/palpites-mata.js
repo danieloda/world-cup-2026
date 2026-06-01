@@ -298,15 +298,17 @@ function renderPage() {
 function renderPalpitesTab(counts) {
   const grouped = groupByStage();
   return `
-    <div class="note" style="margin-bottom:20px; padding:12px 16px; background:var(--card); border-left:3px solid var(--green); border-radius:0 6px 6px 0; font-size:12px; color:var(--text-dim); line-height:1.6;">
-      <strong style="color:var(--green);">Quanto vale cada jogo do mata-mata:</strong>
-      cada fase vale mais que a anterior. <strong style="color:var(--text-dim);">Acertar o placar exato</strong> dá:
-      32-avos <strong>${stageExact('r32')}</strong> · Oitavas <strong>${stageExact('r16')}</strong> · Quartas <strong>${stageExact('qf')}</strong> · Semis <strong>${stageExact('sf')}</strong> · 3º lugar <strong>${stageExact('third')}</strong> · <strong style="color:var(--green);">Final ${stageExact('final')}</strong> pontos.
-      <br><span style="color:var(--text-mute);">Você não precisa acertar tudo: cada parte do placar já dá pontos (os gols de um time, quem vence/empate, e a diferença de gols).</span>
-      <br><span style="color:var(--text-mute);"><strong style="color:var(--text-dim);">Como funciona a vaga:</strong> aqui você dá o placar de uma posição do chaveamento (ex.: "1º do Grupo A × 2º do Grupo B"). Seu palpite vale para <strong style="color:var(--text-dim);">a seleção que realmente se classificar naquela posição</strong> — as bandeiras mostradas são só uma ideia baseada nos seus palpites.</span>
-      <br><span style="color:var(--text-mute);">Acha que vai dar empate? <strong style="color:var(--text-dim);">Escolha quem passa nos pênaltis.</strong> Vale o placar do tempo normal. As vagas viram seleções de verdade quando os grupos terminam.</span>
-      <br><span style="color:var(--red); font-weight:700;">⏰ Cada palpite fecha na hora em que o jogo começa.</span> <span style="color:var(--text-mute);">Depois disso não dá mais para mudar.</span>
-      <a href="regras.html" style="color:var(--green); font-weight:700;"> Ver todas as regras →</a>
+    <div class="note" style="margin-bottom:20px; padding:14px 18px; background:var(--card); border-left:3px solid var(--green); border-radius:0 6px 6px 0; font-size:12px; color:var(--text-dim);">
+      <span class="note-head">Como funcionam os palpites do mata-mata</span>
+      <ul class="note-list">
+        <li>📈 <strong>Cada fase vale mais.</strong> Placar exato: 32-avos ${stageExact('r32')} · oitavas ${stageExact('r16')} · quartas ${stageExact('qf')} · semis ${stageExact('sf')} · 3º lugar ${stageExact('third')} · <strong>final ${stageExact('final')}</strong> pontos.</li>
+        <li>➕ Não precisa cravar tudo — cada parte do placar (gols de um time, quem vence, diferença) já dá pontos.</li>
+        <li>🏳️ <strong>Regra da vaga:</strong> você dá o placar de uma posição (ex.: "1º do Grupo A × 2º do Grupo B"). Vale para a seleção que <strong>realmente se classificar</strong> ali — as bandeiras são só um guia.</li>
+        <li>⚽ Acha que vai dar empate? <strong>Escolha quem passa nos pênaltis</strong> (conta o placar do tempo normal).</li>
+      </ul>
+      <span class="note-deadline">⏰ Cada palpite fecha às 23h59 da véspera do jogo (um dia antes).
+        <span class="sub">As vagas viram seleções de verdade quando os grupos terminam.</span></span>
+      <a class="note-link" href="regras.html">Ver todas as regras →</a>
     </div>
 
     ${renderKpis(counts)}

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   flag,
   decodeHtmlEntities,
@@ -416,26 +416,34 @@ describe('isLive', () => {
   });
 });
 
-describe('isLocked', () => {
+describe('isLocked (fecha 23h59 BRT da véspera)', () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
 
-  it('returns false before kickoff', () => {
-    vi.setSystemTime(new Date('2026-06-11T14:00:00Z'));
-    const m = { match_date: '2026-06-11T15:00:00Z' };
+  // Jogo: 15/jun 16h BRT = 15/jun 19:00 UTC → trava 14/jun 23h59 BRT = 15/jun 02:59 UTC.
+  const m = { match_date: '2026-06-15T19:00:00Z' };
+
+  it('aberto bem antes da véspera', () => {
+    vi.setSystemTime(new Date('2026-06-14T12:00:00Z')); // 14/jun 09h BRT
     expect(isLocked(m)).toBe(false);
   });
 
-  it('returns true at kickoff', () => {
-    vi.setSystemTime(new Date('2026-06-11T15:00:00Z'));
-    const m = { match_date: '2026-06-11T15:00:00Z' };
+  it('aberto 1 minuto antes do prazo', () => {
+    vi.setSystemTime(new Date('2026-06-15T02:58:00Z')); // 14/jun 23h58 BRT
+    expect(isLocked(m)).toBe(false);
+  });
+
+  it('travado no prazo (23h59 BRT da véspera)', () => {
+    vi.setSystemTime(new Date('2026-06-15T02:59:00Z')); // 14/jun 23h59 BRT
     expect(isLocked(m)).toBe(true);
   });
 
-  it('returns true after kickoff', () => {
-    vi.setSystemTime(new Date('2026-06-11T16:00:00Z'));
-    const m = { match_date: '2026-06-11T15:00:00Z' };
+  it('travado no dia do jogo (antes do apito)', () => {
+    vi.setSystemTime(new Date('2026-06-15T12:00:00Z')); // 15/jun 09h BRT, jogo só 16h
     expect(isLocked(m)).toBe(true);
   });
 });

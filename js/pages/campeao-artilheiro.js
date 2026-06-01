@@ -120,9 +120,21 @@ async function loadData() {
     await loadPlayersForCountry(selectedCountry);
   }
 
-  // Deadline: settings ou default 10/jun 23:59 BRT
-  const sv = settingsRes.data?.value;
-  deadline = sv ? new Date(typeof sv === 'string' ? sv : sv.toString().replace(/^"|"$/g, '')) : KICKOFF_BOLAO;
+  // Deadline: settings ou default 10/jun 23:59 BRT.
+  // settings.value pode vir duplo-codificado ('"2026-..."') de saves antigos do admin → parse robusto.
+  deadline = parseSettingDate(settingsRes.data?.value) ?? KICKOFF_BOLAO;
+}
+
+// Lê uma data salva em settings (jsonb), tolerando dupla codificação ('"..."').
+// Retorna null se não der uma data válida.
+function parseSettingDate(sv) {
+  if (sv == null) return null;
+  let s = sv;
+  if (typeof s === 'string') {
+    try { s = JSON.parse(s); } catch { /* string simples, mantém */ }
+  }
+  const d = new Date(s);
+  return isNaN(d.getTime()) ? null : d;
 }
 
 function isAllFinished() {
@@ -200,13 +212,15 @@ function renderPage() {
       </div>
     </section>
 
-    <div class="note" style="margin-bottom:20px; padding:12px 16px; background:var(--card); border-left:3px solid var(--green); border-radius:0 6px 6px 0; font-size:12px; color:var(--text-dim); line-height:1.6;">
-      <strong style="color:var(--green);">Dois palpites bônus:</strong>
-      🏆 <strong>acertar o Campeão = +${CHAMPION_BONUS_PTS} pontos</strong> ·
-      ⚽ <strong>Artilheiro: +2 pontos por gol</strong> do jogador que você escolher (vale mais nas fases finais).
-      <br><span style="color:var(--text-mute);">São duas escolhas que você faz <strong style="color:var(--text-dim);">uma única vez</strong>. O bônus de campeão vale como ${Math.round(CHAMPION_BONUS_PTS / GROUP_EXACT)} placares exatos da fase de grupos — pense com calma.</span>
-      <br><span style="color:var(--red); font-weight:700;">⏰ ${locked ? 'Os palpites já fecharam.' : `Você pode escolher e mudar até ${formatDeadline(deadline)}.`}</span> <span style="color:var(--text-mute);">Depois disso ficam travados.</span>
-      <a href="regras.html" style="color:var(--green); font-weight:700;"> Ver todas as regras →</a>
+    <div class="note" style="margin-bottom:20px; padding:14px 18px; background:var(--card); border-left:3px solid var(--green); border-radius:0 6px 6px 0; font-size:12px; color:var(--text-dim);">
+      <span class="note-head">Dois palpites bônus, feitos uma única vez</span>
+      <ul class="note-list">
+        <li>🏆 Acertar o <strong>Campeão</strong>: <strong>+${CHAMPION_BONUS_PTS} pontos</strong> (vale como ${Math.round(CHAMPION_BONUS_PTS / GROUP_EXACT)} placares exatos dos grupos — pense com calma)</li>
+        <li>⚽ <strong>Artilheiro</strong>: <strong>+2 pontos por gol</strong> do jogador que você escolher (vale mais nas fases finais)</li>
+      </ul>
+      <span class="note-deadline">⏰ ${locked ? 'Os palpites já fecharam.' : `Você pode escolher e mudar até ${formatDeadline(deadline)}.`}
+        <span class="sub">Depois disso ficam travados.</span></span>
+      <a class="note-link" href="regras.html">Ver todas as regras →</a>
     </div>
 
     <div class="cs-split">
@@ -721,6 +735,7 @@ function rerenderPlayerList() {
 // Formatters
 // ============================================================
 function formatDeadline(d) {
+  if (!(d instanceof Date) || isNaN(d.getTime())) return 'o prazo';
   const dia = String(d.getDate()).padStart(2, '0');
   const meses = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
   const mes = meses[d.getMonth()];

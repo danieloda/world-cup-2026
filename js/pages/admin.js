@@ -219,18 +219,16 @@ function updateGlobalKpis() {
 // USERS TAB
 // ============================================================
 async function loadUsers() {
-  const [usersRes, predsRes] = await Promise.all([
+  // Progresso agregado no SERVIDOR (1 linha por usuário) — evita o teto de ~1000
+  // linhas do PostgREST que truncava a contagem com muitos palpites (104 × N).
+  const [usersRes, progRes] = await Promise.all([
     supabase.from('profiles').select('*').order('created_at'),
-    supabase.from('predictions').select('user_id'),
+    supabase.rpc('admin_pred_progress'),
   ]);
   if (usersRes.error) throw usersRes.error;
-  if (predsRes.error) throw predsRes.error;
+  if (progRes.error) throw progRes.error;
   cache.users = usersRes.data;
-  const map = new Map();
-  for (const p of predsRes.data) {
-    map.set(p.user_id, (map.get(p.user_id) ?? 0) + 1);
-  }
-  cache.predictions_count = map;
+  cache.pred_progress = new Map((progRes.data ?? []).map(r => [r.user_id, r]));
 
   // settings (for fee)
   if (!cache.settings) {
@@ -243,7 +241,8 @@ async function renderUsersTab() {
   if (!cache.users) await loadUsers();
 
   const users = cache.users;
-  const predCounts = cache.predictions_count;
+  const progress = cache.pred_progress ?? new Map();
+  const fullCount = users.filter(u => (progress.get(u.id)?.total_count ?? 0) >= 104).length;
 
   return `
     <div class="kpis">
@@ -258,6 +257,10 @@ async function renderUsersTab() {
       <div class="kpi">
         <div class="kpi-label">Admins</div>
         <div class="kpi-num">${users.filter(u => u.is_admin).length}</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Palpitaram tudo</div>
+        <div class="kpi-num">${fullCount}<small>/${users.length}</small></div>
       </div>
       <div class="kpi gold">
         <div class="kpi-label">Caixa</div>
@@ -279,13 +282,20 @@ async function renderUsersTab() {
       </thead>
       <tbody>
         ${users.map(u => {
-          const count = predCounts.get(u.id) ?? 0;
+          const pr = progress.get(u.id) ?? { total_count: 0, group_count: 0, ko_count: 0, has_champion: false, has_scorer: false };
+          const count = pr.total_count ?? 0;
           const isMe = u.id === profile.id;
+          const csBadges =
+            `<span class="cs-mini ${pr.has_champion ? 'on' : ''}" title="Campeão ${pr.has_champion ? 'escolhido' : 'pendente'}">🏆</span>` +
+            `<span class="cs-mini ${pr.has_scorer ? 'on' : ''}" title="Artilheiro ${pr.has_scorer ? 'escolhido' : 'pendente'}">⚽</span>`;
           return `
             <tr>
               <td><strong>${escapeHtml(u.full_name)}</strong>${isMe ? ' <small style="color:var(--green);font-weight:800">VOCÊ</small>' : ''}</td>
               <td><span class="em-cell">${escapeHtml(u.email)}</span></td>
-              <td><span class="pill ${count >= 104 ? 'open' : count > 0 ? 'done' : 'locked'}">${count}/104</span></td>
+              <td>
+                <span class="pill ${count >= 104 ? 'open' : count > 0 ? 'done' : 'locked'}" title="Grupos ${pr.group_count}/72 · Mata-mata ${pr.ko_count}/32">${count}/104</span>
+                <div class="pred-breakdown">G ${pr.group_count}/72 · M ${pr.ko_count}/32 ${csBadges}</div>
+              </td>
               <td>
                 <button class="admin-action ${u.paid ? 'green-active' : ''}"
                         data-action="toggle-paid" data-id="${u.id}">
@@ -969,11 +979,14 @@ async function saveSettings() {
 
   const deadlineIso = new Date(dlLocal).toISOString();
 
+  // A coluna settings.value é jsonb e o supabase-js já serializa: passamos valores
+  // NATIVOS (não JSON.stringify, senão duplo-codifica e vira '"2026-..."' com aspas,
+  // que quebra new Date() no front e o cast ::timestamptz no cs_deadline() do SQL).
   const updates = [
-    { key: 'pool_name', value: JSON.stringify(poolName) },
-    { key: 'fee_amount', value: JSON.stringify(fee) },
-    { key: 'deadline_champion_scorer', value: JSON.stringify(deadlineIso) },
-    { key: 'prize_split', value: JSON.stringify({ first, second, third }) },
+    { key: 'pool_name', value: poolName },
+    { key: 'fee_amount', value: fee },
+    { key: 'deadline_champion_scorer', value: deadlineIso },
+    { key: 'prize_split', value: { first, second, third } },
   ];
 
   const errors = [];

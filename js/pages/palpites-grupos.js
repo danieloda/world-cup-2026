@@ -114,15 +114,17 @@ function renderPage() {
 // ============================================================
 function renderPalpitesTab(counts) {
   return `
-    <div class="note" style="margin-bottom:20px; padding:12px 16px; background:var(--card); border-left:3px solid var(--green); border-radius:0 6px 6px 0; font-size:12px; color:var(--text-dim); line-height:1.6;">
-      <strong style="color:var(--green);">Como você ganha pontos (cada acerto soma):</strong>
-      🥅 <strong>+${GP.ag}</strong> por acertar os gols de um time ·
-      ⚽ <strong>+${GP.ave}</strong> por acertar quem vence (ou o empate) ·
-      ➕ <strong>+${GP.dg}</strong> por acertar a diferença de gols.
-      <br><span style="color:var(--text-mute);">Acertar o <strong style="color:var(--text-dim);">placar exato</strong> soma tudo: <strong style="color:var(--text-dim);">${GP.exact} pontos</strong>. Você não precisa cravar o placar — cada parte certa já vale.</span>
-      <br><span style="color:var(--text-mute);">É só digitar o placar nos dois campos: <strong style="color:var(--text-dim);">salva sozinho</strong>, e você pode mudar quantas vezes quiser antes do jogo.</span>
-      <br><span style="color:var(--red); font-weight:700;">⏰ Cada palpite fecha na hora em que o jogo começa.</span> <span style="color:var(--text-mute);">Depois disso não dá mais para mudar aquele jogo.</span>
-      <a href="regras.html" style="color:var(--green); font-weight:700;"> Ver todas as regras →</a>
+    <div class="note" style="margin-bottom:20px; padding:14px 18px; background:var(--card); border-left:3px solid var(--green); border-radius:0 6px 6px 0; font-size:12px; color:var(--text-dim);">
+      <span class="note-head">Como você ganha pontos em cada jogo</span>
+      <ul class="note-list">
+        <li>🥅 <strong>+${GP.ag}</strong> se acertar quantos gols um time fez (pode valer pelos dois times)</li>
+        <li>⚽ <strong>+${GP.ave}</strong> se acertar quem vence — ou que vai dar empate</li>
+        <li>➕ <strong>+${GP.dg}</strong> se acertar a diferença de gols</li>
+        <li>🎯 Cravou o placar exato? Soma tudo: <strong>${GP.exact} pontos</strong></li>
+      </ul>
+      <span class="note-deadline">⏰ Cada palpite fecha às 23h59 da véspera do jogo (um dia antes).
+        <span class="sub">Até lá, é só digitar o placar — salva sozinho e pode mudar quantas vezes quiser.</span></span>
+      <a class="note-link" href="regras.html">Ver todas as regras →</a>
     </div>
 
     ${renderKpisPalpites(counts)}

@@ -355,15 +355,15 @@ function renderPrazos() {
   return section('prazos', '10', 'Prazos — até quando dá para palpitar', `
     <div class="rules-tip" style="border-left-color: var(--red); margin-top:0; margin-bottom:16px;">
       ⏰ <strong style="color:var(--text);">A regra mais importante:</strong> cada palpite de placar
-      <strong style="color:var(--text);">fecha no horário em que o jogo começa</strong>. A partir do apito inicial,
-      aquele palpite não pode mais ser alterado.
+      <strong style="color:var(--text);">fecha às 23h59 (horário de Brasília) da véspera do jogo</strong> —
+      ou seja, na noite anterior. Depois disso, aquele palpite não pode mais ser alterado.
     </div>
     <ul class="rules-list">
-      <li>Você pode <strong>criar e mudar</strong> o palpite de um jogo quantas vezes quiser — até a hora em que ele começa.</li>
-      <li>Cada jogo tem seu próprio horário. Na tela de palpites aparece a data e a hora de cada partida.</li>
-      <li>Os palpites de <strong>Campeão</strong> e <strong>Artilheiro</strong> fecham num <strong>prazo único</strong>, antes do primeiro jogo da Copa.</li>
-      <li>Não dá para palpitar um jogo depois que ele já começou — então não deixe para a última hora.</li>
-      <li>As vagas do mata-mata viram seleções de verdade automaticamente, assim que o último jogo de cada grupo é lançado.</li>
+      <li><strong>Exemplo:</strong> um jogo no dia 15, às 16h, fecha para palpites no dia <strong>14, às 23h59</strong>.</li>
+      <li>Você pode <strong>criar e mudar</strong> o palpite quantas vezes quiser — até esse horário da véspera.</li>
+      <li>Cada jogo tem seu próprio prazo (a véspera dele). Na tela de palpites, os jogos já fechados aparecem marcados como <strong>"Travado"</strong>.</li>
+      <li>Os palpites de <strong>Campeão</strong> e <strong>Artilheiro</strong> fecham num <strong>prazo único</strong>, na véspera do primeiro jogo da Copa.</li>
+      <li>Não deixe para a última hora: passada a véspera, não dá mais para palpitar aquele jogo.</li>
     </ul>
   `);
 }
