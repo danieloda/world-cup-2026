@@ -6,6 +6,9 @@ import {
   isLocked, isLive, showToast, attachTeamTooltips, loadRecentMatches,
   teamPt, groundShort,
 } from '../util.js';
+import { matchPoints } from '../scoring.js';
+
+const GP = matchPoints('group'); // { ag:1, ave:4, dg:1, exact:7 }
 
 // ============================================================
 // Estado da página
@@ -111,14 +114,15 @@ function renderPage() {
 // ============================================================
 function renderPalpitesTab(counts) {
   return `
-    <div class="note" style="margin-bottom:20px; padding:12px 16px; background:var(--card); border-left:3px solid var(--green); border-radius:0 6px 6px 0; font-size:12px; color:var(--text-dim);">
-      <strong style="color:var(--green);">Pontuação (vale o melhor acerto, não soma):</strong>
-      🎯 <strong>5 pts</strong> placar exato ·
-      ⚽ <strong>3 pts</strong> vencedor + saldo de gols ·
-      ✓ <strong>2 pts</strong> só o vencedor/empate ·
-      🥅 <strong>1 pt</strong> acertou os gols de um dos times.
-      <br><span style="color:var(--text-mute);">Aqui (fase de grupos) o multiplicador é ×1. Digite o placar e pronto: <strong style="color:var(--text-dim);">salva sozinho</strong>. Dá pra editar quantas vezes quiser até o jogo começar — <strong style="color:var(--text-dim);">cada palpite trava no apito inicial</strong> daquele jogo.</span>
-      <a href="regras.html" style="color:var(--green); font-weight:700;"> Regras completas →</a>
+    <div class="note" style="margin-bottom:20px; padding:12px 16px; background:var(--card); border-left:3px solid var(--green); border-radius:0 6px 6px 0; font-size:12px; color:var(--text-dim); line-height:1.6;">
+      <strong style="color:var(--green);">Como você ganha pontos (cada acerto soma):</strong>
+      🥅 <strong>+${GP.ag}</strong> por acertar os gols de um time ·
+      ⚽ <strong>+${GP.ave}</strong> por acertar quem vence (ou o empate) ·
+      ➕ <strong>+${GP.dg}</strong> por acertar a diferença de gols.
+      <br><span style="color:var(--text-mute);">Acertar o <strong style="color:var(--text-dim);">placar exato</strong> soma tudo: <strong style="color:var(--text-dim);">${GP.exact} pontos</strong>. Você não precisa cravar o placar — cada parte certa já vale.</span>
+      <br><span style="color:var(--text-mute);">É só digitar o placar nos dois campos: <strong style="color:var(--text-dim);">salva sozinho</strong>, e você pode mudar quantas vezes quiser antes do jogo.</span>
+      <br><span style="color:var(--red); font-weight:700;">⏰ Cada palpite fecha na hora em que o jogo começa.</span> <span style="color:var(--text-mute);">Depois disso não dá mais para mudar aquele jogo.</span>
+      <a href="regras.html" style="color:var(--green); font-weight:700;"> Ver todas as regras →</a>
     </div>
 
     ${renderKpisPalpites(counts)}
@@ -276,7 +280,7 @@ function renderKpisResultados(counts) {
       <div class="kpi green">
         <div class="kpi-label">Placares exatos</div>
         <div class="kpi-num">${exact}</div>
-        <div class="kpi-sub">vale 5 pts cada</div>
+        <div class="kpi-sub">vale ${GP.exact} pts cada</div>
       </div>
       <div class="kpi">
         <div class="kpi-label">Acertos parciais</div>
@@ -316,8 +320,9 @@ function renderResultadosList() {
 function renderResultRow(m) {
   const pred = predsByMatch.get(m.id);
   const pts = pred?.points_earned;
-  const cardClass = pts === 5 ? 'exact' : (pts > 0 ? 'partial' : 'miss');
-  const ptsLabel = pts === 5 ? 'Exato!' : pts > 0 ? 'Parcial' : (pred ? 'Errou' : 'Sem palpite');
+  const isExact = pred && pred.pred_home === m.actual_home && pred.pred_away === m.actual_away;
+  const cardClass = isExact ? 'exact' : (pts > 0 ? 'partial' : 'miss');
+  const ptsLabel = isExact ? 'Exato!' : pts > 0 ? 'Parcial' : (pred ? 'Errou' : 'Sem palpite');
 
   const goals = goalsByMatch.get(m.id) ?? [];
   const homeGoals = goals.filter(g => g.players.team === m.team_home);
@@ -440,7 +445,7 @@ function computeCounts() {
         totalFinishedWithPred++;
         const pts = p.points_earned ?? 0;
         totalPoints += pts;
-        if (pts === 5) exactCount++;
+        if (p.pred_home === m.actual_home && p.pred_away === m.actual_away) exactCount++;
         else if (pts > 0) partialCount++;
         else missCount++;
       }

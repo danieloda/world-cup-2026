@@ -80,7 +80,7 @@ function renderKpis() {
       <div class="kpi gold">
         <div class="kpi-label">Placares exatos</div>
         <div class="kpi-num">${exactsDisplay}</div>
-        <div class="kpi-sub">vale 5 pts cada</div>
+        <div class="kpi-sub">seu maior acerto</div>
       </div>
       <div class="kpi">
         <div class="kpi-label">Copa disputada</div>

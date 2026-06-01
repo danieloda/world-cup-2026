@@ -1,18 +1,17 @@
 import { requireAuth } from '../auth.js';
 import { renderShell } from '../sidebar.js';
 import { supabase } from '../supabase.js';
-import { stageMultiplier, championBonus, scorerBonus, scorePrediction, qualifierBonus } from '../scoring.js';
+import { matchPoints, championBonus, scorerBonus, qualifierBonus } from '../scoring.js';
 
 // ============================================================
 // Regras & Pontuação
-// Página 100% estática — todos os NÚMEROS vêm de js/scoring.js
-// (módulo canônico, espelho de 003_scoring.sql). Assim a página
-// de regras nunca diverge da engine real.
+// Página 100% estática — todos os NÚMEROS vêm de js/scoring.js (módulo
+// canônico, espelho das migrations). Assim a página nunca diverge da engine.
 // ============================================================
 
 let profile, stats;
 
-// Fases na ordem do torneio. Multiplicadores vêm de stageMultiplier().
+// Fases na ordem do torneio.
 const STAGES = [
   { id: 'group', label: 'Grupos',     short: 'Grupos' },
   { id: 'r32',   label: '32-avos',    short: '32-avos' },
@@ -23,35 +22,7 @@ const STAGES = [
   { id: 'final', label: 'Final',      short: 'Final' },
 ];
 
-// Tiers de acerto por jogo (base, antes do multiplicador).
-// A base sai da própria engine (scorePrediction em grupo = ×1).
-const TIERS = [
-  {
-    base: scorePrediction(2, 1, null, 2, 1, null, 'group'),       // 5
-    icon: '🎯', name: 'Placar exato',
-    desc: 'Você cravou os dois placares (ex.: previu 2×1 e o jogo terminou 2×1).',
-  },
-  {
-    base: scorePrediction(3, 1, null, 2, 0, null, 'group'),       // 3
-    icon: '⚽', name: 'Vencedor + saldo de gols',
-    desc: 'Acertou quem venceu (ou o empate) E a diferença de gols, mas não o placar exato (ex.: previu 3×1, deu 2×0).',
-  },
-  {
-    base: scorePrediction(2, 0, null, 1, 0, null, 'group'),       // 2
-    icon: '✓', name: 'Só o vencedor / empate',
-    desc: 'Acertou quem venceu ou que seria empate, com saldo diferente (ex.: previu 2×0, deu 1×0).',
-  },
-  {
-    base: scorePrediction(2, 0, null, 2, 3, null, 'group'),       // 1
-    icon: '🥅', name: 'Gols de um lado',
-    desc: 'Errou o vencedor, mas acertou em cheio quantos gols um dos times fez (ex.: previu 2×0, deu 2×3 — acertou os 2 da casa).',
-  },
-  {
-    base: 0,
-    icon: '✗', name: 'Errou tudo',
-    desc: 'Nenhuma das condições acima.',
-  },
-];
+const GP = matchPoints('group'); // valores da fase de grupos
 
 // ============================================================
 // Main
@@ -85,12 +56,12 @@ try {
 function renderPage() {
   return `
     <section class="hero">
-      <div class="hero-kicker">Tudo que você precisa saber</div>
+      <div class="hero-kicker">Tudo que você precisa saber, explicado com calma</div>
       <h1 class="hero-title">Regras & Pontuação</h1>
       <div class="hero-meta">
         <b>104 jogos</b><span class="sep"></span>
-        3 formas de pontuar<span class="sep"></span>
-        Quanto mais avança a Copa, mais valem os pontos
+        Cada acerto soma pontos<span class="sep"></span>
+        Quanto mais perto da final, mais vale
       </div>
     </section>
 
@@ -98,20 +69,20 @@ function renderPage() {
       ${[
         ['como-funciona', 'Como funciona'],
         ['pontos-jogo', 'Pontos por jogo'],
-        ['multiplicadores', 'Multiplicadores'],
+        ['fases', 'Quanto cada fase vale'],
         ['vaga', 'Regra da vaga'],
         ['penaltis', 'Empate no mata-mata'],
         ['campeao', 'Campeão'],
         ['artilheiro', 'Artilheiro'],
         ['classificado', 'Bônus de classificado'],
         ['desempate', 'Desempates'],
-        ['prazos', 'Prazos & travas'],
+        ['prazos', 'Prazos (até quando palpitar)'],
       ].map(([id, label]) => `<a href="#${id}" class="rules-toc-link">${label}</a>`).join('')}
     </nav>
 
     ${renderComoFunciona()}
     ${renderPontosJogo()}
-    ${renderMultiplicadores()}
+    ${renderFases()}
     ${renderVaga()}
     ${renderPenaltis()}
     ${renderCampeao()}
@@ -121,7 +92,7 @@ function renderPage() {
     ${renderPrazos()}
 
     <div class="rules-foot">
-      Dúvidas sobre alguma regra? Fale com a organização do bolão.
+      Ficou com dúvida em alguma regra? Fale com a organização do bolão.
     </div>
   `;
 }
@@ -130,28 +101,35 @@ function renderPage() {
 function renderComoFunciona() {
   return section('como-funciona', '1', 'Como funciona', `
     <p class="rules-p">
-      Você ganha pontos de <strong>três formas</strong> que somam no seu total. Vence o bolão
-      quem tiver mais pontos ao fim da Copa.
+      Você ganha pontos de <strong>três formas</strong>, e elas se somam no seu total.
+      Vence o bolão quem tiver mais pontos no fim da Copa.
     </p>
     <div class="rules-cards3">
-      ${miniCard('⚽', 'Palpites de placar', 'Você prevê o placar de cada um dos 104 jogos. Cada acerto vale pontos, multiplicados conforme a fase.')}
-      ${miniCard('🏆', 'Bônus de Campeão', `Escolhe quem leva a taça. Acertou? <strong>+${championBonus(true)} pts</strong> de uma vez.`)}
-      ${miniCard('🥇', 'Bônus de Artilheiro', 'Escolhe 1 jogador. Cada gol dele rende pontos extras que escalam com a fase.')}
+      ${miniCard('⚽', 'Palpites de placar', 'Você dá o placar de cada um dos 104 jogos. Cada parte que você acerta já vale pontos.')}
+      ${miniCard('🏆', 'Bônus de Campeão', `Você escolhe quem leva a taça. Se acertar: <strong>+${championBonus(true)} pontos</strong> de uma vez.`)}
+      ${miniCard('🥇', 'Bônus de Artilheiro', 'Você escolhe 1 jogador. Cada gol dele soma pontos extras.')}
     </div>
     <div class="rules-tip">
-      💡 Os pontos dos jogos são <strong>recalculados automaticamente</strong> assim que a organização
-      lança cada resultado — não precisa fazer nada.
+      💡 Você não precisa entender de conta: é só dar o placar dos jogos. O sistema soma os pontos
+      <strong>sozinho</strong>, assim que cada resultado é lançado.
     </div>
   `);
 }
 
-// ---- 2) Pontos por jogo ----
+// ---- 2) Pontos por jogo (modelo aditivo) ----
 function renderPontosJogo() {
-  const rows = TIERS.map(t => `
-    <div class="rules-tier ${t.base === 0 ? 'zero' : ''}">
+  const rows = [
+    { icon: '🥅', pts: GP.ag,  name: 'Acertou os gols de um time',
+      desc: 'Para cada seleção em que você acertar quantos gols ela fez, você ganha esses pontos. Pode valer pelos dois times.' },
+    { icon: '⚽', pts: GP.ave, name: 'Acertou quem vence (ou o empate)',
+      desc: 'Se você acertar qual time venceu — ou que o jogo terminaria empatado.' },
+    { icon: '➕', pts: GP.dg,  name: 'Acertou a diferença de gols',
+      desc: 'Se você acertar por quantos gols o jogo terminou (ex.: vitória por 2). O empate também conta como diferença certa.' },
+  ].map(t => `
+    <div class="rules-tier">
       <div class="rules-tier-pts">
         <span class="ico">${t.icon}</span>
-        <span class="pts">${t.base}<small>pt${t.base === 1 ? '' : 's'}</small></span>
+        <span class="pts">+${t.pts}</span>
       </div>
       <div class="rules-tier-body">
         <div class="rules-tier-name">${t.name}</div>
@@ -162,66 +140,57 @@ function renderPontosJogo() {
 
   return section('pontos-jogo', '2', 'Pontos por jogo', `
     <p class="rules-p">
-      Cada palpite recebe a pontuação do <strong>melhor acerto que se encaixar</strong> —
-      não acumula. Esses são os pontos-base da fase de grupos; nas fases seguintes eles são
-      multiplicados (veja a seção abaixo).
+      Em cada jogo, <strong>cada acerto soma</strong> — você não precisa cravar o placar para pontuar.
+      Estes são os valores na <strong>fase de grupos</strong> (nas fases seguintes valem mais):
     </p>
     <div class="rules-tiers">${rows}</div>
-    <div class="rules-tip">
-      💡 Repare: o <strong>placar exato</strong> (${TIERS[0].base} pts) já inclui o acerto do vencedor
-      e do saldo — você sempre leva o maior valor possível, nunca a soma.
+    <div class="rules-example">
+      <div class="rules-example-head">Exemplo</div>
+      <p>O jogo terminou <strong>Brasil 3 × 1 Suíça</strong>.</p>
+      <p>Se você tinha palpitado <strong>2 × 0</strong>: acertou que o Brasil venceria (+${GP.ave}) e que a
+        diferença seria de 2 gols (+${GP.dg}) → <strong>${GP.ave + GP.dg} pontos</strong>.</p>
+      <p class="rules-example-result">Se tivesse cravado <strong>3 × 1</strong>, somaria tudo:
+        os gols dos dois times (+${GP.ag} e +${GP.ag}), o vencedor (+${GP.ave}) e a diferença (+${GP.dg}) =
+        <strong>${GP.exact} pontos</strong> (o máximo de um jogo de grupos).</p>
     </div>
   `);
 }
 
-// ---- 3) Multiplicadores ----
-function renderMultiplicadores() {
+// ---- 3) Quanto cada fase vale ----
+function renderFases() {
   const head = STAGES.map(s => `<th>${s.short}</th>`).join('');
+  const row = (label, pick, hl) => `
+    <tr ${hl ? 'class="rules-matrix-mult"' : ''}>
+      <td class="rules-matrix-label">${label}</td>
+      ${STAGES.map(s => {
+        const v = pick(matchPoints(s.id));
+        return `<td class="${hl ? '' : ''}">${v}</td>`;
+      }).join('')}
+    </tr>`;
 
-  const multRow = STAGES.map(s => {
-    const m = stageMultiplier(s.id);
-    return `<td class="mult-cell">×${fmt(m)}</td>`;
-  }).join('');
-
-  // Linhas: cada tier base × mult de cada fase
-  const tierRows = TIERS.filter(t => t.base > 0).map(t => {
-    const cells = STAGES.map(s => {
-      const v = Math.round(t.base * stageMultiplier(s.id));
-      const isMax = t.base === TIERS[0].base;
-      return `<td class="${isMax ? 'hl' : ''}">${v}</td>`;
-    }).join('');
-    return `
-      <tr>
-        <td class="rules-matrix-label"><span class="ico">${t.icon}</span> ${t.name}</td>
-        ${cells}
-      </tr>
-    `;
-  }).join('');
-
-  return section('multiplicadores', '3', 'Multiplicadores por fase', `
+  return section('fases', '3', 'Quanto cada fase vale', `
     <p class="rules-p">
-      Quanto mais decisivo o jogo, mais ele vale. O placar de uma <strong>final</strong> vale
-      <strong>×${fmt(stageMultiplier('final'))}</strong> o de um jogo de grupos — então a Copa
-      fica em aberto até o fim e dá pra virar o jogo no mata-mata.
+      Quanto mais decisivo o jogo, <strong>mais pontos ele vale</strong>. Um placar exato na
+      <strong>final</strong> vale <strong>${matchPoints('final').exact}</strong> pontos — contra
+      <strong>${GP.exact}</strong> de um jogo de grupos. É por isso que <strong>a emoção fica para o fim</strong>:
+      mesmo quem não foi bem nos grupos pode virar o jogo no mata-mata.
     </p>
     <div class="rules-table-wrap">
       <table class="rules-matrix">
         <thead>
-          <tr><th class="rules-matrix-label">Fase →</th>${head}</tr>
+          <tr><th class="rules-matrix-label">Acerto →</th>${head}</tr>
         </thead>
         <tbody>
-          <tr class="rules-matrix-mult">
-            <td class="rules-matrix-label">Multiplicador</td>
-            ${multRow}
-          </tr>
-          ${tierRows}
+          ${row('🥅 Gols de um time', p => '+' + p.ag)}
+          ${row('⚽ Vencedor / empate', p => '+' + p.ave)}
+          ${row('➕ Diferença de gols', p => '+' + p.dg)}
+          ${row('🎯 Placar exato', p => p.exact, true)}
         </tbody>
       </table>
     </div>
     <div class="rules-tip">
-      💡 Os valores na tabela já são os <strong>pontos finais</strong> de cada acerto por fase
-      (base × multiplicador, arredondado). Ex.: placar exato na final = ${TIERS[0].base} × ${fmt(stageMultiplier('final'))} =
-      <strong>${Math.round(TIERS[0].base * stageMultiplier('final'))} pts</strong>.
+      💡 A linha <strong>Placar exato</strong> é o máximo que um jogo daquela fase pode dar
+      (a soma de todos os acertos).
     </div>
   `);
 }
@@ -230,26 +199,25 @@ function renderMultiplicadores() {
 function renderVaga() {
   return section('vaga', '4', 'Regra da vaga (mata-mata)', `
     <p class="rules-p">
-      No mata-mata você não aposta num time específico — você aposta no <strong>placar de uma vaga
-      do chaveamento</strong> (ex.: "1º do Grupo A × 2º do Grupo B"). Seu palpite de gols vale para
-      <strong>quem realmente se classificar naquela posição</strong>, mesmo que não seja o time que
-      você imaginava.
+      No mata-mata você não aposta numa seleção específica — você dá o <strong>placar de uma vaga do
+      chaveamento</strong> (por exemplo: "1º do Grupo A × 2º do Grupo B"). Seu palpite de gols vale para
+      <strong>quem realmente se classificar naquela posição</strong>, mesmo que não seja a seleção que você imaginava.
     </p>
     <div class="rules-example">
       <div class="rules-example-head">Exemplo</div>
       <p>
         No jogo "1º do Grupo A × 2º do Grupo B" você achava que seria
         <strong>França × Argentina</strong> e apostou <strong>1 × 0</strong>.
-        Na real, quem classificou nessas posições foi <strong>África do Sul × Nigéria</strong>.
+        Na vida real, quem se classificou nessas posições foi <strong>África do Sul × Nigéria</strong>.
       </p>
       <p class="rules-example-result">
-        → Seu palpite passa a valer como <strong>África do Sul 1 × 0 Nigéria</strong> e é pontuado
-        contra o resultado real desse jogo. Você ainda pode tirar placar exato, vencedor, etc.
+        → Seu palpite passa a valer como <strong>África do Sul 1 × 0 Nigéria</strong> e é contado contra o
+        resultado real desse jogo. Você ainda pode pontuar normalmente.
       </p>
     </div>
     <div class="rules-tip">
       💡 Na tela <a href="palpites-mata.html">Mata-mata</a>, as bandeiras que aparecem nas vagas são
-      apenas um guia visual baseado nos <em>seus</em> palpites — não afetam a pontuação.
+      apenas uma ideia baseada nos <em>seus</em> palpites — não mudam a pontuação.
     </div>
   `);
 }
@@ -258,12 +226,11 @@ function renderVaga() {
 function renderPenaltis() {
   return section('penaltis', '5', 'Empate no mata-mata', `
     <p class="rules-p">
-      Se você prevê um <strong>empate</strong> num jogo de mata-mata, escolha também
-      <strong>quem passa nos pênaltis</strong>. Esse palpite define o "vencedor" do seu prognóstico
-      para fins de pontuação.
+      Se você acha que um jogo de mata-mata vai terminar <strong>empatado</strong>, escolha também
+      <strong>quem passa nos pênaltis</strong>. Essa escolha define o "vencedor" do seu palpite.
     </p>
     <ul class="rules-list">
-      <li>O <strong>placar do tempo normal</strong> é o que conta para o acerto de gols e saldo.</li>
+      <li>Vale o <strong>placar do tempo normal</strong> para os pontos de gols e de diferença.</li>
       <li>Se você cravar o placar do tempo normal, leva o <strong>placar exato</strong> — mesmo que erre quem ganhou nos pênaltis.</li>
       <li>Na fase de grupos não há pênaltis: empate é empate.</li>
     </ul>
@@ -274,17 +241,16 @@ function renderPenaltis() {
 function renderCampeao() {
   return section('campeao', '6', 'Bônus de Campeão', `
     <p class="rules-p">
-      Antes do prazo, você escolhe a seleção que acha que vai <strong>levantar a taça</strong>.
-      Se acertar o campeão, ganha <strong>+${championBonus(true)} pontos</strong> de bônus (valor fixo,
-      independente da fase).
+      Antes da Copa começar, você escolhe a seleção que acha que vai <strong>levantar a taça</strong>.
+      Se acertar o campeão, ganha <strong>+${championBonus(true)} pontos</strong> de bônus.
     </p>
     <div class="rules-bignum">
       <span class="n">+${championBonus(true)}</span>
-      <span class="l">pontos se acertar o campeão</span>
+      <span class="l">pontos se você acertar o campeão</span>
     </div>
     <div class="rules-tip">
-      💡 É o palpite mais valioso do bolão — equivale a ${Math.round(championBonus(true) / TIERS[0].base)}
-      placares exatos da fase de grupos. Vale a pena pensar bem.
+      💡 É um dos palpites mais valiosos do bolão — vale como ${Math.round(championBonus(true) / GP.exact)}
+      placares exatos da fase de grupos. E como só é decidido no último jogo, ajuda a manter a emoção até o fim.
     </div>
   `);
 }
@@ -301,20 +267,18 @@ function renderArtilheiro() {
 
   return section('artilheiro', '7', 'Bônus de Artilheiro', `
     <p class="rules-p">
-      Você escolhe <strong>1 jogador</strong> antes do prazo. Cada gol que ele marcar rende pontos
-      extras — e, como nos placares, gols em fases mais adiantadas valem mais
-      (<strong>+${scorerBonus(1, 'group')} por gol</strong> na fase de grupos, escalando até
-      <strong>+${scorerBonus(1, 'final')} por gol</strong> na final).
+      Você escolhe <strong>1 jogador</strong> antes da Copa. Cada gol que ele marcar soma pontos —
+      e gols nas fases finais valem mais (<strong>+${scorerBonus(1, 'group')} por gol</strong> nos grupos,
+      chegando a <strong>+${scorerBonus(1, 'final')} por gol</strong> na final).
     </p>
     <div class="rules-scorer-grid">${cells}</div>
     <div class="rules-tip">
-      💡 Fórmula: <strong>nº de gols × ${scorerBonus(1, 'group')} × multiplicador da fase</strong>.
-      Escolher um artilheiro de uma seleção que vai longe na Copa multiplica seus pontos.
+      💡 Escolher o artilheiro de uma seleção que vai longe na Copa rende mais pontos.
     </div>
   `);
 }
 
-// ---- 8) Bônus de classificado (BPE/BP) ----
+// ---- 8) Classificado (BPE/BP) ----
 function renderClassificado() {
   const PH = [
     { id: 'r32',   label: '32-avos' },
@@ -325,43 +289,36 @@ function renderClassificado() {
     { id: 'final', label: 'Final' },
   ];
   const head = PH.map(p => `<th>${p.label}</th>`).join('');
-  const bpeRow = PH.map(p => `<td class="hl">${qualifierBonus(p.id, true)}</td>`).join('');
+  const bpeRow = PH.map(p => `<td class="hl">+${qualifierBonus(p.id, true)}</td>`).join('');
   const bpRow = PH.map(p => {
     const v = qualifierBonus(p.id, false);
-    return `<td>${v === 0 ? '—' : v}</td>`;
+    return `<td>${v === 0 ? '—' : '+' + v}</td>`;
   }).join('');
 
   return section('classificado', '8', 'Bônus de seleção classificada', `
     <p class="rules-p">
-      Além do placar, você ganha pontos por <strong>acertar qual seleção chega a cada vaga do mata-mata</strong>
-      — com base em quem os <em>seus palpites</em> fazem avançar. São dois tipos:
+      Além do placar, você ganha pontos por <strong>acertar qual seleção chega a cada fase do mata-mata</strong>
+      — com base em quem os <em>seus palpites</em> fazem avançar. São dois casos:
     </p>
     <ul class="rules-list">
-      <li><strong>Posição exata (BPE):</strong> a seleção que você previu para aquela vaga é exatamente quem se classificou ali.</li>
-      <li><strong>Time certo, vaga errada (BP):</strong> a seleção chegou àquela fase, mas em outra vaga. Vale <strong>metade</strong> do BPE.</li>
+      <li><strong>Posição exata:</strong> a seleção que você previu para aquela vaga é exatamente quem se classificou ali.</li>
+      <li><strong>Time certo, vaga errada:</strong> a seleção chegou àquela fase, mas em outra posição. Vale a <strong>metade</strong>.</li>
     </ul>
-    <p class="rules-p">É cumulativo: um time que você acompanha corretamente fase após fase rende bônus em cada uma.</p>
+    <p class="rules-p">Soma a cada fase: uma seleção que você acompanha corretamente fase após fase rende bônus em todas elas.</p>
     <div class="rules-table-wrap">
       <table class="rules-matrix">
         <thead>
-          <tr><th class="rules-matrix-label">Fase →</th>${head}</tr>
+          <tr><th class="rules-matrix-label">Acerto →</th>${head}</tr>
         </thead>
         <tbody>
-          <tr>
-            <td class="rules-matrix-label">✓ Posição exata (BPE)</td>
-            ${bpeRow}
-          </tr>
-          <tr>
-            <td class="rules-matrix-label">~ Vaga errada (BP)</td>
-            ${bpRow}
-          </tr>
+          <tr><td class="rules-matrix-label">✓ Posição exata</td>${bpeRow}</tr>
+          <tr><td class="rules-matrix-label">~ Vaga errada</td>${bpRow}</tr>
         </tbody>
       </table>
     </div>
     <div class="rules-tip">
-      💡 Não há BP nos 32-avos (quase todo time está nessa fase, seria só sorte). E lembre:
-      acertar o chaveamento é, por natureza, mais <strong>sorte</strong> do que habilidade — por isso esse bônus
-      é propositalmente <strong>modesto</strong>, pra não passar por cima de quem cravou mais placares.
+      💡 Acertar o caminho das seleções é mais <strong>sorte</strong> do que ciência, então esse bônus é
+      pequeno de propósito: dá um tempero, mas quem decide o bolão é o acerto dos placares.
     </div>
   `);
 }
@@ -372,21 +329,21 @@ function renderDesempate() {
     <div class="rules-two">
       <div class="rules-half">
         <div class="rules-half-title">Classificação dos grupos</div>
-        <p class="rules-p">Para decidir quem avança quando os times empatam em pontos:</p>
+        <p class="rules-p">Quando seleções empatam em pontos, quem avança é decidido por:</p>
         <ol class="rules-ord">
           <li>Pontos</li>
           <li>Saldo de gols</li>
-          <li>Gols marcados (pró)</li>
-          <li>Ranking FIFA (melhor posição passa)</li>
+          <li>Gols marcados</li>
+          <li>Ranking da FIFA (melhor posição passa)</li>
         </ol>
       </div>
       <div class="rules-half">
         <div class="rules-half-title">Ranking do bolão</div>
-        <p class="rules-p">Para decidir o vencedor quando dois apostadores empatam em pontos:</p>
+        <p class="rules-p">Quando dois participantes empatam em pontos, fica na frente quem tiver:</p>
         <ol class="rules-ord">
-          <li>Total de pontos</li>
-          <li>Quantidade de placares exatos</li>
-          <li>Quantidade de acertos de vencedor + saldo</li>
+          <li>Mais pontos no total</li>
+          <li>Mais placares exatos</li>
+          <li>Mais acertos de vencedor + diferença de gols</li>
         </ol>
       </div>
     </div>
@@ -395,12 +352,18 @@ function renderDesempate() {
 
 // ---- 10) Prazos ----
 function renderPrazos() {
-  return section('prazos', '10', 'Prazos & travas', `
+  return section('prazos', '10', 'Prazos — até quando dá para palpitar', `
+    <div class="rules-tip" style="border-left-color: var(--red); margin-top:0; margin-bottom:16px;">
+      ⏰ <strong style="color:var(--text);">A regra mais importante:</strong> cada palpite de placar
+      <strong style="color:var(--text);">fecha no horário em que o jogo começa</strong>. A partir do apito inicial,
+      aquele palpite não pode mais ser alterado.
+    </div>
     <ul class="rules-list">
-      <li>Cada palpite de placar <strong>trava no apito inicial</strong> daquele jogo. Antes disso, pode editar à vontade — salva automático.</li>
-      <li>Os palpites de <strong>Campeão</strong> e <strong>Artilheiro</strong> travam num prazo único, antes do início da Copa.</li>
-      <li>Depois de travado, o palpite não pode mais ser alterado.</li>
-      <li>As vagas do mata-mata viram times reais automaticamente assim que o último jogo de cada grupo é lançado.</li>
+      <li>Você pode <strong>criar e mudar</strong> o palpite de um jogo quantas vezes quiser — até a hora em que ele começa.</li>
+      <li>Cada jogo tem seu próprio horário. Na tela de palpites aparece a data e a hora de cada partida.</li>
+      <li>Os palpites de <strong>Campeão</strong> e <strong>Artilheiro</strong> fecham num <strong>prazo único</strong>, antes do primeiro jogo da Copa.</li>
+      <li>Não dá para palpitar um jogo depois que ele já começou — então não deixe para a última hora.</li>
+      <li>As vagas do mata-mata viram seleções de verdade automaticamente, assim que o último jogo de cada grupo é lançado.</li>
     </ul>
   `);
 }
@@ -428,11 +391,6 @@ function miniCard(icon, title, text) {
       <div class="rules-mini-text">${text}</div>
     </div>
   `;
-}
-
-// Formata multiplicador: 1.5 → "1,5", 2 → "2"
-function fmt(n) {
-  return Number.isInteger(n) ? String(n) : String(n).replace('.', ',');
 }
 
 // ============================================================

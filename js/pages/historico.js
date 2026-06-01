@@ -140,8 +140,8 @@ function renderPage() {
     </section>
 
     <div class="note" style="margin-bottom:20px; padding:12px 16px; background:var(--card); border-left:3px solid var(--green); border-radius:0 6px 6px 0; font-size:12px; color:var(--text-dim);">
-      <strong style="color:var(--green);">Transparência total:</strong>
-      Veja o palpite de cada jogador após o apito final. Quem acertou? Quem errou feio? Confira tudo aqui.
+      <strong style="color:var(--green);">Transparência:</strong>
+      depois que cada jogo termina, você vê aqui o palpite de todos os participantes e quantos pontos cada um fez naquela partida.
     </div>
 
     <div class="chips" id="chips">
@@ -237,7 +237,7 @@ function renderHistoryCard(m) {
 
       ${sortedBets.length > 0 ? `
         <div class="history-bets">
-          ${sortedBets.map(b => renderBetCell(b)).join('')}
+          ${sortedBets.map(b => renderBetCell(b, m)).join('')}
         </div>
       ` : '<div style="padding-top:12px; border-top:1px solid var(--line); font-size:12px; color:var(--text-mute); font-style:italic;">Nenhum palpite registrado pra este jogo.</div>'}
 
@@ -251,11 +251,12 @@ function renderHistoryCard(m) {
   `;
 }
 
-function renderBetCell(bet) {
+function renderBetCell(bet, m) {
   const pts = bet.points_earned ?? 0;
   const isMe = bet.user_id === profile.id;
-  const ptsClass = pts === 5 ? 'exact' : pts > 0 ? 'partial' : 'zero';
-  const cellClass = pts === 5 ? 'win-exact' : pts > 0 ? 'win-partial' : '';
+  const isExact = bet.pred_home === m.actual_home && bet.pred_away === m.actual_away;
+  const ptsClass = isExact ? 'exact' : pts > 0 ? 'partial' : 'zero';
+  const cellClass = isExact ? 'win-exact' : pts > 0 ? 'win-partial' : '';
   const cls = ['hb-cell', cellClass, isMe ? 'me' : ''].filter(Boolean).join(' ');
   const displayName = isMe ? 'Você' : (bet.profiles?.full_name || '?').split(' ')[0];
 

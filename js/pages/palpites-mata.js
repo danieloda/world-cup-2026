@@ -7,17 +7,22 @@ import {
   computeStandings as utilComputeStandings,
 } from '../util.js';
 import { fifaRank } from '../fifa-rank.js';
+import { matchPoints } from '../scoring.js';
 
 // ============================================================
 // Constantes
 // ============================================================
+// Colunas do bracket. A coluna "final" agrupa Final + 3º lugar.
 const STAGES = [
-  { id: 'r32',   label: '32-avos',        mult: 1.5 },
-  { id: 'r16',   label: 'Oitavas',        mult: 2.0 },
-  { id: 'qf',    label: 'Quartas',        mult: 3.0 },
-  { id: 'sf',    label: 'Semifinais',     mult: 4.0 },
-  { id: 'final', label: 'Final · 3º Lugar', mult: 5.0 },  // agrupa Final (×5) + 3º (×2) na mesma coluna
+  { id: 'r32',   label: '32-avos' },
+  { id: 'r16',   label: 'Oitavas' },
+  { id: 'qf',    label: 'Quartas' },
+  { id: 'sf',    label: 'Semifinais' },
+  { id: 'final', label: 'Final & 3º lugar' },
 ];
+
+// Placar exato de cada fase (pontuação aditiva, vem de js/scoring.js — sem drift).
+function stageExact(stageId) { return matchPoints(stageId).exact; }
 
 const MEZES = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
 
@@ -248,12 +253,14 @@ function teamDisplay(slot) {
 }
 
 function totalPotentialPoints() {
-  // Pontos máximos teóricos por jogo: placar exato (5) × multiplicador da fase
-  return matches.reduce((sum, m) => {
-    const mult = STAGES.find(s => s.id === m.stage)?.mult
-              || (m.stage === 'third' ? 2.0 : 1.0);
-    return sum + Math.round(5 * mult);
-  }, 0);
+  // Pontos máximos teóricos por jogo: o placar exato de cada fase.
+  return matches.reduce((sum, m) => sum + stageExact(m.stage), 0);
+}
+
+// Acertou o placar exato deste jogo?
+function isExactPred(m, pred) {
+  return !!pred && m.finished
+    && pred.pred_home === m.actual_home && pred.pred_away === m.actual_away;
 }
 
 // ============================================================
@@ -267,7 +274,7 @@ function renderPage() {
       <h1 class="hero-title">${activeTab === 'palpites' ? 'Seus palpites' : 'Resultados oficiais'}</h1>
       <div class="hero-meta">
         <b>${matches.length} jogos</b><span class="sep"></span>
-        Pontos ×1.5 a ×4<span class="sep"></span>
+        Quanto mais perto da final, mais pontos<span class="sep"></span>
         <b>${counts.totalDone}</b> palpitados
       </div>
     </section>
@@ -291,12 +298,15 @@ function renderPage() {
 function renderPalpitesTab(counts) {
   const grouped = groupByStage();
   return `
-    <div class="note" style="margin-bottom:20px; padding:12px 16px; background:var(--card); border-left:3px solid var(--green); border-radius:0 6px 6px 0; font-size:12px; color:var(--text-dim);">
-      <strong style="color:var(--green);">Multiplicadores (sobre os mesmos pontos dos grupos):</strong>
-      32-avos <strong>×1.5</strong> · Oitavas <strong>×2</strong> · Quartas <strong>×3</strong> · Semis <strong>×4</strong> · Final <strong>×5</strong> · 3º Lugar <strong>×2</strong>
-      <br><span style="color:var(--text-mute);"><strong style="color:var(--text-dim);">Regra da vaga:</strong> aqui você aposta no placar de uma posição do chaveamento (ex.: "1º A × 2º B"). Seu palpite de gols vale para <strong style="color:var(--text-dim);">quem realmente se classificar naquela vaga</strong> — as bandeiras mostradas são só um guia baseado nos seus palpites.</span>
-      <br><span style="color:var(--text-mute);">Previu empate? <strong style="color:var(--text-dim);">Escolha quem passa nos pênaltis.</strong> O placar do tempo normal é o que conta para o acerto; as vagas viram times reais assim que os grupos terminam.</span>
-      <a href="regras.html" style="color:var(--green); font-weight:700;"> Regras completas →</a>
+    <div class="note" style="margin-bottom:20px; padding:12px 16px; background:var(--card); border-left:3px solid var(--green); border-radius:0 6px 6px 0; font-size:12px; color:var(--text-dim); line-height:1.6;">
+      <strong style="color:var(--green);">Quanto vale cada jogo do mata-mata:</strong>
+      cada fase vale mais que a anterior. <strong style="color:var(--text-dim);">Acertar o placar exato</strong> dá:
+      32-avos <strong>${stageExact('r32')}</strong> · Oitavas <strong>${stageExact('r16')}</strong> · Quartas <strong>${stageExact('qf')}</strong> · Semis <strong>${stageExact('sf')}</strong> · 3º lugar <strong>${stageExact('third')}</strong> · <strong style="color:var(--green);">Final ${stageExact('final')}</strong> pontos.
+      <br><span style="color:var(--text-mute);">Você não precisa acertar tudo: cada parte do placar já dá pontos (os gols de um time, quem vence/empate, e a diferença de gols).</span>
+      <br><span style="color:var(--text-mute);"><strong style="color:var(--text-dim);">Como funciona a vaga:</strong> aqui você dá o placar de uma posição do chaveamento (ex.: "1º do Grupo A × 2º do Grupo B"). Seu palpite vale para <strong style="color:var(--text-dim);">a seleção que realmente se classificar naquela posição</strong> — as bandeiras mostradas são só uma ideia baseada nos seus palpites.</span>
+      <br><span style="color:var(--text-mute);">Acha que vai dar empate? <strong style="color:var(--text-dim);">Escolha quem passa nos pênaltis.</strong> Vale o placar do tempo normal. As vagas viram seleções de verdade quando os grupos terminam.</span>
+      <br><span style="color:var(--red); font-weight:700;">⏰ Cada palpite fecha na hora em que o jogo começa.</span> <span style="color:var(--text-mute);">Depois disso não dá mais para mudar.</span>
+      <a href="regras.html" style="color:var(--green); font-weight:700;"> Ver todas as regras →</a>
     </div>
 
     ${renderKpis(counts)}
@@ -328,7 +338,7 @@ function renderResultStageColumn(stage, grouped) {
     <div class="bracket-col">
       <h4>
         ${escapeHtml(stage.label)}
-        <span class="mult">×${stage.mult}</span>
+        <span class="mult" title="Placar exato vale ${stageExact(stage.id)} pts">exato ${stageExact(stage.id)}</span>
         <span class="count">${list.length} jogo${list.length !== 1 ? 's' : ''}</span>
       </h4>
       ${list.map(renderResultBracketMatch).join('')}
@@ -339,7 +349,6 @@ function renderResultStageColumn(stage, grouped) {
 function renderResultBracketMatch(m) {
   const pred = predsByMatch.get(m.id);
   const pts = pred?.points_earned ?? 0;
-  const mult = STAGES.find(s => s.id === m.stage)?.mult || (m.stage === 'third' ? 2.0 : 1.0);
 
   const dt = new Date(m.match_date);
   const dateLabel = `${String(dt.getDate()).padStart(2,'0')}/${MEZES[dt.getMonth()]}`;
@@ -350,7 +359,7 @@ function renderResultBracketMatch(m) {
 
   let resultClass = '';
   if (m.finished && pred) {
-    if (pts >= Math.round(5 * mult)) resultClass = 'exact';
+    if (isExactPred(m, pred)) resultClass = 'exact';
     else if (pts > 0) resultClass = 'partial';
     else resultClass = 'miss';
   } else if (m.finished && !pred) {
@@ -364,7 +373,7 @@ function renderResultBracketMatch(m) {
   if (m.finished) classes.push('finished');
 
   const pointsBadge = m.finished && pred
-    ? renderPointsBadge(pts, mult)
+    ? renderPointsBadge(pts, stageExact(m.stage))
     : (m.finished && !pred ? '<div class="bm-pts miss">sem palpite</div>' : '');
 
   return `
@@ -441,26 +450,16 @@ function formatSlotShort(slot) {
 }
 
 /**
- * Back-calculates the base points (before multiplier) from the total earned.
- * Returns null if not calculable (mult <= 1 or pts === 0).
+ * Selo de pontos do jogo: "+N pts" e, quando há máximo, "de M".
+ * @param {number} pts pontos ganhos
+ * @param {number} [max] placar exato da fase (referência)
  */
-function basePts(pts, mult) {
-  if (pts == null || pts === 0 || !mult || mult <= 1) return null;
-  return Math.round(pts / mult);
-}
-
-/**
- * Renders a points badge with multiplier breakdown: "+2 × 4 = 8 pts"
- * Falls back to "+N pts" if multiplier doesn't apply.
- */
-function renderPointsBadge(pts, mult, extraClass = '') {
+function renderPointsBadge(pts, max, extraClass = '') {
   if (pts == null) return '';
   const cls = `bm-pts ${pts > 0 ? 'win' : ''} ${extraClass}`.trim();
-  const base = basePts(pts, mult);
-  if (base !== null) {
+  if (max) {
     return `<div class="${cls}">
-      <span class="formula">${base}<small>×${mult}</small></span>
-      <span class="total">= ${pts} pts</span>
+      <span class="formula">+${pts}<small> de ${max}</small></span>
     </div>`;
   }
   return `<div class="${cls}">${pts > 0 ? '+' : ''}${pts} pts</div>`;
@@ -479,7 +478,7 @@ function renderKpisResultados(counts) {
       <div class="kpi green">
         <div class="kpi-label">Placares exatos</div>
         <div class="kpi-num">${counts.exactCount}</div>
-        <div class="kpi-sub">vale 5 × mult cada</div>
+        <div class="kpi-sub">vale mais a cada fase</div>
       </div>
       <div class="kpi">
         <div class="kpi-label">Acertos parciais</div>
@@ -543,7 +542,7 @@ function renderStageColumn(stage, grouped) {
     <div class="bracket-col">
       <h4>
         ${escapeHtml(stage.label)}
-        <span class="mult">×${stage.mult}</span>
+        <span class="mult" title="Placar exato vale ${stageExact(stage.id)} pts">exato ${stageExact(stage.id)}</span>
         <span class="count">${list.length} jogo${list.length !== 1 ? 's' : ''}</span>
       </h4>
       ${list.map(renderBracketMatch).join('')}
@@ -572,9 +571,8 @@ function renderBracketMatch(m) {
   if (isFinal) classes.push('final-match');
   if (isThird) classes.push('third-place');
 
-  const mult = STAGES.find(s => s.id === m.stage)?.mult || (m.stage === 'third' ? 2.0 : 1.0);
   const pointsBadge = pred?.points_earned != null
-    ? renderPointsBadge(pred.points_earned, mult)
+    ? renderPointsBadge(pred.points_earned, stageExact(m.stage))
     : '';
 
   return `
@@ -684,8 +682,7 @@ function computeCounts() {
       totalFinishedWithPred++;
       const pts = p.points_earned ?? 0;
       totalPoints += pts;
-      const mult = STAGES.find(s => s.id === m.stage)?.mult || (m.stage === 'third' ? 2.0 : 1.0);
-      if (pts >= Math.round(5 * mult)) exactCount++;
+      if (isExactPred(m, p)) exactCount++;
       else if (pts > 0) partialCount++;
       else missCount++;
     }

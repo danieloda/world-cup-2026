@@ -122,24 +122,24 @@ select 'Q3b: gating reduz o bônus (<32)',
 
 -- ============================================================
 -- Q4 — valores de qualifier_bonus_pts (paridade com js/scoring.js)
---   BPE: r32 1 · r16 2 · qf 3 · sf 4 · third 3 · final 6
+--   BPE: r32 1 · r16 2 · qf 3 · sf 5 · third 3 · final 8
 --   BP  = round(BPE/2), exceto r32 = 0
 -- ============================================================
 insert into _res(check_name, pass, detail)
-select 'Q4: BPE por fase corretos',
+select 'Q4: BPE por fase corretos (1/2/3/5/3/8)',
        public.qualifier_bonus_pts('r32',true)=1 and public.qualifier_bonus_pts('r16',true)=2
-   and public.qualifier_bonus_pts('qf',true)=3 and public.qualifier_bonus_pts('sf',true)=4
-   and public.qualifier_bonus_pts('third',true)=3 and public.qualifier_bonus_pts('final',true)=6,
+   and public.qualifier_bonus_pts('qf',true)=3 and public.qualifier_bonus_pts('sf',true)=5
+   and public.qualifier_bonus_pts('third',true)=3 and public.qualifier_bonus_pts('final',true)=8,
        'r32/r16/qf/sf/third/final = '
        || public.qualifier_bonus_pts('r32',true)||'/'||public.qualifier_bonus_pts('r16',true)||'/'
        || public.qualifier_bonus_pts('qf',true)||'/'||public.qualifier_bonus_pts('sf',true)||'/'
        || public.qualifier_bonus_pts('third',true)||'/'||public.qualifier_bonus_pts('final',true);
 
 insert into _res(check_name, pass, detail)
-select 'Q4b: BP = metade (r32=0; r16 1; qf 2; sf 2; third 2; final 3)',
+select 'Q4b: BP = metade arredondada (r32=0; r16 1; qf 2; sf 3; third 2; final 4)',
        public.qualifier_bonus_pts('r32',false)=0 and public.qualifier_bonus_pts('r16',false)=1
-   and public.qualifier_bonus_pts('qf',false)=2 and public.qualifier_bonus_pts('sf',false)=2
-   and public.qualifier_bonus_pts('third',false)=2 and public.qualifier_bonus_pts('final',false)=3,
+   and public.qualifier_bonus_pts('qf',false)=2 and public.qualifier_bonus_pts('sf',false)=3
+   and public.qualifier_bonus_pts('third',false)=2 and public.qualifier_bonus_pts('final',false)=4,
        'r32/r16/qf/sf/third/final = '
        || public.qualifier_bonus_pts('r32',false)||'/'||public.qualifier_bonus_pts('r16',false)||'/'
        || public.qualifier_bonus_pts('qf',false)||'/'||public.qualifier_bonus_pts('sf',false)||'/'

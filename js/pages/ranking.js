@@ -5,6 +5,7 @@ import {
   flag, escapeHtml, teamPt, formatBrShort, formatTime, showToast,
   avatarHtml, getInitials,
 } from '../util.js';
+import { championBonus } from '../scoring.js';
 
 // ============================================================
 // Estado
@@ -343,12 +344,10 @@ function renderDrill(u, payload) {
 
   // Stats
   const scored = preds.filter(p => p.matches?.finished && p.points_earned != null);
-  const exactos = scored.filter(p => p.points_earned === 5).length;
-  const parciais = scored.filter(p => p.points_earned > 0 && p.points_earned !== 5).length;
+  const isExact = (p) => p.pred_home === p.matches.actual_home && p.pred_away === p.matches.actual_away;
+  const exactos = scored.filter(isExact).length;
+  const parciais = scored.filter(p => !isExact(p) && p.points_earned > 0).length;
   const erros = scored.filter(p => p.points_earned === 0).length;
-
-  // KO multiplier-aware exact count: pts >= 5 = exact
-  const finishedKO = scored.filter(p => p.matches?.stage !== 'group');
 
   return `
     <div class="profile-drill">
@@ -456,7 +455,7 @@ function renderChampionResultRow(u, champion) {
       <div class="profile-row champion-actual" style="grid-template-columns: 1fr auto; cursor: default; margin-bottom: 12px;">
         <div class="vs" style="color: var(--text-dim); font-size: 12px;">
           Campeão real: <strong style="color: var(--text);">${flag(realChampion)} ${escapeHtml(teamPt(realChampion))}</strong>
-          ${isMe ? `<span style="color: var(--red); margin-left: 6px;">· você perdeu ${50} pts de bônus por errar</span>` : ''}
+          ${isMe ? `<span style="color: var(--red); margin-left: 6px;">· você perdeu ${championBonus(true)} pts de bônus por errar</span>` : ''}
         </div>
         <div></div>
       </div>
@@ -467,7 +466,8 @@ function renderChampionResultRow(u, champion) {
 function renderPredRow(p) {
   const m = p.matches;
   const pts = p.points_earned ?? 0;
-  const ptsClass = pts >= 5 ? 'win' : pts > 0 ? 'partial' : 'zero';
+  const isExact = p.pred_home === m.actual_home && p.pred_away === m.actual_away;
+  const ptsClass = isExact ? 'win' : pts > 0 ? 'partial' : 'zero';
   return `
     <div class="profile-row">
       <div class="when">${formatBrShort(new Date(m.match_date))} · ${formatTime(m.match_date)}</div>

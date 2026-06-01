@@ -184,8 +184,8 @@ begin
 end $$;
 
 insert into _res(check_name, pass, detail)
-select 'C1: final 1-1 pen=home, pick=Brazil → bônus 50',
-       public.champion_bonus_for((select id from public.profiles where is_admin limit 1)) = 50,
+select 'C1: final 1-1 pen=home, pick=Brazil → bônus 40',
+       public.champion_bonus_for((select id from public.profiles where is_admin limit 1)) = 40,
        'bonus=' || public.champion_bonus_for((select id from public.profiles where is_admin limit 1));
 
 -- troca o palpite pro perdedor → 0
@@ -196,11 +196,11 @@ select 'C2: pick=France (perdeu nos pênaltis) → bônus 0',
        public.champion_bonus_for((select id from public.profiles where is_admin limit 1)) = 0,
        'bonus=' || public.champion_bonus_for((select id from public.profiles where is_admin limit 1));
 
--- inverte o pen_winner → France campeã → pick=France volta a 50
+-- inverte o pen_winner → France campeã → pick=France volta a 40
 update public.matches set pen_winner='away' where stage='final';
 insert into _res(check_name, pass, detail)
-select 'C3: pen=away → France campeã, pick=France → bônus 50',
-       public.champion_bonus_for((select id from public.profiles where is_admin limit 1)) = 50,
+select 'C3: pen=away → France campeã, pick=France → bônus 40',
+       public.champion_bonus_for((select id from public.profiles where is_admin limit 1)) = 40,
        'bonus=' || public.champion_bonus_for((select id from public.profiles where is_admin limit 1));
 
 -- ============================================================

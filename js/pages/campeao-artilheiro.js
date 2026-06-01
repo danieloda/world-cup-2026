@@ -5,6 +5,7 @@ import {
   flag, escapeHtml, teamPt, showToast,
   attachTeamTooltips, loadRecentMatches,
 } from '../util.js';
+import { matchPoints } from '../scoring.js';
 
 // ============================================================
 // Estado
@@ -31,10 +32,11 @@ const KICKOFF_BOLAO = new Date('2026-06-11T02:59:00Z'); // 10/jun 23:59 BRT defa
 // Position order for sorting (attackers first for top scorer)
 const POS_ORDER = { ATA: 0, MEI: 1, DEF: 2, GOL: 3 };
 
-// Stage multipliers (mirror of public.stage_multiplier in 003_scoring.sql)
+// Stage multipliers para o ARTILHEIRO (2 × gols × mult). Mirror de stage_multiplier (003).
 const STAGE_MULT = { group: 1.0, r32: 1.5, r16: 2.0, qf: 3.0, sf: 4.0, third: 2.0, final: 5.0 };
 const STAGE_LABEL = { group: 'Grupos', r32: '32-avos', r16: 'Oitavas', qf: 'Quartas', sf: 'Semis', third: '3º Lugar', final: 'Final' };
-const CHAMPION_BONUS_PTS = 50;
+const CHAMPION_BONUS_PTS = 40;        // mirror de champion_bonus_for (022)
+const GROUP_EXACT = matchPoints('group').exact; // 7 — p/ a comparação "equivale a X exatos"
 
 // ============================================================
 // Main
@@ -198,13 +200,13 @@ function renderPage() {
       </div>
     </section>
 
-    <div class="note" style="margin-bottom:20px; padding:12px 16px; background:var(--card); border-left:3px solid var(--green); border-radius:0 6px 6px 0; font-size:12px; color:var(--text-dim);">
-      <strong style="color:var(--green);">Pontuação bônus:</strong>
-      🏆 <strong>Campeão certo = +${CHAMPION_BONUS_PTS} pts</strong> (valor fixo) ·
-      ⚽ <strong>Artilheiro = +2 pts por gol</strong> do seu jogador, multiplicado pela fase (×1 nos grupos até ×${STAGE_MULT.final} na final)
-      <br><span style="color:var(--text-mute);">São duas escolhas únicas, feitas uma só vez antes da Copa e travadas no prazo — não dá pra mudar depois.
-      O bônus de campeão equivale a ${Math.round(CHAMPION_BONUS_PTS / 5)} placares exatos da fase de grupos: pense bem.</span>
-      <br><a href="regras.html" style="color:var(--green); font-weight:700;">Ver todas as regras →</a>
+    <div class="note" style="margin-bottom:20px; padding:12px 16px; background:var(--card); border-left:3px solid var(--green); border-radius:0 6px 6px 0; font-size:12px; color:var(--text-dim); line-height:1.6;">
+      <strong style="color:var(--green);">Dois palpites bônus:</strong>
+      🏆 <strong>acertar o Campeão = +${CHAMPION_BONUS_PTS} pontos</strong> ·
+      ⚽ <strong>Artilheiro: +2 pontos por gol</strong> do jogador que você escolher (vale mais nas fases finais).
+      <br><span style="color:var(--text-mute);">São duas escolhas que você faz <strong style="color:var(--text-dim);">uma única vez</strong>. O bônus de campeão vale como ${Math.round(CHAMPION_BONUS_PTS / GROUP_EXACT)} placares exatos da fase de grupos — pense com calma.</span>
+      <br><span style="color:var(--red); font-weight:700;">⏰ ${locked ? 'Os palpites já fecharam.' : `Você pode escolher e mudar até ${formatDeadline(deadline)}.`}</span> <span style="color:var(--text-mute);">Depois disso ficam travados.</span>
+      <a href="regras.html" style="color:var(--green); font-weight:700;"> Ver todas as regras →</a>
     </div>
 
     <div class="cs-split">
@@ -360,9 +362,9 @@ function renderScorerCard(locked) {
   return `
     <div class="cs-card" id="cardScorer">
       <div class="cs-card-icon">⚽</div>
-      <div class="cs-card-kicker">Aposta 2 · +2 pts × multiplicador por gol</div>
+      <div class="cs-card-kicker">Aposta 2 · pontos extras por cada gol do seu jogador</div>
       <h3>Artilheiro do Bolão</h3>
-      <p class="desc">Escolha 1 jogador. Cada gol dele vale +2 pts (escalando até ×${STAGE_MULT.final} na final).</p>
+      <p class="desc">Escolha 1 jogador. Cada gol dele soma pontos — e gols nas fases finais valem ainda mais.</p>
 
       ${current
         ? `<div class="cs-pick-box">
@@ -470,7 +472,7 @@ function renderScorerResult() {
         <div class="cs-result-points hit">
           <div class="cs-result-points-label">Total dos gols</div>
           <div class="cs-result-points-value">+${totalPts} pts</div>
-          <div class="cs-result-points-sub">${totalGoals} gol${totalGoals !== 1 ? 's' : ''} × multiplicadores de fase</div>
+          <div class="cs-result-points-sub">${totalGoals} gol${totalGoals !== 1 ? 's' : ''}, valendo mais nas fases finais</div>
         </div>
       `}
     </div>
