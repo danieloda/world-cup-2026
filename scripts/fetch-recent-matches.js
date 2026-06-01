@@ -101,6 +101,7 @@ function toTuple(fixture, teamName, teamId) {
     'World Cup - Qualification Asia': 'Eliminatórias',
     'World Cup - Qualification CONCACAF': 'Eliminatórias',
     'World Cup - Qualification CONMEBOL': 'Eliminatórias',
+    'World Cup - Qualification South America': 'Eliminatórias',  // spelling real da API p/ CONMEBOL
     'World Cup - Qualification Europe': 'Eliminatórias',
     'World Cup - Qualification Intercontinental Play-offs': 'Repescagem',
     'UEFA Nations League': 'Nations League',
@@ -110,6 +111,7 @@ function toTuple(fixture, teamName, teamId) {
     'Africa Cup of Nations': 'Copa Africana',
     'CONCACAF Gold Cup': 'Copa Ouro',
     'AFC Asian Cup': 'Copa Asiática',
+    'CAFA Nations Cup': 'Copa CAFA',
   };
   const competition = compMap[leagueName] || leagueName;
 

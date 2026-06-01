@@ -1,0 +1,75 @@
+name: Refresh Recent Matches
+
+# Atualiza assets/data/recent.json com as ULTIMAS 10 partidas de cada seleção
+# (via API-Football) e commita o arquivo de volta no main — o Netlify redeploya
+# no push, então as tooltips de "últimos jogos" ficam sempre frescas.
+#
+# Pré-requisitos (Settings → Secrets and variables → Actions):
+#   Secrets:
+#     - API_FOOTBALL_KEY
+# (Não usa Supabase — recent.json é arquivo estático servido pelo Netlify.)
+
+on:
+  schedule:
+    # 08:00 UTC = 05:00 BRT — depois que os jogos da véspera já terminaram
+    - cron: '0 8 * * *'
+  workflow_dispatch:        # botão "Run workflow" no GitHub UI
+    inputs:
+      team:
+        description: 'Atualizar só um time (ex.: Brazil). Vazio = todos os 48.'
+        required: false
+        default: ''
+
+concurrency:
+  group: refresh-recent-matches
+  cancel-in-progress: false
+
+# Necessário para o passo de commit & push de volta no repo
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    name: Fetch recent matches & commit
+    runs-on: ubuntu-latest
+    # Não roda em forks (sem o secret da API)
+    if: ${{ github.repository_owner == 'danieloda' }}
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          # Node 22 p/ alinhar com o refresh-odds (mesma família de jobs de dados)
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Fetch recent matches
+        env:
+          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
+          # Passa o input via env (não interpolar ${{ }} direto no shell — injeção)
+          TEAM: ${{ github.event.inputs.team }}
+        run: |
+          if [ -n "$TEAM" ]; then
+            node scripts/fetch-recent-matches.js --team="$TEAM"
+          else
+            node scripts/fetch-recent-matches.js
+          fi
+
+      - name: Commit & push if changed
+        run: |
+          if git diff --quiet -- assets/data/recent.json; then
+            echo "Sem mudanças em recent.json — nada a commitar."
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/data/recent.json
+          git commit -m "data: refresh recent matches (auto) [skip ci]"
+          git push
