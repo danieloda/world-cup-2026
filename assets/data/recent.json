@@ -419,6 +419,13 @@
   ],
   "Brazil": [
     [
+      "2026-05-31",
+      "Panama",
+      true,
+      "6-2",
+      "Amistoso"
+    ],
+    [
       "2026-04-01",
       "Croatia",
       true,
@@ -465,28 +472,21 @@
       "Bolivia",
       false,
       "0-1",
-      "World Cup - Qualification South America"
+      "Eliminatórias"
     ],
     [
       "2025-09-05",
       "Chile",
       true,
       "3-0",
-      "World Cup - Qualification South America"
+      "Eliminatórias"
     ],
     [
       "2025-06-11",
       "Paraguay",
       true,
       "1-0",
-      "World Cup - Qualification South America"
-    ],
-    [
-      "2025-06-05",
-      "Ecuador",
-      false,
-      "0-0",
-      "World Cup - Qualification South America"
+      "Eliminatórias"
     ]
   ],
   "Canada": [
