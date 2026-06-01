@@ -45,13 +45,23 @@ const REQ_DELAY_MS = parseInt(args.delay || '6000', 10);
 // ============================================================
 // Helpers
 // ============================================================
+// A API-Football usa grafias próprias pra alguns países que NÃO batem com os nomes
+// canônicos do nosso seed/DB (usados em data-team em toda a UI). Sem normalizar, a
+// chave do recent.json fica com o nome da API e o tooltip de forma recente não casa
+// com o time no DOM → some silenciosamente. Mapeia API → canônico (nosso).
+const CANON = {
+  'Cape Verde Islands': 'Cape Verde',
+  'Congo DR': 'DR Congo',
+};
+const canon = (name) => CANON[name] || name;
+
 function buildTeamMap() {
   const fx = JSON.parse(readFileSync(FIXTURES_PATH, 'utf8'));
   const fixtures = fx.fixtures || fx;
   const map = {};
   for (const f of fixtures) {
-    if (f.homeTeam?.id && f.homeTeam?.name) map[f.homeTeam.name] = f.homeTeam.id;
-    if (f.awayTeam?.id && f.awayTeam?.name) map[f.awayTeam.name] = f.awayTeam.id;
+    if (f.homeTeam?.id && f.homeTeam?.name) map[canon(f.homeTeam.name)] = f.homeTeam.id;
+    if (f.awayTeam?.id && f.awayTeam?.name) map[canon(f.awayTeam.name)] = f.awayTeam.id;
   }
   return map;
 }
