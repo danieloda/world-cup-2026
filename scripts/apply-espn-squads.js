@@ -49,11 +49,12 @@ function toInitial(fullName) {
 
 // ===== ESPN data (35 final rosters) =====
 const ESPN = {
+  // Final 26 — CNN Brasil (01/06/2026)
   Mexico: {
-    Goalkeepers: ['Álex Padilla','Antonio Rodríguez','Carlos Acevedo','Carlos Moreno','Guillermo Ochoa','Raúl Rangel'],
-    Defenders: ['Bryan González','César Montes','Edson Álvarez','Eduardo Águila','Everardo López','Israel Reyes','Jesús Angulo','Jesús Gallardo','Jesús Gómez','Johan Vásquez','Jorge Sánchez','Julián Araujo','Luis Rey','Mateo Chávez','Ramón Juárez','Richard Ledezma','Víctor Guzmán'],
-    Midfielders: ['Alexei Domínguez','Alexis Gutiérrez','Álvaro Fidalgo','Brian Gutiérrez','Carlos Rodríguez','Denzell Garcia','Diego Lainez','Efrain Álvarez','Elias Montiel','Erick Sánchez','Erik Lira','Gilberto Mora','Isaías Violante','Jeremy Márquez','Jordan Carrillo','Jorge Ruvalcaba','Kevin Castañeda','Luis Chávez','Luis Romo','Marcel Ruiz','Obed Vargas','Orbelín Pineda'],
-    Forwards: ['Alexis Vega','Armando González','César Huerta','Germán Berterame','Guillermo Martínez','Julián Quiñones','Raúl Jiménez','Roberto Alvarado','Santiago Giménez'],
+    Goalkeepers: ['Carlos Acevedo','Guillermo Ochoa','Raúl Rangel'],
+    Defenders: ['César Montes','Edson Álvarez','Israel Reyes','Jesús Gallardo','Johan Vásquez','Jorge Sánchez','Mateo Chávez'],
+    Midfielders: ['Álvaro Fidalgo','Brian Gutiérrez','Luis Romo','Erik Lira','Gilberto Mora','Luis Chávez','Obed Vargas','Orbelín Pineda'],
+    Forwards: ['Alexis Vega','Armando González','César Huerta','Guillermo Martínez','Julián Quiñones','Raúl Jiménez','Roberto Alvarado','Santiago Giménez'],
   },
   'South Africa': {
     Goalkeepers: ['Ronwen Williams','Ricardo Goss','Sipho Chaine'],
@@ -67,11 +68,12 @@ const ESPN = {
     Midfielders: ['Yang Hyun-Jun','Paik Seung-Ho','Hwang In-Beom','Kim Jin-Kyu','Bae Jun-Ho','Um Ji-Sung','Hwang Hee-Chan','Lee Dong-Gyeong','Lee Jae-Sung','Lee Kang-In'],
     Forwards: ['Oh Hyun-Kyu','Son Heung-Min','Cho Kyu-Sung'],
   },
+  // Final 26 — CNN Brasil (01/06/2026)
   Czechia: {
-    Goalkeepers: ['Lukas Hornicek','Martin Jedlicka','Antonín Kinsky','Jan Koutny','Matej Kovar','Jakub Markovic','Jindrich Stanek'],
-    Defenders: ['Vladimír Coufal','David Douděra','Matěj Hadaš','Tomáš Holeš','Robin Hranáč','Štěpán Chaloupek','Václav Jemelka','David Jurásek','Ladislav Krejčí','Karel Spáčil','Adam Ševínský','Martin Vitík','Tomáš Vlček','Jaroslav Zelený','David Zima'],
-    Midfielders: ['Lukas Ambros','Michal Beran','Pavel Bucha','Lukás Cerv','Krystof Danek','Vladimir Darida','Patrik Hellebrand','Adam Karabec','Ondrej Kricfaluši','Tomáš Ladra','David Planka','Lukás Provod','Matěj Ryneš','Lukas Sadílek','Michal Sadílek','Hugo Sochůrek','Alexandr Sojka','Tomáš Souček','Pavel Šulc','Denis Višinský'],
-    Forwards: ['Adam Hložek','Tomáš Chorý','Mojmír Chytil','Christophe Kabongo','Jan Kliment','Jan Kuchta','Vasil Kušej','Ondřej Mihálik','Vojtěch Patrák','Václav Sejk','Patrik Schick','Matej Vydra'],
+    Goalkeepers: ['Lukas Hornicek','Matej Kovar','Jindrich Stanek'],
+    Defenders: ['Vladimír Coufal','David Douděra','Tomáš Holeš','Robin Hranáč','David Jurásek','Štěpán Chaloupek','Ladislav Krejčí','Jaroslav Zelený','David Zima'],
+    Midfielders: ['Lukás Cerv','Vladimir Darida','Lukás Provod','Michal Sadílek','Hugo Sochůrek','Alexandr Sojka','Tomáš Souček','Pavel Šulc','Denis Višinský'],
+    Forwards: ['Adam Hložek','Tomáš Chorý','Mojmír Chytil','Jan Kuchta','Patrik Schick'],
   },
   'Bosnia-Herzegovina': {
     Goalkeepers: ['Nikola Vasilj','Martin Zlomislic','Osman Hadzikic'],
@@ -121,11 +123,12 @@ const ESPN = {
     Midfielders: ['Tyler Adams','Sebastian Berhalter','Weston McKennie','Cristian Roldan','Brenden Aaronson','Malik Tillman','Tim Weah','Alejandro Zendejas'],
     Forwards: ['Christian Pulisic','Gio Reyna','Folarin Balogun','Ricardo Pepi','Haji Wright'],
   },
+  // Final 26 — CNN Brasil (01/06/2026)
   Paraguay: {
-    Goalkeepers: ['Roberto Fernández','Orlando Gill','Gastón Olveira','Carlos Coronel','Santiago Rojas','Juan Espínola'],
-    Defenders: ['Gustavo Gómez','Júnior Alonso','Fabián Balbuena','Omar Alderete','Juan Caceres','Blas Riveros','Alan Benitez','Agustin Sandez','Mateo Gamarra','Saul Salcedo','Jose Canale','Diego León','Alexandro Maidana','Alcides Benitez','Ronaldo Dejesus','Alan Nuñez'],
-    Midfielders: ['Miguel Almirón','Mathías Villasanti','Kaku','Andrés Cubas','Ramón Sosa','Diego Gómez','Damián Bobadilla','Braian Ojeda','Matías Galarza','Robert Piris Da Motta','Alvaro Campuzano','Diego Gonzalez','Hugo Cuenca','Mauricio Magalhaes','Lucas Romero','Enso González','Ruben Lezcano'],
-    Forwards: ['Oscar Romero','Ángel Romero','Antonio Sanabria','Julio Enciso','Gabriel Avalos','Carlos Gonzalez','Alex Arce','Adam Bareiro','Lorenzo Melgarejo','Isidro Pitta','Ronaldo Martinez','Gustavo Caballero','Robert Morales','Adrian Alcaraz','Rodney Redes'],
+    Goalkeepers: ['Gastón Olveira','Roberto Fernández','Orlando Gill'],
+    Defenders: ['Juan Caceres','Júnior Alonso','Alexandro Maidana','Gustavo Gómez','Fabián Balbuena','Gustavo Velázquez','Omar Alderete','Jose Canale'],
+    Midfielders: ['Andrés Cubas','Diego Gómez','Matías Galarza','Damián Bobadilla','Braian Ojeda','Mauricio Magalhaes'],
+    Forwards: ['Julio Enciso','Kaku','Miguel Almirón','Gustavo Caballero','Ramón Sosa','Antonio Sanabria','Gabriel Avalos','Alex Arce','Isidro Pitta'],
   },
   Türkiye: {
     Goalkeepers: ['Ugurcan Cakir','Mert Gunok','Altay Bayindir','Muhammed Sengezer','Ersin Destanoglou'],
@@ -136,7 +139,7 @@ const ESPN = {
   Germany: {
     Goalkeepers: ['Oliver Baumann','Manuel Neuer','Alexander Nübel'],
     Defenders: ['Waldemar Anton','Nathaniel Brown','David Raum','Antonio Rüdiger','Nico Schlotterbeck','Jonathan Tah','Malick Thiaw'],
-    Midfielders: ['Pascal Gross','Joshua Kimmich','Felix Nmecha','Aleksandar Pavlovic','Angelo Stiller','Leon Goretzka','Florian Wirtz','Jamie Leweling'],
+    Midfielders: ['Pascal Gross','Joshua Kimmich','Felix Nmecha','Aleksandar Pavlovic','Angelo Stiller','Leon Goretzka','Florian Wirtz','Jamie Leweling','Nadiem Amiri'],
     Forwards: ['Maximilian Beier','Kai Havertz','Lennart Karl','Jamal Musiala','Leroy Sané','Deniz Undav','Nick Woltemade'],
   },
   Curacao: {
@@ -181,17 +184,19 @@ const ESPN = {
     Midfielders: ['Kevin De Bruyne','Amadou Onana','Nicolas Raskin','Youri Tielemans','Hans Vanaken','Axel Witsel'],
     Forwards: ['Charles De Ketelaere','Jérémy Doku','Matias Fernandez-Pardo','Romelu Lukaku','Dodi Lukebakio','Diego Moreira','Alexis Saelemaekers','Leandro Trossard'],
   },
+  // Final 26 — CNN Brasil (01/06/2026)
   Egypt: {
     Goalkeepers: ['Mohamed El Shenawy','Mostafa Shobeir','El Mahdi Soliman','Mohamed Alaa'],
-    Defenders: ['Mohamed Hany','Tarek Alaa','Hamdy Fathy','Rami Rabia','Yasser Ibrahim','Hossam Abdelmaguid','Mohamed Abdelmonemn','Ahmed Fatouh','Karim Hafez'],
+    Defenders: ['Tarek Hamed','Hamdy Fathy','Rami Rabia','Yasser Ibrahim','Hossam Abdelmaguid','Mohamed Abdelmonemn','Ahmed Fatouh','Karim Hafez'],
     Midfielders: ['Marwan Ateya','Mohanad Lasheen','Nabil Emad','Mahmoud Saber','Ahmed Zizo','Emam Ashour','Mostafa Ziko','Mahmoud Trezeguet','Ibrahim Adel','Haissem Hassan'],
-    Forwards: ['Omar Marmoush','Mohamed Salah','Aqtay Abdallah','Hamza Abdelkarim'],
+    Forwards: ['Omar Marmoush','Mohamed Salah','Akram Tawfiq','Hamza Abdelkarim'],
   },
+  // Final 26 — CNN Brasil (01/06/2026)
   Iran: {
-    Goalkeepers: ['Alireza Beiranvand','Hossein Hosseini','Payam Niazmand','Mohammed Khalifeh'],
-    Defenders: ['Danial Eiri','Ehsan Hajsafi','Saleh Hardani','Hossein Kanaani','Shoka Khalilzadeh','Milad Mohammadi','Ali Nemati','Omid Noorafkan','Ramin Rezaeian'],
+    Goalkeepers: ['Alireza Beiranvand','Hossein Hosseini','Payam Niazmand'],
+    Defenders: ['Danial Eiri','Ehsan Hajsafi','Saleh Hardani','Hossein Kanaani','Shoka Khalilzadeh','Milad Mohammadi','Ali Nemati','Ramin Rezaeian'],
     Midfielders: ['Rouzbeh Cheshmi','Saeid Ezatolahi','Mehdi Ghaedi','Saman Ghoddos','Mohammad Ghorbani','Alireza Jahanbakhsh','Mohammad Mohebi','Amir Mohammad Razzaghinia','Mehdi Torabi','Aria Yousefi'],
-    Forwards: ['Ali Alipour','Dennis Dargahi','Hadi Habibinejad','Amirhossein Hosseinzadeh','Amirhossein Mahmoudi','Kasra Taheri','Mehdi Taremi'],
+    Forwards: ['Ali Alipour','Dennis Dargahi','Amirhossein Hosseinzadeh','Mehdi Taremi','Shahriar Moghanlou'],
   },
   'New Zealand': {
     Goalkeepers: ['Max Crocombe','Alex Paulsen','Michael Woud'],
@@ -266,6 +271,44 @@ const ESPN = {
     Defenders: ['Chancel Mbemba','Axel Tuanzebe','Arthur Masuaku','Gedeon Kalulu','Joris Kayembe','Aaron Wan-Bissaka','Aaron Tshibola','Steve Kapuadi','Dylan Batubinsika'],
     Midfielders: ['Noah Sadiki','Charles Pickel','Edo Kayembe','Samuel Moutoussamy',"Ngal'ayel Mukau",'Nathanaël Mbuku','Meschak Elia','Brian Cipenga','Gaël Kakuta','Théo Bongonda'],
     Forwards: ['Simon Banza','Yoane Wissa','Fiston Mayele','Cédric Bakambu'],
+  },
+  // ===== Rosters finais 26 adicionados via CNN Brasil (01/06/2026) =====
+  // Antes ficavam com a lista preliminar crua da API (>26).
+  'Saudi Arabia': {
+    Goalkeepers: ['Ahmed Al Kassar','Mohammed Al Owais','Nawaf Al Aqidi'],
+    Defenders: ['Saud Abdulhamid','Mohammed Abu Al Shamat','Khalid Al Ghannam','Moteb Al Harbi','Abdulelah Al Amri','Nawaf Boushal','Hassan Kadesh','Ali Lajami','Ali Majrashi','Hassan Tambakti','Jehad Thikri'],
+    Midfielders: ['Nasser Al Dawsari','Alaa Al Hajji','Ziyad Al Johani','Musab Al Juwayr','Abdullah Al Khaibari','Mohammed Kanno','Sultan Mandash','Ayman Yahya'],
+    Forwards: ['Feras Al Brikan','Salem Al Dawsari','Abdullah Al Hamdan','Saleh Al Shehri'],
+  },
+  Canada: {
+    Goalkeepers: ['Dayne St. Clair','Maxim Crépeau','Owen Goodman'],
+    Defenders: ['Alistair Johnston','Derek Cornelius','Richie Laryea','Niko Sigur','Joel Waterman','Luc De Fougerolles','Moise Bombito','Alfie Jones','Alphonso Davies'],
+    Midfielders: ['Stephen Eustáquio','Ismael Koné','Tajon Buchanan','Mathieu Choinière','Ali Ahmed','Nathan Saliba','Liam Millar','Marcelo Flores','Jacob Shaffelburg','Jonathan Osorio'],
+    Forwards: ['Jonathan David','Cyle Larin','Tani Oluwaseyi','Promise David'],
+  },
+  Ecuador: {
+    Goalkeepers: ['Hernán Galíndez','Moisés Ramírez','Gonzalo Valle'],
+    Defenders: ['Piero Hincapié','Willian Pacho','Pervis Estupiñán','Félix Torres','Joel Ordoñez','Jackson Porozo','Angelo Preciado'],
+    Midfielders: ['Moisés Caicedo','Alan Franco','Kendry Páez','Pedro Vite','Jordy Alcívar','Denil Castillo','Yaimar Medina'],
+    Forwards: ['Enner Valencia','Gonzalo Plata','Alan Minda','John Yeboah','Kevin Rodríguez','Jordy Caicedo','Nilson Angulo','Anthony Valencia','Jeremy Arévalo'],
+  },
+  Algeria: {
+    Goalkeepers: ['Oussama Benbot','Melvin Mastil','Luca Zidane'],
+    Defenders: ['Achraf Abada','Rayan Aït-Nouri','Zinedine Belaïd','Rafik Belghali','Ramy Bensebaïni','Samir Chergui','Jaouen Hadjam','Aïssa Mandi','Mohamed Tougai'],
+    Midfielders: ['Houssem Aouar','Nabil Bentaleb','Hicham Boudaoui','Farès Chaïbi','Ibrahim Maza','Yassine Titraoui','Ramiz Zerrouki'],
+    Forwards: ['Mohamed Amoura','Nadir Benbouali','Adil Boulbina','Farès Ghedjemis','Amine Gouiri','Riyad Mahrez','Anis Hadj-Moussa'],
+  },
+  Uruguay: {
+    Goalkeepers: ['Sergio Rochet','Fernando Muslera','Santiago Mele'],
+    Defenders: ['Guillermo Varela','Ronald Araújo','José Giménez','Santiago Bueno','Sebastián Cáceres','Mathías Olivera','Joaquín Piquerez','Matías Viña'],
+    Midfielders: ['Juan Sanabria','Manuel Ugarte','Emiliano Martínez','Rodrigo Bentancur','Federico Valverde','Giorgian de Arrascaeta','Nicolás de la Cruz','Rodrigo Zalazar','Agustín Canobbio','Facundo Pellistri','Maxi Araújo','Brian Rodríguez'],
+    Forwards: ['Rodrigo Aguirre','Federico Viñas','Darwin Núñez'],
+  },
+  Colombia: {
+    Goalkeepers: ['Camilo Vargas','Álvaro Montero','David Ospina'],
+    Defenders: ['Davinson Sánchez','Jhon Lucumí','Yerry Mina','Daniel Muñoz','Willer Ditta','Santiago Arias','Johan Mojica','Deiver Machado'],
+    Midfielders: ['Richard Ríos','Jefferson Lerma','Kevin Castaño','Gustavo Puerta','Jhon Arias','Jorge Carrascal','Juan Portilla','Juan Quintero','James Rodríguez','Jaminton Campaz'],
+    Forwards: ['Cucho Hernández','Luis Díaz','Luis Suárez','Andrés Gómez','Jhon Córdoba'],
   },
 };
 

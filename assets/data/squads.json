@@ -822,20 +822,12 @@
     "logo": "https://media.api-sports.io/football/teams/7.png",
     "players": [
       {
-        "id": 405124,
-        "name": "K. Martínez",
-        "age": 20,
+        "id": 50077,
+        "name": "S. Rochet",
+        "age": 32,
         "number": 1,
         "position": "GOL",
-        "photo": "https://media.api-sports.io/football/players/405124.png"
-      },
-      {
-        "id": 61895,
-        "name": "S. Mele",
-        "age": 28,
-        "number": 23,
-        "position": "GOL",
-        "photo": "https://media.api-sports.io/football/players/61895.png"
+        "photo": "https://media.api-sports.io/football/players/50077.png"
       },
       {
         "id": 429,
@@ -846,12 +838,20 @@
         "photo": "https://media.api-sports.io/football/players/429.png"
       },
       {
-        "id": 50077,
-        "name": "S. Rochet",
-        "age": 32,
-        "number": 1,
+        "id": 61895,
+        "name": "S. Mele",
+        "age": 28,
+        "number": 23,
         "position": "GOL",
-        "photo": "https://media.api-sports.io/football/players/50077.png"
+        "photo": "https://media.api-sports.io/football/players/61895.png"
+      },
+      {
+        "id": 1290,
+        "name": "G. Varela",
+        "age": 32,
+        "number": 13,
+        "position": "DEF",
+        "photo": "https://media.api-sports.io/football/players/1290.png"
       },
       {
         "id": 101814,
@@ -860,6 +860,14 @@
         "number": 4,
         "position": "DEF",
         "photo": "https://media.api-sports.io/football/players/101814.png"
+      },
+      {
+        "id": 31,
+        "name": "J. Giménez",
+        "age": 30,
+        "number": 2,
+        "position": "DEF",
+        "photo": "https://media.api-sports.io/football/players/31.png"
       },
       {
         "id": 135334,
@@ -878,14 +886,6 @@
         "photo": "https://media.api-sports.io/football/players/51535.png"
       },
       {
-        "id": 31,
-        "name": "J. Giménez",
-        "age": 30,
-        "number": 2,
-        "position": "DEF",
-        "photo": "https://media.api-sports.io/football/players/31.png"
-      },
-      {
         "id": 47254,
         "name": "M. Olivera",
         "age": 28,
@@ -902,44 +902,12 @@
         "photo": "https://media.api-sports.io/football/players/51466.png"
       },
       {
-        "id": 51426,
-        "name": "J. Rodríguez",
-        "age": 28,
-        "number": 14,
-        "position": "DEF",
-        "photo": "https://media.api-sports.io/football/players/51426.png"
-      },
-      {
-        "id": 1290,
-        "name": "G. Varela",
-        "age": 32,
-        "number": 13,
-        "position": "DEF",
-        "photo": "https://media.api-sports.io/football/players/1290.png"
-      },
-      {
         "id": 51572,
         "name": "M. Viña",
         "age": 28,
         "number": 17,
         "position": "DEF",
         "photo": "https://media.api-sports.io/football/players/51572.png"
-      },
-      {
-        "id": 30690,
-        "name": "N. Fonseca",
-        "age": 27,
-        "number": 15,
-        "position": "MEI",
-        "photo": "https://media.api-sports.io/football/players/30690.png"
-      },
-      {
-        "id": 153083,
-        "name": "E. Martínez",
-        "age": 26,
-        "number": 20,
-        "position": "MEI",
-        "photo": "https://media.api-sports.io/football/players/153083.png"
       },
       {
         "id": 162891,
@@ -956,6 +924,19 @@
         "number": 5,
         "position": "MEI",
         "photo": "https://media.api-sports.io/football/players/51494.png"
+      },
+      {
+        "id": 153083,
+        "name": "E. Martínez",
+        "age": 26,
+        "number": 20,
+        "position": "MEI",
+        "photo": "https://media.api-sports.io/football/players/153083.png"
+      },
+      {
+        "name": "R. Bentancur",
+        "position": "MEI",
+        "number": null
       },
       {
         "id": 756,
@@ -982,6 +963,43 @@
         "photo": "https://media.api-sports.io/football/players/5995.png"
       },
       {
+        "name": "R. Zalazar",
+        "position": "MEI",
+        "number": null
+      },
+      {
+        "id": 51603,
+        "name": "A. Canobbio",
+        "age": 27,
+        "number": 14,
+        "position": "MEI",
+        "photo": "https://media.api-sports.io/football/players/51603.png"
+      },
+      {
+        "id": 70078,
+        "name": "F. Pellistri",
+        "age": 24,
+        "number": 11,
+        "position": "MEI",
+        "photo": "https://media.api-sports.io/football/players/70078.png"
+      },
+      {
+        "id": 51776,
+        "name": "M. Araújo",
+        "age": 25,
+        "number": 20,
+        "position": "MEI",
+        "photo": "https://media.api-sports.io/football/players/51776.png"
+      },
+      {
+        "id": 51618,
+        "name": "B. Rodríguez",
+        "age": 25,
+        "number": 10,
+        "position": "MEI",
+        "photo": "https://media.api-sports.io/football/players/51618.png"
+      },
+      {
         "id": 16482,
         "name": "R. Aguirre",
         "age": 31,
@@ -990,28 +1008,12 @@
         "photo": "https://media.api-sports.io/football/players/16482.png"
       },
       {
-        "id": 278190,
-        "name": "A. Álvarez",
-        "age": 24,
-        "number": 9,
-        "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/278190.png"
-      },
-      {
-        "id": 51776,
-        "name": "M. Araújo",
-        "age": 25,
-        "number": 20,
-        "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/51776.png"
-      },
-      {
-        "id": 51603,
-        "name": "A. Canobbio",
+        "id": 51530,
+        "name": "F. Viñas",
         "age": 27,
-        "number": 14,
+        "number": 13,
         "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/51603.png"
+        "photo": "https://media.api-sports.io/football/players/51530.png"
       },
       {
         "id": 51617,
@@ -1020,38 +1022,6 @@
         "number": 9,
         "position": "ATA",
         "photo": "https://media.api-sports.io/football/players/51617.png"
-      },
-      {
-        "id": 70078,
-        "name": "F. Pellistri",
-        "age": 24,
-        "number": 11,
-        "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/70078.png"
-      },
-      {
-        "id": 51618,
-        "name": "B. Rodríguez",
-        "age": 25,
-        "number": 10,
-        "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/51618.png"
-      },
-      {
-        "id": 51620,
-        "name": "F. Torres",
-        "age": 25,
-        "number": 21,
-        "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/51620.png"
-      },
-      {
-        "id": 51530,
-        "name": "F. Viñas",
-        "age": 27,
-        "number": 13,
-        "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/51530.png"
       }
     ]
   },
@@ -1059,6 +1029,14 @@
     "id": 8,
     "logo": "https://media.api-sports.io/football/teams/8.png",
     "players": [
+      {
+        "id": 2482,
+        "name": "C. Vargas",
+        "age": 36,
+        "number": 12,
+        "position": "GOL",
+        "photo": "https://media.api-sports.io/football/players/2482.png"
+      },
       {
         "id": 2481,
         "name": "Á. Montero",
@@ -1076,28 +1054,12 @@
         "photo": "https://media.api-sports.io/football/players/313.png"
       },
       {
-        "id": 2482,
-        "name": "C. Vargas",
-        "age": 36,
-        "number": 12,
-        "position": "GOL",
-        "photo": "https://media.api-sports.io/football/players/2482.png"
-      },
-      {
-        "id": 30,
-        "name": "S. Arias",
-        "age": 33,
-        "number": 4,
+        "id": 168,
+        "name": "D. Sánchez",
+        "age": 29,
+        "number": 23,
         "position": "DEF",
-        "photo": "https://media.api-sports.io/football/players/30.png"
-      },
-      {
-        "id": 125674,
-        "name": "J. Cabal",
-        "age": 24,
-        "number": 2,
-        "position": "DEF",
-        "photo": "https://media.api-sports.io/football/players/125674.png"
+        "photo": "https://media.api-sports.io/football/players/168.png"
       },
       {
         "id": 1929,
@@ -1108,28 +1070,12 @@
         "photo": "https://media.api-sports.io/football/players/1929.png"
       },
       {
-        "id": 2483,
-        "name": "D. Machado",
-        "age": 32,
-        "number": 4,
-        "position": "DEF",
-        "photo": "https://media.api-sports.io/football/players/2483.png"
-      },
-      {
         "id": 2484,
         "name": "Y. Mina",
         "age": 31,
         "number": 13,
         "position": "DEF",
         "photo": "https://media.api-sports.io/football/players/2484.png"
-      },
-      {
-        "id": 64268,
-        "name": "J. Mojica",
-        "age": 33,
-        "number": 14,
-        "position": "DEF",
-        "photo": "https://media.api-sports.io/football/players/64268.png"
       },
       {
         "id": 13736,
@@ -1140,20 +1086,38 @@
         "photo": "https://media.api-sports.io/football/players/13736.png"
       },
       {
-        "id": 168,
-        "name": "D. Sánchez",
-        "age": 29,
-        "number": 23,
+        "name": "W. Ditta",
         "position": "DEF",
-        "photo": "https://media.api-sports.io/football/players/168.png"
+        "number": null
       },
       {
-        "id": 289592,
-        "name": "K. Castaño",
-        "age": 25,
-        "number": 5,
+        "id": 30,
+        "name": "S. Arias",
+        "age": 33,
+        "number": 4,
+        "position": "DEF",
+        "photo": "https://media.api-sports.io/football/players/30.png"
+      },
+      {
+        "id": 64268,
+        "name": "J. Mojica",
+        "age": 33,
+        "number": 14,
+        "position": "DEF",
+        "photo": "https://media.api-sports.io/football/players/64268.png"
+      },
+      {
+        "id": 2483,
+        "name": "D. Machado",
+        "age": 32,
+        "number": 4,
+        "position": "DEF",
+        "photo": "https://media.api-sports.io/football/players/2483.png"
+      },
+      {
+        "name": "R. Ríos",
         "position": "MEI",
-        "photo": "https://media.api-sports.io/football/players/289592.png"
+        "number": null
       },
       {
         "id": 2490,
@@ -1164,12 +1128,12 @@
         "photo": "https://media.api-sports.io/football/players/2490.png"
       },
       {
-        "id": 195717,
-        "name": "Y. Mosquera",
-        "age": 24,
-        "number": 2,
+        "id": 289592,
+        "name": "K. Castaño",
+        "age": 25,
+        "number": 5,
         "position": "MEI",
-        "photo": "https://media.api-sports.io/football/players/195717.png"
+        "photo": "https://media.api-sports.io/football/players/289592.png"
       },
       {
         "id": 324034,
@@ -1180,20 +1144,33 @@
         "photo": "https://media.api-sports.io/football/players/324034.png"
       },
       {
+        "id": 13708,
+        "name": "J. Arias",
+        "age": 28,
+        "number": 11,
+        "position": "MEI",
+        "photo": "https://media.api-sports.io/football/players/13708.png"
+      },
+      {
+        "id": 5994,
+        "name": "J. Carrascal",
+        "age": 27,
+        "number": 8,
+        "position": "MEI",
+        "photo": "https://media.api-sports.io/football/players/5994.png"
+      },
+      {
+        "name": "J. Portilla",
+        "position": "MEI",
+        "number": null
+      },
+      {
         "id": 6005,
         "name": "J. Quintero",
         "age": 32,
         "number": 20,
         "position": "MEI",
         "photo": "https://media.api-sports.io/football/players/6005.png"
-      },
-      {
-        "id": 195104,
-        "name": "R. Rios",
-        "age": 25,
-        "number": 6,
-        "position": "MEI",
-        "photo": "https://media.api-sports.io/football/players/195104.png"
       },
       {
         "id": 517,
@@ -1204,52 +1181,17 @@
         "photo": "https://media.api-sports.io/football/players/517.png"
       },
       {
-        "id": 13708,
-        "name": "J. Arias",
-        "age": 28,
-        "number": 11,
-        "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/13708.png"
-      },
-      {
-        "id": 6011,
-        "name": "R. Borré",
-        "age": 30,
-        "number": 19,
-        "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/6011.png"
-      },
-      {
         "id": 13376,
         "name": "J. Campaz",
         "age": 25,
         "number": 21,
-        "position": "ATA",
+        "position": "MEI",
         "photo": "https://media.api-sports.io/football/players/13376.png"
       },
       {
-        "id": 13691,
-        "name": "J. Carbonero",
-        "age": 26,
-        "number": 21,
+        "name": "C. Hernández",
         "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/13691.png"
-      },
-      {
-        "id": 5994,
-        "name": "J. Carrascal",
-        "age": 27,
-        "number": 8,
-        "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/5994.png"
-      },
-      {
-        "id": 24810,
-        "name": "J. Córdoba",
-        "age": 32,
-        "number": 9,
-        "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/24810.png"
+        "number": null
       },
       {
         "id": 2489,
@@ -1260,6 +1202,14 @@
         "photo": "https://media.api-sports.io/football/players/2489.png"
       },
       {
+        "id": 47237,
+        "name": "L. Suárez",
+        "age": 28,
+        "number": 19,
+        "position": "ATA",
+        "photo": "https://media.api-sports.io/football/players/47237.png"
+      },
+      {
         "id": 345748,
         "name": "A. Gómez",
         "age": 23,
@@ -1268,12 +1218,12 @@
         "photo": "https://media.api-sports.io/football/players/345748.png"
       },
       {
-        "id": 47237,
-        "name": "L. Suárez",
-        "age": 28,
-        "number": 19,
+        "id": 24810,
+        "name": "J. Córdoba",
+        "age": 32,
+        "number": 9,
         "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/47237.png"
+        "photo": "https://media.api-sports.io/football/players/24810.png"
       }
     ]
   },
@@ -2225,22 +2175,7 @@
     "logo": "https://media.api-sports.io/football/teams/16.png",
     "players": [
       {
-        "name": "Á. Padilla",
-        "position": "GOL",
-        "number": null
-      },
-      {
-        "name": "A. Rodríguez",
-        "position": "GOL",
-        "number": null
-      },
-      {
         "name": "C. Acevedo",
-        "position": "GOL",
-        "number": null
-      },
-      {
-        "name": "C. Moreno",
         "position": "GOL",
         "number": null
       },
@@ -2255,11 +2190,6 @@
         "number": null
       },
       {
-        "name": "B. González",
-        "position": "DEF",
-        "number": null
-      },
-      {
         "name": "C. Montes",
         "position": "DEF",
         "number": null
@@ -2270,32 +2200,12 @@
         "number": null
       },
       {
-        "name": "E. Águila",
-        "position": "DEF",
-        "number": null
-      },
-      {
-        "name": "E. López",
-        "position": "DEF",
-        "number": null
-      },
-      {
         "name": "I. Reyes",
         "position": "DEF",
         "number": null
       },
       {
-        "name": "J. Angulo",
-        "position": "DEF",
-        "number": null
-      },
-      {
         "name": "J. Gallardo",
-        "position": "DEF",
-        "number": null
-      },
-      {
-        "name": "J. Gómez",
         "position": "DEF",
         "number": null
       },
@@ -2310,43 +2220,8 @@
         "number": null
       },
       {
-        "name": "J. Araujo",
-        "position": "DEF",
-        "number": null
-      },
-      {
-        "name": "L. Rey",
-        "position": "DEF",
-        "number": null
-      },
-      {
         "name": "M. Chávez",
         "position": "DEF",
-        "number": null
-      },
-      {
-        "name": "R. Juárez",
-        "position": "DEF",
-        "number": null
-      },
-      {
-        "name": "R. Ledezma",
-        "position": "DEF",
-        "number": null
-      },
-      {
-        "name": "V. Guzmán",
-        "position": "DEF",
-        "number": null
-      },
-      {
-        "name": "A. Domínguez",
-        "position": "MEI",
-        "number": null
-      },
-      {
-        "name": "A. Gutiérrez",
-        "position": "MEI",
         "number": null
       },
       {
@@ -2363,32 +2238,7 @@
         "number": null
       },
       {
-        "name": "C. Rodríguez",
-        "position": "MEI",
-        "number": null
-      },
-      {
-        "name": "D. Garcia",
-        "position": "MEI",
-        "number": null
-      },
-      {
-        "name": "D. Lainez",
-        "position": "MEI",
-        "number": null
-      },
-      {
-        "name": "Efrain Álvarez",
-        "position": "MEI",
-        "number": null
-      },
-      {
-        "name": "E. Montiel",
-        "position": "MEI",
-        "number": null
-      },
-      {
-        "name": "E. Sánchez",
+        "name": "L. Romo",
         "position": "MEI",
         "number": null
       },
@@ -2403,42 +2253,7 @@
         "number": null
       },
       {
-        "name": "I. Violante",
-        "position": "MEI",
-        "number": null
-      },
-      {
-        "name": "J. Márquez",
-        "position": "MEI",
-        "number": null
-      },
-      {
-        "name": "J. Carrillo",
-        "position": "MEI",
-        "number": null
-      },
-      {
-        "name": "J. Ruvalcaba",
-        "position": "MEI",
-        "number": null
-      },
-      {
-        "name": "K. Castañeda",
-        "position": "MEI",
-        "number": null
-      },
-      {
         "name": "L. Chávez",
-        "position": "MEI",
-        "number": null
-      },
-      {
-        "name": "L. Romo",
-        "position": "MEI",
-        "number": null
-      },
-      {
-        "name": "M. Ruiz",
         "position": "MEI",
         "number": null
       },
@@ -2464,11 +2279,6 @@
       },
       {
         "name": "C. Huerta",
-        "position": "ATA",
-        "number": null
-      },
-      {
-        "name": "G. Berterame",
         "position": "ATA",
         "number": null
       },
@@ -2920,11 +2730,6 @@
         "number": null
       },
       {
-        "name": "M. Khalifeh",
-        "position": "GOL",
-        "number": null
-      },
-      {
         "name": "D. Eiri",
         "position": "DEF",
         "number": null
@@ -2959,11 +2764,6 @@
       },
       {
         "name": "A. Nemati",
-        "position": "DEF",
-        "number": null
-      },
-      {
-        "name": "O. Noorafkan",
         "position": "DEF",
         "number": null
       },
@@ -3033,27 +2833,17 @@
         "number": null
       },
       {
-        "name": "H. Habibinejad",
-        "position": "ATA",
-        "number": null
-      },
-      {
         "name": "A. Hosseinzadeh",
         "position": "ATA",
         "number": null
       },
       {
-        "name": "A. Mahmoudi",
-        "position": "ATA",
-        "number": null
-      },
-      {
-        "name": "K. Taheri",
-        "position": "ATA",
-        "number": null
-      },
-      {
         "name": "M. Taremi",
+        "position": "ATA",
+        "number": null
+      },
+      {
+        "name": "S. Moghanlou",
         "position": "ATA",
         "number": null
       }
@@ -3064,120 +2854,77 @@
     "logo": "https://media.api-sports.io/football/teams/23.png",
     "players": [
       {
-        "id": 193288,
-        "name": "Nawaf Al Aqidi",
-        "age": 25,
-        "number": 1,
-        "position": "GOL",
-        "photo": "https://media.api-sports.io/football/players/193288.png"
-      },
-      {
         "id": 44449,
-        "name": "Ahmed Al Kassar",
+        "name": "A. Al Kassar",
         "age": 34,
         "number": 22,
         "position": "GOL",
         "photo": "https://media.api-sports.io/football/players/44449.png"
       },
       {
-        "id": 44360,
-        "name": "Raghed Najjar",
-        "age": 29,
-        "number": 22,
-        "position": "GOL",
-        "photo": "https://media.api-sports.io/football/players/44360.png"
-      },
-      {
         "id": 44411,
-        "name": "Mohammed Al Owais",
+        "name": "M. Al Owais",
         "age": 34,
         "number": 21,
         "position": "GOL",
         "photo": "https://media.api-sports.io/football/players/44411.png"
       },
       {
-        "id": 543009,
-        "name": "M. Al Rubaie",
-        "age": 28,
-        "number": 22,
+        "id": 193288,
+        "name": "N. Al Aqidi",
+        "age": 25,
+        "number": 1,
         "position": "GOL",
-        "photo": "https://media.api-sports.io/football/players/543009.png"
-      },
-      {
-        "id": 310827,
-        "name": "Abdulrahman Al Sanbi",
-        "age": 24,
-        "number": 21,
-        "position": "GOL",
-        "photo": "https://media.api-sports.io/football/players/310827.png"
+        "photo": "https://media.api-sports.io/football/players/193288.png"
       },
       {
         "id": 44594,
-        "name": "Saud Abdulhamid",
+        "name": "S. Abdulhamid",
         "age": 26,
         "number": 12,
         "position": "DEF",
         "photo": "https://media.api-sports.io/football/players/44594.png"
       },
       {
-        "id": 134995,
-        "name": "Nawaf Boushal",
-        "age": 26,
-        "number": 13,
+        "id": 403087,
+        "name": "M. Abu Al Shamat",
+        "age": 23,
+        "number": 12,
         "position": "DEF",
-        "photo": "https://media.api-sports.io/football/players/134995.png"
+        "photo": "https://media.api-sports.io/football/players/403087.png"
       },
       {
-        "id": 44337,
-        "name": "Waleed Al Ahmad",
-        "age": 26,
-        "number": 14,
+        "id": 44701,
+        "name": "K. Al Ghannam",
+        "age": 25,
+        "number": 16,
         "position": "DEF",
-        "photo": "https://media.api-sports.io/football/players/44337.png"
+        "photo": "https://media.api-sports.io/football/players/44701.png"
+      },
+      {
+        "name": "M. Al Harbi",
+        "position": "DEF",
+        "number": null
       },
       {
         "id": 44475,
-        "name": "Abdulelah Al Amri",
+        "name": "A. Al Amri",
         "age": 28,
         "number": 4,
         "position": "DEF",
         "photo": "https://media.api-sports.io/football/players/44475.png"
       },
       {
-        "id": 44684,
-        "name": "Khalifah Al Dawsari",
+        "id": 134995,
+        "name": "N. Boushal",
         "age": 26,
-        "number": 4,
+        "number": 13,
         "position": "DEF",
-        "photo": "https://media.api-sports.io/football/players/44684.png"
-      },
-      {
-        "id": 2628,
-        "name": "Muteb Al Mufarrij",
-        "age": 29,
-        "number": 4,
-        "position": "DEF",
-        "photo": "https://media.api-sports.io/football/players/2628.png"
-      },
-      {
-        "id": 363310,
-        "name": "Mohammed Essa Harbush",
-        "age": 22,
-        "number": 5,
-        "position": "DEF",
-        "photo": "https://media.api-sports.io/football/players/363310.png"
-      },
-      {
-        "id": 542829,
-        "name": "R. Hamidou",
-        "age": 23,
-        "number": 2,
-        "position": "DEF",
-        "photo": "https://media.api-sports.io/football/players/542829.png"
+        "photo": "https://media.api-sports.io/football/players/134995.png"
       },
       {
         "id": 44335,
-        "name": "Hassan Kadesh",
+        "name": "H. Kadesh",
         "age": 33,
         "number": 14,
         "position": "DEF",
@@ -3185,7 +2932,7 @@
       },
       {
         "id": 44507,
-        "name": "Ali Lajami",
+        "name": "A. Lajami",
         "age": 29,
         "number": 3,
         "position": "DEF",
@@ -3193,95 +2940,41 @@
       },
       {
         "id": 44367,
-        "name": "Ali Majrashi",
+        "name": "A. Majrashi",
         "age": 26,
         "number": 2,
         "position": "DEF",
         "photo": "https://media.api-sports.io/football/players/44367.png"
       },
       {
-        "id": 369413,
-        "name": "Mohammed Bakor",
-        "age": 21,
-        "number": 17,
-        "position": "DEF",
-        "photo": "https://media.api-sports.io/football/players/369413.png"
-      },
-      {
         "id": 44362,
-        "name": "Hassan Tambakti",
+        "name": "H. Tambakti",
         "age": 26,
         "number": 5,
         "position": "DEF",
         "photo": "https://media.api-sports.io/football/players/44362.png"
       },
       {
-        "id": 543059,
-        "name": "J. Thakri",
-        "age": 24,
-        "number": 3,
+        "name": "J. Thikri",
         "position": "DEF",
-        "photo": "https://media.api-sports.io/football/players/543059.png"
-      },
-      {
-        "id": 403087,
-        "name": "Mohammed Abu Al Shamat",
-        "age": 23,
-        "number": 12,
-        "position": "MEI",
-        "photo": "https://media.api-sports.io/football/players/403087.png"
-      },
-      {
-        "id": 312652,
-        "name": "Waheb Saleh",
-        "age": 23,
-        "number": 18,
-        "position": "MEI",
-        "photo": "https://media.api-sports.io/football/players/312652.png"
-      },
-      {
-        "id": 44374,
-        "name": "Turki Al Ammar",
-        "age": 26,
-        "number": 19,
-        "position": "MEI",
-        "photo": "https://media.api-sports.io/football/players/44374.png"
+        "number": null
       },
       {
         "id": 44339,
-        "name": "Nasser Al Dawsari",
+        "name": "N. Al Dawsari",
         "age": 27,
         "number": 6,
         "position": "MEI",
         "photo": "https://media.api-sports.io/football/players/44339.png"
       },
       {
-        "id": 44340,
-        "name": "Salem Al Dawsari",
-        "age": 34,
-        "number": 10,
+        "name": "A. Al Hajji",
         "position": "MEI",
-        "photo": "https://media.api-sports.io/football/players/44340.png"
-      },
-      {
-        "id": 44341,
-        "name": "Salman Al Faraj",
-        "age": 36,
-        "number": 7,
-        "position": "MEI",
-        "photo": "https://media.api-sports.io/football/players/44341.png"
-      },
-      {
-        "id": 442343,
-        "name": "Murad Al Hawsawi",
-        "age": 24,
-        "number": 16,
-        "position": "MEI",
-        "photo": "https://media.api-sports.io/football/players/442343.png"
+        "number": null
       },
       {
         "id": 269172,
-        "name": "Ziyad Al Johani",
+        "name": "Z. Al Johani",
         "age": 24,
         "number": 8,
         "position": "MEI",
@@ -3289,7 +2982,7 @@
       },
       {
         "id": 306380,
-        "name": "Musab Al Juwayr",
+        "name": "M. Al Juwayr",
         "age": 22,
         "number": 10,
         "position": "MEI",
@@ -3297,115 +2990,64 @@
       },
       {
         "id": 44315,
-        "name": "Abdullah Al Khaibari",
+        "name": "A. Al Khaibari",
         "age": 29,
         "number": 15,
         "position": "MEI",
         "photo": "https://media.api-sports.io/football/players/44315.png"
       },
       {
-        "id": 44510,
-        "name": "Mohammed Al-Majhad",
-        "age": 27,
-        "number": 20,
+        "name": "M. Kanno",
         "position": "MEI",
-        "photo": "https://media.api-sports.io/football/players/44510.png"
+        "number": null
       },
       {
-        "id": 44349,
-        "name": "Mohamed Kanno",
+        "id": 2639,
+        "name": "S. Mandash",
         "age": 31,
-        "number": 23,
+        "number": null,
         "position": "MEI",
-        "photo": "https://media.api-sports.io/football/players/44349.png"
+        "photo": "https://media.api-sports.io/football/players/2639.png"
       },
       {
-        "id": 326984,
-        "name": "Mohammed Mater Mohsin Mahzari",
-        "age": 23,
-        "number": 23,
-        "position": "MEI",
-        "photo": "https://media.api-sports.io/football/players/326984.png"
-      },
-      {
-        "id": 578970,
-        "name": "N. Masoud",
+        "id": 147812,
+        "name": "A. Yahya",
         "age": 24,
-        "number": 6,
+        "number": 8,
         "position": "MEI",
-        "photo": "https://media.api-sports.io/football/players/578970.png"
-      },
-      {
-        "id": 578901,
-        "name": "A. S. Al Aliwa",
-        "age": 21,
-        "number": 7,
-        "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/578901.png"
+        "photo": "https://media.api-sports.io/football/players/147812.png"
       },
       {
         "id": 44324,
-        "name": "Feras Al Brikan",
+        "name": "F. Al Brikan",
         "age": 25,
         "number": 9,
         "position": "ATA",
         "photo": "https://media.api-sports.io/football/players/44324.png"
       },
       {
-        "id": 44701,
-        "name": "Khalid Al Ghannam",
-        "age": 25,
-        "number": 16,
+        "id": 44340,
+        "name": "S. Al Dawsari",
+        "age": 34,
+        "number": 10,
         "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/44701.png"
+        "photo": "https://media.api-sports.io/football/players/44340.png"
       },
       {
         "id": 44382,
-        "name": "Abdullah Al Hamdan",
+        "name": "A. Al Hamdan",
         "age": 26,
         "number": 19,
         "position": "ATA",
         "photo": "https://media.api-sports.io/football/players/44382.png"
       },
       {
-        "id": 44586,
-        "name": "Abdulrahman Al Obud",
-        "age": 30,
-        "number": 20,
-        "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/44586.png"
-      },
-      {
-        "id": 381176,
-        "name": "Marwan Al Sahafi",
-        "age": 21,
-        "number": 20,
-        "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/381176.png"
-      },
-      {
         "id": 44551,
-        "name": "Saleh Al Shehri",
+        "name": "S. Al Shehri",
         "age": 32,
         "number": 11,
         "position": "ATA",
         "photo": "https://media.api-sports.io/football/players/44551.png"
-      },
-      {
-        "id": 2639,
-        "name": "Sultan Mandash",
-        "age": 31,
-        "number": null,
-        "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/2639.png"
-      },
-      {
-        "id": 147812,
-        "name": "Ayman Yahya",
-        "age": 24,
-        "number": 8,
-        "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/147812.png"
       }
     ]
   },
@@ -3500,6 +3142,11 @@
       },
       {
         "name": "J. Leweling",
+        "position": "MEI",
+        "number": null
+      },
+      {
+        "name": "N. Amiri",
         "position": "MEI",
         "number": null
       },
@@ -4186,15 +3833,7 @@
         "number": null
       },
       {
-        "id": 2654,
-        "name": "M. Hany",
-        "age": 29,
-        "number": 3,
-        "position": "DEF",
-        "photo": "https://media.api-sports.io/football/players/2654.png"
-      },
-      {
-        "name": "T. Alaa",
+        "name": "T. Hamed",
         "position": "DEF",
         "number": null
       },
@@ -4321,7 +3960,7 @@
         "photo": "https://media.api-sports.io/football/players/306.png"
       },
       {
-        "name": "A. Abdallah",
+        "name": "A. Tawfiq",
         "position": "ATA",
         "number": null
       },
@@ -4342,27 +3981,7 @@
         "number": null
       },
       {
-        "name": "M. Jedlicka",
-        "position": "GOL",
-        "number": null
-      },
-      {
-        "name": "A. Kinsky",
-        "position": "GOL",
-        "number": null
-      },
-      {
-        "name": "J. Koutny",
-        "position": "GOL",
-        "number": null
-      },
-      {
         "name": "M. Kovar",
-        "position": "GOL",
-        "number": null
-      },
-      {
-        "name": "J. Markovic",
         "position": "GOL",
         "number": null
       },
@@ -4382,11 +4001,6 @@
         "number": null
       },
       {
-        "name": "M. Hadaš",
-        "position": "DEF",
-        "number": null
-      },
-      {
         "name": "T. Holeš",
         "position": "DEF",
         "number": null
@@ -4397,42 +4011,17 @@
         "number": null
       },
       {
-        "name": "Š. Chaloupek",
-        "position": "DEF",
-        "number": null
-      },
-      {
-        "name": "V. Jemelka",
-        "position": "DEF",
-        "number": null
-      },
-      {
         "name": "D. Jurásek",
         "position": "DEF",
         "number": null
       },
       {
+        "name": "Š. Chaloupek",
+        "position": "DEF",
+        "number": null
+      },
+      {
         "name": "L. Krejčí",
-        "position": "DEF",
-        "number": null
-      },
-      {
-        "name": "K. Spáčil",
-        "position": "DEF",
-        "number": null
-      },
-      {
-        "name": "A. Ševínský",
-        "position": "DEF",
-        "number": null
-      },
-      {
-        "name": "M. Vitík",
-        "position": "DEF",
-        "number": null
-      },
-      {
-        "name": "T. Vlček",
         "position": "DEF",
         "number": null
       },
@@ -4447,27 +4036,7 @@
         "number": null
       },
       {
-        "name": "L. Ambros",
-        "position": "MEI",
-        "number": null
-      },
-      {
-        "name": "M. Beran",
-        "position": "MEI",
-        "number": null
-      },
-      {
-        "name": "P. Bucha",
-        "position": "MEI",
-        "number": null
-      },
-      {
         "name": "L. Cerv",
-        "position": "MEI",
-        "number": null
-      },
-      {
-        "name": "K. Danek",
         "position": "MEI",
         "number": null
       },
@@ -4477,42 +4046,7 @@
         "number": null
       },
       {
-        "name": "P. Hellebrand",
-        "position": "MEI",
-        "number": null
-      },
-      {
-        "name": "A. Karabec",
-        "position": "MEI",
-        "number": null
-      },
-      {
-        "name": "O. Kricfaluši",
-        "position": "MEI",
-        "number": null
-      },
-      {
-        "name": "T. Ladra",
-        "position": "MEI",
-        "number": null
-      },
-      {
-        "name": "D. Planka",
-        "position": "MEI",
-        "number": null
-      },
-      {
         "name": "L. Provod",
-        "position": "MEI",
-        "number": null
-      },
-      {
-        "name": "M. Ryneš",
-        "position": "MEI",
-        "number": null
-      },
-      {
-        "name": "L. Sadílek",
         "position": "MEI",
         "number": null
       },
@@ -4562,47 +4096,12 @@
         "number": null
       },
       {
-        "name": "C. Kabongo",
-        "position": "ATA",
-        "number": null
-      },
-      {
-        "name": "J. Kliment",
-        "position": "ATA",
-        "number": null
-      },
-      {
         "name": "J. Kuchta",
         "position": "ATA",
         "number": null
       },
       {
-        "name": "V. Kušej",
-        "position": "ATA",
-        "number": null
-      },
-      {
-        "name": "O. Mihálik",
-        "position": "ATA",
-        "number": null
-      },
-      {
-        "name": "V. Patrák",
-        "position": "ATA",
-        "number": null
-      },
-      {
-        "name": "V. Sejk",
-        "position": "ATA",
-        "number": null
-      },
-      {
         "name": "P. Schick",
-        "position": "ATA",
-        "number": null
-      },
-      {
-        "name": "M. Vydra",
         "position": "ATA",
         "number": null
       }
@@ -6174,20 +5673,9 @@
     "logo": "https://media.api-sports.io/football/teams/1532.png",
     "players": [
       {
-        "id": 601332,
-        "name": "Kilian Belazzoug",
-        "age": 19,
-        "number": null,
+        "name": "O. Benbot",
         "position": "GOL",
-        "photo": "https://media.api-sports.io/football/players/601332.png"
-      },
-      {
-        "id": 21137,
-        "name": "A. Mandréa",
-        "age": 29,
-        "number": 1,
-        "position": "GOL",
-        "photo": "https://media.api-sports.io/football/players/21137.png"
+        "number": null
       },
       {
         "id": 304229,
@@ -6222,14 +5710,6 @@
         "photo": "https://media.api-sports.io/football/players/21138.png"
       },
       {
-        "id": 4997,
-        "name": "H. Baouche",
-        "age": 30,
-        "number": 2,
-        "position": "DEF",
-        "photo": "https://media.api-sports.io/football/players/4997.png"
-      },
-      {
         "id": 4561,
         "name": "Z. Belaïd",
         "age": 27,
@@ -6246,14 +5726,6 @@
         "photo": "https://media.api-sports.io/football/players/303362.png"
       },
       {
-        "id": 277029,
-        "name": "R. Benchaa",
-        "age": 24,
-        "number": 22,
-        "position": "DEF",
-        "photo": "https://media.api-sports.io/football/players/277029.png"
-      },
-      {
         "id": 2194,
         "name": "R. Bensebaïni",
         "age": 30,
@@ -6262,20 +5734,14 @@
         "photo": "https://media.api-sports.io/football/players/2194.png"
       },
       {
-        "id": 284935,
-        "name": "M. Dorval",
-        "age": 24,
-        "number": 3,
+        "name": "S. Chergui",
         "position": "DEF",
-        "photo": "https://media.api-sports.io/football/players/284935.png"
+        "number": null
       },
       {
-        "id": 4707,
-        "name": "R. Halaïmia",
-        "age": 29,
-        "number": 12,
+        "name": "J. Hadjam",
         "position": "DEF",
-        "photo": "https://media.api-sports.io/football/players/4707.png"
+        "number": null
       },
       {
         "id": 1567,
@@ -6286,12 +5752,9 @@
         "photo": "https://media.api-sports.io/football/players/1567.png"
       },
       {
-        "id": 191336,
-        "name": "S. Nair",
-        "age": 23,
-        "number": 4,
+        "name": "M. Tougai",
         "position": "DEF",
-        "photo": "https://media.api-sports.io/football/players/191336.png"
+        "number": null
       },
       {
         "id": 658,
@@ -6302,12 +5765,9 @@
         "photo": "https://media.api-sports.io/football/players/658.png"
       },
       {
-        "id": 137129,
-        "name": "A. Aouchiche",
-        "age": 23,
-        "number": 10,
+        "name": "N. Bentaleb",
         "position": "MEI",
-        "photo": "https://media.api-sports.io/football/players/137129.png"
+        "number": null
       },
       {
         "id": 4399,
@@ -6318,20 +5778,20 @@
         "photo": "https://media.api-sports.io/football/players/4399.png"
       },
       {
+        "id": 276670,
+        "name": "F. Chaïbi",
+        "age": 23,
+        "number": 17,
+        "position": "MEI",
+        "photo": "https://media.api-sports.io/football/players/276670.png"
+      },
+      {
         "id": 380587,
         "name": "I. Maza",
         "age": 20,
         "number": 22,
         "position": "MEI",
         "photo": "https://media.api-sports.io/football/players/380587.png"
-      },
-      {
-        "id": 294652,
-        "name": "H. Mrezigue",
-        "age": 26,
-        "number": 15,
-        "position": "MEI",
-        "photo": "https://media.api-sports.io/football/players/294652.png"
       },
       {
         "id": 327599,
@@ -6358,12 +5818,9 @@
         "photo": "https://media.api-sports.io/football/players/200139.png"
       },
       {
-        "id": 292924,
-        "name": "A. Benbouali",
-        "age": 26,
-        "number": null,
+        "name": "N. Benbouali",
         "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/292924.png"
+        "number": null
       },
       {
         "id": 329163,
@@ -6372,22 +5829,6 @@
         "number": 27,
         "position": "ATA",
         "photo": "https://media.api-sports.io/football/players/329163.png"
-      },
-      {
-        "id": 276670,
-        "name": "F. Chaïbi",
-        "age": 23,
-        "number": 17,
-        "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/276670.png"
-      },
-      {
-        "id": 393073,
-        "name": "Amin Chiakha",
-        "age": 19,
-        "number": 9,
-        "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/393073.png"
       },
       {
         "id": 334915,
@@ -6406,20 +5847,20 @@
         "photo": "https://media.api-sports.io/football/players/85041.png"
       },
       {
-        "id": 326067,
-        "name": "A. Hadj-Moussa",
-        "age": 23,
-        "number": 11,
-        "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/326067.png"
-      },
-      {
         "id": 635,
         "name": "R. Mahrez",
         "age": 34,
         "number": 7,
         "position": "ATA",
         "photo": "https://media.api-sports.io/football/players/635.png"
+      },
+      {
+        "id": 326067,
+        "name": "A. Hadj-Moussa",
+        "age": 23,
+        "number": 11,
+        "position": "ATA",
+        "photo": "https://media.api-sports.io/football/players/326067.png"
       }
     ]
   },
@@ -7438,6 +6879,11 @@
     "logo": "https://media.api-sports.io/football/teams/2380.png",
     "players": [
       {
+        "name": "G. Olveira",
+        "position": "GOL",
+        "number": null
+      },
+      {
         "name": "R. Fernández",
         "position": "GOL",
         "number": null
@@ -7448,27 +6894,7 @@
         "number": null
       },
       {
-        "name": "G. Olveira",
-        "position": "GOL",
-        "number": null
-      },
-      {
-        "name": "C. Coronel",
-        "position": "GOL",
-        "number": null
-      },
-      {
-        "name": "S. Rojas",
-        "position": "GOL",
-        "number": null
-      },
-      {
-        "name": "J. Espínola",
-        "position": "GOL",
-        "number": null
-      },
-      {
-        "name": "G. Gómez",
+        "name": "J. Caceres",
         "position": "DEF",
         "number": null
       },
@@ -7478,7 +6904,22 @@
         "number": null
       },
       {
+        "name": "A. Maidana",
+        "position": "DEF",
+        "number": null
+      },
+      {
+        "name": "G. Gómez",
+        "position": "DEF",
+        "number": null
+      },
+      {
         "name": "F. Balbuena",
+        "position": "DEF",
+        "number": null
+      },
+      {
+        "name": "G. Velázquez",
         "position": "DEF",
         "number": null
       },
@@ -7488,78 +6929,8 @@
         "number": null
       },
       {
-        "name": "J. Caceres",
-        "position": "DEF",
-        "number": null
-      },
-      {
-        "name": "B. Riveros",
-        "position": "DEF",
-        "number": null
-      },
-      {
-        "name": "Alan Benitez",
-        "position": "DEF",
-        "number": null
-      },
-      {
-        "name": "A. Sandez",
-        "position": "DEF",
-        "number": null
-      },
-      {
-        "name": "M. Gamarra",
-        "position": "DEF",
-        "number": null
-      },
-      {
-        "name": "S. Salcedo",
-        "position": "DEF",
-        "number": null
-      },
-      {
         "name": "J. Canale",
         "position": "DEF",
-        "number": null
-      },
-      {
-        "name": "D. León",
-        "position": "DEF",
-        "number": null
-      },
-      {
-        "name": "A. Maidana",
-        "position": "DEF",
-        "number": null
-      },
-      {
-        "name": "Alcides Benitez",
-        "position": "DEF",
-        "number": null
-      },
-      {
-        "name": "R. Dejesus",
-        "position": "DEF",
-        "number": null
-      },
-      {
-        "name": "A. Nuñez",
-        "position": "DEF",
-        "number": null
-      },
-      {
-        "name": "M. Almirón",
-        "position": "MEI",
-        "number": null
-      },
-      {
-        "name": "M. Villasanti",
-        "position": "MEI",
-        "number": null
-      },
-      {
-        "name": "Kaku",
-        "position": "MEI",
         "number": null
       },
       {
@@ -7568,12 +6939,12 @@
         "number": null
       },
       {
-        "name": "R. Sosa",
+        "name": "D. Gómez",
         "position": "MEI",
         "number": null
       },
       {
-        "name": "D. Gómez",
+        "name": "M. Galarza",
         "position": "MEI",
         "number": null
       },
@@ -7588,63 +6959,8 @@
         "number": null
       },
       {
-        "name": "M. Galarza",
-        "position": "MEI",
-        "number": null
-      },
-      {
-        "name": "R. Piris Da Motta",
-        "position": "MEI",
-        "number": null
-      },
-      {
-        "name": "A. Campuzano",
-        "position": "MEI",
-        "number": null
-      },
-      {
-        "name": "D. Gonzalez",
-        "position": "MEI",
-        "number": null
-      },
-      {
-        "name": "H. Cuenca",
-        "position": "MEI",
-        "number": null
-      },
-      {
         "name": "M. Magalhaes",
         "position": "MEI",
-        "number": null
-      },
-      {
-        "name": "L. Romero",
-        "position": "MEI",
-        "number": null
-      },
-      {
-        "name": "E. González",
-        "position": "MEI",
-        "number": null
-      },
-      {
-        "name": "R. Lezcano",
-        "position": "MEI",
-        "number": null
-      },
-      {
-        "name": "O. Romero",
-        "position": "ATA",
-        "number": null
-      },
-      {
-        "name": "Á. Romero",
-        "position": "ATA",
-        "number": null
-      },
-      {
-        "name": "A. Sanabria",
-        "position": "ATA",
         "number": null
       },
       {
@@ -7653,37 +6969,12 @@
         "number": null
       },
       {
-        "name": "G. Avalos",
+        "name": "Kaku",
         "position": "ATA",
         "number": null
       },
       {
-        "name": "C. Gonzalez",
-        "position": "ATA",
-        "number": null
-      },
-      {
-        "name": "A. Arce",
-        "position": "ATA",
-        "number": null
-      },
-      {
-        "name": "A. Bareiro",
-        "position": "ATA",
-        "number": null
-      },
-      {
-        "name": "L. Melgarejo",
-        "position": "ATA",
-        "number": null
-      },
-      {
-        "name": "I. Pitta",
-        "position": "ATA",
-        "number": null
-      },
-      {
-        "name": "R. Martinez",
+        "name": "M. Almirón",
         "position": "ATA",
         "number": null
       },
@@ -7693,17 +6984,27 @@
         "number": null
       },
       {
-        "name": "R. Morales",
+        "name": "R. Sosa",
         "position": "ATA",
         "number": null
       },
       {
-        "name": "A. Alcaraz",
+        "name": "A. Sanabria",
         "position": "ATA",
         "number": null
       },
       {
-        "name": "R. Redes",
+        "name": "G. Avalos",
+        "position": "ATA",
+        "number": null
+      },
+      {
+        "name": "A. Arce",
+        "position": "ATA",
+        "number": null
+      },
+      {
+        "name": "I. Pitta",
         "position": "ATA",
         "number": null
       }
@@ -7714,28 +7015,12 @@
     "logo": "https://media.api-sports.io/football/teams/2382.png",
     "players": [
       {
-        "id": 16579,
-        "name": "D. Cabezas",
-        "age": 30,
-        "number": 22,
-        "position": "GOL",
-        "photo": "https://media.api-sports.io/football/players/16579.png"
-      },
-      {
         "id": 16380,
         "name": "H. Galíndez",
         "age": 38,
         "number": 1,
         "position": "GOL",
         "photo": "https://media.api-sports.io/football/players/16380.png"
-      },
-      {
-        "id": 410134,
-        "name": "C. Loor",
-        "age": 19,
-        "number": 1,
-        "position": "GOL",
-        "photo": "https://media.api-sports.io/football/players/410134.png"
       },
       {
         "id": 81224,
@@ -7754,14 +7039,6 @@
         "photo": "https://media.api-sports.io/football/players/16642.png"
       },
       {
-        "id": 46731,
-        "name": "P. Estupiñán",
-        "age": 27,
-        "number": 7,
-        "position": "DEF",
-        "photo": "https://media.api-sports.io/football/players/46731.png"
-      },
-      {
         "id": 127817,
         "name": "P. Hincapié",
         "age": 23,
@@ -7770,20 +7047,28 @@
         "photo": "https://media.api-sports.io/football/players/127817.png"
       },
       {
-        "id": 68113,
-        "name": "J. Hurtado",
+        "id": 16367,
+        "name": "W. Pacho",
         "age": 24,
-        "number": 24,
+        "number": 6,
         "position": "DEF",
-        "photo": "https://media.api-sports.io/football/players/68113.png"
+        "photo": "https://media.api-sports.io/football/players/16367.png"
       },
       {
-        "id": 306940,
-        "name": "Y. Medina",
-        "age": 21,
+        "id": 46731,
+        "name": "P. Estupiñán",
+        "age": 27,
         "number": 7,
         "position": "DEF",
-        "photo": "https://media.api-sports.io/football/players/306940.png"
+        "photo": "https://media.api-sports.io/football/players/46731.png"
+      },
+      {
+        "id": 63964,
+        "name": "F. Torres",
+        "age": 28,
+        "number": 2,
+        "position": "DEF",
+        "photo": "https://media.api-sports.io/football/players/63964.png"
       },
       {
         "id": 354027,
@@ -7792,14 +7077,6 @@
         "number": 4,
         "position": "DEF",
         "photo": "https://media.api-sports.io/football/players/354027.png"
-      },
-      {
-        "id": 16367,
-        "name": "W. Pacho",
-        "age": 24,
-        "number": 6,
-        "position": "DEF",
-        "photo": "https://media.api-sports.io/football/players/16367.png"
       },
       {
         "id": 2575,
@@ -7818,44 +7095,12 @@
         "photo": "https://media.api-sports.io/football/players/2583.png"
       },
       {
-        "id": 2076,
-        "name": "C. Ramírez",
-        "age": 31,
-        "number": 5,
-        "position": "DEF",
-        "photo": "https://media.api-sports.io/football/players/2076.png"
-      },
-      {
-        "id": 63964,
-        "name": "F. Torres",
-        "age": 28,
-        "number": 2,
-        "position": "DEF",
-        "photo": "https://media.api-sports.io/football/players/63964.png"
-      },
-      {
-        "id": 16470,
-        "name": "J. Alcívar",
-        "age": 26,
-        "number": 18,
-        "position": "MEI",
-        "photo": "https://media.api-sports.io/football/players/16470.png"
-      },
-      {
         "id": 116117,
         "name": "M. Caicedo",
         "age": 24,
         "number": 23,
         "position": "MEI",
         "photo": "https://media.api-sports.io/football/players/116117.png"
-      },
-      {
-        "id": 338045,
-        "name": "D. Castillo",
-        "age": 21,
-        "number": 16,
-        "position": "MEI",
-        "photo": "https://media.api-sports.io/football/players/338045.png"
       },
       {
         "id": 16360,
@@ -7866,36 +7111,12 @@
         "photo": "https://media.api-sports.io/football/players/16360.png"
       },
       {
-        "id": 321658,
-        "name": "P. Mercado",
-        "age": 22,
-        "number": 16,
-        "position": "MEI",
-        "photo": "https://media.api-sports.io/football/players/321658.png"
-      },
-      {
         "id": 406303,
         "name": "K. Páez",
         "age": 18,
         "number": 10,
         "position": "MEI",
         "photo": "https://media.api-sports.io/football/players/406303.png"
-      },
-      {
-        "id": 361966,
-        "name": "K. Rodríguez",
-        "age": 25,
-        "number": 11,
-        "position": "MEI",
-        "photo": "https://media.api-sports.io/football/players/361966.png"
-      },
-      {
-        "id": 198347,
-        "name": "A. Valencia",
-        "age": 22,
-        "number": null,
-        "position": "MEI",
-        "photo": "https://media.api-sports.io/football/players/198347.png"
       },
       {
         "id": 237078,
@@ -7906,68 +7127,36 @@
         "photo": "https://media.api-sports.io/football/players/237078.png"
       },
       {
-        "id": 25414,
-        "name": "J. Yeboah",
-        "age": 25,
-        "number": 9,
+        "id": 16470,
+        "name": "J. Alcívar",
+        "age": 26,
+        "number": 18,
         "position": "MEI",
-        "photo": "https://media.api-sports.io/football/players/25414.png"
+        "photo": "https://media.api-sports.io/football/players/16470.png"
       },
       {
-        "id": 311543,
-        "name": "N. Angulo",
-        "age": 22,
-        "number": 20,
-        "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/311543.png"
+        "id": 338045,
+        "name": "D. Castillo",
+        "age": 21,
+        "number": 16,
+        "position": "MEI",
+        "photo": "https://media.api-sports.io/football/players/338045.png"
       },
       {
-        "id": 16590,
-        "name": "J. Caicedo",
-        "age": 28,
-        "number": 19,
-        "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/16590.png"
+        "id": 306940,
+        "name": "Y. Medina",
+        "age": 21,
+        "number": 7,
+        "position": "MEI",
+        "photo": "https://media.api-sports.io/football/players/306940.png"
       },
       {
-        "id": 16413,
-        "name": "J. Corozo",
-        "age": 30,
-        "number": 18,
+        "id": 35533,
+        "name": "E. Valencia",
+        "age": 36,
+        "number": 13,
         "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/16413.png"
-      },
-      {
-        "id": 350799,
-        "name": "Jeremy Arévalo",
-        "age": 20,
-        "number": 8,
-        "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/350799.png"
-      },
-      {
-        "id": 625629,
-        "name": "Elias Legendre Quiñonez",
-        "age": 17,
-        "number": 9,
-        "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/625629.png"
-      },
-      {
-        "id": 237122,
-        "name": "J. Mercado",
-        "age": 23,
-        "number": 18,
-        "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/237122.png"
-      },
-      {
-        "id": 280695,
-        "name": "A. Minda",
-        "age": 22,
-        "number": 14,
-        "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/280695.png"
+        "photo": "https://media.api-sports.io/football/players/35533.png"
       },
       {
         "id": 16369,
@@ -7978,20 +7167,60 @@
         "photo": "https://media.api-sports.io/football/players/16369.png"
       },
       {
-        "id": 356456,
-        "name": "Bryan Josías Ramírez León",
-        "age": 25,
-        "number": 20,
+        "id": 280695,
+        "name": "A. Minda",
+        "age": 22,
+        "number": 14,
         "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/356456.png"
+        "photo": "https://media.api-sports.io/football/players/280695.png"
       },
       {
-        "id": 35533,
-        "name": "E. Valencia",
-        "age": 36,
-        "number": 13,
+        "id": 25414,
+        "name": "J. Yeboah",
+        "age": 25,
+        "number": 9,
         "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/35533.png"
+        "photo": "https://media.api-sports.io/football/players/25414.png"
+      },
+      {
+        "id": 361966,
+        "name": "K. Rodríguez",
+        "age": 25,
+        "number": 11,
+        "position": "ATA",
+        "photo": "https://media.api-sports.io/football/players/361966.png"
+      },
+      {
+        "id": 16590,
+        "name": "J. Caicedo",
+        "age": 28,
+        "number": 19,
+        "position": "ATA",
+        "photo": "https://media.api-sports.io/football/players/16590.png"
+      },
+      {
+        "id": 311543,
+        "name": "N. Angulo",
+        "age": 22,
+        "number": 20,
+        "position": "ATA",
+        "photo": "https://media.api-sports.io/football/players/311543.png"
+      },
+      {
+        "id": 198347,
+        "name": "A. Valencia",
+        "age": 22,
+        "number": null,
+        "position": "ATA",
+        "photo": "https://media.api-sports.io/football/players/198347.png"
+      },
+      {
+        "id": 350799,
+        "name": "J. Arévalo",
+        "age": 20,
+        "number": 8,
+        "position": "ATA",
+        "photo": "https://media.api-sports.io/football/players/350799.png"
       }
     ]
   },
@@ -8480,20 +7709,20 @@
     "logo": "https://media.api-sports.io/football/teams/5529.png",
     "players": [
       {
+        "id": 51148,
+        "name": "D. St. Clair",
+        "age": 28,
+        "number": 1,
+        "position": "GOL",
+        "photo": "https://media.api-sports.io/football/players/51148.png"
+      },
+      {
         "id": 51274,
         "name": "M. Crépeau",
         "age": 31,
         "number": 16,
         "position": "GOL",
         "photo": "https://media.api-sports.io/football/players/51274.png"
-      },
-      {
-        "id": 351582,
-        "name": "L. Gavran",
-        "age": 25,
-        "number": null,
-        "position": "GOL",
-        "photo": "https://media.api-sports.io/football/players/351582.png"
       },
       {
         "id": 284554,
@@ -8504,36 +7733,9 @@
         "photo": "https://media.api-sports.io/football/players/284554.png"
       },
       {
-        "id": 50778,
-        "name": "J. Pantemis",
-        "age": 28,
-        "number": 16,
-        "position": "GOL",
-        "photo": "https://media.api-sports.io/football/players/50778.png"
-      },
-      {
-        "id": 51148,
-        "name": "D. St. Clair",
-        "age": 28,
-        "number": 1,
-        "position": "GOL",
-        "photo": "https://media.api-sports.io/football/players/51148.png"
-      },
-      {
-        "id": 370936,
-        "name": "N. Abatneh",
-        "age": 21,
-        "number": 2,
+        "name": "A. Johnston",
         "position": "DEF",
-        "photo": "https://media.api-sports.io/football/players/370936.png"
-      },
-      {
-        "id": 8660,
-        "name": "Z. Bassong",
-        "age": 26,
-        "number": 3,
-        "position": "DEF",
-        "photo": "https://media.api-sports.io/football/players/8660.png"
+        "number": null
       },
       {
         "id": 51295,
@@ -8544,14 +7746,6 @@
         "photo": "https://media.api-sports.io/football/players/51295.png"
       },
       {
-        "id": 327738,
-        "name": "L. De Fougerolles",
-        "age": 20,
-        "number": 15,
-        "position": "DEF",
-        "photo": "https://media.api-sports.io/football/players/327738.png"
-      },
-      {
         "id": 50816,
         "name": "R. Laryea",
         "age": 30,
@@ -8560,20 +7754,12 @@
         "photo": "https://media.api-sports.io/football/players/50816.png"
       },
       {
-        "id": 201707,
-        "name": "J. Marshall-Rutty",
-        "age": 21,
-        "number": null,
+        "id": 416901,
+        "name": "N. Sigur",
+        "age": 22,
+        "number": 23,
         "position": "DEF",
-        "photo": "https://media.api-sports.io/football/players/201707.png"
-      },
-      {
-        "id": 50925,
-        "name": "K. Miller",
-        "age": 28,
-        "number": 4,
-        "position": "DEF",
-        "photo": "https://media.api-sports.io/football/players/50925.png"
+        "photo": "https://media.api-sports.io/football/players/416901.png"
       },
       {
         "id": 78494,
@@ -8584,12 +7770,43 @@
         "photo": "https://media.api-sports.io/football/players/78494.png"
       },
       {
-        "id": 362145,
-        "name": "A. Ahmed",
-        "age": 25,
-        "number": 20,
+        "id": 327738,
+        "name": "L. De Fougerolles",
+        "age": 20,
+        "number": 15,
+        "position": "DEF",
+        "photo": "https://media.api-sports.io/football/players/327738.png"
+      },
+      {
+        "name": "M. Bombito",
+        "position": "DEF",
+        "number": null
+      },
+      {
+        "name": "A. Jones",
+        "position": "DEF",
+        "number": null
+      },
+      {
+        "name": "A. Davies",
+        "position": "DEF",
+        "number": null
+      },
+      {
+        "id": 35570,
+        "name": "S. Eustáquio",
+        "age": 29,
+        "number": 7,
         "position": "MEI",
-        "photo": "https://media.api-sports.io/football/players/362145.png"
+        "photo": "https://media.api-sports.io/football/players/35570.png"
+      },
+      {
+        "id": 328046,
+        "name": "I. Koné",
+        "age": 23,
+        "number": 8,
+        "position": "MEI",
+        "photo": "https://media.api-sports.io/football/players/328046.png"
       },
       {
         "id": 51016,
@@ -8608,52 +7825,12 @@
         "photo": "https://media.api-sports.io/football/players/50788.png"
       },
       {
-        "id": 35570,
-        "name": "S. Eustáquio",
-        "age": 29,
-        "number": 7,
+        "id": 362145,
+        "name": "A. Ahmed",
+        "age": 25,
+        "number": 20,
         "position": "MEI",
-        "photo": "https://media.api-sports.io/football/players/35570.png"
-      },
-      {
-        "id": 284061,
-        "name": "M. Flores",
-        "age": 22,
-        "number": 18,
-        "position": "MEI",
-        "photo": "https://media.api-sports.io/football/players/284061.png"
-      },
-      {
-        "id": 512956,
-        "name": "Malik Henry",
-        "age": 23,
-        "number": null,
-        "position": "MEI",
-        "photo": "https://media.api-sports.io/football/players/512956.png"
-      },
-      {
-        "id": 328046,
-        "name": "I. Koné",
-        "age": 23,
-        "number": 8,
-        "position": "MEI",
-        "photo": "https://media.api-sports.io/football/players/328046.png"
-      },
-      {
-        "id": 50817,
-        "name": "J. Osorio",
-        "age": 33,
-        "number": 21,
-        "position": "MEI",
-        "photo": "https://media.api-sports.io/football/players/50817.png"
-      },
-      {
-        "id": 203436,
-        "name": "R. Priso",
-        "age": 23,
-        "number": 8,
-        "position": "MEI",
-        "photo": "https://media.api-sports.io/football/players/203436.png"
+        "photo": "https://media.api-sports.io/football/players/362145.png"
       },
       {
         "id": 294824,
@@ -8664,44 +7841,36 @@
         "photo": "https://media.api-sports.io/football/players/294824.png"
       },
       {
-        "id": 416901,
-        "name": "N. Sigur",
-        "age": 22,
+        "id": 44798,
+        "name": "L. Millar",
+        "age": 26,
         "number": 23,
         "position": "MEI",
-        "photo": "https://media.api-sports.io/football/players/416901.png"
+        "photo": "https://media.api-sports.io/football/players/44798.png"
       },
       {
-        "id": 269936,
-        "name": "M. de Brienne",
-        "age": 23,
-        "number": null,
+        "id": 284061,
+        "name": "M. Flores",
+        "age": 22,
+        "number": 18,
         "position": "MEI",
-        "photo": "https://media.api-sports.io/football/players/269936.png"
+        "photo": "https://media.api-sports.io/football/players/284061.png"
       },
       {
-        "id": 541949,
-        "name": "M. Aiyenero",
-        "age": 17,
-        "number": 9,
-        "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/541949.png"
-      },
-      {
-        "id": 51293,
-        "name": "T. Bair",
+        "id": 50826,
+        "name": "J. Shaffelburg",
         "age": 26,
-        "number": 11,
-        "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/51293.png"
+        "number": 14,
+        "position": "MEI",
+        "photo": "https://media.api-sports.io/football/players/50826.png"
       },
       {
-        "id": 370938,
-        "name": "T. Coimbra",
-        "age": 21,
-        "number": 19,
-        "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/370938.png"
+        "id": 50817,
+        "name": "J. Osorio",
+        "age": 33,
+        "number": 21,
+        "position": "MEI",
+        "photo": "https://media.api-sports.io/football/players/50817.png"
       },
       {
         "id": 8489,
@@ -8712,52 +7881,12 @@
         "photo": "https://media.api-sports.io/football/players/8489.png"
       },
       {
-        "id": 313353,
-        "name": "P. David",
-        "age": 24,
-        "number": 24,
-        "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/313353.png"
-      },
-      {
-        "id": 19007,
-        "name": "J. Hoilett",
-        "age": 35,
-        "number": 10,
-        "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/19007.png"
-      },
-      {
-        "id": 296458,
-        "name": "D. Jebbison",
-        "age": 22,
-        "number": 11,
-        "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/296458.png"
-      },
-      {
         "id": 2001,
         "name": "C. Larin",
         "age": 30,
         "number": 9,
         "position": "ATA",
         "photo": "https://media.api-sports.io/football/players/2001.png"
-      },
-      {
-        "id": 44798,
-        "name": "L. Millar",
-        "age": 26,
-        "number": 23,
-        "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/44798.png"
-      },
-      {
-        "id": 193279,
-        "name": "J. Nelson",
-        "age": 23,
-        "number": 25,
-        "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/193279.png"
       },
       {
         "id": 351587,
@@ -8768,28 +7897,12 @@
         "photo": "https://media.api-sports.io/football/players/351587.png"
       },
       {
-        "id": 146325,
-        "name": "A. Pepple",
-        "age": 23,
-        "number": null,
+        "id": 313353,
+        "name": "P. David",
+        "age": 24,
+        "number": 24,
         "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/146325.png"
-      },
-      {
-        "id": 203428,
-        "name": "J. Russell-Rowe",
-        "age": 23,
-        "number": 12,
-        "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/203428.png"
-      },
-      {
-        "id": 50826,
-        "name": "J. Shaffelburg",
-        "age": 26,
-        "number": 14,
-        "position": "ATA",
-        "photo": "https://media.api-sports.io/football/players/50826.png"
+        "photo": "https://media.api-sports.io/football/players/313353.png"
       }
     ]
   },
