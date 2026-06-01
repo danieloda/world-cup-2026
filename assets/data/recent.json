@@ -203,6 +203,13 @@
   ],
   "Austria": [
     [
+      "2026-06-01",
+      "Tunisia",
+      true,
+      "1-0",
+      "Amistoso"
+    ],
+    [
       "2026-03-31",
       "South Korea",
       true,
@@ -263,13 +270,6 @@
       "San Marino",
       false,
       "4-0",
-      "Eliminatórias"
-    ],
-    [
-      "2025-06-07",
-      "Romania",
-      true,
-      "2-1",
       "Eliminatórias"
     ]
   ],
@@ -561,43 +561,6 @@
       "Copa Ouro"
     ]
   ],
-  "Cape Verde": [
-    [
-      "2025-11-17",
-      "Egypt",
-      false,
-      "1-1",
-      "Amistoso"
-    ],
-    [
-      "2025-11-13",
-      "Iran",
-      false,
-      "0-0",
-      "Amistoso"
-    ],
-    [
-      "2025-10-13",
-      "Eswatini",
-      true,
-      "3-0",
-      "Elim. 2026"
-    ],
-    [
-      "2025-10-08",
-      "Libya",
-      false,
-      "3-3",
-      "Elim. 2026"
-    ],
-    [
-      "2025-09-09",
-      "Cameroon",
-      true,
-      "1-0",
-      "Elim. 2026"
-    ]
-  ],
   "Colombia": [
     [
       "2026-03-29",
@@ -886,7 +849,6 @@
       "Eliminatórias"
     ]
   ],
-  "DR Congo": [],
   "Ecuador": [
     [
       "2026-05-31",
@@ -2034,6 +1996,13 @@
   ],
   "Norway": [
     [
+      "2026-06-01",
+      "Sweden",
+      true,
+      "3-1",
+      "Amistoso"
+    ],
+    [
       "2026-03-31",
       "Switzerland",
       true,
@@ -2094,13 +2063,6 @@
       "Estonia",
       false,
       "1-0",
-      "Eliminatórias"
-    ],
-    [
-      "2025-06-06",
-      "Italy",
-      true,
-      "3-0",
       "Eliminatórias"
     ]
   ],
@@ -2798,6 +2760,13 @@
   ],
   "Sweden": [
     [
+      "2026-06-01",
+      "Norway",
+      false,
+      "1-3",
+      "Amistoso"
+    ],
+    [
       "2026-03-31",
       "Poland",
       true,
@@ -2858,13 +2827,6 @@
       "Algeria",
       true,
       "4-3",
-      "Amistoso"
-    ],
-    [
-      "2025-06-06",
-      "Hungary",
-      false,
-      "2-0",
       "Amistoso"
     ]
   ],
@@ -2942,6 +2904,13 @@
   ],
   "Tunisia": [
     [
+      "2026-06-01",
+      "Austria",
+      false,
+      "0-1",
+      "Amistoso"
+    ],
+    [
       "2026-03-31",
       "Canada",
       false,
@@ -3003,50 +2972,6 @@
       true,
       "0-1",
       "Arab Cup"
-    ],
-    [
-      "2025-11-18",
-      "Brazil",
-      false,
-      "1-1",
-      "Amistoso"
-    ]
-  ],
-  "Turkey": [
-    [
-      "2026-03-31",
-      "Kosovo",
-      false,
-      "1-0",
-      "Elim. 2026"
-    ],
-    [
-      "2026-03-26",
-      "Romania",
-      true,
-      "1-0",
-      "Elim. 2026"
-    ],
-    [
-      "2024-11-19",
-      "Montenegro",
-      false,
-      "1-3",
-      "Liga das Nações"
-    ],
-    [
-      "2024-11-16",
-      "Wales",
-      true,
-      "0-0",
-      "Liga das Nações"
-    ],
-    [
-      "2024-10-14",
-      "Iceland",
-      false,
-      "4-2",
-      "Liga das Nações"
     ]
   ],
   "USA": [
@@ -3267,6 +3192,13 @@
   ],
   "Türkiye": [
     [
+      "2026-06-01",
+      "FYR Macedonia",
+      true,
+      "4-0",
+      "Amistoso"
+    ],
+    [
       "2026-03-31",
       "Kosovo",
       false,
@@ -3327,13 +3259,6 @@
       "Mexico",
       false,
       "0-1",
-      "Amistoso"
-    ],
-    [
-      "2025-06-07",
-      "USA",
-      false,
-      "2-1",
       "Amistoso"
     ]
   ],

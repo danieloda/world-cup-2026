@@ -40,7 +40,7 @@ const LIMIT = parseInt(args.last || '10', 10);
 
 // Rate limit: API-Football free plan = 10 req/min, paid = 30/min ou mais.
 // Vou pausar 6s entre requests pra ficar safe no free plan.
-const REQ_DELAY_MS = 6000;
+const REQ_DELAY_MS = parseInt(args.delay || '6000', 10);
 
 // ============================================================
 // Helpers
@@ -187,6 +187,17 @@ async function main() {
   if (DRY_RUN) {
     console.log(`\n✅ DRY-RUN concluído. ${skipCount} time(s) seriam processados.`);
     return;
+  }
+
+  // Pruning: remove chaves órfãs — nomes que não existem mais no fixtures.json
+  // (drift de nome canônico, ex.: "Turkey" → "Türkiye"). Sem isso, o spread
+  // `{ ...existing }` mantém dados velhos sob a chave antiga para sempre.
+  // teamMap tem sempre os 48 canônicos, então é seguro mesmo com --team.
+  const canonical = new Set(Object.keys(teamMap));
+  const orphans = Object.keys(result).filter((k) => !canonical.has(k));
+  for (const k of orphans) delete result[k];
+  if (orphans.length) {
+    console.log(`🧹 Removidas ${orphans.length} chave(s) órfã(s): ${orphans.join(', ')}`);
   }
 
   // Salva
