@@ -89,10 +89,11 @@ npm run test:all       # Run all tests
 ├── index.html              # World Cup simulator
 ├── login.html              # Authentication
 ├── inicio.html             # Dashboard
-├── palpites-grupos.html    # Group stage predictions
+├── palpites-grupos.html    # Group stage: predictions + standings + best thirds + results (tabbed)
 ├── palpites-mata.html      # Knockout predictions
 ├── campeao-artilheiro.html # Champion & top scorer picks
-├── grupos.html             # Group standings
+├── grupos.html             # Redirect → palpites-grupos.html#classificacao (legacy deep-link)
+├── terceiros.html          # Redirect → palpites-grupos.html#terceiros (legacy deep-link)
 ├── ranking.html            # Leaderboard
 ├── admin.html              # Admin panel
 ├── js/

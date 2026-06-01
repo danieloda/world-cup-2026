@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * #2 Força empate pts=SG=GF num grupo e verifica que grupos.html renderiza
- *    a ordem por RANKING FIFA no DOM (não só no SQL).
+ * #2 Força empate pts=SG=GF num grupo e verifica que palpites-grupos
+ *    (Resultados → Classificação) renderiza a ordem por RANKING FIFA no DOM.
  * Grupo A todos 1-1 → 4 times empatados (3pts, SG 0, GF 3) → FIFA decide tudo:
  *   Mexico(15) < South Korea(25) < Czech Republic(41) < South Africa(60).
  * Snapshot + restore exato dos resultados originais ao final.
@@ -35,7 +35,9 @@ try {
   await page.goto(`${BASE}/login.html`);
   await page.fill('#email', process.env.ADMIN_EMAIL); await page.fill('#password', process.env.ADMIN_PASSWORD);
   await page.click('#submitBtn'); await page.waitForURL(/\/inicio(\.html)?$/, {timeout:15000});
-  await page.goto(`${BASE}/grupos.html`);
+  await page.goto(`${BASE}/palpites-grupos.html`);
+  await page.waitForSelector('.admin-tabs', {timeout:15000});
+  await page.click('[data-tab="resultados"]');  // sub-aba default = Classificação (real)
   await page.waitForSelector('.group-card .group-table', {timeout:15000});
   const order = await page.evaluate(() => {
     const card = [...document.querySelectorAll('.group-card')].find(c => (c.querySelector('.group-name')?.textContent||'').includes('A'));

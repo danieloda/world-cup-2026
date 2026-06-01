@@ -16,18 +16,16 @@ const NAV_SECTIONS = [
   {
     label: 'Bolão',
     items: [
-      { id: 'grupos',     href: 'grupos.html',     label: 'Grupos & Classificação', icon: iconGrid },
-      { id: 'terceiros',  href: 'terceiros.html',  label: '3ºs Lugares',            icon: iconPodium },
-      { id: 'historico',  href: 'historico.html',  label: 'Resultados',             icon: iconClock },
-      { id: 'ranking',    href: 'ranking.html',    label: 'Ranking',                icon: iconChart },
+      { id: 'historico',  href: 'historico.html',  label: 'Resultados', icon: iconClock },
+      { id: 'ranking',    href: 'ranking.html',    label: 'Ranking',    icon: iconChart },
     ],
   },
   {
     label: 'Palpites',
     items: [
-      { id: 'palpites-g', href: 'palpites-grupos.html',    label: 'Grupos',              icon: iconClipboard },
-      { id: 'palpites-k', href: 'palpites-mata.html',      label: 'Mata-mata',           icon: iconBracket },
-      { id: 'campeao',    href: 'campeao-artilheiro.html', label: 'Campeão & Artilheiro', icon: iconTrophy },
+      { id: 'palpites-g', href: 'palpites-grupos.html',    label: 'Grupos & Classificação', icon: iconClipboard },
+      { id: 'palpites-k', href: 'palpites-mata.html',      label: 'Mata-mata',              icon: iconBracket },
+      { id: 'campeao',    href: 'campeao-artilheiro.html', label: 'Campeão & Artilheiro',   icon: iconTrophy },
     ],
   },
 ];
@@ -178,16 +176,6 @@ function svg(d) { return `<svg fill="none" stroke="currentColor" viewBox="0 0 24
 // Casa
 function iconHome() {
   return svg('<path d="M3 9.5L12 2l9 7.5V21a2 2 0 0 1-2 2h-3v-7h-8v7H5a2 2 0 0 1-2-2z"/>');
-}
-
-// Grupos & Classificação — tabela de standings
-function iconGrid() {
-  return svg('<rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/>');
-}
-
-// 3ºs Lugares — pódio com 3 degraus
-function iconPodium() {
-  return svg('<rect x="9" y="8" width="6" height="13"/><rect x="2" y="13" width="6" height="8"/><rect x="16" y="11" width="6" height="10"/><path d="M3 21h18"/>');
 }
 
 // Histórico — relógio com seta

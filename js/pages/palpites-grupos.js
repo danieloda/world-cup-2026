@@ -7,6 +7,9 @@ import {
   teamPt, groundShort,
 } from '../util.js';
 import { matchPoints, scoreBreakdown } from '../scoring.js';
+import {
+  renderGroupsGrid, computeThirds, countThirdsComplete, renderThirdsTable,
+} from '../standings-view.js';
 
 const GP = matchPoints('group'); // { ag:1, ave:4, dg:1, exact:7 }
 
@@ -18,8 +21,10 @@ let matches = [];                    // 72 group-stage matches, ordered by date
 let predsByMatch = new Map();        // match_id -> prediction row
 let goalsByMatch = new Map();        // match_id -> [{player, goals}]
 let oddsByMatch = new Map();         // match_id -> { odd_home, odd_draw, odd_away, bookmaker_name }
-let activeTab = 'palpites';          // 'palpites' | 'resultados'
-let activeGroup = 'all';             // 'all' | 'A'..'L'
+let activeTab = 'palpites';          // 'palpites' | 'simulacao' | 'resultados'
+let activeGroup = 'all';             // 'all' | 'A'..'L' (filtro da lista de jogos)
+let simSub = 'classificacao';        // sub-aba de 'Minha simulação': 'classificacao' | 'terceiros'
+let resSub = 'classificacao';        // sub-aba de 'Resultados': 'classificacao' | 'terceiros' | 'jogos'
 const saveTimers = new Map();        // match_id -> setTimeout handle
 const GROUPS = ['A','B','C','D','E','F','G','H','I','J','K','L'];
 
@@ -32,6 +37,8 @@ try {
   profile = auth.profile;
 
   await loadData();
+
+  applyHashRoute();  // deep-link opcional (ex.: redirects de grupos.html / terceiros.html)
 
   const recentByTeam = await loadRecentMatches();
 
@@ -86,7 +93,7 @@ function renderPage() {
   return `
     <section class="hero">
       <div class="hero-kicker">Palpitar placares · Fase de grupos</div>
-      <h1 class="hero-title">${activeTab === 'palpites' ? 'Seus palpites' : 'Resultados oficiais'}</h1>
+      <h1 class="hero-title">${heroTitle()}</h1>
       <div class="hero-meta">
         <b>${matches.length} jogos</b><span class="sep"></span>
         <b>${counts.totalDone}</b> palpitados<span class="sep"></span>
@@ -98,15 +105,47 @@ function renderPage() {
       <button class="admin-tab ${activeTab === 'palpites' ? 'active' : ''}" data-tab="palpites">
         Palpites <span class="ct">${counts.totalRemaining}</span>
       </button>
+      <button class="admin-tab ${activeTab === 'simulacao' ? 'active' : ''}" data-tab="simulacao">
+        Minha simulação
+      </button>
       <button class="admin-tab ${activeTab === 'resultados' ? 'active' : ''}" data-tab="resultados">
         Resultados <span class="ct">${counts.totalFinished}</span>
       </button>
     </div>
 
     <div id="tabBody">
-      ${activeTab === 'palpites' ? renderPalpitesTab(counts) : renderResultadosTab(counts)}
+      ${renderActiveTab(counts)}
     </div>
   `;
+}
+
+// Deep-link via hash. Usado pelos redirects das antigas grupos.html / terceiros.html
+// e por URLs compartilháveis. Define activeTab/resSub antes do primeiro render.
+function applyHashRoute() {
+  switch ((location.hash || '').replace('#', '')) {
+    case 'classificacao': activeTab = 'resultados'; resSub = 'classificacao'; break;
+    case 'terceiros':     activeTab = 'resultados'; resSub = 'terceiros';     break;
+    case 'jogos':         activeTab = 'resultados'; resSub = 'jogos';         break;
+    case 'simulacao':     activeTab = 'simulacao';                            break;
+    case 'resultados':    activeTab = 'resultados';                           break;
+    // 'palpites' ou vazio → mantém o default (aba Palpites)
+  }
+}
+
+function heroTitle() {
+  switch (activeTab) {
+    case 'simulacao':  return 'Minha simulação';
+    case 'resultados': return 'Resultados';
+    default:           return 'Seus palpites';
+  }
+}
+
+function renderActiveTab(counts) {
+  switch (activeTab) {
+    case 'simulacao':  return renderSimulacaoTab();
+    case 'resultados': return renderResultadosTab(counts);
+    default:           return renderPalpitesTab(counts);
+  }
 }
 
 // ============================================================
@@ -248,14 +287,17 @@ function renderPalpiteRow(m) {
 }
 
 // ============================================================
-// TAB: RESULTADOS (jogos finalizados com pontos)
+// SUB-ABA: JOGOS (placares oficiais finalizados, com seus pontos)
+// Só por grupo — sem "Todos" (a visão geral fica em Classificação).
 // ============================================================
-function renderResultadosTab(counts) {
+function renderJogosOficiais(counts) {
+  // Garante um grupo válido selecionado (Jogos não tem a opção "Todos").
+  if (!GROUPS.includes(activeGroup)) activeGroup = defaultJogosGroup();
+
   return `
     ${renderKpisResultados(counts)}
 
     <div class="chips" id="chips">
-      ${renderChip('all', 'Todos', counts.finishedByGroup.all.done, counts.finishedByGroup.all.total)}
       ${GROUPS.map(g => renderChip(g, 'Grupo ' + g, counts.finishedByGroup[g]?.done ?? 0, counts.finishedByGroup[g]?.total ?? 0)).join('')}
     </div>
 
@@ -263,6 +305,11 @@ function renderResultadosTab(counts) {
       ${renderResultadosList()}
     </div>
   `;
+}
+
+// Primeiro grupo (A..L) com pelo menos 1 jogo finalizado; senão o primeiro grupo.
+function defaultJogosGroup() {
+  return GROUPS.find(g => matches.some(m => m.group_name === g && m.finished)) || GROUPS[0];
 }
 
 function renderKpisResultados(counts) {
@@ -299,15 +346,12 @@ function renderKpisResultados(counts) {
 }
 
 function renderResultadosList() {
-  const finished = matches.filter(m => m.finished);
-  const filtered = activeGroup === 'all'
-    ? finished
-    : finished.filter(m => m.group_name === activeGroup);
+  const filtered = matches.filter(m => m.finished && m.group_name === activeGroup);
 
   if (filtered.length === 0) {
     return `
       <div class="empty">
-        <h3>Nenhum resultado ainda</h3>
+        <h3>Nenhum resultado no Grupo ${activeGroup} ainda</h3>
         <p>Os resultados aparecem aqui conforme o admin lança os placares dos jogos.</p>
         <a class="btn btn-ghost" href="palpites-grupos.html" onclick="document.querySelector('[data-tab=palpites]').click(); return false;">Ver palpites pendentes →</a>
       </div>
@@ -384,6 +428,108 @@ function renderResultRow(m) {
           ${awayGoals.map(g => `<span class="scorer">${escapeHtml(g.players.full_name)} <span class="num">${g.goals}'</span></span>`).join('')}
         </div>
       ` : ''}
+    </div>
+  `;
+}
+
+// ============================================================
+// TAB: MINHA SIMULAÇÃO (tudo projetado a partir dos seus palpites)
+// Sub-abas: Classificação | Melhores 3ºs
+// ============================================================
+function renderSimulacaoTab() {
+  return `
+    ${renderSubNav([['classificacao', 'Classificação'], ['terceiros', 'Melhores 3ºs']], simSub)}
+    ${simSub === 'terceiros'
+      ? renderStandingsThirds('sim')
+      : renderStandingsGroups('sim')}
+  `;
+}
+
+// ============================================================
+// TAB: RESULTADOS (tudo oficial)
+// Sub-abas: Classificação | Melhores 3ºs | Jogos
+// ============================================================
+function renderResultadosTab(counts) {
+  let body;
+  if (resSub === 'terceiros')   body = renderStandingsThirds('real');
+  else if (resSub === 'jogos')  body = renderJogosOficiais(counts);
+  else                          body = renderStandingsGroups('real');
+
+  return `
+    ${renderSubNav(
+      [['classificacao', 'Classificação'], ['terceiros', 'Melhores 3ºs'], ['jogos', 'Jogos']],
+      resSub
+    )}
+    ${body}
+  `;
+}
+
+// Segmented control de sub-abas (estilo .toggle, reaproveitado).
+function renderSubNav(items, activeSub) {
+  return `
+    <div class="toggle subnav" id="subNav" style="margin-bottom:20px; flex-wrap:wrap;">
+      ${items.map(([id, label]) =>
+        `<button class="${id === activeSub ? 'active' : ''}" data-sub="${id}">${escapeHtml(label)}</button>`
+      ).join('')}
+    </div>
+  `;
+}
+
+// ============================================================
+// Vistas de standings (parametrizadas por modo: 'sim' | 'real')
+// Usadas tanto em Minha simulação quanto em Resultados.
+// ============================================================
+function renderStandingsGroups(mode) {
+  const totalFinished = matches.filter(m => m.finished).length;
+  const totalPredicted = matches.filter(m => predsByMatch.has(m.id)).length;
+  const statusLine = mode === 'real'
+    ? `Classificação oficial · ${totalFinished}/72 jogos finalizados`
+    : `Projeção a partir de ${totalPredicted}/72 palpites seus`;
+
+  return `
+    <div class="note" style="margin-bottom:20px; padding:12px 16px; background:var(--card); border-left:3px solid var(--green); border-radius:0 6px 6px 0; font-size:12px; color:var(--text-dim);">
+      <span style="color:#1DB954; font-weight:700;">● Verde</span> = classificado direto (1º e 2º) ·
+      <span style="color:var(--medal-bronze); font-weight:700;">● Bronze</span> = disputa vaga de 3º melhor ·
+      <span style="color:var(--text-mute);">● Cinza</span> = eliminado
+      <br><span style="color:var(--text-mute);">Em cada grupo, <strong style="color:var(--text-dim);">1º e 2º avançam direto</strong>; os <strong style="color:var(--text-dim);">8 melhores 3ºs</strong> também passam (veja <strong style="color:var(--text-dim);">Melhores 3ºs</strong>).</span>
+      <br><span style="color:var(--text-mute);">${statusLine}</span>
+    </div>
+
+    ${renderGroupsGrid(matches, mode, predsByMatch)}
+  `;
+}
+
+function renderStandingsThirds(mode) {
+  const thirds = computeThirds(matches, mode, predsByMatch);
+  const completeCount = countThirdsComplete(thirds);
+  const statusLine = mode === 'real'
+    ? `Oficial · ${completeCount}/12 grupos finalizados`
+    : `Projeção · ${completeCount}/12 grupos palpitados`;
+
+  return `
+    <div class="note" style="margin-bottom:20px; padding:12px 16px; background:var(--card); border-left:3px solid var(--green); border-radius:0 6px 6px 0; font-size:12px; color:var(--text-dim);">
+      <span style="color:#1DB954; font-weight:700;">● Verde</span> = avança aos 32-avos ·
+      <span style="color:var(--text-mute);">● Cinza</span> = eliminado
+      <br><span style="color:var(--text-mute);">8 de 12 passam · Desempate: Pontos → Saldo → Gols pró → Ranking FIFA</span>
+      <br><span style="color:var(--text-mute);">${statusLine}</span>
+    </div>
+
+    ${completeCount === 0
+      ? renderTerceirosEmpty(mode)
+      : `<div class="thirds-wrap">${renderThirdsTable(thirds)}</div>`}
+  `;
+}
+
+function renderTerceirosEmpty(mode) {
+  return `
+    <div class="empty">
+      <h3>${mode === 'real' ? 'Nenhum grupo finalizado' : 'Nenhum grupo palpitado completamente'}</h3>
+      <p>${mode === 'real'
+        ? 'Os 3ºs lugares aparecem aqui conforme cada grupo termina.'
+        : 'Palpite todos os 6 jogos de pelo menos 1 grupo para ver a projeção.'}</p>
+      ${mode === 'sim'
+        ? '<button class="btn btn-green" data-tab="palpites">Ir para palpites</button>'
+        : ''}
     </div>
   `;
 }
@@ -482,15 +628,31 @@ function computeCounts() {
 // Eventos
 // ============================================================
 function attachEventListeners() {
-  // Tab switching
+  // Tab switching (abas + botões que apontam para uma aba, ex. empty-state)
   document.addEventListener('click', (e) => {
-    const tabBtn = e.target.closest('.admin-tab[data-tab]');
+    const tabBtn = e.target.closest('[data-tab]');
     if (tabBtn) {
       const t = tabBtn.dataset.tab;
       if (t !== activeTab) {
         activeTab = t;
         activeGroup = 'all';  // reset filter
         rerenderAll();
+      }
+      return;
+    }
+
+    // Sub-abas (Classificação / 3ºs / Jogos) dentro de Simulação e Resultados
+    const subBtn = e.target.closest('#subNav button[data-sub]');
+    if (subBtn) {
+      const s = subBtn.dataset.sub;
+      if (activeTab === 'simulacao' && s !== simSub) {
+        simSub = s;
+        rerenderTabBody();
+      } else if (activeTab === 'resultados' && s !== resSub) {
+        resSub = s;
+        // Jogos é só por grupo (sem "Todos"); abre num grupo válido.
+        activeGroup = (s === 'jogos') ? defaultJogosGroup() : 'all';
+        rerenderTabBody();
       }
       return;
     }
@@ -582,7 +744,7 @@ function rerenderTabBody() {
   const counts = computeCounts();
   const tabBody = document.getElementById('tabBody');
   if (!tabBody) return;
-  tabBody.innerHTML = activeTab === 'palpites' ? renderPalpitesTab(counts) : renderResultadosTab(counts);
+  tabBody.innerHTML = renderActiveTab(counts);
 }
 
 function updateKpisAndChips() {

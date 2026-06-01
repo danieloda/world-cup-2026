@@ -2,8 +2,8 @@
 /**
  * Fase 4: Asserções no DOM (não só "a página abriu").
  * Loga como admin e compara o que a UI RENDERIZA com o oráculo:
- *   - grupos.html  : ordem dos times por grupo == standings (pts→SG→GF→FIFA)
- *   - terceiros.html: 8 classificados == 8 melhores 3ºs do DB
+ *   - palpites-grupos → Resultados → Classificação: ordem dos times por grupo == standings (pts→SG→GF→FIFA)
+ *   - palpites-grupos → Resultados → Melhores 3ºs : 8 classificados == 8 melhores 3ºs do DB
  *   - ranking.html : ordem + pontos == v_leaderboard
  *   - historico.html: nº de jogos e placar da final corretos
  *   - palpites-mata.html: chaveamento renderiza sem slot cru
@@ -72,9 +72,11 @@ await page.click('#submitBtn');
 await page.waitForURL(/\/inicio(\.html)?$/, { timeout: 15000 });
 await page.waitForSelector('.sidebar, [class*="sidebar"]', { timeout: 15000 });
 
-// ===== A) grupos =====
-console.log(`\n${C.b}grupos.html${C.x}`);
-await page.goto(`${BASE}/grupos.html`);
+// ===== A) classificação (palpites-grupos → Resultados → Classificação) =====
+console.log(`\n${C.b}palpites-grupos → Resultados → Classificação${C.x}`);
+await page.goto(`${BASE}/palpites-grupos.html`);
+await page.waitForSelector('.admin-tabs', { timeout: 15000 });
+await page.click('[data-tab="resultados"]');  // sub-aba default = Classificação (real)
 await page.waitForSelector('.group-card .group-table', { timeout: 15000 });
 const domGroups = await page.$$eval('.group-card', cards => cards.map(c => ({
   letter: (c.querySelector('.group-name')?.textContent||'').replace(/Grupo/i,'').trim(),
@@ -91,9 +93,9 @@ check(`grupos: ordem (pts→SG→GF→FIFA) em ${GROUPS.length} grupos`, groupsB
   groupsBad.length?groupsBad[0]:`${groupsOk}/${GROUPS.length} ok`);
 await shot('grupos');
 
-// ===== D) terceiros =====
-console.log(`\n${C.b}terceiros.html${C.x}`);
-await page.goto(`${BASE}/terceiros.html`);
+// ===== D) melhores 3ºs (mesma página, sub-aba Melhores 3ºs) =====
+console.log(`\n${C.b}palpites-grupos → Resultados → Melhores 3ºs${C.x}`);
+await page.click('#subNav [data-sub="terceiros"]');
 await page.waitForSelector('.thirds-table', { timeout: 15000 });
 const domAdv = await page.$$eval('.thirds-table tbody tr.adv',
   rows => rows.map(r => r.querySelector('.team-name')?.getAttribute('data-team')).filter(Boolean));

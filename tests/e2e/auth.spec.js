@@ -54,14 +54,13 @@ test.describe('Authentication Flow', () => {
 });
 
 test.describe('Protected Routes', () => {
+  // grupos.html / terceiros.html foram fundidas em palpites-grupos.html (agora redirects).
   const protectedPages = [
     '/inicio.html',
     '/palpites-grupos.html',
     '/palpites-mata.html',
     '/campeao-artilheiro.html',
-    '/grupos.html',
     '/ranking.html',
-    '/terceiros.html',
     '/historico.html',
   ];
 
