@@ -36,35 +36,49 @@ const SEVERITY_EMOJI: Record<string, string> = {
   info: 'ℹ️',
 };
 
-const SEVERITY_LABEL: Record<string, string> = {
-  critical: 'CRITICO',
-  warn: 'WARN',
-  info: 'INFO',
-};
-
 // Telegram MarkdownV2 reserved chars that need escaping
 function escapeMd(s: string): string {
   return s.replace(/[_*[\]()~`>#+\-=|{}.!\\]/g, (c) => '\\' + c);
 }
 
+// URL precisa ser válida pra virar link clicável no MarkdownV2.
+function isHttpUrl(s: unknown): s is string {
+  return typeof s === 'string' && /^https?:\/\/[^\s)]+$/.test(s);
+}
+
 function formatMessage(p: AlertPayload): string {
-  const emoji = SEVERITY_EMOJI[p.severity] ?? '•';
-  const label = SEVERITY_LABEL[p.severity] ?? p.severity.toUpperCase();
   const title = escapeMd(p.title);
   const body = escapeMd(p.body);
-  const category = escapeMd(p.category);
+  const ctx = p.context ?? {};
 
-  let msg = `${emoji} *${escapeMd(label)}* \\[${category}\\]\n*${title}*\n\n${body}`;
-
-  if (p.context && Object.keys(p.context).length > 0) {
-    msg += '\n\n*Contexto:*';
-    for (const [k, v] of Object.entries(p.context)) {
-      const vStr = typeof v === 'object' ? JSON.stringify(v) : String(v);
-      msg += `\n• ${escapeMd(k)}: \`${escapeMd(vStr)}\``;
+  // ───────────────────────────────────────────────────────────────
+  // INFO = mensagem AMIGÁVEL, visível pros participantes do bolão.
+  // Sem cabeçalho técnico, sem bloco de contexto (que pode vazar email/id),
+  // sem link de dashboard, sem timestamp ISO. Só título + corpo + CTA opcional.
+  // O CTA vem em context.cta_url / context.cta_label.
+  // ───────────────────────────────────────────────────────────────
+  if (p.severity === 'info') {
+    let msg = `*${title}*\n\n${body}`;
+    if (isHttpUrl(ctx.cta_url)) {
+      const label = typeof ctx.cta_label === 'string' && ctx.cta_label ? ctx.cta_label : 'Abrir';
+      // No (url) do MarkdownV2 só precisamos escapar ')' e '\'.
+      const safeUrl = ctx.cta_url.replace(/[\\)]/g, (c) => '\\' + c);
+      msg += `\n\n[${escapeMd(label)}](${safeUrl})`;
     }
+    return msg;
   }
 
-  // Link pro dashboard
+  // ───────────────────────────────────────────────────────────────
+  // CRITICAL / WARN = alerta de bug/segurança. Como o chat é compartilhado
+  // com os participantes, mantemos enxuto: emoji de urgência + título +
+  // corpo + link de dashboard. SEM "[categoria]", SEM bloco Contexto, SEM
+  // timestamp ISO — tudo isso fica salvo em public.alert_log pra forense.
+  // ───────────────────────────────────────────────────────────────
+  const emoji = SEVERITY_EMOJI[p.severity] ?? '•';
+
+  let msg = `${emoji} *${title}*\n\n${body}`;
+
+  // Link pro dashboard (útil pro admin investigar)
   if (SUPABASE_URL) {
     const projectRef = SUPABASE_URL.match(/https:\/\/([^.]+)/)?.[1];
     if (projectRef) {
@@ -72,8 +86,6 @@ function formatMessage(p: AlertPayload): string {
       msg += `\n\n[Abrir dashboard](${dashUrl})`;
     }
   }
-
-  msg += `\n\n_${escapeMd(new Date().toISOString())}_`;
 
   return msg;
 }

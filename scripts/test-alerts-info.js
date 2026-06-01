@@ -118,23 +118,8 @@ async function testPicksComplete() {
   log('ok', '   ✓ Enviado'); return true;
 }
 
-async function testPickActivityCron() {
-  log('info', '\n📤 [6] cron_alert_pick_activity (execução real)...');
-  if (DRY_RUN) { log('warn', '   DRY-RUN'); return true; }
-  const { data, error } = await supabase.rpc('cron_alert_pick_activity');
-  if (error) { log('fail', `   ✗ ${error.message}`); return false; }
-  log('ok', `   ✓ Cron rodou. Usuários ativos no período: ${data ?? 0}`);
-  return true;
-}
-
-async function testDailyDigestCron() {
-  log('info', '\n📤 [7] cron_alert_daily_digest (execução real)...');
-  if (DRY_RUN) { log('warn', '   DRY-RUN'); return true; }
-  const { error } = await supabase.rpc('cron_alert_daily_digest');
-  if (error) { log('fail', `   ✗ ${error.message}`); return false; }
-  log('ok', '   ✓ Digest disparado');
-  return true;
-}
+// NOTA: cron_alert_pick_activity e cron_alert_daily_digest foram REMOVIDOS na
+// migration 026 (revamp). Os alertas diários agora vivem em scripts/test-alerts-daily.js.
 
 async function main() {
   log('info', `${C.bold}🧪 Teste dos alertas INFO (migration 019)${C.reset}`);
@@ -149,8 +134,6 @@ async function main() {
     { name: 'champion', fn: testChampionChange },
     { name: 'scorer', fn: testScorerChange },
     { name: 'complete', fn: testPicksComplete },
-    { name: 'activity', fn: testPickActivityCron },
-    { name: 'digest', fn: testDailyDigestCron },
   ];
 
   const results = {};
