@@ -6,7 +6,7 @@ import {
   isLocked, isLive, showToast, attachTeamTooltips, loadRecentMatches,
   teamPt, groundShort,
 } from '../util.js';
-import { matchPoints } from '../scoring.js';
+import { matchPoints, scoreBreakdown } from '../scoring.js';
 
 const GP = matchPoints('group'); // { ag:1, ave:4, dg:1, exact:7 }
 
@@ -323,8 +323,22 @@ function renderResultRow(m) {
   const pred = predsByMatch.get(m.id);
   const pts = pred?.points_earned;
   const isExact = pred && pred.pred_home === m.actual_home && pred.pred_away === m.actual_away;
-  const cardClass = isExact ? 'exact' : (pts > 0 ? 'partial' : 'miss');
+  const cardClass = isExact ? 'exact' : pts > 0 ? 'partial' : pred ? 'miss' : 'no-pred';
   const ptsLabel = isExact ? 'Exato!' : pts > 0 ? 'Parcial' : (pred ? 'Errou' : 'Sem palpite');
+
+  // Quebra aditiva do seu palpite (só quando há palpite)
+  let breakRow = '';
+  if (pred) {
+    const { parts } = scoreBreakdown(
+      pred.pred_home, pred.pred_away, pred.pred_pen_winner,
+      m.actual_home, m.actual_away, m.pen_winner, m.stage,
+    );
+    breakRow = `<div class="result-card-break">${
+      parts.length > 0
+        ? parts.map(p => `<span class="brk ${p.key}">${p.label} <b>+${p.pts}</b></span>`).join('')
+        : '<span class="brk miss">não pontuou</span>'
+    }</div>`;
+  }
 
   const goals = goalsByMatch.get(m.id) ?? [];
   const homeGoals = goals.filter(g => g.players.team === m.team_home);
@@ -359,6 +373,8 @@ function renderResultRow(m) {
           <br><span class="stage">Grupo ${m.group_name}</span>
         </div>
       </div>
+
+      ${breakRow}
 
       ${goals.length > 0 ? `
         <div class="result-card-scorers">

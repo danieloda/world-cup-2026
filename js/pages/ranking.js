@@ -5,7 +5,7 @@ import {
   flag, escapeHtml, teamPt, formatBrShort, formatTime, showToast,
   avatarHtml, getInitials,
 } from '../util.js';
-import { championBonus } from '../scoring.js';
+import { championBonus, scoreBreakdown } from '../scoring.js';
 
 // ============================================================
 // Estado
@@ -107,6 +107,8 @@ function renderPage() {
       </div>
     </section>
 
+    <p class="hist-note">Quatro formas de pontuar: <b>Jogos</b> (cada acerto soma — lado, resultado e saldo) · <b>Campeão</b> +${championBonus(true)} · <b>Artilheiro</b> (gols × fase) · <b>Classificados</b> (time na fase certa). <a href="regras.html">Ver regras →</a></p>
+
     ${renderPot(totalPot, split)}
 
     ${leaderboard.length === 0 ? renderEmpty() : renderPodium(totalPot, split)}
@@ -119,12 +121,11 @@ function renderPage() {
             <tr>
               <th class="left col-pos">#</th>
               <th class="left col-player">Jogador</th>
-              <th class="col-stat">Exatos</th>
-              <th class="col-stat">V+SG</th>
-              <th class="col-stat">V</th>
-              <th class="col-stat">1 Lado</th>
+              <th class="col-stat" title="Pontos dos palpites de jogos (soma de lado + resultado + saldo)">Jogos</th>
+              <th class="col-stat" title="Placares cravados">Exatos</th>
               <th class="left col-pick">Campeão</th>
               <th class="left col-pick">Artilheiro</th>
+              <th class="col-stat" title="Bônus por acertar times classificados (BPE/BP)">Classif.</th>
               <th class="col-pts">Pts</th>
             </tr>
           </thead>
@@ -275,12 +276,13 @@ function renderRankRow(u, idx) {
           </div>
         </div>
       </td>
+      <td>${u.match_pts}</td>
       <td>${u.exact_count}</td>
-      <td>${u.winner_sg_count}</td>
-      <td>${u.winner_count}</td>
-      <td>${u.side_count}</td>
       <td class="left pick-col">${champCell}</td>
       <td class="left pick-col">${scorerCell}</td>
+      <td>${(u.qualifier_pts ?? 0) > 0
+            ? `<span class="qual-pts">+${u.qualifier_pts}</span>`
+            : '<span style="color:var(--text-mute);">—</span>'}</td>
       <td class="pts">${u.total_pts}</td>
     </tr>
   `;
@@ -468,13 +470,27 @@ function renderPredRow(p) {
   const pts = p.points_earned ?? 0;
   const isExact = p.pred_home === m.actual_home && p.pred_away === m.actual_away;
   const ptsClass = isExact ? 'win' : pts > 0 ? 'partial' : 'zero';
+
+  // Quebra aditiva: quais partes acertaram (lado / resultado / saldo)
+  const { parts } = scoreBreakdown(
+    p.pred_home, p.pred_away, p.pred_pen_winner,
+    m.actual_home, m.actual_away, m.pen_winner, m.stage,
+  );
+  const breakdown = parts.length > 0
+    ? `<div class="pred-break">${parts.map(part =>
+        `<span class="brk ${part.key}">${part.label} <b>+${part.pts}</b></span>`).join('')}</div>`
+    : `<div class="pred-break"><span class="brk miss">não pontuou</span></div>`;
+
   return `
-    <div class="profile-row">
-      <div class="when">${formatBrShort(new Date(m.match_date))} · ${formatTime(m.match_date)}</div>
-      <div class="vs">${flag(m.team_home)} ${escapeHtml(teamPt(m.team_home))} × ${escapeHtml(teamPt(m.team_away))} ${flag(m.team_away)}</div>
-      <div class="got">Palpitou ${p.pred_home}-${p.pred_away}</div>
-      <div class="real">Real ${m.actual_home}-${m.actual_away}</div>
-      <div class="pts-cell ${ptsClass}">${pts > 0 ? '+' + pts : '0'}</div>
+    <div class="pred-entry">
+      <div class="profile-row">
+        <div class="when">${formatBrShort(new Date(m.match_date))} · ${formatTime(m.match_date)}</div>
+        <div class="vs">${flag(m.team_home)} ${escapeHtml(teamPt(m.team_home))} × ${escapeHtml(teamPt(m.team_away))} ${flag(m.team_away)}</div>
+        <div class="got">Palpitou ${p.pred_home}-${p.pred_away}</div>
+        <div class="real">Real ${m.actual_home}-${m.actual_away}</div>
+        <div class="pts-cell ${ptsClass}">${pts > 0 ? '+' + pts : '0'}</div>
+      </div>
+      ${breakdown}
     </div>
   `;
 }

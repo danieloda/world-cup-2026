@@ -7,7 +7,7 @@ import {
   computeStandings as utilComputeStandings,
 } from '../util.js';
 import { fifaRank } from '../fifa-rank.js';
-import { matchPoints } from '../scoring.js';
+import { matchPoints, scoreBreakdown } from '../scoring.js';
 
 // ============================================================
 // Constantes
@@ -375,8 +375,11 @@ function renderResultBracketMatch(m) {
   if (m.finished) classes.push('finished');
 
   const pointsBadge = m.finished && pred
-    ? renderPointsBadge(pts, stageExact(m.stage))
-    : (m.finished && !pred ? '<div class="bm-pts miss">sem palpite</div>' : '');
+    ? renderPointsBadge(pts, stageExact(m.stage), resultClass)
+    : (m.finished && !pred ? '<div class="bm-pts no-pred">sem palpite</div>' : '');
+
+  // Quebra aditiva (lado / resultado / saldo) — só em jogo finalizado com palpite
+  const breakdown = (m.finished && pred) ? renderBmBreak(m, pred) : '';
 
   return `
     <div class="${classes.join(' ')}" data-match-id="${m.id}">
@@ -402,9 +405,21 @@ function renderResultBracketMatch(m) {
         </div>
       ` : ''}
 
+      ${breakdown}
       ${pointsBadge}
     </div>
   `;
+}
+
+// Quebra aditiva do palpite num card de resultado do bracket
+function renderBmBreak(m, pred) {
+  const { parts } = scoreBreakdown(
+    pred.pred_home, pred.pred_away, pred.pred_pen_winner,
+    m.actual_home, m.actual_away, m.pen_winner, m.stage,
+  );
+  if (parts.length === 0) return '';
+  return `<div class="bm-break">${parts.map(p =>
+    `<span class="brk ${p.key}">${p.label} <b>+${p.pts}</b></span>`).join('')}</div>`;
 }
 
 function renderResultTeamRow(m, side) {
@@ -458,7 +473,8 @@ function formatSlotShort(slot) {
  */
 function renderPointsBadge(pts, max, extraClass = '') {
   if (pts == null) return '';
-  const cls = `bm-pts ${pts > 0 ? 'win' : ''} ${extraClass}`.trim();
+  // extraClass (exact/partial/miss) define a cor; sem ela, cai no 'win' antigo
+  const cls = `bm-pts ${extraClass || (pts > 0 ? 'win' : '')}`.trim();
   if (max) {
     return `<div class="${cls}">
       <span class="formula">+${pts}<small> de ${max}</small></span>

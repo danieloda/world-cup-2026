@@ -5,7 +5,7 @@ import {
   flag, escapeHtml, teamPt, showToast,
   attachTeamTooltips, loadRecentMatches,
 } from '../util.js';
-import { matchPoints } from '../scoring.js';
+import { matchPoints, championBonus } from '../scoring.js';
 
 // ============================================================
 // Estado
@@ -35,7 +35,7 @@ const POS_ORDER = { ATA: 0, MEI: 1, DEF: 2, GOL: 3 };
 // Stage multipliers para o ARTILHEIRO (2 × gols × mult). Mirror de stage_multiplier (003).
 const STAGE_MULT = { group: 1.0, r32: 1.5, r16: 2.0, qf: 3.0, sf: 4.0, third: 2.0, final: 5.0 };
 const STAGE_LABEL = { group: 'Grupos', r32: '32-avos', r16: 'Oitavas', qf: 'Quartas', sf: 'Semis', third: '3º Lugar', final: 'Final' };
-const CHAMPION_BONUS_PTS = 40;        // mirror de champion_bonus_for (022)
+const CHAMPION_BONUS_PTS = championBonus(true);  // canônico (scoring.js → champion_bonus_for 022)
 const GROUP_EXACT = matchPoints('group').exact; // 7 — p/ a comparação "equivale a X exatos"
 
 // ============================================================

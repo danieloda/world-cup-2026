@@ -3,17 +3,19 @@ import { renderShell } from '../sidebar.js';
 import { supabase } from '../supabase.js';
 import {
   flag, escapeHtml, teamPt, formatBrShort, formatTime, stageLabel,
-  attachTeamTooltips, loadRecentMatches, avatarHtml,
+  isLive, avatarHtml,
 } from '../util.js';
 
 // ============================================================
 // Estado
 // ============================================================
 let profile, stats;
-let finishedMatches = [];          // só finished=true, desc por data
+let revealedMatches = [];          // jogos já iniciados (match_date <= now), desc por data
 let predsByMatch = new Map();      // match_id -> [{...prediction, profiles}]
 let goalsByMatch = new Map();      // match_id -> [{...goal, players}]
-let activeFilter = 'all';          // 'all' | 'today' | 'yesterday' | 'week' | 'group' | 'ko'
+let activeStage = 'group';         // ABA 1 (fase): 'group' | 'ko'
+let activeDay = null;              // ABA 2 (dia): 'YYYY-MM-DD' (sempre um dia específico)
+let activeStatus = 'finished';     // FILTRO: 'finished' | 'awaiting'
 
 // ============================================================
 // Main
@@ -30,9 +32,6 @@ try {
   pageBody.classList.add('fade-up');
 
   attachEventListeners();
-
-  const recentByTeam = await loadRecentMatches();
-  attachTeamTooltips(recentByTeam);
 } catch (err) {
   console.error('[historico] FATAL:', err);
   document.body.innerHTML = `
@@ -50,17 +49,19 @@ try {
 async function loadData() {
   const [statsRes, matchesRes] = await Promise.all([
     supabase.from('v_pool_stats').select('*').single(),
-    supabase.from('matches').select('*').eq('finished', true).order('match_date', { ascending: false }),
+    // Um jogo entra no Histórico quando JÁ COMEÇOU (apito inicial): é o momento
+    // em que o RLS revela os palpites alheios (predictions_select_own_or_locked).
+    supabase.from('matches').select('*').lte('match_date', new Date().toISOString())
+      .order('match_date', { ascending: false }),
   ]);
 
   if (matchesRes.error) throw matchesRes.error;
   stats = statsRes.data ?? { finished_matches: 0, total_matches: 104, pct_played: 0, paid_users: 0 };
-  finishedMatches = matchesRes.data ?? [];
+  revealedMatches = matchesRes.data ?? [];
 
-  if (finishedMatches.length === 0) return;
+  if (revealedMatches.length === 0) return;
 
-  // Carrega palpites + gols só dos jogos finalizados
-  const matchIds = finishedMatches.map(m => m.id);
+  const matchIds = revealedMatches.map(m => m.id);
   const [predsRes, goalsRes] = await Promise.all([
     supabase.from('predictions')
       .select('*, profiles(full_name, email, paid, avatar_url)')
@@ -70,9 +71,8 @@ async function loadData() {
       .in('match_id', matchIds),
   ]);
 
-  // Agrupa
   for (const p of (predsRes.data ?? [])) {
-    if (!p.profiles?.paid) continue;  // só palpites de usuários pagos
+    if (!p.profiles?.paid) continue;  // só participantes do bolão (pagos)
     if (!predsByMatch.has(p.match_id)) predsByMatch.set(p.match_id, []);
     predsByMatch.get(p.match_id).push(p);
   }
@@ -83,163 +83,221 @@ async function loadData() {
 }
 
 // ============================================================
-// Filtros
+// Helpers de estado/seleção
 // ============================================================
-function applyFilter(matches, filter) {
-  const now = new Date();
-  const todayStart = new Date(now); todayStart.setHours(0, 0, 0, 0);
-  const yesterdayStart = new Date(todayStart); yesterdayStart.setDate(yesterdayStart.getDate() - 1);
-  const weekAgo = new Date(todayStart); weekAgo.setDate(weekAgo.getDate() - 7);
+// 'finished' → resultado lançado (pontua) · 'awaiting' → já começou, sem resultado
+function matchStatus(m) {
+  return m.finished ? 'finished' : 'awaiting';
+}
+function inStage(m, stage) {
+  return stage === 'group' ? m.stage === 'group' : m.stage !== 'group';
+}
+function dayKey(m) {
+  // Data LOCAL (mesmo fuso da exibição em formatBrShort/formatBrDate), pra que a
+  // aba de dia e a data do card nunca divirjam num jogo perto da meia-noite.
+  const d = new Date(m.match_date);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
 
-  switch (filter) {
-    case 'today':
-      return matches.filter(m => new Date(m.match_date) >= todayStart);
-    case 'yesterday':
-      return matches.filter(m => {
-        const d = new Date(m.match_date);
-        return d >= yesterdayStart && d < todayStart;
-      });
-    case 'week':
-      return matches.filter(m => new Date(m.match_date) >= weekAgo);
-    case 'group':
-      return matches.filter(m => m.stage === 'group');
-    case 'ko':
-      return matches.filter(m => m.stage !== 'group');
-    default:
-      return matches;
+function stageMatches() {
+  return revealedMatches.filter(m => inStage(m, activeStage));
+}
+function dayMatches() {
+  return stageMatches().filter(m => dayKey(m) === activeDay);
+}
+// Garante um dia válido selecionado para a fase ativa (o mais recente por padrão)
+function ensureValidDay() {
+  const days = stageDays();
+  if (!days.some(([k]) => k === activeDay)) activeDay = days.length ? days[0][0] : null;
+}
+// Garante um status com jogos no dia (prefere Finalizadas; senão Próximas partidas)
+function ensureValidStatus() {
+  const scoped = dayMatches();
+  const has = s => scoped.some(m => matchStatus(m) === s);
+  if (!has(activeStatus)) activeStatus = has('finished') ? 'finished' : 'awaiting';
+}
+function visibleMatches() {
+  return dayMatches().filter(m => matchStatus(m) === activeStatus);
+}
+
+// Dias distintos (desc) da fase ativa, com contagem
+function stageDays() {
+  const map = new Map(); // key -> count
+  for (const m of stageMatches()) {
+    map.set(dayKey(m), (map.get(dayKey(m)) ?? 0) + 1);
   }
-}
-
-function getCounts() {
-  return {
-    all: finishedMatches.length,
-    today: applyFilter(finishedMatches, 'today').length,
-    yesterday: applyFilter(finishedMatches, 'yesterday').length,
-    week: applyFilter(finishedMatches, 'week').length,
-    group: applyFilter(finishedMatches, 'group').length,
-    ko: applyFilter(finishedMatches, 'ko').length,
-  };
+  return [...map.entries()].sort((a, b) => b[0].localeCompare(a[0])); // desc por data
 }
 
 // ============================================================
-// Render
+// Render — página
 // ============================================================
 function renderPage() {
-  const counts = getCounts();
-  const totalPaid = stats.paid_users;
+  const awaitingTotal = revealedMatches.filter(m => matchStatus(m) === 'awaiting').length;
 
   return `
     <section class="hero">
-      <div class="hero-kicker">Resultados e palpites de todos</div>
-      <h1 class="hero-title">Histórico</h1>
+      <div class="hero-kicker">Palpites de todos, jogo a jogo</div>
+      <h1 class="hero-title">Resultados</h1>
       <div class="hero-meta">
-        <b>${stats.finished_matches}</b> jogos finalizados<span class="sep"></span>
-        <b>${totalPaid}</b> jogadores<span class="sep"></span>
+        <b>${stats.finished_matches}</b> finalizados<span class="sep"></span>
+        <b>${awaitingTotal}</b> aguardando resultado<span class="sep"></span>
         <b>${stats.pct_played}%</b> da Copa
       </div>
     </section>
 
-    <div class="note" style="margin-bottom:20px; padding:12px 16px; background:var(--card); border-left:3px solid var(--green); border-radius:0 6px 6px 0; font-size:12px; color:var(--text-dim);">
-      <strong style="color:var(--green);">Transparência:</strong>
-      depois que cada jogo termina, você vê aqui o palpite de todos os participantes e quantos pontos cada um fez naquela partida.
-    </div>
+    <p class="hist-note">Os palpites de todos ficam visíveis quando o jogo começa — em <b>Próximas partidas</b> sem pontos, e em <b>Finalizadas</b> já pontuados.</p>
 
-    <div class="chips" id="chips">
-      ${renderChip('all',       'Todos',       counts.all)}
-      ${renderChip('today',     'Hoje',        counts.today)}
-      ${renderChip('yesterday', 'Ontem',       counts.yesterday)}
-      ${renderChip('week',      'Esta semana', counts.week)}
-      ${renderChip('group',     'Grupos',      counts.group)}
-      ${renderChip('ko',        'Mata-mata',   counts.ko)}
-    </div>
+    ${renderStageTabs()}
 
+    <div id="tabBody">
+      ${renderTabBody()}
+    </div>
+  `;
+}
+
+// ----- ABA 1: FASE -----
+function renderStageTabs() {
+  const groupCount = revealedMatches.filter(m => m.stage === 'group').length;
+  const koCount    = revealedMatches.filter(m => m.stage !== 'group').length;
+  return `
+    <div class="admin-tabs" id="stageTabs">
+      <button class="admin-tab ${activeStage === 'group' ? 'active' : ''}" data-stage="group">
+        Grupos <span class="ct">${groupCount}</span>
+      </button>
+      <button class="admin-tab ${activeStage === 'ko' ? 'active' : ''}" data-stage="ko">
+        Mata-mata <span class="ct">${koCount}</span>
+      </button>
+    </div>
+  `;
+}
+
+// ----- ABA 2 (dias) + FILTRO de status + lista -----
+function renderTabBody() {
+  if (stageMatches().length === 0) {
+    return renderEmptyStage();
+  }
+  ensureValidDay();
+  ensureValidStatus();
+  return `
+    ${renderDayTabs()}
+    ${renderStatusChips()}
     <div id="historyList">
       ${renderList()}
     </div>
   `;
 }
 
-function renderChip(value, label, count) {
-  const isActive = activeFilter === value;
+function renderDayTabs() {
+  const days = stageDays();
   return `
-    <button class="chip ${isActive ? 'active' : ''}" data-filter="${value}">
-      ${escapeHtml(label)} <span class="ct">${count}</span>
-    </button>
-  `;
-}
-
-function renderList() {
-  const filtered = applyFilter(finishedMatches, activeFilter);
-
-  if (filtered.length === 0) {
-    return renderEmpty();
-  }
-
-  return `
-    <div class="history-list">
-      ${filtered.map(renderHistoryCard).join('')}
+    <div class="day-tabs" id="dayTabs">
+      ${days.map(([key, count]) => {
+        const d = new Date(key + 'T12:00:00');
+        return `
+          <button class="day-tab ${activeDay === key ? 'active' : ''}" data-day="${key}">
+            ${formatBrShort(d)} <span class="ct">${count}</span>
+          </button>
+        `;
+      }).join('')}
     </div>
   `;
 }
 
-function renderEmpty() {
-  if (finishedMatches.length === 0) {
-    return `
-      <div class="empty">
-        <h3>Nenhum jogo finalizado ainda</h3>
-        <p>O histórico aparece conforme o admin lança os resultados.
-          Volte aqui após o início da Copa pra ver os palpites de todos os jogadores.</p>
-        <a class="btn btn-ghost" href="inicio.html">← Início</a>
-      </div>
-    `;
-  }
+function renderStatusChips() {
+  const scoped = dayMatches();
+  const counts = {
+    finished: scoped.filter(m => matchStatus(m) === 'finished').length,
+    awaiting: scoped.filter(m => matchStatus(m) === 'awaiting').length,
+  };
+  const chip = (value, label, count) => `
+    <button class="chip ${activeStatus === value ? 'active' : ''}" data-status="${value}">
+      ${escapeHtml(label)} <span class="ct">${count}</span>
+    </button>`;
+  return `
+    <div class="chips" id="statusChips">
+      ${chip('finished', 'Finalizadas',       counts.finished)}
+      ${chip('awaiting', 'Próximas partidas', counts.awaiting)}
+    </div>
+  `;
+}
+
+// ----- Lista do dia selecionado -----
+function renderList() {
+  const list = visibleMatches();
+  if (list.length === 0) return renderEmptyFilter();
+  return `<div class="history-list">${list.map(renderMatchCard).join('')}</div>`;
+}
+
+function renderEmptyStage() {
+  const stageName = activeStage === 'group' ? 'fase de grupos' : 'mata-mata';
   return `
     <div class="empty">
-      <h3>Sem jogos nesse filtro</h3>
-      <p>Tente outro período ou veja todos os jogos finalizados.</p>
-      <button class="btn btn-ghost" onclick="document.querySelector('[data-filter=all]').click()">Ver todos</button>
+      <h3>Nenhum jogo do ${stageName} começou ainda</h3>
+      <p>O histórico aparece conforme os jogos começam.</p>
+    </div>
+  `;
+}
+function renderEmptyFilter() {
+  return `
+    <div class="empty">
+      <h3>Nada nesse filtro</h3>
+      <p>Tente outro dia ou status.</p>
     </div>
   `;
 }
 
-function renderHistoryCard(m) {
-  const bets = predsByMatch.get(m.id) ?? [];
+// ============================================================
+// Card de jogo
+// ============================================================
+function renderMatchCard(m) {
+  return matchStatus(m) === 'finished' ? renderFinishedCard(m) : renderAwaitingCard(m);
+}
+
+function matchupHtml(m) {
+  return `
+    <div class="matchup">
+      <span class="flag">${flag(m.team_home)}</span>
+      <span>${escapeHtml(teamPt(m.team_home))}</span>
+      <span style="color:var(--text-mute); font-weight:500;">×</span>
+      <span>${escapeHtml(teamPt(m.team_away))}</span>
+      <span class="flag">${flag(m.team_away)}</span>
+    </div>
+  `;
+}
+
+function stageDisp(m) {
+  return m.stage === 'group' ? `Grupo ${m.group_name}` : stageLabel(m.stage);
+}
+
+// Total de gols de um palpite (chave de ordenação)
+function predGoals(p) {
+  return (p.pred_home ?? 0) + (p.pred_away ?? 0);
+}
+
+// ----- Finalizada: resultado + pontos + gols -----
+function renderFinishedCard(m) {
+  // Ordena: pontos desc → total de gols desc → mandante desc → nome
+  const bets = [...(predsByMatch.get(m.id) ?? [])].sort((a, b) =>
+    (b.points_earned ?? 0) - (a.points_earned ?? 0)
+    || predGoals(b) - predGoals(a)
+    || (b.pred_home ?? 0) - (a.pred_home ?? 0)
+    || (a.profiles?.full_name || '').localeCompare(b.profiles?.full_name || '')
+  );
   const goals = goalsByMatch.get(m.id) ?? [];
-
-  // Sort bets: pts desc, then nome
-  const sortedBets = [...bets].sort((a, b) => {
-    const pa = a.points_earned ?? 0;
-    const pb = b.points_earned ?? 0;
-    if (pb !== pa) return pb - pa;
-    return (a.profiles?.full_name || '').localeCompare(b.profiles?.full_name || '');
-  });
-
-  const stageDisp = m.stage === 'group' ? `Grupo ${m.group_name}` : stageLabel(m.stage);
-  const penInfo = m.pen_winner ? `<small>pen: ${m.pen_winner === 'home' ? teamPt(m.team_home) : teamPt(m.team_away)}</small>` : '';
+  const penInfo = m.pen_winner
+    ? `<small>pen: ${m.pen_winner === 'home' ? teamPt(m.team_home) : teamPt(m.team_away)}</small>` : '';
 
   return `
     <div class="history-card ${m.stage}">
       <div class="history-head">
-        <div class="date">${formatBrShort(new Date(m.match_date))} · ${formatTime(m.match_date)}</div>
-        <div class="matchup">
-          <span class="flag">${flag(m.team_home)}</span>
-          <span class="team-name" data-team="${escapeHtml(m.team_home)}">${escapeHtml(teamPt(m.team_home))}</span>
-          <span style="color:var(--text-mute); font-weight:500;">×</span>
-          <span class="team-name" data-team="${escapeHtml(m.team_away)}">${escapeHtml(teamPt(m.team_away))}</span>
-          <span class="flag">${flag(m.team_away)}</span>
-        </div>
-        <div class="score">
-          ${m.actual_home} — ${m.actual_away}
-          ${penInfo}
-        </div>
-        <div class="stage">${stageDisp}</div>
+        <div class="date">${formatTime(m.match_date)}</div>
+        ${matchupHtml(m)}
+        <div class="score">${m.actual_home} — ${m.actual_away}${penInfo}</div>
+        <div class="stage">${stageDisp(m)}</div>
       </div>
 
-      ${sortedBets.length > 0 ? `
-        <div class="history-bets">
-          ${sortedBets.map(b => renderBetCell(b, m)).join('')}
-        </div>
-      ` : '<div style="padding-top:12px; border-top:1px solid var(--line); font-size:12px; color:var(--text-mute); font-style:italic;">Nenhum palpite registrado pra este jogo.</div>'}
+      ${renderBetsList(m, bets, true)}
 
       ${goals.length > 0 ? `
         <div class="history-scorers">
@@ -251,23 +309,69 @@ function renderHistoryCard(m) {
   `;
 }
 
-function renderBetCell(bet, m) {
-  const pts = bet.points_earned ?? 0;
-  const isMe = bet.user_id === profile.id;
-  const isExact = bet.pred_home === m.actual_home && bet.pred_away === m.actual_away;
-  const ptsClass = isExact ? 'exact' : pts > 0 ? 'partial' : 'zero';
-  const cellClass = isExact ? 'win-exact' : pts > 0 ? 'win-partial' : '';
-  const cls = ['hb-cell', cellClass, isMe ? 'me' : ''].filter(Boolean).join(' ');
-  const displayName = isMe ? 'Você' : (bet.profiles?.full_name || '?').split(' ')[0];
+// ----- Próxima partida (aguardando): palpites de todos, SEM pontos -----
+function renderAwaitingCard(m) {
+  const live = isLive(m);
+  // Ordena por total de gols desc → mandante desc → nome ("Você" fica destacado pelo estilo)
+  const bets = [...(predsByMatch.get(m.id) ?? [])].sort((a, b) =>
+    predGoals(b) - predGoals(a)
+    || (b.pred_home ?? 0) - (a.pred_home ?? 0)
+    || (a.profiles?.full_name || '').localeCompare(b.profiles?.full_name || '')
+  );
 
   return `
-    <div class="${cls}">
-      <div class="av-mini">${avatarHtml(bet.profiles)}</div>
-      <div class="nm">${escapeHtml(displayName)}</div>
-      <div class="pred-and-pts">
-        <span class="pred">${bet.pred_home}-${bet.pred_away}</span>
-        <span class="pts ${ptsClass}">${pts > 0 ? '+' + pts : '0'}</span>
+    <div class="history-card ${m.stage} awaiting">
+      <div class="history-head">
+        <div class="date">${formatTime(m.match_date)}</div>
+        ${matchupHtml(m)}
+        <div class="status-cell">
+          <span class="pill ${live ? 'live' : 'locked'}">${live ? 'Ao vivo' : 'Aguardando resultado'}</span>
+        </div>
+        <div class="stage">${stageDisp(m)}</div>
       </div>
+
+      ${renderBetsList(m, bets, false)}
+    </div>
+  `;
+}
+
+// ----- Lista vertical de palpites -----
+function renderBetsList(m, bets, finished) {
+  if (bets.length === 0) {
+    return `<div class="history-bets-empty">Nenhum palpite registrado pra este jogo.</div>`;
+  }
+  return `
+    <div class="history-bets">
+      ${bets.map(b => renderBetRow(b, m, finished)).join('')}
+    </div>
+  `;
+}
+
+function renderBetRow(bet, m, finished) {
+  const isMe = bet.user_id === profile.id;
+  const name = isMe ? 'Você' : (bet.profiles?.full_name || '?');
+
+  if (!finished) {
+    return `
+      <div class="hb-row ${isMe ? 'me' : ''}">
+        <div class="av-mini">${avatarHtml(bet.profiles)}</div>
+        <div class="nm">${escapeHtml(name)}</div>
+        <span class="pred">${bet.pred_home}<span class="x">–</span>${bet.pred_away}</span>
+      </div>
+    `;
+  }
+
+  const pts = bet.points_earned ?? 0;
+  const isExact = bet.pred_home === m.actual_home && bet.pred_away === m.actual_away;
+  const rowClass = isExact ? 'win-exact' : pts > 0 ? 'win-partial' : 'miss';
+  const ptsClass = isExact ? 'exact' : pts > 0 ? 'partial' : 'zero';
+
+  return `
+    <div class="hb-row ${rowClass} ${isMe ? 'me' : ''}">
+      <div class="av-mini">${avatarHtml(bet.profiles)}</div>
+      <div class="nm">${escapeHtml(name)}</div>
+      <span class="pred">${bet.pred_home}<span class="x">–</span>${bet.pred_away}</span>
+      <span class="pts ${ptsClass}" title="${isExact ? 'Placar exato' : pts > 0 ? 'Acerto parcial' : 'Errou'}">${pts > 0 ? '+' + pts : '0'}</span>
     </div>
   `;
 }
@@ -277,14 +381,42 @@ function renderBetCell(bet, m) {
 // ============================================================
 function attachEventListeners() {
   document.addEventListener('click', (e) => {
-    const chip = e.target.closest('.chip[data-filter]');
-    if (!chip) return;
-    const f = chip.dataset.filter;
-    if (f === activeFilter) return;
-    activeFilter = f;
-    // Re-render chips e lista
-    document.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c.dataset.filter === f));
-    document.getElementById('historyList').innerHTML = renderList();
+    // ABA 1: fase
+    const tab = e.target.closest('.admin-tab[data-stage]');
+    if (tab) {
+      if (tab.dataset.stage !== activeStage) {
+        activeStage = tab.dataset.stage;
+        activeDay = null;          // renderTabBody → ensureValidDay seleciona o dia mais recente
+        activeStatus = 'finished'; // renderTabBody → ensureValidStatus ajusta se o dia não tiver finalizadas
+        document.querySelectorAll('#stageTabs .admin-tab').forEach(t =>
+          t.classList.toggle('active', t.dataset.stage === activeStage));
+        document.getElementById('tabBody').innerHTML = renderTabBody();
+      }
+      return;
+    }
+    // ABA 2: dia
+    const dayTab = e.target.closest('.day-tab[data-day]');
+    if (dayTab) {
+      if (dayTab.dataset.day !== activeDay) {
+        activeDay = dayTab.dataset.day;
+        ensureValidStatus();  // mantém o status atual se houver jogos; senão troca
+        document.querySelectorAll('#dayTabs .day-tab').forEach(t =>
+          t.classList.toggle('active', t.dataset.day === activeDay));
+        // recontagem do status dentro do dia + lista
+        document.getElementById('statusChips').outerHTML = renderStatusChips();
+        document.getElementById('historyList').innerHTML = renderList();
+      }
+      return;
+    }
+    // FILTRO: status
+    const chip = e.target.closest('[data-status]');
+    if (chip) {
+      if (chip.dataset.status === activeStatus) return;
+      activeStatus = chip.dataset.status;
+      document.querySelectorAll('#statusChips .chip').forEach(c =>
+        c.classList.toggle('active', c.dataset.status === activeStatus));
+      document.getElementById('historyList').innerHTML = renderList();
+      return;
+    }
   });
 }
-

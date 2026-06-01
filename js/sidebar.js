@@ -18,7 +18,7 @@ const NAV_SECTIONS = [
     items: [
       { id: 'grupos',     href: 'grupos.html',     label: 'Grupos & Classificação', icon: iconGrid },
       { id: 'terceiros',  href: 'terceiros.html',  label: '3ºs Lugares',            icon: iconPodium },
-      { id: 'historico',  href: 'historico.html',  label: 'Histórico',              icon: iconClock },
+      { id: 'historico',  href: 'historico.html',  label: 'Resultados',             icon: iconClock },
       { id: 'ranking',    href: 'ranking.html',    label: 'Ranking',                icon: iconChart },
     ],
   },

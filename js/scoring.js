@@ -90,6 +90,28 @@ export function scorePrediction(predHome, predAway, predPen, actualHome, actualA
 }
 
 /**
+ * Decompõe a pontuação aditiva de um palpite nas partes que acertaram.
+ * Útil pra explicar de onde vieram os pontos (lado / resultado / saldo).
+ * @returns {{ parts: {key:string,label:string,pts:number}[], pts:number }}
+ */
+export function scoreBreakdown(predHome, predAway, predPen, actualHome, actualAway, actualPen, stage) {
+  if (predHome == null || predAway == null || actualHome == null || actualAway == null) {
+    return { parts: [], pts: 0 };
+  }
+  const { ag, ave, dg } = matchPoints(stage);
+  const parts = [];
+  if (predHome === actualHome) parts.push({ key: 'side', label: 'Gols mandante', pts: ag });
+  if (predAway === actualAway) parts.push({ key: 'side', label: 'Gols visitante', pts: ag });
+  if (determineWinner(predHome, predAway, predPen, stage) === determineWinner(actualHome, actualAway, actualPen, stage)) {
+    parts.push({ key: 'winner', label: 'Resultado', pts: ave });
+  }
+  if ((predHome - predAway) === (actualHome - actualAway)) {
+    parts.push({ key: 'diff', label: 'Saldo', pts: dg });
+  }
+  return { parts, pts: parts.reduce((s, p) => s + p.pts, 0) };
+}
+
+/**
  * Determine winner from score.
  * @returns {string} 'h', 'a', 'd', or the pen value for knockout draws
  */
