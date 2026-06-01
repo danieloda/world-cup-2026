@@ -380,7 +380,10 @@ let _recentCache = null;
 export async function loadRecentMatches() {
   if (_recentCache) return _recentCache;
   try {
-    const res = await fetch('assets/data/recent.json');
+    // 'no-cache' = ainda usa o cache do navegador, mas SEMPRE revalida via etag
+    // (304 barato se nada mudou). Garante que, após a action atualizar o
+    // recent.json, o usuário pega o dado novo no próximo load — sem hard-refresh.
+    const res = await fetch('assets/data/recent.json', { cache: 'no-cache' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const raw = await res.json();
     const map = new Map();
