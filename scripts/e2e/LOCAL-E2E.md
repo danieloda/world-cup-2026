@@ -73,13 +73,22 @@ docker exec -i $CID psql -U postgres -d postgres < scripts/e2e/scenarios/tiebrea
 
 # Locks por horário + segurança:
 node scripts/e2e/test-date-locks.js
+node scripts/e2e/test-deadline-boundary.js  # trava véspera 23h59 BRT: INSERT/UPDATE palpite+campeão+artilheiro (14 checks)
 node scripts/e2e/test-rls-hostile.js
 node scripts/e2e/test-signup-flow.js        # exige enable_confirmations=true (já no config.toml)
 node scripts/e2e/test-avatar-upload.js
 
+# Cenários SQL determinísticos (transação c/ rollback — rode via psql no container):
+CID=supabase_db_world-cup-2026
+docker cp scripts/e2e/scenarios/scoring-sql.sql $CID:/tmp/ && docker exec $CID psql -U postgres -d postgres -f /tmp/scoring-sql.sql
+#   ^ score_prediction (DB) vs canônico ag/ave/dg por fase + pênaltis (47 checks)
+docker cp scripts/e2e/scenarios/tiebreak.sql $CID:/tmp/ && docker exec $CID psql -U postgres -d postgres -f /tmp/tiebreak.sql
+docker cp scripts/e2e/scenarios/qualifier-bonus.sql $CID:/tmp/ && docker exec $CID psql -U postgres -d postgres -f /tmp/qualifier-bonus.sql
+
 # Cobertura estendida (cada um faz snapshot/restore do que mexe):
 node scripts/e2e/test-storage-and-validation.js   # RLS de avatar Storage + validação de placar
 node scripts/e2e/test-admin-ui-penalty.js         # campeão via pênaltis (UI) + clear/update-result
+node scripts/e2e/test-admin-validation.js         # save bloqueia: KO empate s/ pênalti + marcadores≠placar (5 checks)
 node scripts/e2e/test-fifa-tie-dom.js             # empate total no Grupo A → ordem FIFA no DOM
 node scripts/e2e/test-odds.js                     # match_odds: RLS + badge no DOM
 node scripts/e2e/test-concurrency-alerts.js       # writes paralelos (UNIQUE) + send_alert→alert_log

@@ -51,14 +51,14 @@ await page.click('#submitBtn'); await page.waitForURL(/\/inicio(\.html)?$/, {tim
 
 console.log(`${C.b}${C.bold}🏆 #1 Campeão via pênaltis (via UI do admin)${C.x}`);
 const bonusBefore = await champBonus(capeVerdePickers[0]);
-check('baseline: picker de Cape Verde tem bônus 50 (3-1 regulamentar)', bonusBefore===50, `bonus=${bonusBefore}`);
+check('baseline: picker de Cape Verde tem bônus 40 (3-1 regulamentar)', bonusBefore===40, `bonus=${bonusBefore}`);
 
 // (a) 2-2 pen=home → Cape Verde campeão VIA PÊNALTIS
 await updateFinalViaUI(page, 2, 2, 'home');
 const finA = (await admin.from('matches').select('actual_home,actual_away,pen_winner').eq('id',104).single()).data;
 const bonusA = await champBonus(capeVerdePickers[0]);
 check('final 2-2 pen=home gravada via UI', finA.actual_home===2 && finA.pen_winner==='home', JSON.stringify(finA));
-check('Cape Verde segue campeão via pênaltis → bônus 50', bonusA===50, `bonus=${bonusA}`);
+check('Cape Verde segue campeão via pênaltis → bônus 40', bonusA===40, `bonus=${bonusA}`);
 
 // (b) 2-2 pen=away → Egypt campeão; Cape Verde pickers caem a 0
 await updateFinalViaUI(page, 2, 2, 'away');
@@ -69,7 +69,7 @@ check('pen=away → Egypt campeão, pickers de Cape Verde caem a 0', bonusB===0,
 await updateFinalViaUI(page, 3, 1, null);
 const finC = (await admin.from('matches').select('actual_home,actual_away,pen_winner').eq('id',104).single()).data;
 const bonusC = await champBonus(capeVerdePickers[0]);
-check('restaurado 3-1; Cape Verde campeão; bônus 50', finC.actual_home===3 && finC.pen_winner===null && bonusC===50, `bonus=${bonusC}`);
+check('restaurado 3-1; Cape Verde campeão; bônus 40', finC.actual_home===3 && finC.pen_winner===null && bonusC===40, `bonus=${bonusC}`);
 
 console.log(`\n${C.b}${C.bold}🧹 #7 clear-result + re-lançar (via UI, M#50)${C.x}`);
 // NOTA: admin.js:474 limita a aba "lançados" aos 60 jogos mais recentes (slice(0,60)).
