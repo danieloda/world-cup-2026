@@ -9,7 +9,7 @@ import { matchPoints, championBonus, scorerBonus, qualifierBonus } from '../scor
 // canônico, espelho das migrations). Assim a página nunca diverge da engine.
 // ============================================================
 
-let profile, stats;
+let profile, stats, settings;
 
 // Fases na ordem do torneio.
 const STAGES = [
@@ -32,8 +32,16 @@ try {
   if (!auth) throw new Error('not authed');
   profile = auth.profile;
 
-  const { data } = await supabase.from('v_pool_stats').select('*').single();
-  stats = data ?? { finished_matches: 0, total_matches: 104, pct_played: 0, paid_users: 0 };
+  const [statsRes, settingsRes] = await Promise.all([
+    supabase.from('v_pool_stats').select('*').single(),
+    supabase.from('settings').select('key, value'),
+  ]);
+  stats = statsRes.data ?? { finished_matches: 0, total_matches: 104, pct_played: 0, paid_users: 0 };
+  // Mesma ideia do resto da página: os números (taxa, divisão de prêmios) vêm da
+  // fonte canônica — aqui, a tabela settings, espelho do que o Admin configura.
+  settings = Object.fromEntries(
+    (settingsRes.data ?? []).map(r => [r.key, typeof r.value === 'string' ? tryParse(r.value) : r.value])
+  );
 
   const pageBody = await renderShell({ active: 'regras', profile, stats });
   pageBody.innerHTML = renderPage();
@@ -68,6 +76,7 @@ function renderPage() {
     <nav class="rules-toc">
       ${[
         ['como-funciona', 'Como funciona'],
+        ['premiacao', 'Premiação'],
         ['pontos-jogo', 'Pontos por jogo'],
         ['fases', 'Quanto cada fase vale'],
         ['vaga', 'Regra da vaga'],
@@ -81,6 +90,7 @@ function renderPage() {
     </nav>
 
     ${renderComoFunciona()}
+    ${renderPremiacao()}
     ${renderPontosJogo()}
     ${renderFases()}
     ${renderVaga()}
@@ -101,13 +111,14 @@ function renderPage() {
 function renderComoFunciona() {
   return section('como-funciona', '1', 'Como funciona', `
     <p class="rules-p">
-      Você ganha pontos de <strong>três formas</strong>, e elas se somam no seu total.
+      Você ganha pontos de <strong>quatro formas</strong>, e elas se somam no seu total.
       Vence o bolão quem tiver mais pontos no fim da Copa.
     </p>
     <div class="rules-cards3">
       ${miniCard('⚽', 'Palpites de placar', 'Você dá o placar de cada um dos 104 jogos. Cada parte que você acerta já vale pontos.')}
       ${miniCard('🏆', 'Bônus de Campeão', `Você escolhe quem leva a taça. Se acertar: <strong>+${championBonus(true)} pontos</strong> de uma vez.`)}
       ${miniCard('🥇', 'Bônus de Artilheiro', 'Você escolhe 1 jogador. Cada gol dele soma pontos extras.')}
+      ${miniCard('🎟️', 'Bônus de classificado', 'A cada fase do mata-mata, você ganha pontos por acertar quais seleções avançam.')}
     </div>
     <div class="rules-tip">
       💡 Você não precisa entender de conta: é só dar o placar dos jogos. O sistema soma os pontos
@@ -116,7 +127,56 @@ function renderComoFunciona() {
   `);
 }
 
-// ---- 2) Pontos por jogo (modelo aditivo) ----
+// ---- 2) Premiação ----
+function renderPremiacao() {
+  const fee   = settings?.fee_amount ?? 100;
+  const split = settings?.prize_split || { first: 70, second: 20, third: 10 };
+  const paid  = stats?.paid_users ?? 0;
+  const pot   = paid * fee;
+
+  const prizeRow = (place, pct, medal) => `
+    <div class="rules-tier">
+      <div class="rules-tier-pts">
+        <span class="ico">${medal}</span>
+        <span class="pts">${pct}%</span>
+      </div>
+      <div class="rules-tier-body">
+        <div class="rules-tier-name">${place} lugar${pot > 0 ? ` — ${formatBRL(Math.round(pot * pct / 100))}` : ''}</div>
+        <div class="rules-tier-desc">${pct}% de todo o dinheiro arrecadado no bolão.</div>
+      </div>
+    </div>`;
+
+  return section('premiacao', '2', 'Premiação', `
+    <p class="rules-p">
+      O bolão é <strong>pago</strong>: cada participante entra com uma <strong>taxa de inscrição</strong> e
+      todo esse dinheiro forma um <strong>caixa único</strong>, que vai inteiro para os primeiros colocados.
+      A organização não fica com nada — <strong>tudo é distribuído entre os jogadores</strong>.
+    </p>
+    <div class="rules-bignum">
+      <span class="n">${formatBRL(fee)}</span>
+      <span class="l">taxa de inscrição por jogador</span>
+    </div>
+    <p class="rules-p">
+      O <strong>bolso total</strong> é simplesmente a taxa multiplicada por quantos jogadores pagaram —
+      então quanto mais gente entra, maior o prêmio. ${pot > 0
+        ? `Hoje, com <strong>${paid}</strong> ${paid === 1 ? 'pagante' : 'pagantes'}, o caixa está em <strong>${formatBRL(pot)}</strong>.`
+        : `O valor atualizado aparece sempre no topo da tela de <a href="ranking.html">Ranking</a>.`}
+    </p>
+    <p class="rules-p">Esse bolso é dividido assim entre o <strong>pódio final do bolão</strong>:</p>
+    <div class="rules-tiers">
+      ${prizeRow('1º', split.first, '🥇')}
+      ${prizeRow('2º', split.second, '🥈')}
+      ${prizeRow('3º', split.third, '🥉')}
+    </div>
+    <div class="rules-tip">
+      💡 Só entra na disputa do prêmio quem <strong>pagou a inscrição</strong> e teve o pagamento confirmado
+      pela organização. Combine a forma de pagamento com quem organiza o bolão; o acompanhamento ao vivo de
+      quanto cada posição vai levar fica na página de <a href="ranking.html">Ranking</a>.
+    </div>
+  `);
+}
+
+// ---- 3) Pontos por jogo (modelo aditivo) ----
 function renderPontosJogo() {
   const rows = [
     { icon: '🥅', pts: GP.ag,  name: 'Acertou os gols de um time',
@@ -138,7 +198,7 @@ function renderPontosJogo() {
     </div>
   `).join('');
 
-  return section('pontos-jogo', '2', 'Pontos por jogo', `
+  return section('pontos-jogo', '3', 'Pontos por jogo', `
     <p class="rules-p">
       Em cada jogo, <strong>cada acerto soma</strong> — você não precisa cravar o placar para pontuar.
       Estes são os valores na <strong>fase de grupos</strong> (nas fases seguintes valem mais):
@@ -156,7 +216,7 @@ function renderPontosJogo() {
   `);
 }
 
-// ---- 3) Quanto cada fase vale ----
+// ---- 4) Quanto cada fase vale ----
 function renderFases() {
   const head = STAGES.map(s => `<th>${s.short}</th>`).join('');
   const row = (label, pick, hl) => `
@@ -168,7 +228,7 @@ function renderFases() {
       }).join('')}
     </tr>`;
 
-  return section('fases', '3', 'Quanto cada fase vale', `
+  return section('fases', '4', 'Quanto cada fase vale', `
     <p class="rules-p">
       Quanto mais decisivo o jogo, <strong>mais pontos ele vale</strong>. Um placar exato na
       <strong>final</strong> vale <strong>${matchPoints('final').exact}</strong> pontos — contra
@@ -195,9 +255,9 @@ function renderFases() {
   `);
 }
 
-// ---- 4) Regra da vaga ----
+// ---- 5) Regra da vaga ----
 function renderVaga() {
-  return section('vaga', '4', 'Regra da vaga (mata-mata)', `
+  return section('vaga', '5', 'Regra da vaga (mata-mata)', `
     <p class="rules-p">
       No mata-mata você não aposta numa seleção específica — você dá o <strong>placar de uma vaga do
       chaveamento</strong> (por exemplo: "1º do Grupo A × 2º do Grupo B"). Seu palpite de gols vale para
@@ -222,9 +282,9 @@ function renderVaga() {
   `);
 }
 
-// ---- 5) Pênaltis ----
+// ---- 6) Pênaltis ----
 function renderPenaltis() {
-  return section('penaltis', '5', 'Empate no mata-mata', `
+  return section('penaltis', '6', 'Empate no mata-mata', `
     <p class="rules-p">
       Se você acha que um jogo de mata-mata vai terminar <strong>empatado</strong>, escolha também
       <strong>quem passa nos pênaltis</strong>. Essa escolha define o "vencedor" do seu palpite.
@@ -237,9 +297,9 @@ function renderPenaltis() {
   `);
 }
 
-// ---- 6) Campeão ----
+// ---- 7) Campeão ----
 function renderCampeao() {
-  return section('campeao', '6', 'Bônus de Campeão', `
+  return section('campeao', '7', 'Bônus de Campeão', `
     <p class="rules-p">
       Antes da Copa começar, você escolhe a seleção que acha que vai <strong>levantar a taça</strong>.
       Se acertar o campeão, ganha <strong>+${championBonus(true)} pontos</strong> de bônus.
@@ -255,7 +315,7 @@ function renderCampeao() {
   `);
 }
 
-// ---- 7) Artilheiro ----
+// ---- 8) Artilheiro ----
 function renderArtilheiro() {
   const cells = STAGES.map(s => `
     <div class="rules-scorer-col">
@@ -265,7 +325,7 @@ function renderArtilheiro() {
     </div>
   `).join('');
 
-  return section('artilheiro', '7', 'Bônus de Artilheiro', `
+  return section('artilheiro', '8', 'Bônus de Artilheiro', `
     <p class="rules-p">
       Você escolhe <strong>1 jogador</strong> antes da Copa. Cada gol que ele marcar soma pontos —
       e gols nas fases finais valem mais (<strong>+${scorerBonus(1, 'group')} por gol</strong> nos grupos,
@@ -278,7 +338,7 @@ function renderArtilheiro() {
   `);
 }
 
-// ---- 8) Classificado (BPE/BP) ----
+// ---- 9) Classificado (BPE/BP) ----
 function renderClassificado() {
   const PH = [
     { id: 'r32',   label: '32-avos' },
@@ -295,7 +355,7 @@ function renderClassificado() {
     return `<td>${v === 0 ? '—' : '+' + v}</td>`;
   }).join('');
 
-  return section('classificado', '8', 'Bônus de seleção classificada', `
+  return section('classificado', '9', 'Bônus de seleção classificada', `
     <p class="rules-p">
       Além do placar, você ganha pontos por <strong>acertar qual seleção chega a cada fase do mata-mata</strong>
       — com base em quem os <em>seus palpites</em> fazem avançar. São dois casos:
@@ -323,9 +383,9 @@ function renderClassificado() {
   `);
 }
 
-// ---- 9) Desempate ----
+// ---- 10) Desempate ----
 function renderDesempate() {
-  return section('desempate', '9', 'Critérios de desempate', `
+  return section('desempate', '10', 'Critérios de desempate', `
     <div class="rules-two">
       <div class="rules-half">
         <div class="rules-half-title">Classificação dos grupos</div>
@@ -350,9 +410,9 @@ function renderDesempate() {
   `);
 }
 
-// ---- 10) Prazos ----
+// ---- 11) Prazos ----
 function renderPrazos() {
-  return section('prazos', '10', 'Prazos — até quando dá para palpitar', `
+  return section('prazos', '11', 'Prazos — até quando dá para palpitar', `
     <div class="rules-tip" style="border-left-color: var(--red); margin-top:0; margin-bottom:16px;">
       ⏰ <strong style="color:var(--text);">A regra mais importante:</strong> cada palpite de placar
       <strong style="color:var(--text);">fecha às 23h59 (horário de Brasília) da véspera do jogo</strong> —
@@ -381,6 +441,12 @@ function section(id, num, title, body) {
       <div class="rules-section-body">${body}</div>
     </section>
   `;
+}
+
+function tryParse(s) { try { return JSON.parse(s); } catch { return s; } }
+
+function formatBRL(value) {
+  return `R$ ${Number(value).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 }
 
 function miniCard(icon, title, text) {
