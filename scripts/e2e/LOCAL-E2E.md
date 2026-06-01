@@ -74,9 +74,15 @@ docker exec -i $CID psql -U postgres -d postgres < scripts/e2e/scenarios/tiebrea
 # Locks por horário + segurança:
 node scripts/e2e/test-date-locks.js
 node scripts/e2e/test-deadline-boundary.js  # trava véspera 23h59 BRT: INSERT/UPDATE palpite+campeão+artilheiro (14 checks)
+node scripts/e2e/test-deadline-parity.js    # paridade do prazo: js/util.js ↔ SQL prediction_deadline() em 104 jogos + bordas (read-only)
 node scripts/e2e/test-rls-hostile.js
 node scripts/e2e/test-signup-flow.js        # exige enable_confirmations=true (já no config.toml)
 node scripts/e2e/test-avatar-upload.js
+
+# Estados temporais + UI + re-scoring (snapshot/restore; DESLIGAM alert triggers durante a mutação):
+node scripts/e2e/test-temporal-states.js    # pré-torneio (vazio/aberto/TBD) + parcial (grupos done, KO TBD) no DOM (13 checks)
+node scripts/e2e/test-ui-pages.js           # inicio (KPIs) + campeão/artilheiro ABERTO×TRAVADO (write via UI) + recent.json (15 checks)
+node scripts/e2e/test-rescore-on-edit.js    # editar placar de grupo recomputa pontos+leaderboard; editar venc. de KO re-resolve slot (7 checks)
 
 # Cenários SQL determinísticos (transação c/ rollback — rode via psql no container):
 CID=supabase_db_world-cup-2026
