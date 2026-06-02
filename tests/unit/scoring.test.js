@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { matchPoints, scorePrediction, championBonus, scorerBonus, stageMultiplier } from '../../js/scoring.js';
+import { matchPoints, scorePrediction, scoreBreakdown, championBonus, scorerBonus, stageMultiplier } from '../../js/scoring.js';
 
 // Modelo ADITIVO (022_additive_scoring.sql): cada acerto SOMA.
 //   +ag por LADO certo · +ave vencedor/empate · +dg saldo de gols.
@@ -146,5 +146,69 @@ describe('equilíbrio: emoção no fim', () => {
     expect(ex('sf')).toBeGreaterThan(ex('qf'));
     expect(ex('qf')).toBeGreaterThan(ex('r16'));
     expect(ex('r16')).toBeGreaterThan(ex('r32'));
+  });
+});
+
+// scoreBreakdown decompõe a pontuação aditiva nas partes que acertaram.
+// É o que alimenta os popovers de "de onde vieram os pontos" no histórico
+// (Palpites da galera) e o drill-down do ranking.
+describe('scoreBreakdown — decomposição aditiva', () => {
+  const labels = (b) => b.parts.map(p => p.label);
+  const keys = (b) => b.parts.map(p => p.key);
+
+  it('palpite/resultado nulo → sem partes, 0 pts', () => {
+    expect(scoreBreakdown(null, null, null, 2, 1, null, 'group')).toEqual({ parts: [], pts: 0 });
+    expect(scoreBreakdown(2, 1, null, null, null, null, 'group')).toEqual({ parts: [], pts: 0 });
+  });
+
+  it('placar exato (grupo 2-1) → lados + resultado + saldo, soma 7', () => {
+    const b = scoreBreakdown(2, 1, null, 2, 1, null, 'group');
+    expect(labels(b)).toEqual(['Gols mandante', 'Gols visitante', 'Resultado', 'Saldo']);
+    expect(keys(b)).toEqual(['side', 'side', 'winner', 'diff']);
+    expect(b.parts.map(p => p.pts)).toEqual([1, 1, 4, 1]);
+    expect(b.pts).toBe(7);
+  });
+
+  it('vencedor + saldo sem lado (grupo 3-1 vs 2-0) → [Resultado, Saldo] = 5', () => {
+    const b = scoreBreakdown(3, 1, null, 2, 0, null, 'group');
+    expect(labels(b)).toEqual(['Resultado', 'Saldo']);
+    expect(b.pts).toBe(5);
+  });
+
+  it('só um lado, vencedor errado (grupo 2-0 vs 2-3) → [Gols mandante] = 1', () => {
+    const b = scoreBreakdown(2, 0, null, 2, 3, null, 'group');
+    expect(labels(b)).toEqual(['Gols mandante']);
+    expect(b.parts[0].pts).toBe(1);
+    expect(b.pts).toBe(1);
+  });
+
+  it('erro total (grupo 3-0 vs 0-2) → sem partes, 0 pts', () => {
+    expect(scoreBreakdown(3, 0, null, 0, 2, null, 'group')).toEqual({ parts: [], pts: 0 });
+  });
+
+  it('pênalti certo no KO conta como Resultado (r16 2-2 h vs 1-1 h) → [Resultado, Saldo] = 13', () => {
+    const b = scoreBreakdown(2, 2, 'h', 1, 1, 'h', 'r16');
+    expect(labels(b)).toEqual(['Resultado', 'Saldo']);
+    expect(b.pts).toBe(13); // ave12 + dg1
+  });
+
+  it('placar exato mas pênalti errado (r16 1-1 h vs 1-1 a) → lados + saldo, SEM resultado = 7', () => {
+    const b = scoreBreakdown(1, 1, 'h', 1, 1, 'a', 'r16');
+    expect(keys(b)).toEqual(['side', 'side', 'diff']); // 3+3+1, sem winner
+    expect(b.pts).toBe(7);
+  });
+
+  // Propriedade: a soma do breakdown SEMPRE bate com scorePrediction.
+  it('soma do breakdown == scorePrediction (varredura de casos/fases)', () => {
+    const stages = ['group', 'r32', 'r16', 'qf', 'sf', 'third', 'final'];
+    for (const stage of stages) {
+      for (let ph = 0; ph <= 3; ph++) for (let pa = 0; pa <= 3; pa++)
+        for (let ah = 0; ah <= 3; ah++) for (let aw = 0; aw <= 3; aw++) {
+          const pen = stage !== 'group' ? 'h' : null;
+          const apen = stage !== 'group' ? 'a' : null;
+          expect(scoreBreakdown(ph, pa, pen, ah, aw, apen, stage).pts)
+            .toBe(scorePrediction(ph, pa, pen, ah, aw, apen, stage));
+        }
+    }
   });
 });

@@ -84,6 +84,10 @@ node scripts/e2e/test-temporal-states.js    # pré-torneio (vazio/aberto/TBD) + 
 node scripts/e2e/test-ui-pages.js           # inicio (KPIs) + campeão/artilheiro ABERTO×TRAVADO (write via UI) + recent.json (15 checks)
 node scripts/e2e/test-rescore-on-edit.js    # editar placar de grupo recomputa pontos+leaderboard; editar venc. de KO re-resolve slot (7 checks)
 
+# Features novas (gráfico de evolução + bônus de artilheiro nos palpites da galera):
+node scripts/e2e/test-historico-scorer.js   # "Palpites da galera": chip ⚽+N + pontos + popovers batem com o DB (12 checks, read-only)
+node scripts/e2e/test-rank-chart.js         # bump chart: cria +10 voláteis → MUITAS viradas; legenda==v_leaderboard; modos/foco/hover; +historico em escala >1000 palpites (18 checks; limpa no finally)
+
 # Cenários SQL determinísticos (transação c/ rollback — rode via psql no container):
 CID=supabase_db_world-cup-2026
 docker cp scripts/e2e/scenarios/scoring-sql.sql $CID:/tmp/ && docker exec $CID psql -U postgres -d postgres -f /tmp/scoring-sql.sql
@@ -107,7 +111,9 @@ npm test
 #   crie 'spec-user@testuser.com' (paid=false p/ não poluir o leaderboard) via Admin API,
 #   depois rode com as env vars:
 TEST_USER_EMAIL=spec-user@testuser.com TEST_USER_PASSWORD=SpecUser2026! \
-  BASE_URL=http://localhost:3000 npx playwright test
+  BASE_URL=http://localhost:3000 npx playwright test --workers=1
+#   ^ use --workers=1 LOCAL: com fullyParallel+retries=0, vários logins simultâneos
+#     contra o Supabase local estouram o timeout de 10s (flaky). Serial passa 20/20.
 ```
 
 > Nota de UX (admin): a aba "Resultados → lançados" mostra só os **60 jogos mais recentes**
