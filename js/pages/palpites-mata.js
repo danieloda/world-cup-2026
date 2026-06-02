@@ -2,7 +2,7 @@ import { requireAuth } from '../auth.js';
 import { renderShell } from '../sidebar.js';
 import { supabase } from '../supabase.js';
 import {
-  flag, escapeHtml, formatTime, isLocked, showToast,
+  flag, escapeHtml, formatTime, isLocked, lockCountdownLabel, showToast,
   attachTeamTooltips, loadRecentMatches, teamPt,
   computeStandings as utilComputeStandings,
 } from '../util.js';
@@ -599,6 +599,7 @@ function renderBracketMatch(m) {
         <span>${isThird ? '🥉 3º Lugar' : isFinal ? '🏆 Final' : `M${m.id}`}</span>
         <span class="when">${dateLabel} · ${timeLabel}</span>
       </div>
+      <div class="bm-lock">${locked ? 'Bloqueado' : lockCountdownLabel(m.match_date)}</div>
 
       ${renderTeamRow(m, 'home', homeVal, locked)}
       ${renderTeamRow(m, 'away', awayVal, locked)}

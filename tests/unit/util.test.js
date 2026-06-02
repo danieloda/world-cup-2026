@@ -16,6 +16,7 @@ import {
   computeStandings,
   isLive,
   isLocked,
+  lockCountdownLabel,
 } from '../../js/util.js';
 
 describe('flag', () => {
@@ -445,5 +446,37 @@ describe('isLocked (fecha 23h59 BRT da véspera)', () => {
   it('travado no dia do jogo (antes do apito)', () => {
     vi.setSystemTime(new Date('2026-06-15T12:00:00Z')); // 15/jun 09h BRT, jogo só 16h
     expect(isLocked(m)).toBe(true);
+  });
+});
+
+describe('lockCountdownLabel (conta até o bloqueio, não até o jogo)', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  // Jogo: 15/jun 16h BRT = 15/jun 19:00 UTC → trava 14/jun 23h59 BRT = 15/jun 02:59 UTC.
+  const m = { match_date: '2026-06-15T19:00:00Z' };
+
+  it('mostra dias até o bloqueio (não até o jogo)', () => {
+    vi.setSystemTime(new Date('2026-06-12T02:59:00Z')); // 11/jun 23h59 BRT → faltam 3 dias p/ travar
+    expect(lockCountdownLabel(m.match_date)).toBe('Bloqueia em 3 dias');
+  });
+
+  it('singular para 1 dia', () => {
+    vi.setSystemTime(new Date('2026-06-14T02:59:00Z')); // 13/jun 23h59 BRT → 1 dia
+    expect(lockCountdownLabel(m.match_date)).toBe('Bloqueia em 1 dia');
+  });
+
+  it('mostra horas quando falta menos de 1 dia', () => {
+    vi.setSystemTime(new Date('2026-06-14T22:59:00Z')); // 14/jun 19h59 BRT → 4h
+    expect(lockCountdownLabel(m.match_date)).toBe('Bloqueia em 4h');
+  });
+
+  it('"Bloqueado" após o prazo', () => {
+    vi.setSystemTime(new Date('2026-06-15T03:00:00Z')); // já passou 23h59 BRT da véspera
+    expect(lockCountdownLabel(m.match_date)).toBe('Bloqueado');
   });
 });

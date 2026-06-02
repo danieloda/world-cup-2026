@@ -369,6 +369,23 @@ export function isLocked(m) {
   return new Date() >= predictionDeadline(m.match_date);
 }
 
+/**
+ * Rótulo de contagem regressiva até o BLOQUEIO do palpite (não até o jogo).
+ * Bloqueio = 23h59 (Brasília) da véspera. Ex.: "Bloqueia em 9 dias",
+ * "Bloqueia em 5h", "Bloqueado". Use onde aparece um palpite de partida.
+ * @param {string|Date} matchDate
+ * @returns {string}
+ */
+export function lockCountdownLabel(matchDate) {
+  const diff = predictionDeadline(matchDate) - new Date();
+  if (diff <= 0) return 'Bloqueado';
+  const days = Math.floor(diff / 86400000);
+  if (days >= 1) return `Bloqueia em ${days} dia${days > 1 ? 's' : ''}`;
+  const hours = Math.floor(diff / 3600000);
+  if (hours >= 1) return `Bloqueia em ${hours}h`;
+  return 'Bloqueia em breve';
+}
+
 // ============================================================
 // Recent matches loader (últimos jogos reais de cada seleção)
 // ============================================================

@@ -3,7 +3,7 @@ import { renderShell } from '../sidebar.js';
 import { supabase } from '../supabase.js';
 import {
   flag, escapeHtml, greeting, firstName, daysToKickoffLabel,
-  formatBrDate, formatTime, formatRelative, stageLabel, isLive,
+  formatBrDate, formatTime, lockCountdownLabel, stageLabel, isLive,
   teamPt, groundShort,
 } from '../util.js';
 
@@ -167,7 +167,7 @@ function renderMatchRow(m) {
       </div>
       <div class="score-cell">
         <span style="color:var(--text-mute); font-size:13px; font-weight:600;">
-          ${formatRelative(m.match_date)}
+          ${lockCountdownLabel(m.match_date)}
         </span>
       </div>
       <div class="team right away">

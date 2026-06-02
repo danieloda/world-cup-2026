@@ -3,7 +3,7 @@ import { renderShell } from '../sidebar.js';
 import { supabase } from '../supabase.js';
 import {
   flag, escapeHtml, formatBrDate, formatTime,
-  isLocked, isLive, showToast, attachTeamTooltips, loadRecentMatches,
+  isLocked, isLive, lockCountdownLabel, showToast, attachTeamTooltips, loadRecentMatches,
   teamPt, groundShort,
 } from '../util.js';
 import { matchPoints, scoreBreakdown } from '../scoring.js';
@@ -313,6 +313,9 @@ function renderPalpiteRow(m) {
   const status = live ? `<span class="pill live">Ao vivo</span>`
     : locked ? `<span class="pill locked">Travado</span>`
     : `<span class="pill open">${formatTime(m.match_date)}</span>`;
+  const lockNote = (!live && !locked)
+    ? `<div class="lock-note">${lockCountdownLabel(m.match_date)}</div>`
+    : '';
 
   return `
     <div class="match ${locked ? 'locked' : ''}" data-match-id="${m.id}">
@@ -346,6 +349,7 @@ function renderPalpiteRow(m) {
       </div>
       <div class="match-tail">
         ${status}
+        ${lockNote}
         <div style="margin-top:2px; color:var(--text-mute); font-size:10px; letter-spacing:.08em; text-transform:uppercase;">Grupo ${m.group_name}</div>
       </div>
     </div>

@@ -648,6 +648,14 @@ img { max-width: 100%; height: auto; }
 .pill.done::before { background: var(--accent); }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
 
+/* Aviso de bloqueio do palpite (véspera 23h59) sob o status */
+.lock-note {
+  margin-top: 4px;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: .04em;
+  color: var(--accent);
+}
+
 /* ===== Filter chips ===== */
 .chips {
   display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;
@@ -2325,6 +2333,14 @@ img { max-width: 100%; height: auto; }
   color: var(--text-dim);
   font-family: ui-monospace, monospace;
 }
+/* Contagem regressiva até o bloqueio do palpite no card do bracket */
+.bm-lock {
+  font-size: 9px; font-weight: 700;
+  letter-spacing: .06em; text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+.bracket-match.locked .bm-lock { color: var(--text-mute); }
 .bm-team {
   display: grid;
   grid-template-columns: 22px 1fr 52px;
