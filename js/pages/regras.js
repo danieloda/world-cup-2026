@@ -25,6 +25,39 @@ const STAGES = [
 const GP = matchPoints('group'); // valores da fase de grupos
 
 // ============================================================
+// Estrutura da página
+// Uma única lista de seções alimenta o índice (TOC) E o corpo — assim os dois
+// nunca saem de sincronia. Os capítulos agrupam as seções numa ordem de leitura
+// natural: primeiro o panorama, depois como pontuar, os bônus e, por fim, a parte
+// prática (prazos e desempates).
+// As funções renderX são hoisted (function declarations), então podem ser
+// referenciadas aqui mesmo declaradas mais abaixo no arquivo.
+// ============================================================
+const SECTIONS = [
+  { id: 'como-funciona', nav: 'Como funciona',      title: 'Como funciona',                       render: renderComoFunciona },
+  { id: 'premiacao',     nav: 'Premiação',          title: 'Premiação',                           render: renderPremiacao },
+  { id: 'pontos-jogo',   nav: 'Pontos por jogo',    title: 'Pontos por jogo',                     render: renderPontosJogo },
+  { id: 'fases',         nav: 'Quanto cada fase vale', title: 'Quanto cada fase vale',            render: renderFases },
+  { id: 'vaga',          nav: 'Regra da vaga',      title: 'Regra da vaga (mata-mata)',           render: renderVaga },
+  { id: 'penaltis',      nav: 'Empate no mata-mata', title: 'Empate no mata-mata',                render: renderPenaltis },
+  { id: 'campeao',       nav: 'Campeão',            title: 'Bônus de Campeão',                    render: renderCampeao },
+  { id: 'artilheiro',    nav: 'Artilheiro',         title: 'Bônus de Artilheiro',                 render: renderArtilheiro },
+  { id: 'classificado',  nav: 'Classificado',       title: 'Bônus de seleção classificada',       render: renderClassificado },
+  { id: 'prazos',        nav: 'Prazos',             title: 'Prazos — até quando dá para palpitar', render: renderPrazos },
+  { id: 'desempate',     nav: 'Desempates',         title: 'Critérios de desempate',              render: renderDesempate },
+];
+
+const CHAPTERS = [
+  { label: 'Para começar',           ids: ['como-funciona', 'premiacao'] },
+  { label: 'Como você pontua',       ids: ['pontos-jogo', 'fases', 'vaga', 'penaltis'] },
+  { label: 'Os três bônus',          ids: ['campeao', 'artilheiro', 'classificado'] },
+  { label: 'Na prática',             ids: ['prazos', 'desempate'] },
+];
+
+// Índice por id, já com o número sequencial da seção (1..N) para o selo do título.
+const SECTION_BY_ID = Object.fromEntries(SECTIONS.map((s, i) => [s.id, { ...s, num: i + 1 }]));
+
+// ============================================================
 // Main
 // ============================================================
 try {
@@ -62,6 +95,22 @@ try {
 // Render
 // ============================================================
 function renderPage() {
+  const toc = CHAPTERS.map(ch => `
+    <div class="rules-toc-group">
+      <span class="rules-toc-group-label">${ch.label}</span>
+      <div class="rules-toc-pills">
+        ${ch.ids.map(id => `<a href="#${id}" class="rules-toc-link">${SECTION_BY_ID[id].nav}</a>`).join('')}
+      </div>
+    </div>
+  `).join('');
+
+  const body = CHAPTERS.map(ch => `
+    <div class="rules-chapter">
+      <span class="rules-chapter-label">${ch.label}</span>
+    </div>
+    ${ch.ids.map(id => SECTION_BY_ID[id].render()).join('')}
+  `).join('');
+
   return `
     <section class="hero">
       <div class="hero-kicker">Tudo que você precisa saber, explicado com calma</div>
@@ -73,33 +122,9 @@ function renderPage() {
       </div>
     </section>
 
-    <nav class="rules-toc">
-      ${[
-        ['como-funciona', 'Como funciona'],
-        ['premiacao', 'Premiação'],
-        ['pontos-jogo', 'Pontos por jogo'],
-        ['fases', 'Quanto cada fase vale'],
-        ['vaga', 'Regra da vaga'],
-        ['penaltis', 'Empate no mata-mata'],
-        ['campeao', 'Campeão'],
-        ['artilheiro', 'Artilheiro'],
-        ['classificado', 'Bônus de classificado'],
-        ['desempate', 'Desempates'],
-        ['prazos', 'Prazos (até quando palpitar)'],
-      ].map(([id, label]) => `<a href="#${id}" class="rules-toc-link">${label}</a>`).join('')}
-    </nav>
+    <nav class="rules-toc">${toc}</nav>
 
-    ${renderComoFunciona()}
-    ${renderPremiacao()}
-    ${renderPontosJogo()}
-    ${renderFases()}
-    ${renderVaga()}
-    ${renderPenaltis()}
-    ${renderCampeao()}
-    ${renderArtilheiro()}
-    ${renderClassificado()}
-    ${renderDesempate()}
-    ${renderPrazos()}
+    ${body}
 
     <div class="rules-foot">
       Ficou com dúvida em alguma regra? Fale com a organização do bolão.
@@ -109,7 +134,7 @@ function renderPage() {
 
 // ---- 1) Como funciona ----
 function renderComoFunciona() {
-  return section('como-funciona', '1', 'Como funciona', `
+  return section('como-funciona', `
     <p class="rules-p">
       Você ganha pontos de <strong>quatro formas</strong>, e elas se somam no seu total.
       Vence o bolão quem tiver mais pontos no fim da Copa.
@@ -146,7 +171,7 @@ function renderPremiacao() {
       </div>
     </div>`;
 
-  return section('premiacao', '2', 'Premiação', `
+  return section('premiacao', `
     <p class="rules-p">
       O bolão é <strong>pago</strong>: cada participante entra com uma <strong>taxa de inscrição</strong> e
       todo esse dinheiro forma um <strong>caixa único</strong>, que vai inteiro para os primeiros colocados.
@@ -198,7 +223,7 @@ function renderPontosJogo() {
     </div>
   `).join('');
 
-  return section('pontos-jogo', '3', 'Pontos por jogo', `
+  return section('pontos-jogo', `
     <p class="rules-p">
       Em cada jogo, <strong>cada acerto soma</strong> — você não precisa cravar o placar para pontuar.
       Estes são os valores na <strong>fase de grupos</strong> (nas fases seguintes valem mais):
@@ -228,7 +253,7 @@ function renderFases() {
       }).join('')}
     </tr>`;
 
-  return section('fases', '4', 'Quanto cada fase vale', `
+  return section('fases', `
     <p class="rules-p">
       Quanto mais decisivo o jogo, <strong>mais pontos ele vale</strong>. Um placar exato na
       <strong>final</strong> vale <strong>${matchPoints('final').exact}</strong> pontos — contra
@@ -257,7 +282,7 @@ function renderFases() {
 
 // ---- 5) Regra da vaga ----
 function renderVaga() {
-  return section('vaga', '5', 'Regra da vaga (mata-mata)', `
+  return section('vaga', `
     <p class="rules-p">
       No mata-mata você não aposta numa seleção específica — você dá o <strong>placar de uma vaga do
       chaveamento</strong> (por exemplo: "1º do Grupo A × 2º do Grupo B"). Seu palpite de gols vale para
@@ -284,7 +309,7 @@ function renderVaga() {
 
 // ---- 6) Pênaltis ----
 function renderPenaltis() {
-  return section('penaltis', '6', 'Empate no mata-mata', `
+  return section('penaltis', `
     <p class="rules-p">
       Se você acha que um jogo de mata-mata vai terminar <strong>empatado</strong>, escolha também
       <strong>quem passa nos pênaltis</strong>. Essa escolha define o "vencedor" do seu palpite.
@@ -299,7 +324,7 @@ function renderPenaltis() {
 
 // ---- 7) Campeão ----
 function renderCampeao() {
-  return section('campeao', '7', 'Bônus de Campeão', `
+  return section('campeao', `
     <p class="rules-p">
       Antes da Copa começar, você escolhe a seleção que acha que vai <strong>levantar a taça</strong>.
       Se acertar o campeão, ganha <strong>+${championBonus(true)} pontos</strong> de bônus.
@@ -325,7 +350,7 @@ function renderArtilheiro() {
     </div>
   `).join('');
 
-  return section('artilheiro', '8', 'Bônus de Artilheiro', `
+  return section('artilheiro', `
     <p class="rules-p">
       Você escolhe <strong>1 jogador</strong> antes da Copa. Cada gol que ele marcar soma pontos —
       e gols nas fases finais valem mais (<strong>+${scorerBonus(1, 'group')} por gol</strong> nos grupos,
@@ -355,7 +380,7 @@ function renderClassificado() {
     return `<td>${v === 0 ? '—' : '+' + v}</td>`;
   }).join('');
 
-  return section('classificado', '9', 'Bônus de seleção classificada', `
+  return section('classificado', `
     <p class="rules-p">
       Além do placar, você ganha pontos por <strong>acertar qual seleção chega a cada fase do mata-mata</strong>
       — com base em quem os <em>seus palpites</em> fazem avançar. São dois casos:
@@ -385,7 +410,7 @@ function renderClassificado() {
 
 // ---- 10) Desempate ----
 function renderDesempate() {
-  return section('desempate', '10', 'Critérios de desempate', `
+  return section('desempate', `
     <div class="rules-two">
       <div class="rules-half">
         <div class="rules-half-title">Classificação dos grupos</div>
@@ -412,7 +437,7 @@ function renderDesempate() {
 
 // ---- 11) Prazos ----
 function renderPrazos() {
-  return section('prazos', '11', 'Prazos — até quando dá para palpitar', `
+  return section('prazos', `
     <div class="rules-tip" style="border-left-color: var(--red); margin-top:0; margin-bottom:16px;">
       ⏰ <strong style="color:var(--text);">A regra mais importante:</strong> cada palpite de placar
       <strong style="color:var(--text);">fecha às 23h59 (horário de Brasília) da véspera do jogo</strong> —
@@ -431,7 +456,8 @@ function renderPrazos() {
 // ============================================================
 // Helpers de render
 // ============================================================
-function section(id, num, title, body) {
+function section(id, body) {
+  const { num, title } = SECTION_BY_ID[id];
   return `
     <section class="rules-section" id="${id}">
       <div class="rules-section-head">
@@ -463,11 +489,28 @@ function miniCard(icon, title, text) {
 // Eventos — scroll suave da TOC
 // ============================================================
 function attachEventListeners() {
-  document.querySelectorAll('.rules-toc-link').forEach(link => {
+  const links = [...document.querySelectorAll('.rules-toc-link')];
+
+  // Rolagem suave ao clicar no índice.
+  links.forEach(link => {
     link.addEventListener('click', (e) => {
       e.preventDefault();
       const id = link.getAttribute('href').slice(1);
       document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
   });
+
+  // Scrollspy: destaca no índice a seção que está em foco na tela.
+  const linkById = new Map(links.map(l => [l.getAttribute('href').slice(1), l]));
+  const setActive = (id) => links.forEach(l => l.classList.toggle('active', l === linkById.get(id)));
+
+  const observer = new IntersectionObserver((entries) => {
+    // Pega a seção visível mais próxima do topo.
+    const visible = entries
+      .filter(e => e.isIntersecting)
+      .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+    if (visible) setActive(visible.target.id);
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+
+  document.querySelectorAll('.rules-section').forEach(s => observer.observe(s));
 }
