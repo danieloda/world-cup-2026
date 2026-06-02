@@ -60,8 +60,12 @@ const ALERT_TRIGGERS = [
   ['matches', 'trg_z_alert_unresolved_slots'],
   ['predictions', 'trg_z_alert_pred_overwrite'],
 ];
-const toggleAlerts = (action) =>
-  psql(ALERT_TRIGGERS.map(([t, trg]) => `alter table public.${t} ${action} trigger ${trg};`).join('\n'));
+// E2E_KEEP_ALERTS=1 → não desliga triggers (alertas reais chegam ao Telegram, por opção do usuário).
+const KEEP_ALERTS = process.env.E2E_KEEP_ALERTS === '1';
+const toggleAlerts = (action) => {
+  if (KEEP_ALERTS) { console.log(`   (E2E_KEEP_ALERTS=1: triggers de alerta mantidos ligados)`); return; }
+  return psql(ALERT_TRIGGERS.map(([t, trg]) => `alter table public.${t} ${action} trigger ${trg};`).join('\n'));
+};
 
 async function loginAdmin(page) {
   await page.goto(`${BASE}/login.html`);
@@ -133,9 +137,13 @@ async function main() {
     // A2 — historico vazio
     console.log(`\n${C.b}A2) historico.html — vazio${C.x}`);
     await page.goto(`${BASE}/historico.html`);
-    await page.waitForSelector('.history-card, .empty', { timeout: 15000 });
-    const histCards = await page.$$eval('.history-card', els => els.length);
-    check('historico sem cards de jogo (nenhum começou)', histCards === 0, `cards=${histCards}`);
+    await page.waitForSelector('.history-card, .empty, .preview-wrap', { timeout: 15000 });
+    // Pré-Copa, nenhum jogo começou → historico mostra a PRÉVIA desfocada (cards fictícios
+    // dentro de .preview-blurred). O que não pode existir é card REAL (fora da prévia).
+    const realCards = await page.$$eval('.history-card', els => els.filter(e => !e.closest('.preview-blurred')).length);
+    const previewShown = !!(await page.$('.preview-wrap'));
+    check('historico sem cards reais (nenhum começou; exibe prévia)', realCards === 0 && previewShown,
+      `reais=${realCards} prévia=${previewShown}`);
 
     // A3 — palpites-grupos com inputs ABERTOS
     console.log(`\n${C.b}A3) palpites-grupos.html — inputs abertos${C.x}`);
@@ -191,9 +199,19 @@ async function main() {
     await page.goto(`${BASE}/palpites-grupos.html`);
     await page.waitForSelector('.admin-tabs', { timeout: 15000 });
     await page.click('[data-tab="resultados"]');
-    await page.waitForSelector('.group-card .group-table', { timeout: 15000 });
-    const groupCount = await page.$$eval('.group-card', els => els.length);
-    check('classificação renderiza tabelas dos 12 grupos', groupCount === 12, `grupos=${groupCount}`);
+    // A aba Resultados renderiza UM grupo por vez (chips A..L) — itera os 12.
+    await page.waitForSelector('.chip[data-group]', { timeout: 15000 });
+    let groupCount = 0;
+    for (const g of ['A','B','C','D','E','F','G','H','I','J','K','L']) {
+      await page.click(`.chip[data-group="${g}"]`);
+      const ok = await page.waitForFunction(
+        (gg) => (document.querySelector('.group-card .group-name')?.textContent || '').includes(`Grupo ${gg}`)
+                && !!document.querySelector('.group-card .group-table tbody tr'),
+        g, { timeout: 8000 }
+      ).then(() => true).catch(() => false);
+      if (ok) groupCount++;
+    }
+    check('classificação renderiza tabelas dos 12 grupos (por chip)', groupCount === 12, `grupos=${groupCount}`);
 
     // B2 — historico (filtrado por dia) mostra grupos e NÃO vaza KO futuro
     console.log(`\n${C.b}B2) historico.html — grupos sim, KO futuro não${C.x}`);

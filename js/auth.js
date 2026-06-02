@@ -99,10 +99,7 @@ export async function signOut() {
  */
 export async function requireAuth(options = {}) {
   const session = await getSession();
-  if (!session) {
-    window.location.replace('login.html');
-    return null;
-  }
+  if (!session) return redirectAndHalt('login.html');
   let profile = await getProfile();
   if (!profile) {
     // Primeiro login — auto-criar profile com defaults seguros.
@@ -110,20 +107,27 @@ export async function requireAuth(options = {}) {
     if (!profile) {
       console.error('Falha ao criar profile auto.');
       await supabase.auth.signOut();
-      window.location.replace('login.html?error=profile');
-      return null;
+      return redirectAndHalt('login.html?error=profile');
     }
   }
-  if (options.adminOnly && !profile.is_admin) {
-    window.location.replace('inicio.html');
-    return null;
-  }
+  if (options.adminOnly && !profile.is_admin) return redirectAndHalt('inicio.html');
   // Gate de avatar obrigatório (admins isentos — já têm avatar local)
   if (!options.skipAvatarGate && !profile.avatar_url && !profile.is_admin) {
-    window.location.replace('complete-profile.html');
-    return null;
+    return redirectAndHalt('complete-profile.html');
   }
   return { session, profile };
+}
+
+/**
+ * Redireciona e BLOQUEIA a execução do caller. A navegação vai descartar a
+ * página atual, então retornamos uma Promise que nunca resolve — assim o código
+ * após `await requireAuth()` não roda e nenhuma página dispara seu render de
+ * erro FATAL durante o redirect legítimo (ex.: login → inicio → complete-profile
+ * pelo gate de avatar). Devolve uma Promise<never>.
+ */
+function redirectAndHalt(to) {
+  window.location.replace(to);
+  return new Promise(() => {});
 }
 
 async function createMyProfile(user) {

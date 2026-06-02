@@ -43,7 +43,7 @@ function expectedStandings(matches, group) {
 
 const admin = makeAdminClient();
 const { data: matches } = await admin.from('matches')
-  .select('id,stage,group_name,team_home,team_away,actual_home,actual_away,pen_winner,finished');
+  .select('id,stage,group_name,team_home,team_away,actual_home,actual_away,pen_winner,finished,match_date');
 const { data: lb } = await admin.from('v_leaderboard').select('user_id,full_name,total_pts');
 
 // 8 melhores 3ºs do DB (pts→SG→GF→FIFA)
@@ -76,28 +76,32 @@ await page.waitForSelector('.sidebar, [class*="sidebar"]', { timeout: 15000 });
 console.log(`\n${C.b}palpites-grupos → Resultados → Classificação${C.x}`);
 await page.goto(`${BASE}/palpites-grupos.html`);
 await page.waitForSelector('.admin-tabs', { timeout: 15000 });
-await page.click('[data-tab="resultados"]');  // sub-aba default = Classificação (real)
-await page.waitForSelector('.group-card .group-table', { timeout: 15000 });
-const domGroups = await page.$$eval('.group-card', cards => cards.map(c => ({
-  letter: (c.querySelector('.group-name')?.textContent||'').replace(/Grupo/i,'').trim(),
-  teams: [...c.querySelectorAll('tbody tr')].map(tr => tr.querySelector('.team-name')?.getAttribute('data-team')).filter(Boolean),
-})));
+await page.click('[data-tab="resultados"]');  // aba Resultados (classificação oficial)
+// A aba Resultados renderiza UM grupo por vez (chips A..L) — itera os chips.
+await page.waitForSelector('.chip[data-group]', { timeout: 15000 });
 let groupsOk = 0, groupsBad = [];
 for (const g of GROUPS) {
-  const dom = domGroups.find(x => x.letter === g);
+  await page.click(`.chip[data-group="${g}"]`);
+  await page.waitForFunction(
+    (gg) => (document.querySelector('.group-card .group-name')?.textContent || '').includes(`Grupo ${gg}`),
+    g, { timeout: 8000 }
+  ).catch(() => {});
+  const teams = await page.$$eval('.group-card tbody tr .team-name',
+    els => els.map(e => e.getAttribute('data-team')).filter(Boolean));
   const exp = expectedStandings(matches, g);
-  const ok = dom && JSON.stringify(dom.teams) === JSON.stringify(exp);
-  if (ok) groupsOk++; else groupsBad.push(`${g}: dom=${dom?.teams?.join('>')} exp=${exp.join('>')}`);
+  const ok = JSON.stringify(teams) === JSON.stringify(exp);
+  if (ok) groupsOk++; else groupsBad.push(`${g}: dom=${teams.join('>')} exp=${exp.join('>')}`);
 }
 check(`grupos: ordem (pts→SG→GF→FIFA) em ${GROUPS.length} grupos`, groupsBad.length===0,
   groupsBad.length?groupsBad[0]:`${groupsOk}/${GROUPS.length} ok`);
 await shot('grupos');
 
 // ===== D) melhores 3ºs (mesma página, sub-aba Melhores 3ºs) =====
-console.log(`\n${C.b}palpites-grupos → Resultados → Melhores 3ºs${C.x}`);
-await page.click('#subNav [data-sub="terceiros"]');
-await page.waitForSelector('.thirds-table', { timeout: 15000 });
-const domAdv = await page.$$eval('.thirds-table tbody tr.adv',
+console.log(`\n${C.b}palpites-grupos → Resultados → Melhores 3ºs (popover)${C.x}`);
+// Os 3ºs agora vivem num popover colapsável na própria aba Resultados.
+await page.click('[data-action="toggle-thirds"]');
+await page.waitForSelector('.thirds-pop.open .thirds-table', { timeout: 15000 });
+const domAdv = await page.$$eval('.thirds-pop.open .thirds-table tbody tr.adv',
   rows => rows.map(r => r.querySelector('.team-name')?.getAttribute('data-team')).filter(Boolean));
 const setEq = (a,b) => a.length===b.length && [...a].sort().join('|')===[...b].sort().join('|');
 check(`terceiros: 8 classificados == 8 melhores 3ºs do DB`, domAdv.length===8 && setEq(domAdv, best8Thirds),
@@ -120,27 +124,37 @@ check(`ranking: pontos por linha batem com v_leaderboard`, ptsOk);
 await shot('ranking');
 
 // ===== C) historico =====
+// historico.html navega por fase (group/ko) → dia → status; nunca lista os 104 de uma vez.
+// Validamos (C1) a contagem do RECORTE ativo vs DB e (C2) o card da final.
 console.log(`\n${C.b}historico.html${C.x}`);
 await page.goto(`${BASE}/historico.html`);
 await page.waitForSelector('.history-card', { timeout: 15000 });
-const cardCount = await page.$$eval('.history-card', els => els.length);
-const finishedCount = matches.filter(m=>m.finished).length;
-check(`historico: nº de jogos exibidos == finalizados no DB`, cardCount===finishedCount,
-  `dom=${cardCount} db=${finishedCount}`);
-// placar da final no DOM: localiza o card .history-card.final pelo data-team (nome EN)
-// e confere o texto do .score (independente da tradução pt-BR do nome exibido).
-const finalM = matches.find(m=>m.stage==='final');
-const finalCard = await page.evaluate(({home, away}) => {
-  const cards = [...document.querySelectorAll('.history-card.final')];
-  const c = cards.find(el => {
-    const teams = [...el.querySelectorAll('.team-name')].map(t=>t.getAttribute('data-team'));
-    return teams.includes(home) && teams.includes(away);
-  });
-  return c ? { score: (c.querySelector('.score')?.textContent||'').replace(/\s+/g,' ').trim() } : null;
-}, { home: finalM.team_home, away: finalM.team_away });
-const scoreOk = !!finalCard && finalCard.score.includes(`${finalM.actual_home} — ${finalM.actual_away}`);
+
+const localDayKey = (d) => { const x = new Date(d);
+  return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`; };
+const inStageJs = (m, st) => st === 'group' ? m.stage === 'group' : m.stage !== 'group';
+
+// (C1) recorte ativo (default: group / dia mais recente / finalizadas)
+const actStage = await page.$eval('#stageTabs .admin-tab.active', el => el.dataset.stage).catch(() => 'group');
+const actDay   = await page.$eval('#dayTabs .day-tab.active', el => el.dataset.day).catch(() => null);
+const domCount = await page.$$eval('.history-card', els => els.length);
+const expCount = matches.filter(m => m.finished && inStageJs(m, actStage) && localDayKey(m.match_date) === actDay).length;
+check(`historico: cards do recorte ativo (${actStage}/${actDay}) == DB`, domCount === expCount && domCount > 0,
+  `dom=${domCount} db=${expCount}`);
+
+// (C2) card da final: navega fase KO + dia da final. Os cards não têm mais data-team,
+// mas há exatamente 1 .history-card.final — lemos o .score direto.
+const finalM = matches.find(m => m.stage === 'final');
+const finalDay = localDayKey(finalM.match_date);
+await page.click('[data-stage="ko"]');
+await page.waitForSelector(`#dayTabs .day-tab[data-day="${finalDay}"]`, { timeout: 8000 });
+await page.click(`#dayTabs .day-tab[data-day="${finalDay}"]`);
+await page.waitForSelector('.history-card.final', { timeout: 8000 });
+const finalScore = await page.$eval('.history-card.final .score',
+  el => el.textContent.replace(/\s+/g, ' ').trim()).catch(() => null);
+const scoreOk = !!finalScore && finalScore.includes(`${finalM.actual_home} — ${finalM.actual_away}`);
 check(`historico: card da final mostra placar correto`, scoreOk,
-  `final ${finalM.team_home} ${finalM.actual_home}-${finalM.actual_away} ${finalM.team_away} | dom='${finalCard?.score??'(card não achado)'}'`);
+  `final ${finalM.team_home} ${finalM.actual_home}-${finalM.actual_away} ${finalM.team_away} | dom='${finalScore ?? '(card não achado)'}'`);
 await shot('historico');
 
 // ===== E) palpites-mata (smoke + sem slot cru) =====

@@ -69,6 +69,15 @@ async function main() {
   const origDeadline = setRow.value;
   const setDeadline = (ms) => admin.from('settings').update({ value: iso(ms) }).eq('key', 'deadline_champion_scorer');
 
+  // snapshot da final p/ restaurar. Os estados ABERTO/TRAVADO do card de campeão só
+  // renderizam enquanto a final NÃO terminou (isFinalDone() === finalMatch.finished).
+  // No DB pós-pipeline a final já acabou, então desfinalizamos só o flag `finished`
+  // (placar intacto) durante essas checagens e restauramos no finally — os triggers
+  // recomputam os pontos a partir do placar preservado.
+  const { data: finalRow } = await admin.from('matches').select('id, finished').eq('stage', 'final').single();
+  const origFinalFinished = finalRow?.finished ?? true;
+  const setFinalFinished = (v) => admin.from('matches').update({ finished: v }).eq('id', finalRow.id);
+
   const browser = await chromium.launch({ headless: !HEADED });
   const page = await browser.newPage();
 
@@ -103,6 +112,7 @@ async function main() {
     // 2) campeao-artilheiro.html — ABERTO (deadline no futuro)
     // ============================================================
     console.log(`\n${C.b}2A) campeao-artilheiro — ABERTO (deadline futuro)${C.x}`);
+    await setFinalFinished(false); // final "em aberto" p/ exercitar os estados do card de campeão
     await setDeadline(Date.now() + 2 * DAY);
     await page.goto(`${BASE}/campeao-artilheiro.html`);
     await page.waitForSelector('#cardChampion', { timeout: 15000 });
@@ -182,8 +192,9 @@ async function main() {
     await browser.close().catch(() => {});
     console.log(`\n${C.b}[teardown] restaura deadline + remove user${C.x}`);
     try { await admin.from('settings').update({ value: origDeadline }).eq('key', 'deadline_champion_scorer'); } catch {}
+    try { await setFinalFinished(origFinalFinished); } catch {} // re-finaliza a final → triggers recomputam pontos
     try { await admin.auth.admin.deleteUser(userId); } catch {}
-    console.log(`   ${C.g}✓${C.x} restaurado`);
+    console.log(`   ${C.g}✓${C.x} restaurado (deadline + final + user)`);
   }
 
   const failed = results.filter((r) => !r.pass);

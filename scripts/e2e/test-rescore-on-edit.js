@@ -37,7 +37,12 @@ const check = (name, pass, detail = '') => {
 };
 const psql = (sql) => execFileSync('docker', ['exec', '-i', CID, 'psql', '-U', 'postgres', '-d', 'postgres', '-v', 'ON_ERROR_STOP=1'], { input: sql, encoding: 'utf8' });
 const ALERTS = [['matches', 'trg_z_alert_orphan_predictions'], ['matches', 'trg_z_alert_unresolved_slots'], ['predictions', 'trg_z_alert_pred_overwrite']];
-const toggleAlerts = (a) => psql(ALERTS.map(([t, g]) => `alter table public.${t} ${a} trigger ${g};`).join('\n'));
+// E2E_KEEP_ALERTS=1 → não desliga triggers (alertas reais chegam ao Telegram, por opção do usuário).
+const KEEP_ALERTS = process.env.E2E_KEEP_ALERTS === '1';
+const toggleAlerts = (a) => {
+  if (KEEP_ALERTS) { console.log(`   ${C.d}(E2E_KEEP_ALERTS=1: triggers de alerta mantidos ${a==='disable'?'LIGADOS':'ligados'})${C.x}`); return; }
+  return psql(ALERTS.map(([t, g]) => `alter table public.${t} ${a} trigger ${g};`).join('\n'));
+};
 
 // vencedor de um jogo (home/away) considerando pênaltis
 const winnerOf = (m) =>
@@ -50,6 +55,22 @@ async function main() {
   console.log(`${C.b}${C.bold}✏️  Re-scoring ao editar resultado${C.x}`);
   const admin = makeAdminClient();
   toggleAlerts('disable');
+
+  // Editar o placar de um jogo dispara o trigger que APAGA os player_goals (scorers)
+  // daquele jogo — e reverter o placar NÃO os recria. Sem restaurar, o jogo fica com
+  // scorers faltando (diverge do oráculo no total de gols do artilheiro). Snapshot →
+  // restore no finally (delete+insert depois que o placar já voltou ao original).
+  const goalBackups = {}; // match_id -> [{player_id, match_id, goals}]
+  const snapshotGoals = async (matchId) => {
+    const { data } = await admin.from('player_goals').select('player_id, match_id, goals').eq('match_id', matchId);
+    goalBackups[matchId] = data || [];
+  };
+  const restoreGoals = async () => {
+    for (const [matchId, rows] of Object.entries(goalBackups)) {
+      await admin.from('player_goals').delete().eq('match_id', matchId);
+      if (rows.length) await admin.from('player_goals').insert(rows);
+    }
+  };
 
   try {
     // ============================================================
@@ -71,6 +92,7 @@ async function main() {
     const origHome = M.actual_home, origAway = M.actual_away;
     console.log(`   ${C.d}jogo #${M.id} (${M.team_home} ${origHome}-${origAway} ${M.team_away}), user ${P.user_id.slice(0, 8)} palpitou ${P.pred_home}-${P.pred_away}${C.x}`);
 
+    await snapshotGoals(M.id); // scorers serão apagados pelo trigger ao editar o placar
     const oldPts = P.points_earned ?? 0;
     const lbBefore = (await admin.from('v_leaderboard').select('total_pts').eq('user_id', P.user_id).maybeSingle()).data?.total_pts ?? 0;
 
@@ -110,6 +132,7 @@ async function main() {
       if (d) { K = k; D = d; side = d.slot_home === tag ? 'home' : 'away'; break; }
     }
     if (!K) throw new Error('nenhum KO finalizado que alimente outro jogo');
+    await snapshotGoals(K.id); // idem: editar o vencedor apaga os scorers de K
     const kHome = K.actual_home, kAway = K.actual_away, kPen = K.pen_winner;
     const origWinner = winnerOf(K);
     const origDteam = side === 'home' ? D.team_home : D.team_away;
@@ -134,7 +157,9 @@ async function main() {
     check('reverter vencedor volta o slot seguinte ao time original', backDteam === origDteam, `D.${side}=${backDteam} orig=${origDteam}`);
 
   } finally {
-    try { toggleAlerts('enable'); console.log(`\n   ${C.g}✓${C.x} alert triggers religados`); }
+    try { await restoreGoals(); console.log(`   ${C.g}✓${C.x} player_goals (scorers) restaurados`); }
+    catch (e) { console.log(`   ${C.r}⚠ restaurar scorers falhou: ${e.message}${C.x}`); }
+    try { toggleAlerts('enable'); console.log(`   ${C.g}✓${C.x} alert triggers religados`); }
     catch (e) { console.log(`\n   ${C.r}⚠ religar alertas falhou: ${e.message}${C.x}`); }
   }
 

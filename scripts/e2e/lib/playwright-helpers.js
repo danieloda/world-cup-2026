@@ -24,28 +24,55 @@ export async function fillGroupPredictions(page, predictions, tracker) {
   tracker?.setContext({ step: 'palpitar_grupos' });
   await page.goto(`${BASE_URL}/palpites-grupos.html`);
 
-  // Aguarda a UI carregar
-  await page.waitForSelector('.bm-team .mini-input, .pred-input, [data-match]', { timeout: 15000 });
+  // Aguarda a UI carregar. A aba "palpites" renderiza UM grupo por vez (chips A..L),
+  // então precisamos iterar os grupos — não dá pra preencher os 72 numa página só.
+  await page.waitForSelector('.chip[data-group], [data-match]', { timeout: 15000 });
 
-  for (const p of predictions) {
-    tracker?.setContext({ match_id: p.match_id });
-    const homeSelector = `input[data-match="${p.match_id}"][data-side="home"]`;
-    const awaySelector = `input[data-match="${p.match_id}"][data-side="away"]`;
+  const remaining = new Map(predictions.map(p => [String(p.match_id), p]));
 
-    const homeExists = await page.$(homeSelector);
-    const awayExists = await page.$(awaySelector);
-    if (!homeExists || !awayExists) {
-      tracker?.track('assertion', `Inputs grupos não encontrados para match ${p.match_id}`, { match_id: p.match_id });
-      continue;
+  // Grupos disponíveis (ordem do DOM: A..L). Fallback p/ layout antigo sem chips.
+  let groups = await page.$$eval('.chip[data-group]', els => [...new Set(els.map(e => e.dataset.group))]);
+  if (groups.length === 0) groups = [null];
+
+  for (const g of groups) {
+    if (g !== null) {
+      await page.click(`.chip[data-group="${g}"]`);
+      await page.waitForTimeout(250); // re-render do grupo selecionado
+    }
+    const filled = [];
+    for (const [mid, p] of [...remaining]) {
+      tracker?.setContext({ match_id: Number(mid) });
+      const homeSelector = `input[data-match="${mid}"][data-side="home"]`;
+      const awaySelector = `input[data-match="${mid}"][data-side="away"]`;
+      if (!(await page.$(homeSelector)) || !(await page.$(awaySelector))) continue;
+
+      await page.fill(homeSelector, String(p.pred_home));
+      await page.fill(awaySelector, String(p.pred_away));
+      await page.evaluate((sel) => document.querySelector(sel)?.blur(), awaySelector);
+      filled.push(mid);
+      remaining.delete(mid);
     }
 
-    await page.fill(homeSelector, String(p.pred_home));
-    await page.fill(awaySelector, String(p.pred_away));
-    await page.evaluate((sel) => document.querySelector(sel)?.blur(), awaySelector);
+    // CRÍTICO: espera o debounce (700ms) + upsert concluir ANTES de trocar de grupo.
+    // doSave() lê o valor da row do DOM; se o re-render remover a row antes do save,
+    // o palpite é perdido silenciosamente.
+    if (filled.length) {
+      try {
+        await page.waitForFunction(
+          (ids) => ids.every(id =>
+            document.querySelector(`.match[data-match-id="${id}"]`)?.classList.contains('saved')),
+          filled, { timeout: 8000 }
+        );
+      } catch {
+        await page.waitForTimeout(1500);
+      }
+    }
   }
 
-  // Aguarda debounce final (700ms no app + margem)
-  await page.waitForTimeout(2000);
+  // Sobrou alguém = realmente não renderizou em nenhum grupo.
+  for (const [mid] of remaining) {
+    tracker?.track('assertion', `Inputs grupos não encontrados para match ${mid}`, { match_id: Number(mid) });
+  }
   tracker?.clearContext(['step', 'match_id']);
 }
 
