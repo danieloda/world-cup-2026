@@ -1,6 +1,6 @@
 import { requireAuth } from '../auth.js';
 import { renderShell } from '../sidebar.js';
-import { supabase } from '../supabase.js';
+import { supabase, fetchAllPages } from '../supabase.js';
 import {
   flag, escapeHtml, teamPt, formatBrShort, formatTime, showToast,
   avatarHtml, getInitials,
@@ -64,8 +64,15 @@ try {
 // Data
 // ============================================================
 async function loadData() {
+  // Palpites pontuados de TODO o bolão: cresce com (usuários × jogos), então
+  // PAGINA — sem isso o PostgREST corta em 1000 linhas e o gráfico subconta os
+  // pontos (o fim das séries deixa de bater com o v_leaderboard). Ver fetchAllPages.
+  const predPtsPromise = fetchAllPages(() =>
+    supabase.from('predictions').select('user_id, match_id, points_earned')
+      .not('points_earned', 'is', null).order('id'));
+
   const [statsRes, leaderRes, scorerRes, settingsRes, champRes, sPickRes, profilesRes, finalRes,
-         finMatchesRes, predPtsRes, goalsRes, qualRes] = await Promise.all([
+         finMatchesRes, predPtsRows, goalsRes, qualRes] = await Promise.all([
     supabase.from('v_pool_stats').select('*').single(),
     supabase.from('v_leaderboard').select('*'),
     supabase.from('v_scorer_ranking').select('*'),
@@ -77,7 +84,7 @@ async function loadData() {
     // ---- dados p/ reconstruir a evolução do ranking (replay por data do jogo) ----
     supabase.from('matches').select('id, match_date, stage, group_name, team_home, team_away, actual_home, actual_away')
       .eq('finished', true).order('match_date', { ascending: true }),
-    supabase.from('predictions').select('user_id, match_id, points_earned').not('points_earned', 'is', null),
+    predPtsPromise,
     supabase.from('player_goals').select('player_id, match_id, goals'),
     supabase.from('user_qualifier_points').select('user_id, breakdown'),
   ]);
@@ -113,7 +120,7 @@ async function loadData() {
   finalMatchId = finishedMatches.find(m => m.stage === 'final')?.id ?? null;
   const finishedIds = new Set(finishedMatches.map(m => m.id));
 
-  for (const p of (predPtsRes.data ?? [])) {
+  for (const p of (predPtsRows ?? [])) {
     predPtsByUserMatch.set(`${p.user_id}|${p.match_id}`, p.points_earned ?? 0);
   }
   for (const g of (goalsRes.data ?? [])) {

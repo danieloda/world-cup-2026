@@ -1,6 +1,6 @@
 import { requireAuth } from '../auth.js';
 import { renderShell } from '../sidebar.js';
-import { supabase } from '../supabase.js';
+import { supabase, fetchAllPages } from '../supabase.js';
 import {
   flag, escapeHtml, teamPt, formatBrShort, formatTime, stageLabel,
   isLive, avatarHtml,
@@ -64,12 +64,18 @@ async function loadData() {
   if (revealedMatches.length === 0) return;
 
   const matchIds = revealedMatches.map(m => m.id);
-  // Artilheiros: o RLS só revela a escolha alheia após o deadline (10/jun). Como nenhum
-  // jogo termina antes disso, nos cards finalizados sempre dá pra cruzar quem pontuou.
-  const [predsRes, goalsRes, scorerRes] = await Promise.all([
+  // Palpites de TODOS os participantes nos jogos revelados: cresce com
+  // (usuários × jogos), então PAGINA — senão o PostgREST corta em 1000 linhas e
+  // somem palpites dos cards quando o bolão fica grande. Ver fetchAllPages.
+  const predsPromise = fetchAllPages(() =>
     supabase.from('predictions')
       .select('*, profiles(full_name, email, paid, avatar_url)')
-      .in('match_id', matchIds),
+      .in('match_id', matchIds).order('id'));
+
+  // Artilheiros: o RLS só revela a escolha alheia após o deadline (10/jun). Como nenhum
+  // jogo termina antes disso, nos cards finalizados sempre dá pra cruzar quem pontuou.
+  const [predsRows, goalsRes, scorerRes] = await Promise.all([
+    predsPromise,
     supabase.from('player_goals')
       .select('*, players(full_name, team)')
       .in('match_id', matchIds),
@@ -77,7 +83,7 @@ async function loadData() {
       .select('user_id, player_id, players(full_name, team)'),
   ]);
 
-  for (const p of (predsRes.data ?? [])) {
+  for (const p of (predsRows ?? [])) {
     if (!p.profiles?.paid) continue;  // só participantes do bolão (pagos)
     if (!predsByMatch.has(p.match_id)) predsByMatch.set(p.match_id, []);
     predsByMatch.get(p.match_id).push(p);
