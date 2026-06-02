@@ -28,17 +28,17 @@
   --line-strong: rgba(255, 255, 255, .15);
   --text: #fff;
   --text-dim: #b3b3b3;
-  --text-mute: #7a7a7a;
-  /* NOTA: nomes preservados pra não quebrar o código,
-     mas as cores foram trocadas:
-       --green / --gold = amarelo / verde   */
-  --green: #f4c430;            /* amarelo (era verde Spotify) */
-  --green-bright: #ffd54a;     /* amarelo brilhante */
-  --green-dim: rgba(244, 196, 48, .15);
+  --text-mute: #8a8a8a;
+  /* Cores semânticas do tema:
+       --accent   = amarelo (cor de marca, destaques, botão primário)
+       --positive = verde   (sucesso: acertos, pontos, classificado) */
+  --accent: #f4c430;            /* amarelo (marca) */
+  --accent-bright: #ffd54a;     /* amarelo brilhante */
+  --accent-dim: rgba(244, 196, 48, .15);
   --red: #f15e6c;
   --red-dim: rgba(241, 94, 108, .15);
-  --gold: #1DB954;             /* verde Spotify (era dourado) */
-  --gold-dim: rgba(29, 185, 84, .15);
+  --positive: #1DB954;          /* verde (sucesso) */
+  --positive-dim: rgba(29, 185, 84, .15);
   /* Medalhas (cores fixas, não fazem parte do tema) */
   --medal-gold: #d4a73a;       /* dourado (Final) */
   --medal-bronze: #cd7f32;     /* bronze (3º lugar) */
@@ -149,9 +149,9 @@ img { max-width: 100%; height: auto; }
   box-shadow: 0 2px 8px rgba(0, 0, 0, .4);
 }
 .sb-collapse-btn:hover {
-  background: var(--green);
+  background: var(--accent);
   color: #000;
-  border-color: var(--green);
+  border-color: var(--accent);
   box-shadow: 0 4px 12px rgba(0, 0, 0, .5);
 }
 .app:has(.sidebar.collapsed) .sb-collapse-btn {
@@ -236,7 +236,7 @@ img { max-width: 100%; height: auto; }
   left: 0;
   width: 3px;
   height: 24px;
-  background: var(--green);
+  background: var(--accent);
   border-radius: 0 3px 3px 0;
   transition: opacity .15s;
 }
@@ -284,8 +284,8 @@ img { max-width: 100%; height: auto; }
   display: none;
 }
 .sidebar.collapsed .sb-link.active {
-  background: var(--green-dim);
-  color: var(--green);
+  background: var(--accent-dim);
+  color: var(--accent);
 }
 
 /* Tooltip on collapsed hover (pure CSS) */
@@ -330,7 +330,7 @@ img { max-width: 100%; height: auto; }
 }
 .sb-progress-bar > span {
   display: block; height: 100%;
-  background: var(--green);
+  background: var(--accent);
   border-radius: 3px;
   transition: width .4s ease;
 }
@@ -382,7 +382,7 @@ img { max-width: 100%; height: auto; }
 }
 .sidebar.collapsed .sb-progress-stats strong {
   font-size: 12px;
-  color: var(--green);
+  color: var(--accent);
 }
 
 /* ===== Main content ===== */
@@ -415,7 +415,7 @@ img { max-width: 100%; height: auto; }
 }
 .topbar-user .av {
   width: 28px; height: 28px; border-radius: 50%;
-  background: var(--green);
+  background: var(--accent);
   color: #000; font-weight: 800; font-size: 11px;
   display: flex; align-items: center; justify-content: center;
   overflow: hidden;
@@ -481,8 +481,8 @@ img { max-width: 100%; height: auto; }
 }
 .btn:active { transform: scale(.97); }
 .btn:disabled { opacity: .5; cursor: not-allowed; }
-.btn-green { background: var(--green); color: #000; }
-.btn-green:hover:not(:disabled) { background: var(--green-bright); transform: scale(1.03); }
+.btn-green { background: var(--accent); color: #000; }
+.btn-green:hover:not(:disabled) { background: var(--accent-bright); transform: scale(1.03); }
 .btn-ghost {
   background: transparent;
   border: 1px solid var(--line-strong);
@@ -542,8 +542,8 @@ img { max-width: 100%; height: auto; }
   letter-spacing: -.03em; line-height: 1;
 }
 .kpi-num small { font-size: 14px; color: var(--text-dim); font-weight: 600; }
-.kpi.green .kpi-num { color: var(--green); }
-.kpi.gold  .kpi-num { color: var(--green); }
+.kpi.green .kpi-num { color: var(--accent); }
+.kpi.gold  .kpi-num { color: var(--accent); }
 .kpi.red   .kpi-num { color: var(--red); }
 .kpi-sub { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
 
@@ -617,7 +617,7 @@ img { max-width: 100%; height: auto; }
   color: var(--text);
   font-family: var(--font);
 }
-.score-input:focus { outline: 2px solid var(--green); outline-offset: -1px; }
+.score-input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
 .score-input.locked { background: transparent; border-color: transparent; }
 .score-sep { color: var(--text-mute); font-weight: 700; }
 .match-tail {
@@ -640,12 +640,12 @@ img { max-width: 100%; height: auto; }
   box-shadow: 0 0 8px var(--red);
   animation: pulse 1.5s infinite;
 }
-.pill.open   { background: var(--green-dim); color: var(--green); }
-.pill.open::before { background: var(--green); }
+.pill.open   { background: var(--accent-dim); color: var(--accent); }
+.pill.open::before { background: var(--accent); }
 .pill.locked { background: rgba(255, 255, 255, .08); color: var(--text-dim); }
 .pill.locked::before { background: var(--text-dim); }
-.pill.done   { background: var(--green-dim); color: var(--green); }
-.pill.done::before { background: var(--green); }
+.pill.done   { background: var(--accent-dim); color: var(--accent); }
+.pill.done::before { background: var(--accent); }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
 
 /* ===== Filter chips ===== */
@@ -673,8 +673,84 @@ img { max-width: 100%; height: auto; }
   font-variant-numeric: tabular-nums;
 }
 .chip.active .ct { background: rgba(0, 0, 0, .15); color: #000; }
-.chip.complete .ct { background: var(--green-dim); color: var(--green); }
-.chip.active.complete .ct { background: var(--green); color: #000; }
+.chip.complete .ct { background: var(--accent-dim); color: var(--accent); }
+.chip.active.complete .ct { background: var(--accent); color: #000; }
+
+/* ===== Palpites toolbar (chips + hover dos 3ºs) ===== */
+.palpites-toolbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.palpites-toolbar .chips { margin-bottom: 0; flex: 1; }
+
+/* Popover (hover/clique) dos melhores 3ºs */
+.thirds-pop { position: relative; flex-shrink: 0; }
+.thirds-pop-trigger {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 14px;
+  border-radius: 500px;
+  background: rgba(244, 196, 48, .08);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-size: 12px; font-weight: 700;
+  font-family: var(--font);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .12s, border-color .12s;
+}
+.thirds-pop-trigger:hover { background: rgba(244, 196, 48, .14); border-color: var(--positive); }
+.thirds-pop-trigger .hint {
+  font-size: 10px; font-weight: 600;
+  color: var(--text-mute);
+  text-transform: uppercase; letter-spacing: .1em;
+}
+.thirds-pop-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 60;
+  width: min(620px, 88vw);
+  max-height: 70vh;
+  overflow: auto;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, .55);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: opacity .14s, transform .14s, visibility .14s;
+}
+/* Ponte invisível cobrindo o gap trigger↔painel (evita fechar ao mover o mouse) */
+.thirds-pop-panel::before {
+  content: '';
+  position: absolute;
+  top: -10px; left: 0; right: 0; height: 10px;
+}
+.thirds-pop:hover .thirds-pop-panel,
+.thirds-pop.open .thirds-pop-panel {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+.thirds-pop-head {
+  display: flex; flex-direction: column; gap: 2px;
+  margin-bottom: 12px;
+}
+.thirds-pop-head strong { font-size: 14px; font-weight: 800; }
+.thirds-pop-head span { font-size: 11px; color: var(--text-mute); }
+.thirds-pop-empty {
+  font-size: 12px; color: var(--text-dim);
+  margin: 4px 0 0; line-height: 1.5;
+}
+.thirds-pop-panel .thirds-table { font-size: 12px; }
+.thirds-pop-panel .thirds-table thead th,
+.thirds-pop-panel .thirds-table tbody td { padding: 9px 8px; }
 
 /* ===== Team tooltip (hover popover) ===== */
 .team-name {
@@ -689,7 +765,7 @@ img { max-width: 100%; height: auto; }
   font-size: 12px;
   color: var(--text-mute);
   background: rgba(244, 196, 48, .06);
-  border-left: 3px solid var(--gold);
+  border-left: 3px solid var(--positive);
   padding: 8px 12px;
   border-radius: 6px;
   margin: 0 0 16px;
@@ -718,7 +794,7 @@ img { max-width: 100%; height: auto; }
   transition: border-color .12s;
   text-align: left;
 }
-.flag-select-trigger:hover { border-color: var(--gold); }
+.flag-select-trigger:hover { border-color: var(--positive); }
 .flag-select-display {
   display: flex; align-items: center; gap: 8px;
   overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
@@ -745,7 +821,7 @@ img { max-width: 100%; height: auto; }
   background: #232323;
   font-size: 11px;
   font-weight: 700;
-  color: var(--gold);
+  color: var(--positive);
   text-transform: uppercase;
   letter-spacing: .05em;
   position: sticky; top: 0;
@@ -783,8 +859,8 @@ img { max-width: 100%; height: auto; }
 .flag-select-item .meta { color: var(--text-mute); font-size: 11px; }
 .flag-select .fi { width: 1.2em; }
 .team-name:hover {
-  color: var(--green);
-  border-bottom-color: var(--green);
+  color: var(--accent);
+  border-bottom-color: var(--accent);
 }
 .team-tooltip {
   position: fixed;
@@ -878,7 +954,7 @@ img { max-width: 100%; height: auto; }
   text-overflow: ellipsis;
   max-width: 100%;
 }
-.tt-match .opp .pred b { color: var(--green); font-weight: 800; }
+.tt-match .opp .pred b { color: var(--accent); font-weight: 800; }
 .tt-match .opp .pred.empty b { color: var(--text-mute); font-style: italic; }
 .tt-match .res {
   font-family: ui-monospace, monospace;
@@ -902,9 +978,9 @@ img { max-width: 100%; height: auto; }
   color: #000;
   background: var(--text-mute);
 }
-/* NB: --green/--gold estão trocados no tema (--green = amarelo, --gold = verde Spotify).
-   Aqui usamos --gold pra ter VERDE de verdade em "vitoria". */
-.tt-result.win  { background: var(--gold);      color: #000; }
+/* NB: --accent/--positive estão trocados no tema (--accent = amarelo, --positive = verde Spotify).
+   Aqui usamos --positive pra ter VERDE de verdade em "vitoria". */
+.tt-result.win  { background: var(--positive);      color: #000; }
 .tt-result.draw { background: var(--text-mute); color: #fff; }
 .tt-result.loss { background: var(--red);       color: #fff; }
 
@@ -920,7 +996,7 @@ img { max-width: 100%; height: auto; }
   margin-right: 2px;
   flex-shrink: 0;
 }
-.tt-venue.home { background: var(--green-dim); color: var(--green); }
+.tt-venue.home { background: var(--accent-dim); color: var(--accent); }
 .tt-venue.away { background: rgba(255, 255, 255, .08); color: var(--text-dim); }
 
 /* ===== Save toast (fixed bottom-right) ===== */
@@ -939,7 +1015,7 @@ img { max-width: 100%; height: auto; }
   transition: opacity .25s, transform .25s;
 }
 .save-toast.show { opacity: 1; transform: none; }
-.save-toast.success { background: var(--green); color: #000; }
+.save-toast.success { background: var(--accent); color: #000; }
 .save-toast.error { background: var(--red); color: #fff; }
 .save-toast.info { background: var(--card-elev); color: var(--text); }
 
@@ -948,10 +1024,10 @@ img { max-width: 100%; height: auto; }
   animation: savedFlash 1.2s ease-out;
 }
 @keyframes savedFlash {
-  0%   { box-shadow: 0 0 0 2px var(--green); background: var(--green-dim); }
+  0%   { box-shadow: 0 0 0 2px var(--accent); background: var(--accent-dim); }
   100% { box-shadow: 0 0 0 0 transparent; background: var(--card); }
 }
-.match.saving .score-input { border-color: var(--green); }
+.match.saving .score-input { border-color: var(--accent); }
 .match.error  .score-input { border-color: var(--red); }
 
 /* ===== Date section header ===== */
@@ -978,7 +1054,7 @@ img { max-width: 100%; height: auto; }
 }
 .progress-bar-inline > span {
   display: block; height: 100%;
-  background: var(--green);
+  background: var(--accent);
   border-radius: 3px;
   transition: width .4s ease;
 }
@@ -1017,7 +1093,7 @@ img { max-width: 100%; height: auto; }
 .login-brand { text-align: center; margin-bottom: 32px; }
 .login-brand-logo {
   width: 56px; height: 56px;
-  background: var(--green); color: #000;
+  background: var(--accent); color: #000;
   border-radius: 50%;
   font-size: 28px; font-weight: 900;
   display: flex; align-items: center; justify-content: center;
@@ -1047,14 +1123,14 @@ img { max-width: 100%; height: auto; }
   border-radius: 6px;
   font-size: 14px; color: var(--text);
 }
-.login-field input:focus { outline: 2px solid var(--green); outline-offset: -1px; }
+.login-field input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
 .login-card .btn-green { width: 100%; padding: 14px; margin-top: 8px; }
 .login-foot {
   text-align: center;
   margin-top: 24px;
   font-size: 12px; color: var(--text-dim);
 }
-.login-foot a { color: var(--green); font-weight: 700; cursor: pointer; }
+.login-foot a { color: var(--accent); font-weight: 700; cursor: pointer; }
 .login-error {
   background: var(--red-dim);
   border: 1px solid var(--red);
@@ -1066,9 +1142,9 @@ img { max-width: 100%; height: auto; }
   margin-bottom: 4px;
 }
 .login-success {
-  background: var(--green-dim);
-  border: 1px solid var(--green);
-  color: var(--green);
+  background: var(--accent-dim);
+  border: 1px solid var(--accent);
+  color: var(--accent);
   padding: 10px 14px;
   border-radius: 6px;
   font-size: 13px;
@@ -1078,7 +1154,7 @@ img { max-width: 100%; height: auto; }
 }
 .signup-step-note {
   background: rgba(255, 255, 255, 0.04);
-  border-left: 3px solid var(--green);
+  border-left: 3px solid var(--accent);
   border-radius: 0 6px 6px 0;
   padding: 10px 14px;
   font-size: 12px;
@@ -1099,11 +1175,11 @@ img { max-width: 100%; height: auto; }
 .avatar-preview {
   width: 120px; height: 120px;
   border-radius: 50%;
-  background: var(--green-dim);
-  border: 3px solid var(--green);
+  background: var(--accent-dim);
+  border: 3px solid var(--accent);
   display: flex; align-items: center; justify-content: center;
   overflow: hidden;
-  font-size: 42px; font-weight: 900; color: var(--green);
+  font-size: 42px; font-weight: 900; color: var(--accent);
   text-transform: uppercase;
 }
 .avatar-preview img {
@@ -1125,7 +1201,7 @@ img { max-width: 100%; height: auto; }
   content: '';
   width: 40px; height: 40px;
   border: 3px solid var(--line);
-  border-top-color: var(--green);
+  border-top-color: var(--accent);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -1158,8 +1234,8 @@ img { max-width: 100%; height: auto; }
   inset: 0;
   border-radius: 50%;
   border: 3px solid rgba(255, 255, 255, .06);
-  border-top-color: var(--green);          /* amarelo */
-  border-right-color: var(--green);
+  border-top-color: var(--accent);          /* amarelo */
+  border-right-color: var(--accent);
   animation: spin 1.2s cubic-bezier(.4, 0, .2, 1) infinite;
   box-shadow:
     0 0 30px rgba(244, 196, 48, .15),
@@ -1230,8 +1306,8 @@ img { max-width: 100%; height: auto; }
   transition: background .12s;
 }
 .result-card:hover { background: var(--card-hover); }
-.result-card.exact     { border-left-color: var(--green); }   /* amarelo */
-.result-card.partial   { border-left-color: var(--gold); }    /* verde */
+.result-card.exact     { border-left-color: var(--accent); }   /* amarelo */
+.result-card.partial   { border-left-color: var(--positive); }    /* verde */
 .result-card.miss      { border-left-color: var(--red); }     /* vermelho (errou) */
 .result-card.no-pred   { border-left-color: var(--text-mute); } /* sem palpite */
 .result-card.final     { border-left: 5px solid var(--medal-gold) !important; }
@@ -1289,8 +1365,8 @@ img { max-width: 100%; height: auto; }
   color: var(--text-mute);
   display: block;
 }
-.result-card.exact   .result-card-points .num { color: var(--green); }   /* amarelo */
-.result-card.partial .result-card-points .num { color: var(--gold); }    /* verde */
+.result-card.exact   .result-card-points .num { color: var(--accent); }   /* amarelo */
+.result-card.partial .result-card-points .num { color: var(--positive); }    /* verde */
 .result-card.miss    .result-card-points .num { color: var(--red); }     /* vermelho */
 .result-card.no-pred .result-card-points .num { color: var(--text-mute); }
 
@@ -1306,8 +1382,8 @@ img { max-width: 100%; height: auto; }
   border-radius: 500px;
   padding: 2px 8px;
 }
-.result-card-break .brk b { color: var(--gold); font-weight: 800; }
-.result-card-break .brk.winner b { color: var(--green); }
+.result-card-break .brk b { color: var(--positive); font-weight: 800; }
+.result-card-break .brk.winner b { color: var(--accent); }
 .result-card-break .brk.miss { color: var(--text-mute); font-style: italic; background: transparent; padding-left: 0; }
 .result-card-meta {
   text-align: right;
@@ -1345,7 +1421,7 @@ img { max-width: 100%; height: auto; }
   font-weight: 600;
 }
 .result-card-scorers .scorer .num {
-  color: var(--green);
+  color: var(--accent);
   font-weight: 800;
 }
 
@@ -1363,7 +1439,7 @@ img { max-width: 100%; height: auto; }
 }
 .history-card.group  { border-left-color: var(--text-mute); }
 .history-card.r32, .history-card.r16, .history-card.qf, .history-card.sf {
-  border-left-color: var(--green);
+  border-left-color: var(--accent);
 }
 .history-card.final  { border-left-color: var(--medal-gold); }
 .history-card.third  { border-left-color: var(--medal-bronze); }
@@ -1442,8 +1518,8 @@ img { max-width: 100%; height: auto; }
   font-size: 13px;
 }
 /* Estado pela barra lateral fina (em vez de fundo cheio) — mais limpo */
-.hb-row.win-exact   { border-left-color: var(--green); }   /* amarelo (acerto cheio) */
-.hb-row.win-partial { border-left-color: var(--gold); }    /* verde  (acerto parcial) */
+.hb-row.win-exact   { border-left-color: var(--accent); }   /* amarelo (acerto cheio) */
+.hb-row.win-partial { border-left-color: var(--positive); }    /* verde  (acerto parcial) */
 .hb-row.miss        { border-left-color: var(--red); }     /* vermelho (errou) */
 .hb-row.me { outline: 1px solid var(--text); }
 .hb-row .av-mini {
@@ -1457,7 +1533,7 @@ img { max-width: 100%; height: auto; }
   overflow: hidden;
 }
 .hb-row .av-mini img { width: 100%; height: 100%; object-fit: cover; }
-.hb-row.me .av-mini { background: var(--green); color: #000; }
+.hb-row.me .av-mini { background: var(--accent); color: #000; }
 .hb-row .nm {
   flex: 1 1 auto;
   min-width: 0;
@@ -1480,8 +1556,8 @@ img { max-width: 100%; height: auto; }
   min-width: 34px; text-align: center;
   font-variant-numeric: tabular-nums;
 }
-.hb-row .pts.exact   { background: var(--green); color: #000; }        /* amarelo */
-.hb-row .pts.partial { background: var(--gold);  color: #000; }        /* verde */
+.hb-row .pts.exact   { background: var(--accent); color: #000; }        /* amarelo */
+.hb-row .pts.partial { background: var(--positive);  color: #000; }        /* verde */
 .hb-row .pts.zero    { background: var(--red-dim); color: var(--red); } /* vermelho */
 
 /* Marcadores no fim do card de histórico */
@@ -1506,7 +1582,7 @@ img { max-width: 100%; height: auto; }
   font-weight: 600;
 }
 .history-scorers .scorer .num {
-  color: var(--green);
+  color: var(--accent);
   font-weight: 900;
 }
 
@@ -1579,7 +1655,7 @@ img { max-width: 100%; height: auto; }
 }
 .podium-card:hover { background: var(--card-hover); transform: translateY(-2px); }
 .podium-card.first {
-  background: linear-gradient(160deg, var(--green) 0%, #8b6a1f 100%);
+  background: linear-gradient(160deg, var(--accent) 0%, #8b6a1f 100%);
   padding: 28px 20px;
   transform: translateY(-12px);
   border: none;
@@ -1591,7 +1667,7 @@ img { max-width: 100%; height: auto; }
 .podium-card.first .podium-name { color: #000; }
 .podium-card.first .podium-pts { color: rgba(0, 0, 0, .75); }
 .podium-card.first .podium-prize { color: #000; }
-.podium-card.first .podium-av { background: #000; color: var(--green); border-color: rgba(0, 0, 0, .2); }
+.podium-card.first .podium-av { background: #000; color: var(--accent); border-color: rgba(0, 0, 0, .2); }
 
 .podium-place {
   font-size: 48px; font-weight: 900;
@@ -1602,7 +1678,7 @@ img { max-width: 100%; height: auto; }
 .podium-av {
   width: 64px; height: 64px; border-radius: 50%;
   background: #2a2a2a;
-  color: var(--green);
+  color: var(--accent);
   font-size: 22px; font-weight: 900;
   display: flex; align-items: center; justify-content: center;
   margin: 12px auto;
@@ -1620,7 +1696,7 @@ img { max-width: 100%; height: auto; }
 }
 .podium-prize {
   font-size: 22px; font-weight: 900;
-  letter-spacing: -.02em; color: var(--green);
+  letter-spacing: -.02em; color: var(--accent);
 }
 
 /* ===== Pot banner ===== */
@@ -1649,7 +1725,7 @@ img { max-width: 100%; height: auto; }
   font-size: 22px; font-weight: 900;
   letter-spacing: -.02em;
 }
-.pot-cell.big .val { font-size: 32px; color: var(--green); }
+.pot-cell.big .val { font-size: 32px; color: var(--accent); }
 
 /* ===== Rank table ===== */
 .rank-table-wrap {
@@ -1700,14 +1776,14 @@ img { max-width: 100%; height: auto; }
   display: inline-block;
   text-align: center;
 }
-.rank-table .pos-top { color: var(--green); }
+.rank-table .pos-top { color: var(--accent); }
 .rank-table .user-cell {
   display: flex; align-items: center; gap: 10px;
   min-width: 0;
 }
 .rank-table .av-mini {
   width: 30px; height: 30px; border-radius: 50%;
-  background: #2a2a2a; color: var(--green);
+  background: #2a2a2a; color: var(--accent);
   font-size: 11px; font-weight: 800;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
@@ -1723,10 +1799,10 @@ img { max-width: 100%; height: auto; }
 }
 .rank-table .pts {
   font-size: 16px; font-weight: 900;
-  color: var(--green);
+  color: var(--accent);
 }
 .rank-table tr.me-row { background: rgba(244, 196, 48, .06); }
-.rank-table tr.me-row .pos { color: var(--green); }
+.rank-table tr.me-row .pos { color: var(--accent); }
 
 .rank-table td.pick-col {
   width: 140px;
@@ -1757,8 +1833,8 @@ img { max-width: 100%; height: auto; }
 .rank-table .pick-cell .pick-pts {
   font-size: 9px;
   font-weight: 800;
-  background: var(--green-dim);
-  color: var(--green);
+  background: var(--accent-dim);
+  color: var(--accent);
   padding: 2px 5px;
   border-radius: 3px;
   flex-shrink: 0;
@@ -1772,7 +1848,7 @@ img { max-width: 100%; height: auto; }
 /* Badge de Classificados na tabela */
 .rank-table .qual-pts {
   font-size: 11px; font-weight: 800;
-  background: var(--gold-dim); color: var(--gold);
+  background: var(--positive-dim); color: var(--positive);
   padding: 2px 7px; border-radius: 4px;
   font-variant-numeric: tabular-nums;
 }
@@ -1781,8 +1857,8 @@ img { max-width: 100%; height: auto; }
   font-size: 9px;
   font-weight: 800;
   letter-spacing: .12em;
-  color: var(--green);
-  background: var(--green-dim);
+  color: var(--accent);
+  background: var(--accent-dim);
   padding: 2px 6px;
   border-radius: 4px;
   margin-left: 6px;
@@ -1794,7 +1870,7 @@ img { max-width: 100%; height: auto; }
   border-radius: 10px;
   padding: 24px;
   margin-top: 16px;
-  border: 1px solid var(--green);
+  border: 1px solid var(--accent);
   animation: fadeUp .25s ease-out;
 }
 .profile-head {
@@ -1805,7 +1881,7 @@ img { max-width: 100%; height: auto; }
 }
 .profile-av {
   width: 72px; height: 72px; border-radius: 50%;
-  background: #2a2a2a; color: var(--green);
+  background: #2a2a2a; color: var(--accent);
   font-size: 26px; font-weight: 900;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
@@ -1852,8 +1928,8 @@ img { max-width: 100%; height: auto; }
   line-height: 1;
   margin-bottom: 6px;
 }
-.profile-stat .v.green { color: var(--green); }
-.profile-stat .v.gold { color: var(--green); }
+.profile-stat .v.green { color: var(--accent); }
+.profile-stat .v.gold { color: var(--accent); }
 .profile-stat .v.red { color: var(--red); }
 .profile-stat .l {
   font-size: 9px; color: var(--text-mute);
@@ -1900,8 +1976,8 @@ img { max-width: 100%; height: auto; }
   font-weight: 800;
   font-size: 14px;
 }
-.profile-row .pts-cell.win { color: var(--green); }      /* exato — amarelo */
-.profile-row .pts-cell.partial { color: var(--gold); }   /* parcial — verde */
+.profile-row .pts-cell.win { color: var(--accent); }      /* exato — amarelo */
+.profile-row .pts-cell.partial { color: var(--positive); }   /* parcial — verde */
 .profile-row .pts-cell.zero { color: var(--text-mute); }
 
 /* Quebra aditiva do palpite (lado / resultado / saldo) */
@@ -1918,14 +1994,14 @@ img { max-width: 100%; height: auto; }
   border-radius: 500px;
   padding: 2px 8px;
 }
-.pred-break .brk b { color: var(--gold); font-weight: 800; }
-.pred-break .brk.winner b { color: var(--green); }
+.pred-break .brk b { color: var(--positive); font-weight: 800; }
+.pred-break .brk.winner b { color: var(--accent); }
 .pred-break .brk.miss { color: var(--text-mute); font-style: italic; background: transparent; padding-left: 0; }
 
 /* Champion pick result (acerto/erro do campeão) */
 .profile-row.champion-result.champion-hit {
   background: rgba(45, 200, 110, 0.06);
-  border-left: 3px solid var(--green);
+  border-left: 3px solid var(--accent);
 }
 .profile-row.champion-result.champion-miss {
   background: rgba(241, 94, 108, 0.05);
@@ -1948,7 +2024,7 @@ img { max-width: 100%; height: auto; }
 }
 .champion-tag.hit {
   background: rgba(45, 200, 110, 0.15);
-  color: var(--green);
+  color: var(--accent);
 }
 .champion-tag.miss {
   background: rgba(241, 94, 108, 0.12);
@@ -1995,7 +2071,7 @@ img { max-width: 100%; height: auto; }
   text-align: center;
 }
 .thirds-table tbody tr.adv .rank,
-.thirds-table tbody tr.adv td { color: var(--green); }
+.thirds-table tbody tr.adv td { color: var(--accent); }
 .thirds-table tbody tr.adv td:last-child { font-weight: 800; }
 
 .thirds-table tbody tr.out .rank,
@@ -2025,12 +2101,12 @@ img { max-width: 100%; height: auto; }
 .thirds-table .divider td {
   padding: 8px 16px;
   background: rgba(244, 196, 48, .04);
-  border-top: 1px dashed var(--green);
-  border-bottom: 1px dashed var(--green);
+  border-top: 1px dashed var(--accent);
+  border-bottom: 1px dashed var(--accent);
   font-size: 10px;
   letter-spacing: .2em;
   text-transform: uppercase;
-  color: var(--green);
+  color: var(--accent);
   font-weight: 800;
   text-align: center;
 }
@@ -2154,8 +2230,8 @@ img { max-width: 100%; height: auto; }
   display: inline-block;
   font-size: 9px;
   letter-spacing: 0;
-  background: var(--green-dim);
-  color: var(--green);
+  background: var(--accent-dim);
+  color: var(--accent);
   padding: 2px 6px;
   border-radius: 4px;
   font-family: ui-monospace, monospace;
@@ -2182,7 +2258,7 @@ img { max-width: 100%; height: auto; }
 .bracket-match.saved {
   animation: savedFlash 1.2s ease-out;
 }
-.bracket-match.saving { border-color: var(--green); }
+.bracket-match.saving { border-color: var(--accent); }
 .bracket-match.error { border-color: var(--red); }
 .bracket-match.locked {
   opacity: .85;
@@ -2260,8 +2336,8 @@ img { max-width: 100%; height: auto; }
   align-items: center; justify-content: center;
   font-size: 10px;
   width: 16px; height: 16px;
-  background: var(--green-dim);
-  color: var(--green);
+  background: var(--accent-dim);
+  color: var(--accent);
   border-radius: 50%;
   font-weight: 800;
   cursor: help;
@@ -2286,7 +2362,7 @@ img { max-width: 100%; height: auto; }
   -webkit-appearance: none;
   margin: 0;
 }
-.bm-team .mini-input:focus { outline: 2px solid var(--green); outline-offset: -1px; }
+.bm-team .mini-input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
 .bm-team .mini-input:disabled {
   background: rgba(255, 255, 255, .04);
   border-color: transparent;
@@ -2345,11 +2421,11 @@ input[type="number"].score-input {
   text-align: center;
   font-family: ui-monospace, monospace;
 }
-.bracket-match.result-mode .bm-team.winner .team-name { color: var(--green); }
-.bracket-match.result-mode .bm-team.winner .result-score { color: var(--green); }
+.bracket-match.result-mode .bm-team.winner .team-name { color: var(--accent); }
+.bracket-match.result-mode .bm-team.winner .result-score { color: var(--accent); }
 
-.bracket-match.result-mode.exact { border-color: var(--green); background: rgba(45, 200, 110, 0.04); }
-.bracket-match.result-mode.partial { border-color: var(--gold); background: rgba(244, 196, 48, 0.04); }
+.bracket-match.result-mode.exact { border-color: var(--accent); background: rgba(45, 200, 110, 0.04); }
+.bracket-match.result-mode.partial { border-color: var(--positive); background: rgba(244, 196, 48, 0.04); }
 .bracket-match.result-mode.miss { border-color: var(--red); background: rgba(241, 94, 108, 0.03); }
 .bracket-match.result-mode.no-pred { border-color: var(--line-strong); background: rgba(255, 255, 255, 0.02); }
 
@@ -2407,7 +2483,7 @@ input[type="number"].score-input {
   font-weight: 800;
   letter-spacing: .08em;
   text-transform: uppercase;
-  color: var(--green);
+  color: var(--accent);
   text-align: center;
   margin-bottom: 8px;
   display: flex; align-items: center; justify-content: center;
@@ -2444,9 +2520,9 @@ input[type="number"].score-input {
   color: var(--text);
 }
 .bm-pen button.active {
-  background: var(--green);
+  background: var(--accent);
   color: #000;
-  border-color: var(--green);
+  border-color: var(--accent);
   box-shadow: 0 2px 8px rgba(244, 196, 48, .3);
 }
 .bm-pen-vs {
@@ -2468,9 +2544,9 @@ input[type="number"].score-input {
   align-items: baseline;
   gap: 4px;
 }
-.bm-pts.win { color: var(--green); }
-.bm-pts.exact { color: var(--green); }    /* amarelo */
-.bm-pts.partial { color: var(--gold); }   /* verde */
+.bm-pts.win { color: var(--accent); }
+.bm-pts.exact { color: var(--accent); }    /* amarelo */
+.bm-pts.partial { color: var(--positive); }   /* verde */
 .bm-pts.miss { color: var(--red); }       /* vermelho (errou) */
 .bm-pts.no-pred { color: var(--text-mute); font-style: italic; }
 
@@ -2486,8 +2562,8 @@ input[type="number"].score-input {
   border-radius: 500px;
   padding: 1px 7px;
 }
-.bm-break .brk b { color: var(--gold); font-weight: 800; }
-.bm-break .brk.winner b { color: var(--green); }
+.bm-break .brk b { color: var(--positive); font-weight: 800; }
+.bm-break .brk.winner b { color: var(--accent); }
 .bm-pts .formula {
   color: var(--text-mute);
   font-weight: 700;
@@ -2502,7 +2578,7 @@ input[type="number"].score-input {
   font-weight: 800;
   font-size: 11px;
 }
-.bm-pts.win .total { color: var(--green); }
+.bm-pts.win .total { color: var(--accent); }
 
 /* Quando bracket está em viewport pequeno, scroll horizontal */
 @media (max-width: 1280px) {
@@ -2536,7 +2612,7 @@ input[type="number"].score-input {
 }
 .cs-card-kicker {
   font-size: 10px; letter-spacing: .2em; text-transform: uppercase;
-  color: var(--green); font-weight: 800;
+  color: var(--accent); font-weight: 800;
   margin-bottom: 12px;
 }
 .cs-card h3 {
@@ -2549,7 +2625,7 @@ input[type="number"].score-input {
   margin-bottom: 20px;
 }
 .cs-card-pts {
-  font-size: 11px; color: var(--green);
+  font-size: 11px; color: var(--accent);
   font-weight: 700; letter-spacing: .1em;
   text-transform: uppercase; margin-bottom: 24px;
 }
@@ -2593,7 +2669,7 @@ input[type="number"].score-input {
   font-size: 13px; color: var(--text);
 }
 .cs-search input::placeholder { color: var(--text-mute); }
-.cs-search input:focus { outline: 2px solid var(--green); outline-offset: -1px; }
+.cs-search input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
 .cs-search::before {
   content: '🔍';
   position: absolute; left: 14px; top: 50%;
@@ -2623,7 +2699,7 @@ input[type="number"].score-input {
 }
 .cs-row:hover { background: rgba(255, 255, 255, .05); }
 .cs-row.selected { background: rgba(244, 196, 48, .15); }
-.cs-row.selected .nm { color: var(--green); font-weight: 800; }
+.cs-row.selected .nm { color: var(--accent); font-weight: 800; }
 .cs-row .flag { font-size: 18px; width: 26px; }
 .cs-row .nm {
   flex: 1; font-weight: 600;
@@ -2636,7 +2712,7 @@ input[type="number"].score-input {
   letter-spacing: .08em;
 }
 .cs-row .check {
-  color: var(--green);
+  color: var(--accent);
   font-size: 16px;
   font-weight: 900;
 }
@@ -2650,7 +2726,7 @@ input[type="number"].score-input {
   font-weight: 600;
   letter-spacing: .03em;
 }
-.cs-deadline strong { color: var(--green); font-weight: 800; }
+.cs-deadline strong { color: var(--accent); font-weight: 800; }
 .cs-deadline.locked strong { color: var(--red); }
 
 /* Artilheiro two-step selection */
@@ -2664,7 +2740,7 @@ input[type="number"].score-input {
 }
 .cs-step-badge {
   width: 24px; height: 24px;
-  background: var(--green);
+  background: var(--accent);
   color: #000;
   border-radius: 50%;
   font-size: 12px;
@@ -2770,7 +2846,7 @@ input[type="number"].score-input {
 .cs-spinner {
   width: 18px; height: 18px;
   border: 2px solid var(--line);
-  border-top-color: var(--green);
+  border-top-color: var(--accent);
   border-radius: 50%;
   animation: spin .8s linear infinite;
 }
@@ -2808,7 +2884,7 @@ input[type="number"].score-input {
 }
 .cs-pick-box.win {
   background: rgba(45, 200, 110, 0.08);
-  border-color: var(--green);
+  border-color: var(--accent);
 }
 .cs-pick-box.lose {
   background: rgba(241, 94, 108, 0.06);
@@ -2818,7 +2894,7 @@ input[type="number"].score-input {
   background: rgba(244, 196, 48, 0.05);
   border-color: rgba(244, 196, 48, 0.3);
 }
-.cs-pick-box.win .cs-pick-sub { color: var(--green); font-weight: 700; }
+.cs-pick-box.win .cs-pick-sub { color: var(--accent); font-weight: 700; }
 .cs-pick-box.lose .cs-pick-sub { color: var(--red); font-weight: 700; }
 
 .cs-result-pick {
@@ -2842,7 +2918,7 @@ input[type="number"].score-input {
 }
 .cs-result-points.hit {
   background: rgba(45, 200, 110, 0.08);
-  border-color: var(--green);
+  border-color: var(--accent);
 }
 .cs-result-points.miss {
   background: rgba(255, 255, 255, 0.02);
@@ -2862,7 +2938,7 @@ input[type="number"].score-input {
   letter-spacing: -.03em;
   line-height: 1;
 }
-.cs-result-points.hit .cs-result-points-value { color: var(--green); }
+.cs-result-points.hit .cs-result-points-value { color: var(--accent); }
 .cs-result-points.miss .cs-result-points-value { color: var(--text-mute); }
 .cs-result-points-sub {
   font-size: 12px;
@@ -2882,14 +2958,14 @@ input[type="number"].score-input {
   font-size: 10px;
   letter-spacing: .15em;
   text-transform: uppercase;
-  color: var(--gold);
+  color: var(--positive);
   font-weight: 700;
   margin-bottom: 4px;
 }
 .cs-scorer-running-value {
   font-size: 24px;
   font-weight: 900;
-  color: var(--gold);
+  color: var(--positive);
   line-height: 1;
 }
 .cs-scorer-running-sub {
@@ -2942,7 +3018,7 @@ input[type="number"].score-input {
   text-transform: uppercase;
   padding: 2px 6px;
   background: rgba(45, 200, 110, 0.12);
-  color: var(--green);
+  color: var(--accent);
   border-radius: 3px;
 }
 .cs-goal-match .match-teams {
@@ -2956,7 +3032,7 @@ input[type="number"].score-input {
 .cs-goal-match .match-teams .score {
   font-family: ui-monospace, monospace;
   font-weight: 800;
-  color: var(--gold);
+  color: var(--positive);
   margin: 0 4px;
 }
 .cs-goal-pts {
@@ -2974,7 +3050,7 @@ input[type="number"].score-input {
 .cs-goal-pts .total {
   font-size: 13px;
   font-weight: 800;
-  color: var(--green);
+  color: var(--accent);
 }
 
 .cs-empty-goals {
@@ -3014,7 +3090,7 @@ input[type="number"].score-input {
   border-radius: 500px;
   color: var(--text-mute);
 }
-.admin-tab.active { background: var(--green); color: #000; }
+.admin-tab.active { background: var(--accent); color: #000; }
 .admin-tab.active .ct { background: rgba(0, 0, 0, .2); color: #000; }
 
 /* ===== Admin tables ===== */
@@ -3056,8 +3132,8 @@ input[type="number"].score-input {
 }
 .admin-action:hover { color: var(--text); }
 .admin-action.danger:hover { color: var(--red); }
-.admin-action.green:hover { color: var(--green); }
-.admin-action.green-active { color: var(--green); font-weight: 800; }
+.admin-action.green:hover { color: var(--accent); }
+.admin-action.green-active { color: var(--accent); font-weight: 800; }
 
 /* ===== Result entry rows ===== */
 .result-row {
@@ -3066,7 +3142,7 @@ input[type="number"].score-input {
   margin-bottom: 8px;
   padding: 12px 16px;
 }
-.result-row.done { border-left: 3px solid var(--green); }
+.result-row.done { border-left: 3px solid var(--accent); }
 .result-row-top {
   display: grid;
   grid-template-columns: 80px 1fr 140px 1fr 120px;
@@ -3107,7 +3183,7 @@ input[type="number"].score-input {
   color: var(--text);
   text-transform: none;
 }
-.scorers-head .count.ok { color: var(--green); }
+.scorers-head .count.ok { color: var(--accent); }
 .scorers-head .count.warn { color: var(--red); }
 .scorer-list {
   display: flex; flex-direction: column;
@@ -3130,7 +3206,7 @@ input[type="number"].score-input {
   font-family: ui-monospace, monospace;
   font-weight: 800;
   font-size: 13px;
-  color: var(--green);
+  color: var(--accent);
 }
 .scorer-row .remove {
   width: 28px; height: 28px; border-radius: 50%;
@@ -3173,7 +3249,7 @@ input[type="number"].score-input {
   font-family: var(--font);
 }
 .scorer-add select:focus,
-.scorer-add input:focus { outline: 2px solid var(--green); outline-offset: -1px; }
+.scorer-add input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
 .scorer-add .btn-sm {
   padding: 8px 12px;
   font-size: 12px;
@@ -3198,7 +3274,7 @@ input[type="number"].score-input {
   cursor: pointer;
   font-family: var(--font);
 }
-.pen-toggle button.active { background: var(--green); color: #000; }
+.pen-toggle button.active { background: var(--accent); color: #000; }
 
 /* ===== Setting form ===== */
 .setting-form {
@@ -3235,7 +3311,7 @@ input[type="number"].score-input {
   color: var(--text);
   font-family: var(--font);
 }
-.setting-form input:focus { outline: 2px solid var(--green); outline-offset: -1px; }
+.setting-form input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
 .setting-form .triple {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -3276,7 +3352,7 @@ input[type="number"].score-input {
   letter-spacing: -.04em;
   font-variant-numeric: tabular-nums;
 }
-.today-score.live { color: var(--green); }
+.today-score.live { color: var(--accent); }
 .today-vs { font-size: 18px; color: var(--text-mute); font-weight: 700; }
 
 /* Backdrop é sempre escondido (só vira block em mobile, quando o sidebar abre) */
@@ -3365,7 +3441,7 @@ input[type="number"].score-input {
   width: 30px; height: 30px;
   display: inline-flex; align-items: center; justify-content: center;
   border-radius: 8px;
-  background: var(--green-dim); color: var(--green);
+  background: var(--accent-dim); color: var(--accent);
   font-weight: 900; font-size: 14px;
 }
 .rules-section-head h2 {
@@ -3375,12 +3451,12 @@ input[type="number"].score-input {
 
 .rules-p { font-size: 14px; line-height: 1.6; color: var(--text-dim); margin-bottom: 14px; }
 .rules-p strong { color: var(--text); font-weight: 700; }
-.rules-p a, .rules-tip a { color: var(--green); font-weight: 700; }
+.rules-p a, .rules-tip a { color: var(--accent); font-weight: 700; }
 .rules-p a:hover, .rules-tip a:hover { text-decoration: underline; }
 
 .rules-tip {
   font-size: 13px; line-height: 1.55; color: var(--text-dim);
-  background: var(--card); border-left: 3px solid var(--green);
+  background: var(--card); border-left: 3px solid var(--accent);
   border-radius: 0 6px 6px 0;
   padding: 12px 16px; margin-top: 16px;
 }
@@ -3405,7 +3481,7 @@ input[type="number"].score-input {
 .rules-mini-ico { font-size: 26px; margin-bottom: 8px; }
 .rules-mini-title { font-size: 15px; font-weight: 800; margin-bottom: 6px; }
 .rules-mini-text { font-size: 13px; line-height: 1.55; color: var(--text-dim); }
-.rules-mini-text strong { color: var(--green); }
+.rules-mini-text strong { color: var(--accent); }
 
 /* Tiers de pontuação por jogo */
 .rules-tiers { display: flex; flex-direction: column; gap: 8px; }
@@ -3420,7 +3496,7 @@ input[type="number"].score-input {
   width: 64px;
 }
 .rules-tier-pts .ico { font-size: 20px; margin-bottom: 2px; }
-.rules-tier-pts .pts { font-size: 28px; font-weight: 900; letter-spacing: -.03em; color: var(--green); line-height: 1; }
+.rules-tier-pts .pts { font-size: 28px; font-weight: 900; letter-spacing: -.03em; color: var(--accent); line-height: 1; }
 .rules-tier.zero .rules-tier-pts .pts { color: var(--text-mute); }
 .rules-tier-pts .pts small { font-size: 11px; font-weight: 700; color: var(--text-mute); margin-left: 2px; }
 .rules-tier-name { font-size: 15px; font-weight: 800; margin-bottom: 3px; }
@@ -3446,8 +3522,8 @@ input[type="number"].score-input {
 .rules-matrix tbody td { border-bottom: 1px solid var(--line); color: var(--text-dim); }
 .rules-matrix tbody tr:last-child td { border-bottom: none; }
 .rules-matrix .rules-matrix-mult td { color: var(--text); font-weight: 800; }
-.rules-matrix .mult-cell { color: var(--green) !important; }
-.rules-matrix td.hl { color: var(--green); font-weight: 800; }
+.rules-matrix .mult-cell { color: var(--accent) !important; }
+.rules-matrix td.hl { color: var(--accent); font-weight: 800; }
 
 /* Bloco de exemplo */
 .rules-example {
@@ -3456,13 +3532,13 @@ input[type="number"].score-input {
 }
 .rules-example-head {
   font-size: 10px; letter-spacing: .15em; text-transform: uppercase;
-  color: var(--green); font-weight: 800; margin-bottom: 8px;
+  color: var(--accent); font-weight: 800; margin-bottom: 8px;
 }
 .rules-example p { font-size: 14px; line-height: 1.6; color: var(--text-dim); margin-bottom: 8px; }
 .rules-example p:last-child { margin-bottom: 0; }
 .rules-example strong { color: var(--text); }
 .rules-example-result { color: var(--text) !important; }
-.rules-example-result strong { color: var(--green); }
+.rules-example-result strong { color: var(--accent); }
 
 /* Número grande (campeão) */
 .rules-bignum {
@@ -3470,7 +3546,7 @@ input[type="number"].score-input {
   background: var(--card); border: 1px solid var(--line);
   border-radius: 10px; padding: 20px 24px; margin: 4px 0;
 }
-.rules-bignum .n { font-size: 52px; font-weight: 900; letter-spacing: -.04em; color: var(--green); line-height: 1; }
+.rules-bignum .n { font-size: 52px; font-weight: 900; letter-spacing: -.04em; color: var(--accent); line-height: 1; }
 .rules-bignum .l { font-size: 15px; font-weight: 700; color: var(--text-dim); }
 
 /* Grid de artilheiro por fase */
@@ -3486,7 +3562,7 @@ input[type="number"].score-input {
   font-size: 10px; letter-spacing: .06em; text-transform: uppercase;
   color: var(--text-mute); font-weight: 700; margin-bottom: 6px;
 }
-.rules-scorer-val { font-size: 24px; font-weight: 900; color: var(--green); letter-spacing: -.03em; line-height: 1; }
+.rules-scorer-val { font-size: 24px; font-weight: 900; color: var(--accent); letter-spacing: -.03em; line-height: 1; }
 .rules-scorer-per { font-size: 10px; color: var(--text-mute); margin-top: 3px; }
 
 /* Duas colunas (desempate) */
@@ -3514,8 +3590,34 @@ input[type="number"].score-input {
 .pred-breakdown .cs-mini.on { opacity: 1; filter: none; }
 
 /* Notas explicativas organizadas (telas de palpite) */
+.note {
+  margin-bottom: 20px;
+  padding: 14px 18px;
+  background: var(--card);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 6px 6px 0;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+/* Legenda de cores (classificado / 3º / eliminado) — telas de classificação */
+.legend {
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  background: var(--card);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 6px 6px 0;
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.7;
+}
+.legend .dot { font-weight: 700; }
+.legend .dot.adv   { color: var(--positive); }
+.legend .dot.third { color: var(--medal-bronze); }
+.legend .dot.out   { color: var(--text-mute); }
+.legend .hint  { color: var(--text-mute); }
+.legend strong { color: var(--text-dim); }
 .note .note-head {
-  display: block; color: var(--green); font-weight: 800;
+  display: block; color: var(--accent); font-weight: 800;
   font-size: 12px; letter-spacing: .01em; margin-bottom: 8px;
 }
 .note .note-list { margin: 0; padding-left: 20px; }
@@ -3527,7 +3629,7 @@ input[type="number"].score-input {
   color: var(--red); font-weight: 700; line-height: 1.5;
 }
 .note .note-deadline .sub { color: var(--text-mute); font-weight: 400; }
-.note .note-link { display: inline-block; margin-top: 9px; color: var(--green); font-weight: 700; }
+.note .note-link { display: inline-block; margin-top: 9px; color: var(--accent); font-weight: 700; }
 
 /* Selo de bônus de seleção classificada (aba Resultados do mata-mata) */
 .qual-badge {
@@ -3535,5 +3637,5 @@ input[type="number"].score-input {
   font-size: 10px; font-weight: 700; line-height: 1.2;
   padding: 2px 6px; border-radius: 4px; white-space: nowrap;
 }
-.qual-badge.bpe { background: var(--gold-dim); color: var(--gold); }
+.qual-badge.bpe { background: var(--positive-dim); color: var(--positive); }
 .qual-badge.bp  { background: rgba(255,255,255,.06); color: var(--text-dim); }

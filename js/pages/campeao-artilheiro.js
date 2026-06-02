@@ -208,11 +208,11 @@ function renderPage() {
         <b>Escolha única antes da Copa</b><span class="sep"></span>
         ${locked
           ? `<span style="color:var(--red); font-weight:700;">🔒 Travado</span>`
-          : `<span style="color:var(--green)">Trava ${formatDeadline(deadline)}</span>`}
+          : `<span style="color:var(--accent)">Trava ${formatDeadline(deadline)}</span><span class="sep"></span><span id="countdown" style="color:var(--text-dim)">…</span>`}
       </div>
     </section>
 
-    <div class="note" style="margin-bottom:20px; padding:14px 18px; background:var(--card); border-left:3px solid var(--green); border-radius:0 6px 6px 0; font-size:12px; color:var(--text-dim);">
+    <div class="note">
       <span class="note-head">Dois palpites bônus, feitos uma única vez</span>
       <ul class="note-list">
         <li>🏆 Acertar o <strong>Campeão</strong>: <strong>+${CHAMPION_BONUS_PTS} pontos</strong> (vale como ${Math.round(CHAMPION_BONUS_PTS / GROUP_EXACT)} placares exatos dos grupos — pense com calma)</li>
@@ -320,7 +320,7 @@ function renderChampionSelection(locked) {
   return `
     <div class="cs-card" id="cardChampion">
       <div class="cs-card-icon">🏆</div>
-      <div class="cs-card-kicker">Aposta 1 · Valor: ${CHAMPION_BONUS_PTS} pts</div>
+      <div class="cs-card-kicker">Aposta 1 · +${CHAMPION_BONUS_PTS} pts se acertar</div>
       <h3>Campeão da Copa</h3>
       <p class="desc">Qual seleção vai levantar a taça em 19/jul no MetLife Stadium?</p>
 
@@ -376,7 +376,7 @@ function renderScorerCard(locked) {
   return `
     <div class="cs-card" id="cardScorer">
       <div class="cs-card-icon">⚽</div>
-      <div class="cs-card-kicker">Aposta 2 · pontos extras por cada gol do seu jogador</div>
+      <div class="cs-card-kicker">Aposta 2 · +2 pts por gol</div>
       <h3>Artilheiro do Bolão</h3>
       <p class="desc">Escolha 1 jogador. Cada gol dele soma pontos — e gols nas fases finais valem ainda mais.</p>
 

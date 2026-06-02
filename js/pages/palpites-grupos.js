@@ -8,7 +8,7 @@ import {
 } from '../util.js';
 import { matchPoints, scoreBreakdown } from '../scoring.js';
 import {
-  renderGroupsGrid, computeThirds, countThirdsComplete, renderThirdsTable,
+  renderGroupCard, computeThirds, countThirdsComplete, renderThirdsTable,
 } from '../standings-view.js';
 
 const GP = matchPoints('group'); // { ag:1, ave:4, dg:1, exact:7 }
@@ -21,10 +21,8 @@ let matches = [];                    // 72 group-stage matches, ordered by date
 let predsByMatch = new Map();        // match_id -> prediction row
 let goalsByMatch = new Map();        // match_id -> [{player, goals}]
 let oddsByMatch = new Map();         // match_id -> { odd_home, odd_draw, odd_away, bookmaker_name }
-let activeTab = 'palpites';          // 'palpites' | 'simulacao' | 'resultados'
-let activeGroup = 'all';             // 'all' | 'A'..'L' (filtro da lista de jogos)
-let simSub = 'classificacao';        // sub-aba de 'Minha simulação': 'classificacao' | 'terceiros'
-let resSub = 'classificacao';        // sub-aba de 'Resultados': 'classificacao' | 'terceiros' | 'jogos'
+let activeTab = 'palpites';          // 'palpites' | 'resultados'
+let activeGroup = 'all';             // 'all' | 'A'..'L' (ambas as abas operam sempre por grupo)
 const saveTimers = new Map();        // match_id -> setTimeout handle
 const GROUPS = ['A','B','C','D','E','F','G','H','I','J','K','L'];
 
@@ -105,11 +103,8 @@ function renderPage() {
       <button class="admin-tab ${activeTab === 'palpites' ? 'active' : ''}" data-tab="palpites">
         Palpites <span class="ct">${counts.totalRemaining}</span>
       </button>
-      <button class="admin-tab ${activeTab === 'simulacao' ? 'active' : ''}" data-tab="simulacao">
-        Minha simulação
-      </button>
       <button class="admin-tab ${activeTab === 'resultados' ? 'active' : ''}" data-tab="resultados">
-        Resultados <span class="ct">${counts.totalFinished}</span>
+        Meus resultados <span class="ct">${counts.totalFinished}</span>
       </button>
     </div>
 
@@ -120,40 +115,37 @@ function renderPage() {
 }
 
 // Deep-link via hash. Usado pelos redirects das antigas grupos.html / terceiros.html
-// e por URLs compartilháveis. Define activeTab/resSub antes do primeiro render.
+// e por URLs compartilháveis. Define activeTab antes do primeiro render.
 function applyHashRoute() {
   switch ((location.hash || '').replace('#', '')) {
-    case 'classificacao': activeTab = 'resultados'; resSub = 'classificacao'; break;
-    case 'terceiros':     activeTab = 'resultados'; resSub = 'terceiros';     break;
-    case 'jogos':         activeTab = 'resultados'; resSub = 'jogos';         break;
-    case 'simulacao':     activeTab = 'simulacao';                            break;
-    case 'resultados':    activeTab = 'resultados';                           break;
+    // Antigas sub-abas/páginas oficiais agora vivem todas na aba Resultados (por grupo).
+    case 'classificacao':
+    case 'terceiros':
+    case 'jogos':
+    case 'resultados':    activeTab = 'resultados'; break;
+    // 'simulacao' foi fundida na aba Palpites (projeção + 3ºs no hover)
+    case 'simulacao':     activeTab = 'palpites';   break;
     // 'palpites' ou vazio → mantém o default (aba Palpites)
   }
 }
 
 function heroTitle() {
-  switch (activeTab) {
-    case 'simulacao':  return 'Minha simulação';
-    case 'resultados': return 'Resultados';
-    default:           return 'Seus palpites';
-  }
+  return activeTab === 'resultados' ? 'Meus resultados' : 'Seus palpites';
 }
 
 function renderActiveTab(counts) {
-  switch (activeTab) {
-    case 'simulacao':  return renderSimulacaoTab();
-    case 'resultados': return renderResultadosTab(counts);
-    default:           return renderPalpitesTab(counts);
-  }
+  return activeTab === 'resultados' ? renderResultadosTab(counts) : renderPalpitesTab(counts);
 }
 
 // ============================================================
 // TAB: PALPITES (jogos abertos para palpitar)
 // ============================================================
 function renderPalpitesTab(counts) {
+  // Palpites é sempre por grupo (sem "Todos"); garante um grupo válido selecionado.
+  if (!GROUPS.includes(activeGroup)) activeGroup = defaultPalpitesGroup();
+
   return `
-    <div class="note" style="margin-bottom:20px; padding:14px 18px; background:var(--card); border-left:3px solid var(--green); border-radius:0 6px 6px 0; font-size:12px; color:var(--text-dim);">
+    <div class="note">
       <span class="note-head">Como você ganha pontos em cada jogo</span>
       <ul class="note-list">
         <li>🥅 <strong>+${GP.ag}</strong> se acertar quantos gols um time fez (pode valer pelos dois times)</li>
@@ -168,13 +160,85 @@ function renderPalpitesTab(counts) {
 
     ${renderKpisPalpites(counts)}
 
-    <div class="chips" id="chips">
-      ${renderChip('all', 'Todos', counts.openByGroup.all.done, counts.openByGroup.all.total)}
-      ${GROUPS.map(g => renderChip(g, 'Grupo ' + g, counts.openByGroup[g]?.done ?? 0, counts.openByGroup[g]?.total ?? 0)).join('')}
+    <div class="palpites-toolbar">
+      <div class="chips" id="chips">
+        ${GROUPS.map(g => renderChip(g, 'Grupo ' + g, counts.openByGroup[g]?.done ?? 0, counts.openByGroup[g]?.total ?? 0)).join('')}
+      </div>
+      ${renderThirdsPop('sim')}
     </div>
 
     <div id="matchesList">
       ${renderPalpitesList()}
+    </div>
+
+    <div id="palpitesGroupTable">
+      ${renderGroupTable('sim')}
+    </div>
+  `;
+}
+
+// Primeiro grupo (A..L) com pelo menos 1 jogo em aberto; senão o primeiro grupo.
+function defaultPalpitesGroup() {
+  return GROUPS.find(g => matches.some(m => m.group_name === g && !m.finished)) || GROUPS[0];
+}
+
+// Popover (hover/clique) com os melhores 3ºs. mode 'sim' = projeção dos palpites;
+// 'real' = oficial. Compartilhado por Palpites e Resultados.
+function renderThirdsPop(mode = 'sim') {
+  return `
+    <div class="thirds-pop" id="thirdsPop">
+      <button class="thirds-pop-trigger" type="button" data-action="toggle-thirds" aria-expanded="false">
+        🥉 Melhores 3ºs <span class="hint">${mode === 'real' ? 'oficial' : 'sua projeção'}</span>
+      </button>
+      <div class="thirds-pop-panel" id="thirdsPopBody">
+        ${renderThirdsPopBody(mode)}
+      </div>
+    </div>
+  `;
+}
+
+function renderThirdsPopBody(mode = 'sim') {
+  const thirds = computeThirds(matches, mode, predsByMatch);
+  const completeCount = countThirdsComplete(thirds);
+  const head = mode === 'real'
+    ? [`8 melhores 3ºs (oficial)`, `${completeCount}/12 grupos finalizados · 8 avançam`]
+    : [`Projeção dos 8 melhores 3ºs`, `${completeCount}/12 grupos palpitados · 8 avançam`];
+  const empty = mode === 'real'
+    ? `Os 3ºs lugares aparecem aqui conforme cada grupo termina.`
+    : `Palpite todos os 6 jogos de pelo menos 1 grupo para ver a projeção dos 3ºs.`;
+  return `
+    <div class="thirds-pop-head">
+      <strong>${head[0]}</strong>
+      <span>${head[1]}</span>
+    </div>
+    ${completeCount === 0
+      ? `<p class="thirds-pop-empty">${empty}</p>`
+      : `<div class="thirds-wrap">${renderThirdsTable(thirds)}</div>`}
+  `;
+}
+
+// Tabela de classificação do grupo selecionado. mode 'sim' = projeção dos palpites;
+// 'real' = oficial. Compartilhada por Palpites e Resultados.
+function renderGroupTable(mode = 'sim') {
+  if (!GROUPS.includes(activeGroup)) return '';
+  const gm = matches.filter(m => m.group_name === activeGroup);
+  const title = mode === 'real' ? 'Classificação oficial' : 'Classificação projetada';
+  const sub = mode === 'real'
+    ? `${gm.filter(m => m.finished).length}/6 jogos finalizados`
+    : `a partir dos seus palpites`;
+  return `
+    <div class="date-head" style="margin-top:28px;">
+      <h4>${title} · Grupo ${activeGroup}</h4>
+      <div class="sub">${sub}</div>
+    </div>
+    <div class="legend">
+      <span class="dot adv">● Verde</span> = classificado direto (1º e 2º) ·
+      <span class="dot third">● Bronze</span> = disputa vaga de 3º melhor ·
+      <span class="dot out">● Cinza</span> = eliminado
+      <br><span class="hint">Veja todos os 3ºs em <strong>Melhores 3ºs</strong>, no topo.</span>
+    </div>
+    <div class="groups-grid">
+      ${renderGroupCard(activeGroup, matches, mode, predsByMatch)}
     </div>
   `;
 }
@@ -265,10 +329,12 @@ function renderPalpiteRow(m) {
         <div class="score-inputs">
           <input class="score-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2"
                  data-match="${m.id}" data-side="home"
+                 aria-label="Gols ${escapeHtml(teamPt(m.team_home))}"
                  value="${homeVal}" ${locked ? 'disabled' : ''}>
           <span class="score-sep">–</span>
           <input class="score-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2"
                  data-match="${m.id}" data-side="away"
+                 aria-label="Gols ${escapeHtml(teamPt(m.team_away))}"
                  value="${awayVal}" ${locked ? 'disabled' : ''}>
         </div>
         ${renderOddDraw(m.id)}
@@ -282,27 +348,6 @@ function renderPalpiteRow(m) {
         ${status}
         <div style="margin-top:2px; color:var(--text-mute); font-size:10px; letter-spacing:.08em; text-transform:uppercase;">Grupo ${m.group_name}</div>
       </div>
-    </div>
-  `;
-}
-
-// ============================================================
-// SUB-ABA: JOGOS (placares oficiais finalizados, com seus pontos)
-// Só por grupo — sem "Todos" (a visão geral fica em Classificação).
-// ============================================================
-function renderJogosOficiais(counts) {
-  // Garante um grupo válido selecionado (Jogos não tem a opção "Todos").
-  if (!GROUPS.includes(activeGroup)) activeGroup = defaultJogosGroup();
-
-  return `
-    ${renderKpisResultados(counts)}
-
-    <div class="chips" id="chips">
-      ${GROUPS.map(g => renderChip(g, 'Grupo ' + g, counts.finishedByGroup[g]?.done ?? 0, counts.finishedByGroup[g]?.total ?? 0)).join('')}
-    </div>
-
-    <div id="matchesList">
-      ${renderResultadosList()}
     </div>
   `;
 }
@@ -433,103 +478,29 @@ function renderResultRow(m) {
 }
 
 // ============================================================
-// TAB: MINHA SIMULAÇÃO (tudo projetado a partir dos seus palpites)
-// Sub-abas: Classificação | Melhores 3ºs
-// ============================================================
-function renderSimulacaoTab() {
-  return `
-    ${renderSubNav([['classificacao', 'Classificação'], ['terceiros', 'Melhores 3ºs']], simSub)}
-    ${simSub === 'terceiros'
-      ? renderStandingsThirds('sim')
-      : renderStandingsGroups('sim')}
-  `;
-}
-
-// ============================================================
-// TAB: RESULTADOS (tudo oficial)
-// Sub-abas: Classificação | Melhores 3ºs | Jogos
+// TAB: RESULTADOS (oficial) — espelha a aba Palpites, por grupo:
+// resultados do grupo → classificação oficial do grupo no fim → 3ºs no hover.
 // ============================================================
 function renderResultadosTab(counts) {
-  let body;
-  if (resSub === 'terceiros')   body = renderStandingsThirds('real');
-  else if (resSub === 'jogos')  body = renderJogosOficiais(counts);
-  else                          body = renderStandingsGroups('real');
+  // Resultados é sempre por grupo (igual Palpites); garante grupo válido.
+  if (!GROUPS.includes(activeGroup)) activeGroup = defaultJogosGroup();
 
   return `
-    ${renderSubNav(
-      [['classificacao', 'Classificação'], ['terceiros', 'Melhores 3ºs'], ['jogos', 'Jogos']],
-      resSub
-    )}
-    ${body}
-  `;
-}
+    ${renderKpisResultados(counts)}
 
-// Segmented control de sub-abas (estilo .toggle, reaproveitado).
-function renderSubNav(items, activeSub) {
-  return `
-    <div class="toggle subnav" id="subNav" style="margin-bottom:20px; flex-wrap:wrap;">
-      ${items.map(([id, label]) =>
-        `<button class="${id === activeSub ? 'active' : ''}" data-sub="${id}">${escapeHtml(label)}</button>`
-      ).join('')}
-    </div>
-  `;
-}
-
-// ============================================================
-// Vistas de standings (parametrizadas por modo: 'sim' | 'real')
-// Usadas tanto em Minha simulação quanto em Resultados.
-// ============================================================
-function renderStandingsGroups(mode) {
-  const totalFinished = matches.filter(m => m.finished).length;
-  const totalPredicted = matches.filter(m => predsByMatch.has(m.id)).length;
-  const statusLine = mode === 'real'
-    ? `Classificação oficial · ${totalFinished}/72 jogos finalizados`
-    : `Projeção a partir de ${totalPredicted}/72 palpites seus`;
-
-  return `
-    <div class="note" style="margin-bottom:20px; padding:12px 16px; background:var(--card); border-left:3px solid var(--green); border-radius:0 6px 6px 0; font-size:12px; color:var(--text-dim);">
-      <span style="color:#1DB954; font-weight:700;">● Verde</span> = classificado direto (1º e 2º) ·
-      <span style="color:var(--medal-bronze); font-weight:700;">● Bronze</span> = disputa vaga de 3º melhor ·
-      <span style="color:var(--text-mute);">● Cinza</span> = eliminado
-      <br><span style="color:var(--text-mute);">Em cada grupo, <strong style="color:var(--text-dim);">1º e 2º avançam direto</strong>; os <strong style="color:var(--text-dim);">8 melhores 3ºs</strong> também passam (veja <strong style="color:var(--text-dim);">Melhores 3ºs</strong>).</span>
-      <br><span style="color:var(--text-mute);">${statusLine}</span>
+    <div class="palpites-toolbar">
+      <div class="chips" id="chips">
+        ${GROUPS.map(g => renderChip(g, 'Grupo ' + g, counts.finishedByGroup[g]?.done ?? 0, counts.finishedByGroup[g]?.total ?? 0)).join('')}
+      </div>
+      ${renderThirdsPop('real')}
     </div>
 
-    ${renderGroupsGrid(matches, mode, predsByMatch)}
-  `;
-}
-
-function renderStandingsThirds(mode) {
-  const thirds = computeThirds(matches, mode, predsByMatch);
-  const completeCount = countThirdsComplete(thirds);
-  const statusLine = mode === 'real'
-    ? `Oficial · ${completeCount}/12 grupos finalizados`
-    : `Projeção · ${completeCount}/12 grupos palpitados`;
-
-  return `
-    <div class="note" style="margin-bottom:20px; padding:12px 16px; background:var(--card); border-left:3px solid var(--green); border-radius:0 6px 6px 0; font-size:12px; color:var(--text-dim);">
-      <span style="color:#1DB954; font-weight:700;">● Verde</span> = avança aos 32-avos ·
-      <span style="color:var(--text-mute);">● Cinza</span> = eliminado
-      <br><span style="color:var(--text-mute);">8 de 12 passam · Desempate: Pontos → Saldo → Gols pró → Ranking FIFA</span>
-      <br><span style="color:var(--text-mute);">${statusLine}</span>
+    <div id="matchesList">
+      ${renderResultadosList()}
     </div>
 
-    ${completeCount === 0
-      ? renderTerceirosEmpty(mode)
-      : `<div class="thirds-wrap">${renderThirdsTable(thirds)}</div>`}
-  `;
-}
-
-function renderTerceirosEmpty(mode) {
-  return `
-    <div class="empty">
-      <h3>${mode === 'real' ? 'Nenhum grupo finalizado' : 'Nenhum grupo palpitado completamente'}</h3>
-      <p>${mode === 'real'
-        ? 'Os 3ºs lugares aparecem aqui conforme cada grupo termina.'
-        : 'Palpite todos os 6 jogos de pelo menos 1 grupo para ver a projeção.'}</p>
-      ${mode === 'sim'
-        ? '<button class="btn btn-green" data-tab="palpites">Ir para palpites</button>'
-        : ''}
+    <div id="resultadosGroupTable">
+      ${renderGroupTable('real')}
     </div>
   `;
 }
@@ -635,26 +606,27 @@ function attachEventListeners() {
       const t = tabBtn.dataset.tab;
       if (t !== activeTab) {
         activeTab = t;
-        activeGroup = 'all';  // reset filter
+        // Cada aba abre num grupo válido (ambas operam sempre por grupo).
+        activeGroup = t === 'palpites' ? defaultPalpitesGroup() : defaultJogosGroup();
         rerenderAll();
       }
       return;
     }
 
-    // Sub-abas (Classificação / 3ºs / Jogos) dentro de Simulação e Resultados
-    const subBtn = e.target.closest('#subNav button[data-sub]');
-    if (subBtn) {
-      const s = subBtn.dataset.sub;
-      if (activeTab === 'simulacao' && s !== simSub) {
-        simSub = s;
-        rerenderTabBody();
-      } else if (activeTab === 'resultados' && s !== resSub) {
-        resSub = s;
-        // Jogos é só por grupo (sem "Todos"); abre num grupo válido.
-        activeGroup = (s === 'jogos') ? defaultJogosGroup() : 'all';
-        rerenderTabBody();
-      }
+    // Toggle do popover de 3ºs (necessário no toque, onde não há hover)
+    const thirdsBtn = e.target.closest('[data-action="toggle-thirds"]');
+    if (thirdsBtn) {
+      const pop = thirdsBtn.closest('.thirds-pop');
+      const open = pop.classList.toggle('open');
+      thirdsBtn.setAttribute('aria-expanded', String(open));
       return;
+    }
+    // Clique fora fecha o popover aberto
+    if (!e.target.closest('.thirds-pop')) {
+      document.querySelectorAll('.thirds-pop.open').forEach(p => {
+        p.classList.remove('open');
+        p.querySelector('.thirds-pop-trigger')?.setAttribute('aria-expanded', 'false');
+      });
     }
 
     const chip = e.target.closest('.chip[data-group]');
@@ -727,6 +699,16 @@ async function doSave(matchId) {
   row.classList.add('saved');
   showToast(`Salvo ${getTeamLabel(matchId)}`, 'success', 1200);
   updateKpisAndChips();
+  refreshProjection();
+}
+
+// Atualiza a tabela projetada do grupo e o popover de 3ºs após salvar um palpite
+// (ficam fora dos inputs, então re-renderizar não rouba o foco).
+function refreshProjection() {
+  const gt = document.getElementById('palpitesGroupTable');
+  if (gt) gt.innerHTML = renderGroupTable('sim');
+  const tp = document.getElementById('thirdsPopBody');
+  if (tp) tp.innerHTML = renderThirdsPopBody('sim');
 }
 
 function getTeamLabel(matchId) {
@@ -755,7 +737,6 @@ function updateKpisAndChips() {
   if (chips) {
     const byGroup = activeTab === 'palpites' ? counts.openByGroup : counts.finishedByGroup;
     chips.innerHTML =
-      renderChip('all', 'Todos', byGroup.all.done, byGroup.all.total) +
       GROUPS.map(g => renderChip(g, 'Grupo ' + g, byGroup[g]?.done ?? 0, byGroup[g]?.total ?? 0)).join('');
   }
   // KPIs

@@ -290,7 +290,7 @@ async function renderUsersTab() {
             `<span class="cs-mini ${pr.has_scorer ? 'on' : ''}" title="Artilheiro ${pr.has_scorer ? 'escolhido' : 'pendente'}">⚽</span>`;
           return `
             <tr>
-              <td><strong>${escapeHtml(u.full_name)}</strong>${isMe ? ' <small style="color:var(--green);font-weight:800">VOCÊ</small>' : ''}</td>
+              <td><strong>${escapeHtml(u.full_name)}</strong>${isMe ? ' <small style="color:var(--accent);font-weight:800">VOCÊ</small>' : ''}</td>
               <td><span class="em-cell">${escapeHtml(u.email)}</span></td>
               <td>
                 <span class="pill ${count >= 104 ? 'open' : count > 0 ? 'done' : 'locked'}" title="Grupos ${pr.group_count}/72 · Mata-mata ${pr.ko_count}/32">${count}/104</span>

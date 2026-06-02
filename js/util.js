@@ -428,6 +428,9 @@ export function attachTeamTooltips(recentByTeam) {
     document.body.appendChild(tooltip);
   }
 
+  // Em telas sem mouse (celular/tablet) usamos toque; com mouse, hover.
+  const canHover = window.matchMedia('(hover: hover)').matches;
+
   // Dica visível pro usuário descobrir o tooltip
   if (!document.getElementById('teamTooltipHint')) {
     const firstTeam = document.querySelector('.team-name[data-team]');
@@ -435,7 +438,9 @@ export function attachTeamTooltips(recentByTeam) {
       const hint = document.createElement('div');
       hint.id = 'teamTooltipHint';
       hint.className = 'tooltip-hint';
-      hint.innerHTML = '💡 Passe o mouse sobre o nome de uma seleção para ver as <b>últimas 10 partidas</b>.';
+      hint.innerHTML = canHover
+        ? '💡 Passe o mouse sobre o nome de uma seleção para ver as <b>últimas partidas</b>.'
+        : '💡 Toque no nome de uma seleção para ver as <b>últimas partidas</b>.';
       const main = document.querySelector('main') || document.body;
       const hero = main.querySelector('.hero');
       if (hero && hero.parentNode) hero.parentNode.insertBefore(hint, hero.nextSibling);
@@ -447,27 +452,56 @@ export function attachTeamTooltips(recentByTeam) {
   if (tooltipState) {
     document.removeEventListener('mouseover', tooltipState.onMouseOver);
     document.removeEventListener('mouseout', tooltipState.onMouseOut);
+    document.removeEventListener('click', tooltipState.onClick);
     window.removeEventListener('scroll', tooltipState.onScroll, true);
   }
 
-  const onMouseOver = (e) => {
-    const trigger = e.target.closest('.team-name[data-team]');
-    if (!trigger) return;
-    showTooltip(trigger, recentByTeam);
-  };
-  const onMouseOut = (e) => {
-    const trigger = e.target.closest('.team-name[data-team]');
-    if (!trigger) return;
-    if (e.relatedTarget && trigger.contains(e.relatedTarget)) return;
-    hideTooltip();
-  };
   const onScroll = () => hideTooltip();
+  tooltipState = { onScroll, activeTrigger: null };
 
-  document.addEventListener('mouseover', onMouseOver);
-  document.addEventListener('mouseout', onMouseOut);
+  if (canHover) {
+    const onMouseOver = (e) => {
+      const trigger = e.target.closest('.team-name[data-team]');
+      if (!trigger) return;
+      showTooltip(trigger, recentByTeam);
+    };
+    const onMouseOut = (e) => {
+      const trigger = e.target.closest('.team-name[data-team]');
+      if (!trigger) return;
+      if (e.relatedTarget && trigger.contains(e.relatedTarget)) return;
+      hideTooltip();
+    };
+    document.addEventListener('mouseover', onMouseOver);
+    document.addEventListener('mouseout', onMouseOut);
+    tooltipState.onMouseOver = onMouseOver;
+    tooltipState.onMouseOut = onMouseOut;
+  } else {
+    // Toque: tap no nome abre/fecha; tap fora fecha.
+    const onClick = (e) => {
+      const trigger = e.target.closest('.team-name[data-team]');
+      const tt = document.getElementById('teamTooltip');
+      if (trigger) {
+        e.preventDefault();
+        const isOpen = tt?.classList.contains('show') && tooltipState.activeTrigger === trigger;
+        if (isOpen) {
+          hideTooltip();
+          tooltipState.activeTrigger = null;
+        } else {
+          showTooltip(trigger, recentByTeam);
+          tooltipState.activeTrigger = trigger;
+        }
+        return;
+      }
+      if (!e.target.closest('#teamTooltip')) {
+        hideTooltip();
+        tooltipState.activeTrigger = null;
+      }
+    };
+    document.addEventListener('click', onClick);
+    tooltipState.onClick = onClick;
+  }
+
   window.addEventListener('scroll', onScroll, true);
-
-  tooltipState = { onMouseOver, onMouseOut, onScroll };
 }
 
 function showTooltip(trigger, recentByTeam) {
@@ -533,7 +567,7 @@ function renderTooltipContent(team, recent) {
         <div class="nm">${escapeHtml(teamPt(team))}</div>
         <div class="sub">
           Últimos ${recent.length} jogos ·
-          <span style="color:var(--gold)">${wins}V</span>
+          <span style="color:var(--positive)">${wins}V</span>
           <span style="color:var(--text-mute)">${draws}E</span>
           <span style="color:var(--red)">${losses}D</span>
         </div>

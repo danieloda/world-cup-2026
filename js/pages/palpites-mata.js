@@ -271,7 +271,7 @@ function renderPage() {
   return `
     <section class="hero">
       <div class="hero-kicker">Palpitar placares · Mata-mata</div>
-      <h1 class="hero-title">${activeTab === 'palpites' ? 'Seus palpites' : 'Resultados oficiais'}</h1>
+      <h1 class="hero-title">${activeTab === 'palpites' ? 'Seus palpites' : 'Meus resultados'}</h1>
       <div class="hero-meta">
         <b>${matches.length} jogos</b><span class="sep"></span>
         Quanto mais perto da final, mais pontos<span class="sep"></span>
@@ -284,7 +284,7 @@ function renderPage() {
         Palpites <span class="ct">${counts.totalRemaining}</span>
       </button>
       <button class="admin-tab ${activeTab === 'resultados' ? 'active' : ''}" data-tab="resultados">
-        Resultados <span class="ct">${counts.totalFinished}</span>
+        Meus resultados <span class="ct">${counts.totalFinished}</span>
       </button>
     </div>
 
@@ -298,7 +298,7 @@ function renderPage() {
 function renderPalpitesTab(counts) {
   const grouped = groupByStage();
   return `
-    <div class="note" style="margin-bottom:20px; padding:14px 18px; background:var(--card); border-left:3px solid var(--green); border-radius:0 6px 6px 0; font-size:12px; color:var(--text-dim);">
+    <div class="note">
       <span class="note-head">Como funcionam os palpites do mata-mata</span>
       <ul class="note-list">
         <li>📈 <strong>Cada fase vale mais.</strong> Placar exato: 32-avos ${stageExact('r32')} · oitavas ${stageExact('r16')} · quartas ${stageExact('qf')} · semis ${stageExact('sf')} · 3º lugar ${stageExact('third')} · <strong>final ${stageExact('final')}</strong> pontos.</li>
@@ -681,6 +681,7 @@ function renderTeamRow(m, side, val, locked) {
       ${nameHtml}
       <input class="mini-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2"
              data-match="${m.id}" data-side="${side}"
+             aria-label="Gols ${escapeHtml(team ? teamPt(team) : teamDisplay(slot))}"
              value="${val}" ${locked ? 'disabled' : ''}>
     </div>
   `;

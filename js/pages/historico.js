@@ -137,8 +137,8 @@ function renderPage() {
 
   return `
     <section class="hero">
-      <div class="hero-kicker">Palpites de todos, jogo a jogo</div>
-      <h1 class="hero-title">Resultados</h1>
+      <div class="hero-kicker">Veja o que cada jogador apostou, jogo a jogo</div>
+      <h1 class="hero-title">Palpites de todos</h1>
       <div class="hero-meta">
         <b>${stats.finished_matches}</b> finalizados<span class="sep"></span>
         <b>${awaitingTotal}</b> aguardando resultado<span class="sep"></span>

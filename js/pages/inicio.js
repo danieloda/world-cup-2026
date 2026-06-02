@@ -9,6 +9,8 @@ import {
 
 // Estado da página
 let profile, stats, todayMatches, upcomingMatches, myStanding;
+let myPosition = null;   // posição no ranking (1-based); null antes de haver jogos
+let totalPlayers = 0;    // jogadores no ranking (denominador da posição)
 
 // ============================================================
 // Queries
@@ -69,8 +71,10 @@ function renderKpis() {
     <div class="kpis">
       <div class="kpi green">
         <div class="kpi-label">Sua posição</div>
-        <div class="kpi-num">—</div>
-        <div class="kpi-sub">${stats.paid_users ? `de ${stats.paid_users} jogadores` : 'aguardando jogos'}</div>
+        <div class="kpi-num">${myPosition ? `${myPosition}º` : '—'}</div>
+        <div class="kpi-sub">${myPosition
+          ? `de ${totalPlayers} jogador${totalPlayers === 1 ? '' : 'es'}`
+          : 'começa com os jogos'}</div>
       </div>
       <div class="kpi">
         <div class="kpi-label">Seus pontos</div>
@@ -207,17 +211,26 @@ try {
   if (!auth) throw new Error('not authed (no session)');
   profile = auth.profile;
 
-  const [statsRes, todayRes, upcomingRes, myStandingRes] = await Promise.all([
+  const [statsRes, todayRes, upcomingRes, leaderRes] = await Promise.all([
     supabase.from('v_pool_stats').select('*').single(),
     matchesToday(),
     matchesUpcoming(5),
-    supabase.from('v_leaderboard').select('*').eq('user_id', profile.id).maybeSingle(),
+    supabase.from('v_leaderboard').select('*').order('total_pts', { ascending: false }),
   ]);
 
   stats = statsRes.data ?? { finished_matches: 0, total_matches: 104, pct_played: 0, paid_users: 0, total_pot: 0 };
   todayMatches = todayRes.data ?? [];
   upcomingMatches = upcomingRes.data ?? [];
-  myStanding = myStandingRes.data;
+
+  // Posição derivada do ranking completo (mesma ordenação da página Ranking).
+  const leaderboard = leaderRes.data ?? [];
+  totalPlayers = leaderboard.length;
+  myStanding = leaderboard.find(u => u.user_id === profile.id) ?? null;
+  if (myStanding && stats.finished_matches > 0) {
+    // Ranking de competição (1224): conta quantos têm estritamente mais pontos.
+    const ahead = leaderboard.filter(u => (u.total_pts ?? 0) > (myStanding.total_pts ?? 0)).length;
+    myPosition = ahead + 1;
+  }
 
   const pageBody = await renderShell({ active: 'inicio', profile, stats });
   pageBody.innerHTML = renderInicio();

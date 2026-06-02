@@ -1,13 +1,13 @@
 // standings-view.js — renderização compartilhada de classificação de grupos
 // e tabela dos melhores 3ºs colocados.
 //
-// Usado por:
-//   - palpites-grupos.js → aba "Minha simulação" (Classificação + Melhores 3ºs, modo sim)
-//   - palpites-grupos.js → aba "Resultados"      (Classificação + Melhores 3ºs, modo real)
+// Usado por palpites-grupos.js nas duas abas, sempre por grupo:
+//   - aba "Palpites"  → classificação PROJETADA + 3ºs no popover (modo 'sim')
+//   - aba "Resultados"→ classificação OFICIAL  + 3ºs no popover (modo 'real')
 // (As antigas grupos.html / terceiros.html foram fundidas aqui e viraram redirects.)
 //
 // Todas as funções são puras: recebem (groupMatches, mode, predsByMatch) e
-// devolvem HTML. Nenhuma depende de estado de módulo — assim as três telas
+// devolvem HTML. Nenhuma depende de estado de módulo — assim as telas
 // compartilham exatamente a mesma lógica sem risco de drift.
 
 import { flag, escapeHtml, teamPt, computeStandings } from './util.js';
@@ -17,17 +17,9 @@ export const GROUPS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L
 export const ADVANCE_COUNT = 8; // 8 melhores 3ºs avançam aos 32-avos
 
 // ============================================================
-// Classificação — grade dos 12 grupos
+// Classificação — card de um grupo
 // ============================================================
-export function renderGroupsGrid(groupMatches, mode, predsByMatch) {
-  return `
-    <div class="groups-grid" id="groupsGrid">
-      ${GROUPS.map(g => renderGroupCard(g, groupMatches, mode, predsByMatch)).join('')}
-    </div>
-  `;
-}
-
-function renderGroupCard(g, groupMatches, mode, predsByMatch) {
+export function renderGroupCard(g, groupMatches, mode, predsByMatch) {
   const matches = groupMatches.filter(m => m.group_name === g);
   const finishedCount = matches.filter(m => m.finished).length;
   const predictedCount = matches.filter(m => predsByMatch.has(m.id)).length;
