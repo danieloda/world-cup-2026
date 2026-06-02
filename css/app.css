@@ -760,6 +760,54 @@ img { max-width: 100%; height: auto; }
 .thirds-pop-panel .thirds-table thead th,
 .thirds-pop-panel .thirds-table tbody td { padding: 9px 8px; }
 
+/* ===== Toggle de visão (Por grupo/Por data · Chave/Por data) ===== */
+.palpites-views {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.view-toggle {
+  display: inline-flex;
+  background: var(--card);
+  border-radius: 500px;
+  padding: 3px;
+  gap: 2px;
+}
+.view-toggle button {
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  font: 700 12px var(--font);
+  padding: 6px 16px;
+  border-radius: 500px;
+  cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px;
+  transition: background .12s, color .12s;
+}
+.view-toggle button:hover { color: var(--text); }
+.view-toggle button.active { background: var(--text); color: #000; }
+
+/* Selo de fase no card do mata-mata quando em "Por data" */
+.bm-id-main { display: inline-flex; align-items: center; gap: 6px; }
+.bm-stage-tag {
+  font-size: 10px; font-weight: 800;
+  text-transform: uppercase; letter-spacing: .06em;
+  color: var(--accent);
+  background: var(--accent-dim);
+  padding: 1px 7px; border-radius: 500px;
+}
+
+/* Lista vertical agrupada por data no mata-mata */
+.bracket-date-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+  margin-top: 8px;
+}
+.bracket-date-list .bracket-match { width: auto; margin: 0; }
+
 /* ===== Team tooltip (hover popover) ===== */
 .team-name {
   cursor: help;

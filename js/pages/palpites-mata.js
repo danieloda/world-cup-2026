@@ -2,7 +2,7 @@ import { requireAuth } from '../auth.js';
 import { renderShell } from '../sidebar.js';
 import { supabase } from '../supabase.js';
 import {
-  flag, escapeHtml, formatTime, isLocked, lockCountdownLabel, showToast,
+  flag, escapeHtml, formatTime, formatBrDate, formatBrShort, isLocked, lockCountdownLabel, showToast,
   attachTeamTooltips, loadRecentMatches, teamPt,
   computeStandings as utilComputeStandings,
 } from '../util.js';
@@ -51,7 +51,12 @@ let slotResolution = new Map();      // slot string -> { team, source } (real-fi
 let predSlotResolution = new Map();  // slot string -> { team, source } (apenas palpites do user)
 let qualifierBySide = new Map();     // "matchId:side" -> { kind:'bpe'|'bp', pts, pred, actual } (do cache SQL)
 let activeTab = 'palpites';          // 'palpites' | 'resultados'
+let viewMode = 'bracket';            // 'bracket' | 'date' — layout: chave ou lista por data
+let activeDate = null;               // ISO yyyy-mm-dd quando viewMode === 'date'
 const saveTimers = new Map();        // match_id -> setTimeout handle
+
+// Rótulos curtos de fase (para o selo no card em "Por data").
+const STAGE_LABELS = { r32: '32-avos', r16: 'Oitavas', qf: 'Quartas', sf: 'Semifinais', third: '3º lugar', final: 'Final' };
 
 // ============================================================
 // Main
@@ -277,6 +282,93 @@ function isExactPred(m, pred) {
 }
 
 // ============================================================
+// Visão por data
+// ============================================================
+function dateKey(m) {
+  return new Date(m.match_date).toISOString().slice(0, 10);
+}
+
+// Datas distintas (yyyy-mm-dd) dos jogos de mata-mata, em ordem cronológica.
+function datesFor() {
+  return [...new Set(matches.map(dateKey))].sort();
+}
+
+function defaultDate(tab) {
+  const ks = datesFor();
+  const pick = tab === 'resultados'
+    ? ks.find(k => matches.some(m => dateKey(m) === k && m.finished))
+    : ks.find(k => matches.some(m => dateKey(m) === k && !m.finished));
+  return pick ?? ks[0] ?? null;
+}
+
+function renderViewToggle() {
+  return `
+    <div class="palpites-views">
+      <div class="view-toggle" role="tablist" aria-label="Modo de visualização">
+        <button class="${viewMode === 'bracket' ? 'active' : ''}" data-view="bracket" type="button">Chave</button>
+        <button class="${viewMode === 'date' ? 'active' : ''}" data-view="date" type="button">📅 Por data</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderDateChip(dk, done, total) {
+  const isActive = activeDate === dk;
+  const complete = total > 0 && done === total;
+  const cls = ['chip'];
+  if (isActive) cls.push('active');
+  if (complete) cls.push('complete');
+  const label = formatBrShort(new Date(dk + 'T12:00:00'));
+  return `<button class="${cls.join(' ')}" data-date="${dk}">${label} <span class="ct">${done}/${total}</span></button>`;
+}
+
+// Selo de fase mostrado no card só quando em "Por data" (na chave a fase é a coluna).
+function stageTagFor(m) {
+  if (viewMode !== 'date') return '';
+  const label = STAGE_LABELS[m.stage] ?? m.stage;
+  const multPt = String(stageMultiplier(m.stage)).replace('.', ',');
+  return `<span class="bm-stage-tag" title="Placar exato ${stageExact(m.stage)} pts · fase ×${multPt}">${escapeHtml(label)}</span>`;
+}
+
+function renderBracketView(colRenderer) {
+  const grouped = groupByStage();
+  return `
+    <div class="bracket-wrap">
+      <div class="bracket">
+        ${STAGES.map(stage => colRenderer(stage, grouped)).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function renderDateView(counts, cardRenderer) {
+  const ks = datesFor();
+  if (!ks.includes(activeDate)) activeDate = defaultDate(activeTab);
+
+  const dayMatches = activeDate
+    ? matches.filter(m => dateKey(m) === activeDate).sort((a, b) => new Date(a.match_date) - new Date(b.match_date))
+    : [];
+
+  const chips = ks.map(k => renderDateChip(k, counts.byDate[k]?.done ?? 0, counts.byDate[k]?.total ?? 0)).join('');
+
+  const body = dayMatches.length
+    ? `
+      <div class="date-head">
+        <h4>${formatBrDate(new Date(activeDate + 'T12:00:00'))}</h4>
+        <div class="sub">${dayMatches.length} jogo${dayMatches.length > 1 ? 's' : ''}</div>
+      </div>
+      <div class="bracket-date-list">${dayMatches.map(cardRenderer).join('')}</div>`
+    : `<div class="empty"><h3>Sem jogos nesta data</h3><p>Escolha outra data acima.</p></div>`;
+
+  return `
+    <div class="palpites-toolbar">
+      <div class="chips" id="chips">${chips}</div>
+    </div>
+    ${body}
+  `;
+}
+
+// ============================================================
 // Render
 // ============================================================
 function renderPage() {
@@ -309,7 +401,6 @@ function renderPage() {
 
 
 function renderPalpitesTab(counts) {
-  const grouped = groupByStage();
   return `
     <div class="note">
       <span class="note-head">Como funcionam os palpites do mata-mata</span>
@@ -326,24 +417,23 @@ function renderPalpitesTab(counts) {
 
     ${renderKpis(counts)}
 
-    <div class="bracket-wrap">
-      <div class="bracket">
-        ${STAGES.map(stage => renderStageColumn(stage, grouped)).join('')}
-      </div>
-    </div>
+    ${renderViewToggle()}
+
+    ${viewMode === 'date'
+      ? renderDateView(counts, renderBracketMatch)
+      : renderBracketView(renderStageColumn)}
   `;
 }
 
 function renderResultadosTab(counts) {
-  const grouped = groupByStage();
   return `
     ${renderKpisResultados(counts)}
 
-    <div class="bracket-wrap">
-      <div class="bracket">
-        ${STAGES.map(stage => renderResultStageColumn(stage, grouped)).join('')}
-      </div>
-    </div>
+    ${renderViewToggle()}
+
+    ${viewMode === 'date'
+      ? renderDateView(counts, renderResultBracketMatch)
+      : renderBracketView(renderResultStageColumn)}
   `;
 }
 
@@ -397,7 +487,7 @@ function renderResultBracketMatch(m) {
   return `
     <div class="${classes.join(' ')}" data-match-id="${m.id}">
       <div class="bm-id">
-        <span>${isThird ? '🥉 3º Lugar' : isFinal ? '🏆 Final' : `M${m.id}`}</span>
+        <span class="bm-id-main">${stageTagFor(m)}${isThird ? '🥉 3º Lugar' : isFinal ? '🏆 Final' : `M${m.id}`}</span>
         <span class="when">${dateLabel} · ${timeLabel}</span>
       </div>
 
@@ -609,7 +699,7 @@ function renderBracketMatch(m) {
   return `
     <div class="${classes.join(' ')}" data-match-id="${m.id}">
       <div class="bm-id">
-        <span>${isThird ? '🥉 3º Lugar' : isFinal ? '🏆 Final' : `M${m.id}`}</span>
+        <span class="bm-id-main">${stageTagFor(m)}${isThird ? '🥉 3º Lugar' : isFinal ? '🏆 Final' : `M${m.id}`}</span>
         <span class="when">${dateLabel} · ${timeLabel}</span>
       </div>
       <div class="bm-lock">${locked ? 'Bloqueado' : lockCountdownLabel(m.match_date)}</div>
@@ -704,10 +794,13 @@ function renderTeamRow(m, side, val, locked) {
 function computeCounts() {
   let totalDone = 0, totalLocked = 0, totalFinished = 0;
   let totalPoints = 0, exactCount = 0, partialCount = 0, missCount = 0, totalFinishedWithPred = 0;
+  const byDate = {};   // yyyy-mm-dd -> { done, total } (palpitados / jogos do dia)
 
   for (const m of matches) {
     const p = predsByMatch.get(m.id);
-    if (p) totalDone++;
+    const dk = dateKey(m);
+    (byDate[dk] ??= { done: 0, total: 0 }).total++;
+    if (p) { totalDone++; byDate[dk].done++; }
     if (isLocked(m)) totalLocked++;
     if (m.finished) totalFinished++;
 
@@ -722,6 +815,7 @@ function computeCounts() {
   }
 
   return {
+    byDate,
     totalDone,
     totalRemaining: matches.length - totalDone,
     totalLocked,
@@ -775,6 +869,26 @@ function attachEventListeners() {
         const pageBody = document.getElementById('pageBody');
         if (pageBody) pageBody.innerHTML = renderPage();
       }
+      return;
+    }
+
+    // Toggle de visão: chave ⇄ por data
+    const viewBtn = e.target.closest('.view-toggle button[data-view]');
+    if (viewBtn) {
+      const v = viewBtn.dataset.view;
+      if (v !== viewMode) {
+        viewMode = v;
+        if (viewMode === 'date' && !activeDate) activeDate = defaultDate(activeTab);
+        rerenderTabBody();
+      }
+      return;
+    }
+
+    // Chip de data (modo "por data")
+    const dateChip = e.target.closest('.chip[data-date]');
+    if (dateChip) {
+      activeDate = dateChip.dataset.date;
+      rerenderTabBody();
       return;
     }
 
@@ -950,5 +1064,24 @@ function updateKpis() {
     const wrapper = document.createElement('div');
     wrapper.innerHTML = renderKpis(counts);
     kpis.replaceWith(wrapper.firstElementChild);
+  }
+  // No modo "por data", mantém a contagem dos chips em dia após salvar.
+  if (viewMode === 'date') {
+    const chips = document.getElementById('chips');
+    if (chips) {
+      chips.innerHTML = datesFor()
+        .map(k => renderDateChip(k, counts.byDate[k]?.done ?? 0, counts.byDate[k]?.total ?? 0)).join('');
+    }
+  }
+}
+
+// Re-renderiza só o corpo da aba (usado por toggle de visão e chips de data).
+function rerenderTabBody() {
+  const counts = computeCounts();
+  const tabBody = document.getElementById('tabBody');
+  if (tabBody) {
+    tabBody.innerHTML = activeTab === 'palpites'
+      ? renderPalpitesTab(counts)
+      : renderResultadosTab(counts);
   }
 }

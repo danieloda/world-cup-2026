@@ -2,7 +2,7 @@ import { requireAuth } from '../auth.js';
 import { renderShell } from '../sidebar.js';
 import { supabase } from '../supabase.js';
 import {
-  flag, escapeHtml, formatBrDate, formatTime,
+  flag, escapeHtml, formatBrDate, formatBrShort, formatTime,
   isLocked, isLive, lockCountdownLabel, showToast, attachTeamTooltips, loadRecentMatches,
   teamPt, groundShort,
 } from '../util.js';
@@ -23,6 +23,8 @@ let goalsByMatch = new Map();        // match_id -> [{player, goals}]
 let oddsByMatch = new Map();         // match_id -> { odd_home, odd_draw, odd_away, bookmaker_name }
 let activeTab = 'palpites';          // 'palpites' | 'resultados'
 let activeGroup = 'all';             // 'all' | 'A'..'L' (ambas as abas operam sempre por grupo)
+let groupBy = 'group';               // 'group' | 'date' — dimensão do filtro/agrupamento
+let activeDate = null;               // ISO yyyy-mm-dd quando groupBy === 'date'
 const saveTimers = new Map();        // match_id -> setTimeout handle
 const GROUPS = ['A','B','C','D','E','F','G','H','I','J','K','L'];
 
@@ -141,8 +143,12 @@ function renderActiveTab(counts) {
 // TAB: PALPITES (jogos abertos para palpitar)
 // ============================================================
 function renderPalpitesTab(counts) {
-  // Palpites é sempre por grupo (sem "Todos"); garante um grupo válido selecionado.
-  if (!GROUPS.includes(activeGroup)) activeGroup = defaultPalpitesGroup();
+  // Garante uma seleção válida conforme a dimensão ativa.
+  if (groupBy === 'date') {
+    if (!datesFor('palpites').includes(activeDate)) activeDate = defaultDate('palpites');
+  } else if (!GROUPS.includes(activeGroup)) {
+    activeGroup = defaultPalpitesGroup();
+  }
 
   return `
     <div class="note">
@@ -160,11 +166,15 @@ function renderPalpitesTab(counts) {
 
     ${renderKpisPalpites(counts)}
 
+    ${renderViewToggle()}
+
     <div class="palpites-toolbar">
       <div class="chips" id="chips">
-        ${GROUPS.map(g => renderChip(g, 'Grupo ' + g, counts.openByGroup[g]?.done ?? 0, counts.openByGroup[g]?.total ?? 0)).join('')}
+        ${groupBy === 'date'
+          ? datesFor('palpites').map(k => renderDateChip(k, counts.openByDate[k]?.done ?? 0, counts.openByDate[k]?.total ?? 0)).join('')
+          : GROUPS.map(g => renderChip(g, 'Grupo ' + g, counts.openByGroup[g]?.done ?? 0, counts.openByGroup[g]?.total ?? 0)).join('')}
       </div>
-      ${renderThirdsPop('sim')}
+      ${groupBy === 'group' ? renderThirdsPop('sim') : ''}
     </div>
 
     <div id="matchesList">
@@ -172,7 +182,7 @@ function renderPalpitesTab(counts) {
     </div>
 
     <div id="palpitesGroupTable">
-      ${renderGroupTable('sim')}
+      ${groupBy === 'group' ? renderGroupTable('sim') : ''}
     </div>
   `;
 }
@@ -276,9 +286,9 @@ function renderKpisPalpites(counts) {
 function renderPalpitesList() {
   // Apenas jogos NÃO finalizados (e dentro do filtro)
   const open = matches.filter(m => !m.finished);
-  const filtered = activeGroup === 'all'
-    ? open
-    : open.filter(m => m.group_name === activeGroup);
+  const filtered = groupBy === 'date'
+    ? (activeDate ? open.filter(m => dateKey(m) === activeDate) : open)
+    : (activeGroup === 'all' ? open : open.filter(m => m.group_name === activeGroup));
 
   if (filtered.length === 0) {
     return `<div class="empty"><h3>Sem jogos abertos</h3><p>Nenhum jogo aberto para o filtro selecionado.</p></div>`;
@@ -395,12 +405,15 @@ function renderKpisResultados(counts) {
 }
 
 function renderResultadosList() {
-  const filtered = matches.filter(m => m.finished && m.group_name === activeGroup);
+  const filtered = groupBy === 'date'
+    ? matches.filter(m => m.finished && activeDate && dateKey(m) === activeDate)
+    : matches.filter(m => m.finished && m.group_name === activeGroup);
 
   if (filtered.length === 0) {
+    const what = groupBy === 'date' ? 'nesta data' : `no Grupo ${activeGroup}`;
     return `
       <div class="empty">
-        <h3>Nenhum resultado no Grupo ${activeGroup} ainda</h3>
+        <h3>Nenhum resultado ${what} ainda</h3>
         <p>Os resultados aparecem aqui conforme o admin lança os placares dos jogos.</p>
         <a class="btn btn-ghost" href="palpites-grupos.html" onclick="document.querySelector('[data-tab=palpites]').click(); return false;">Ver palpites pendentes →</a>
       </div>
@@ -486,17 +499,25 @@ function renderResultRow(m) {
 // resultados do grupo → classificação oficial do grupo no fim → 3ºs no hover.
 // ============================================================
 function renderResultadosTab(counts) {
-  // Resultados é sempre por grupo (igual Palpites); garante grupo válido.
-  if (!GROUPS.includes(activeGroup)) activeGroup = defaultJogosGroup();
+  // Garante seleção válida conforme a dimensão ativa.
+  if (groupBy === 'date') {
+    if (!datesFor('resultados').includes(activeDate)) activeDate = defaultDate('resultados');
+  } else if (!GROUPS.includes(activeGroup)) {
+    activeGroup = defaultJogosGroup();
+  }
 
   return `
     ${renderKpisResultados(counts)}
 
+    ${renderViewToggle()}
+
     <div class="palpites-toolbar">
       <div class="chips" id="chips">
-        ${GROUPS.map(g => renderChip(g, 'Grupo ' + g, counts.finishedByGroup[g]?.done ?? 0, counts.finishedByGroup[g]?.total ?? 0)).join('')}
+        ${groupBy === 'date'
+          ? datesFor('resultados').map(k => renderDateChip(k, counts.finishedByDate[k]?.done ?? 0, counts.finishedByDate[k]?.total ?? 0)).join('')
+          : GROUPS.map(g => renderChip(g, 'Grupo ' + g, counts.finishedByGroup[g]?.done ?? 0, counts.finishedByGroup[g]?.total ?? 0)).join('')}
       </div>
-      ${renderThirdsPop('real')}
+      ${groupBy === 'group' ? renderThirdsPop('real') : ''}
     </div>
 
     <div id="matchesList">
@@ -504,7 +525,7 @@ function renderResultadosTab(counts) {
     </div>
 
     <div id="resultadosGroupTable">
-      ${renderGroupTable('real')}
+      ${groupBy === 'group' ? renderGroupTable('real') : ''}
     </div>
   `;
 }
@@ -512,10 +533,54 @@ function renderResultadosTab(counts) {
 // ============================================================
 // Helpers
 // ============================================================
+function dateKey(m) {
+  return new Date(m.match_date).toISOString().slice(0, 10);
+}
+
+// Datas distintas (yyyy-mm-dd) relevantes para a aba: abertas (palpites) ou
+// finalizadas (resultados). Resultados vêm com a data mais recente primeiro.
+function datesFor(tab) {
+  const rel = tab === 'resultados'
+    ? matches.filter(m => m.finished)
+    : matches.filter(m => !m.finished);
+  const keys = [...new Set(rel.map(dateKey))].sort();
+  if (tab === 'resultados') keys.reverse();
+  return keys;
+}
+
+function defaultDate(tab) {
+  return datesFor(tab)[0] ?? null;
+}
+
+function renderViewToggle() {
+  return `
+    <div class="palpites-views">
+      <div class="view-toggle" role="tablist" aria-label="Modo de visualização">
+        <button class="${groupBy === 'group' ? 'active' : ''}" data-view="group" type="button">Por grupo</button>
+        <button class="${groupBy === 'date' ? 'active' : ''}" data-view="date" type="button">📅 Por data</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderDateChip(dk, done, total) {
+  const isActive = activeDate === dk;
+  const complete = total > 0 && done === total;
+  const cls = ['chip'];
+  if (isActive) cls.push('active');
+  if (complete) cls.push('complete');
+  const label = formatBrShort(new Date(dk + 'T12:00:00'));
+  return `
+    <button class="${cls.join(' ')}" data-date="${dk}">
+      ${label} <span class="ct">${done}/${total}</span>
+    </button>
+  `;
+}
+
 function renderGroupedByDate(list, rowRenderer, descDate = false) {
   const byDate = new Map();
   for (const m of list) {
-    const key = new Date(m.match_date).toISOString().slice(0, 10);
+    const key = dateKey(m);
     if (!byDate.has(key)) byDate.set(key, []);
     byDate.get(key).push(m);
   }
@@ -554,6 +619,8 @@ function computeCounts() {
     openByGroup[g] = { done: 0, total: 0 };
     finishedByGroup[g] = { done: 0, total: 0 };
   }
+  const openByDate = {};       // yyyy-mm-dd -> { done, total }
+  const finishedByDate = {};
 
   let totalDone = 0, totalDoneOpen = 0, totalOpen = 0, totalFinished = 0;
   let totalPoints = 0, exactCount = 0, partialCount = 0, missCount = 0, totalFinishedWithPred = 0;
@@ -561,6 +628,7 @@ function computeCounts() {
   for (const m of matches) {
     const p = predsByMatch.get(m.id);
     const g = m.group_name;
+    const dk = dateKey(m);
     const hasPred = !!p;
 
     if (hasPred) totalDone++;
@@ -570,17 +638,21 @@ function computeCounts() {
     if (!m.finished) {
       openByGroup.all.total++;
       if (g) openByGroup[g].total++;
+      (openByDate[dk] ??= { done: 0, total: 0 }).total++;
       if (hasPred) {
         totalDoneOpen++;
         openByGroup.all.done++;
         if (g) openByGroup[g].done++;
+        openByDate[dk].done++;
       }
     } else {
       finishedByGroup.all.total++;
       if (g) finishedByGroup[g].total++;
+      (finishedByDate[dk] ??= { done: 0, total: 0 }).total++;
       if (hasPred) {
         finishedByGroup.all.done++;
         if (g) finishedByGroup[g].done++;
+        finishedByDate[dk].done++;
         totalFinishedWithPred++;
         const pts = p.points_earned ?? 0;
         totalPoints += pts;
@@ -592,7 +664,7 @@ function computeCounts() {
   }
 
   return {
-    openByGroup, finishedByGroup,
+    openByGroup, finishedByGroup, openByDate, finishedByDate,
     totalDone, totalRemaining: matches.length - totalDone,
     totalDoneOpen, totalOpen, totalFinished, totalFinishedWithPred,
     totalPoints, exactCount, partialCount, missCount,
@@ -610,10 +682,32 @@ function attachEventListeners() {
       const t = tabBtn.dataset.tab;
       if (t !== activeTab) {
         activeTab = t;
-        // Cada aba abre num grupo válido (ambas operam sempre por grupo).
-        activeGroup = t === 'palpites' ? defaultPalpitesGroup() : defaultJogosGroup();
+        // Cada aba abre numa seleção válida da dimensão ativa.
+        if (groupBy === 'date') activeDate = defaultDate(t);
+        else activeGroup = t === 'palpites' ? defaultPalpitesGroup() : defaultJogosGroup();
         rerenderAll();
       }
+      return;
+    }
+
+    // Toggle de visão: por grupo ⇄ por data
+    const viewBtn = e.target.closest('.view-toggle button[data-view]');
+    if (viewBtn) {
+      const v = viewBtn.dataset.view;
+      if (v !== groupBy) {
+        groupBy = v;
+        if (groupBy === 'date') activeDate = defaultDate(activeTab);
+        else activeGroup = activeTab === 'palpites' ? defaultPalpitesGroup() : defaultJogosGroup();
+        rerenderTabBody();
+      }
+      return;
+    }
+
+    // Chip de data (modo "por data")
+    const dateChip = e.target.closest('.chip[data-date]');
+    if (dateChip) {
+      activeDate = dateChip.dataset.date;
+      rerenderTabBody();
       return;
     }
 
@@ -709,6 +803,8 @@ async function doSave(matchId) {
 // Atualiza a tabela projetada do grupo e o popover de 3ºs após salvar um palpite
 // (ficam fora dos inputs, então re-renderizar não rouba o foco).
 function refreshProjection() {
+  // Tabela projetada e 3ºs só existem no modo "por grupo".
+  if (groupBy !== 'group') return;
   const gt = document.getElementById('palpitesGroupTable');
   if (gt) gt.innerHTML = renderGroupTable('sim');
   const tp = document.getElementById('thirdsPopBody');
@@ -739,9 +835,15 @@ function updateKpisAndChips() {
   // Chips
   const chips = document.getElementById('chips');
   if (chips) {
-    const byGroup = activeTab === 'palpites' ? counts.openByGroup : counts.finishedByGroup;
-    chips.innerHTML =
-      GROUPS.map(g => renderChip(g, 'Grupo ' + g, byGroup[g]?.done ?? 0, byGroup[g]?.total ?? 0)).join('');
+    if (groupBy === 'date') {
+      const byDate = activeTab === 'palpites' ? counts.openByDate : counts.finishedByDate;
+      chips.innerHTML = datesFor(activeTab)
+        .map(k => renderDateChip(k, byDate[k]?.done ?? 0, byDate[k]?.total ?? 0)).join('');
+    } else {
+      const byGroup = activeTab === 'palpites' ? counts.openByGroup : counts.finishedByGroup;
+      chips.innerHTML =
+        GROUPS.map(g => renderChip(g, 'Grupo ' + g, byGroup[g]?.done ?? 0, byGroup[g]?.total ?? 0)).join('');
+    }
   }
   // KPIs
   const kpis = document.querySelector('.kpis');
