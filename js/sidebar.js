@@ -2,7 +2,8 @@
 // Uso: renderShell({ active: 'inicio', profile, stats })
 
 import { signOut } from './auth.js';
-import { avatarHtml } from './util.js';
+import { supabase } from './supabase.js';
+import { avatarHtml, getInitials, showToast } from './util.js';
 
 // Agrupamento de navegação por seção
 const NAV_SECTIONS = [
@@ -106,9 +107,28 @@ export async function renderShell({ active, profile, stats, stageLabel }) {
             <button class="topbar-back" onclick="history.forward()" aria-label="Avançar">›</button>
           </div>
         </div>
-        <div class="topbar-user ${adminClass}" id="topbarUser">
-          <span>${escapeHtml(profile?.full_name || 'Usuário')}</span>
-          <div class="av">${avatar}</div>
+        <div class="topbar-account ${adminClass}" id="topbarAccount">
+          <button class="topbar-user ${adminClass}" id="topbarUser" type="button"
+                  aria-haspopup="menu" aria-expanded="false" title="Sua conta">
+            <span class="tu-name">${escapeHtml(profile?.full_name || 'Usuário')}</span>
+            <div class="av">${avatar}</div>
+            <svg class="tu-caret" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="account-menu ${adminClass}" id="accountMenu" role="menu" aria-label="Menu da conta">
+            <div class="account-head">
+              <div class="account-head-av">${avatar}</div>
+              <div class="account-head-info">
+                <div class="account-head-name" id="accHeadName">${escapeHtml(profile?.full_name || 'Usuário')}</div>
+                <div class="account-head-email">${escapeHtml(profile?.email || '')}</div>
+              </div>
+            </div>
+            <div class="account-menu-items">
+              <button class="account-item" type="button" data-account-action="name" role="menuitem">${iconEdit()}<span>Alterar nome</span></button>
+              <button class="account-item" type="button" data-account-action="photo" role="menuitem">${iconImage()}<span>Alterar foto</span></button>
+              <div class="account-sep"></div>
+              <button class="account-item danger" type="button" data-account-action="logout" role="menuitem">${iconLogout()}<span>Sair</span></button>
+            </div>
+          </div>
         </div>
       </div>
       <div class="body" id="pageBody"></div>
@@ -128,10 +148,8 @@ export async function renderShell({ active, profile, stats, stageLabel }) {
   document.getElementById('menuToggle')?.addEventListener('click', () => sidebar.classList.toggle('open'));
   backdrop?.addEventListener('click', () => sidebar.classList.remove('open'));
 
-  // Click no nome → menu de logout
-  document.getElementById('topbarUser')?.addEventListener('click', async () => {
-    if (confirm('Sair da conta?')) await signOut();
-  });
+  // Click no nome/foto → menu da conta (alterar nome, alterar foto, sair)
+  wireAccountMenu(profile);
 
   return document.getElementById('pageBody');
 }
@@ -156,6 +174,193 @@ function renderNavItem(item, activeId) {
       <span class="sb-link-label">${escapeHtml(item.label)}</span>
     </a>
   `;
+}
+
+// ============================================================
+// Menu da conta (topbar) — alterar nome, alterar foto, sair
+// ============================================================
+function wireAccountMenu(profile) {
+  const accountEl = document.getElementById('topbarAccount');
+  const userBtn = document.getElementById('topbarUser');
+  const menu = document.getElementById('accountMenu');
+  if (!accountEl || !userBtn || !menu) return;
+
+  const open = () => { accountEl.classList.add('open'); userBtn.setAttribute('aria-expanded', 'true'); };
+  const close = () => { accountEl.classList.remove('open'); userBtn.setAttribute('aria-expanded', 'false'); };
+
+  userBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    accountEl.classList.contains('open') ? close() : open();
+  });
+  // Clique fora fecha
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#topbarAccount')) close();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !document.getElementById('accountModal')?.classList.contains('show')) close();
+  });
+
+  menu.querySelectorAll('[data-account-action]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const action = btn.dataset.accountAction;
+      close();
+      if (action === 'logout') return void signOut();
+      if (action === 'name') openNameModal(profile);
+      if (action === 'photo') openPhotoModal(profile);
+    });
+  });
+}
+
+/** Propaga nome/avatar atualizados pra topbar e cabeçalho do menu. */
+function applyProfileToTopbar(profile) {
+  const av = avatarHtml(profile);
+  const name = profile.full_name || 'Usuário';
+  document.querySelectorAll('#topbarUser .av').forEach(el => { el.innerHTML = av; });
+  const tn = document.querySelector('#topbarUser .tu-name'); if (tn) tn.textContent = name;
+  const hn = document.getElementById('accHeadName'); if (hn) hn.textContent = name;
+  const ha = document.querySelector('.account-head-av'); if (ha) ha.innerHTML = av;
+}
+
+// ----- Modal genérico -----
+function ensureModalRoot() {
+  let root = document.getElementById('accountModal');
+  if (root) return root;
+  root = document.createElement('div');
+  root.id = 'accountModal';
+  root.className = 'modal-overlay';
+  root.innerHTML = `
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="accountModalTitle">
+      <div class="modal-head">
+        <h3 id="accountModalTitle"></h3>
+        <button class="modal-close" type="button" aria-label="Fechar">&times;</button>
+      </div>
+      <div class="modal-body" id="accountModalBody"></div>
+    </div>`;
+  document.body.appendChild(root);
+  root.addEventListener('click', (e) => {
+    if (e.target === root || e.target.closest('.modal-close') || e.target.closest('[data-close]')) closeModal();
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+  return root;
+}
+
+function openModal(title, bodyHtml) {
+  const root = ensureModalRoot();
+  root.querySelector('#accountModalTitle').textContent = title;
+  root.querySelector('#accountModalBody').innerHTML = bodyHtml;
+  requestAnimationFrame(() => root.classList.add('show'));
+  return root;
+}
+
+function closeModal() {
+  document.getElementById('accountModal')?.classList.remove('show');
+}
+
+function showModalErr(el, msg) { el.textContent = msg; el.hidden = false; }
+
+// ----- Alterar nome -----
+function openNameModal(profile) {
+  const current = profile?.full_name || '';
+  openModal('Alterar nome', `
+    <div class="login-field">
+      <label for="accNameInput">Como você quer aparecer no bolão</label>
+      <input id="accNameInput" type="text" maxlength="40" autocomplete="name" value="${escapeHtml(current)}">
+    </div>
+    <div class="login-error" id="accModalErr" hidden></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" type="button" data-close>Cancelar</button>
+      <button class="btn btn-green" type="button" id="accNameSave">Salvar</button>
+    </div>
+  `);
+  const input = document.getElementById('accNameInput');
+  const save = document.getElementById('accNameSave');
+  const err = document.getElementById('accModalErr');
+  input.focus(); input.select();
+
+  const submit = async () => {
+    const name = input.value.trim();
+    if (name.length < 2) return showModalErr(err, 'Digite pelo menos 2 caracteres.');
+    if (name === current) return closeModal();
+    save.disabled = true; save.textContent = 'Salvando…';
+    const { error } = await supabase.from('profiles').update({ full_name: name }).eq('id', profile.id);
+    if (error) {
+      showModalErr(err, 'Não foi possível salvar. Tente de novo.');
+      save.disabled = false; save.textContent = 'Salvar';
+      return;
+    }
+    profile.full_name = name;
+    applyProfileToTopbar(profile);
+    closeModal();
+    showToast('Nome atualizado!', 'success');
+  };
+  save.addEventListener('click', submit);
+  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); submit(); } });
+}
+
+// ----- Alterar foto -----
+function openPhotoModal(profile) {
+  const MAX_BYTES = 2 * 1024 * 1024;
+  const ALLOWED = ['image/png', 'image/jpeg', 'image/webp'];
+  const prevInner = profile?.avatar_url
+    ? `<img src="${escapeHtml(profile.avatar_url)}" alt="">`
+    : escapeHtml(getInitials(profile?.full_name || profile?.email || '?'));
+
+  openModal('Alterar foto', `
+    <div class="avatar-upload">
+      <div class="avatar-preview" id="accAvPrev">${prevInner}</div>
+      <label class="btn btn-dark" for="accAvFile">Escolher imagem</label>
+      <input id="accAvFile" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+      <p class="avatar-hint">PNG, JPG ou WEBP · máx 2MB</p>
+    </div>
+    <div class="login-error" id="accModalErr" hidden></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" type="button" data-close>Cancelar</button>
+      <button class="btn btn-green" type="button" id="accPhotoSave" disabled>Salvar foto</button>
+    </div>
+  `);
+  const fileInput = document.getElementById('accAvFile');
+  const prev = document.getElementById('accAvPrev');
+  const save = document.getElementById('accPhotoSave');
+  const err = document.getElementById('accModalErr');
+  let selected = null;
+
+  fileInput.addEventListener('change', () => {
+    err.hidden = true;
+    const f = fileInput.files?.[0];
+    if (!f) return;
+    if (!ALLOWED.includes(f.type)) return showModalErr(err, 'Formato inválido. Use PNG, JPG ou WEBP.');
+    if (f.size > MAX_BYTES) return showModalErr(err, 'Imagem muito grande (máx 2MB).');
+    selected = f;
+    const reader = new FileReader();
+    reader.onload = (ev) => { prev.innerHTML = `<img src="${ev.target.result}" alt="">`; };
+    reader.readAsDataURL(f);
+    save.disabled = false;
+  });
+
+  save.addEventListener('click', async () => {
+    if (!selected) return;
+    save.disabled = true; save.textContent = 'Salvando…';
+    try {
+      const ext = selected.type === 'image/png' ? 'png' : selected.type === 'image/webp' ? 'webp' : 'jpg';
+      const path = `${profile.id}/avatar.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from('avatars')
+        .upload(path, selected, { upsert: true, contentType: selected.type });
+      if (upErr) throw upErr;
+      const { data: pub } = supabase.storage.from('avatars').getPublicUrl(path);
+      const publicUrl = `${pub.publicUrl}?v=${Date.now()}`;
+      const { error: updErr } = await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', profile.id);
+      if (updErr) throw updErr;
+      profile.avatar_url = publicUrl;
+      applyProfileToTopbar(profile);
+      closeModal();
+      showToast('Foto atualizada!', 'success');
+    } catch (e) {
+      console.warn('avatar update failed:', e);
+      showModalErr(err, 'Não foi possível salvar a foto. Tente de novo.');
+      save.disabled = false; save.textContent = 'Salvar foto';
+    }
+  });
 }
 
 function stageFromProgress(pct) {
@@ -206,6 +411,21 @@ function iconBook() {
 // Campeão & Artilheiro — troféu (filled bowl)
 function iconTrophy() {
   return svg('<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 4h3v2a3 3 0 0 1-3 3M7 4H4v2a3 3 0 0 0 3 3"/>');
+}
+
+// Alterar nome — lápis
+function iconEdit() {
+  return svg('<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/>');
+}
+
+// Alterar foto — imagem
+function iconImage() {
+  return svg('<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/>');
+}
+
+// Sair — log-out
+function iconLogout() {
+  return svg('<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>');
 }
 
 // Admin — engrenagem
