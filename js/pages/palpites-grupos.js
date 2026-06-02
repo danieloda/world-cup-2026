@@ -47,6 +47,7 @@ try {
   pageBody.classList.add('fade-up');
   attachEventListeners();
   attachTeamTooltips(recentByTeam);
+  attachOddsTooltip();
 } catch (err) {
   console.error('[palpites-grupos] FATAL:', err);
   document.body.innerHTML = `
@@ -297,20 +298,83 @@ function renderPalpitesList() {
   return renderGroupedByDate(filtered, renderPalpiteRow);
 }
 
-function oddTip(o, label) {
-  return `${label} · Betano: ${escapeHtml(o.bookmaker_name || 'Casa')}`;
+// Atributos que alimentam o popover informativo de odds (montado em JS no hover).
+function oddAttrs(o, oddValue, outcome) {
+  return `data-odd="${Number(oddValue).toFixed(2)}"`
+    + ` data-outcome="${escapeHtml(outcome)}"`
+    + ` data-bm="${escapeHtml(o.bookmaker_name || 'Betano')}"`;
 }
-function renderOddSide(matchId, side) {
-  const o = oddsByMatch.get(matchId);
+function renderOddSide(m, side) {
+  const o = oddsByMatch.get(m.id);
   if (!o) return '';
   const odd = side === 'home' ? o.odd_home : o.odd_away;
-  const label = side === 'home' ? '1' : '2';
-  return `<span class="odd odd-${side}" title="${oddTip(o, label)}">${Number(odd).toFixed(2)}</span>`;
+  const team = teamPt(side === 'home' ? m.team_home : m.team_away);
+  return `<span class="odd odd-${side}" tabindex="0" ${oddAttrs(o, odd, `Vitória de ${team}`)}>${Number(odd).toFixed(2)}</span>`;
 }
-function renderOddDraw(matchId) {
-  const o = oddsByMatch.get(matchId);
+function renderOddDraw(m) {
+  const o = oddsByMatch.get(m.id);
   if (!o) return '';
-  return `<span class="odd odd-draw" title="${oddTip(o, 'X')}">X ${Number(o.odd_draw).toFixed(2)}</span>`;
+  return `<span class="odd odd-draw" tabindex="0" ${oddAttrs(o, o.odd_draw, 'Empate')}>X ${Number(o.odd_draw).toFixed(2)}</span>`;
+}
+
+// Popover informativo que explica o que a odd significa. Flutua no <body>
+// (position: fixed) pra não ser cortado pelo overflow do .main. Listeners
+// delegados sobrevivem aos re-renders da lista. Idempotente.
+function attachOddsTooltip() {
+  if (document.getElementById('oddsTooltip')) return;
+  const tip = document.createElement('div');
+  tip.id = 'oddsTooltip';
+  tip.className = 'odds-tt';
+  document.body.appendChild(tip);
+
+  const show = (el) => {
+    const odd = Number(el.dataset.odd);
+    if (!odd) return;
+    const prob = Math.round((1 / odd) * 100);
+    const ret = odd.toFixed(2).replace('.', ',');
+    tip.innerHTML = `
+      <div class="odds-tt-tag">Apenas informativo</div>
+      <div class="odds-tt-outcome">${escapeHtml(el.dataset.outcome || '')}</div>
+      <div class="odds-tt-value">${odd.toFixed(2)}<small>odd</small></div>
+      <p class="odds-tt-desc">Cotação da <b>${escapeHtml(el.dataset.bm || 'Betano')}</b> para este resultado. A odd é o quanto o mercado paga por cada R$&nbsp;1 — quanto <b>menor</b> a odd, mais provável o mercado considera o resultado.</p>
+      <div class="odds-tt-rows">
+        <div><span>Chance implícita</span><b>~${prob}%</b></div>
+        <div><span>Retorno por R$ 1</span><b>R$ ${ret}</b></div>
+      </div>
+      <div class="odds-tt-foot">Não afeta sua pontuação e não é recomendação de aposta.</div>`;
+    tip.classList.add('show');
+    positionOddsTip(el, tip);
+  };
+  const hide = () => tip.classList.remove('show');
+
+  document.addEventListener('mouseover', (e) => {
+    const el = e.target.closest('.odd');
+    if (el) show(el);
+  });
+  document.addEventListener('mouseout', (e) => {
+    if (e.target.closest('.odd')) hide();
+  });
+  document.addEventListener('focusin', (e) => {
+    const el = e.target.closest('.odd');
+    if (el) show(el);
+  });
+  document.addEventListener('focusout', (e) => {
+    if (e.target.closest('.odd')) hide();
+  });
+  window.addEventListener('scroll', hide, true);
+}
+
+function positionOddsTip(trigger, tip) {
+  const r = trigger.getBoundingClientRect();
+  const t = tip.getBoundingClientRect();
+  const margin = 8;
+  let left = r.left + r.width / 2 - t.width / 2;
+  let top = r.bottom + margin;
+  if (left < margin) left = margin;
+  if (left + t.width > window.innerWidth - margin) left = window.innerWidth - t.width - margin;
+  if (top + t.height > window.innerHeight - margin) top = r.top - t.height - margin;
+  tip.style.left = left + 'px';
+  tip.style.top = top + 'px';
 }
 
 function renderPalpiteRow(m) {
@@ -335,7 +399,7 @@ function renderPalpiteRow(m) {
       </div>
       <div class="team home">
         <span class="flag">${flag(m.team_home)}</span>
-        ${renderOddSide(m.id, 'home')}
+        ${renderOddSide(m, 'home')}
         <span class="team-name" data-team="${escapeHtml(m.team_home)}">${escapeHtml(teamPt(m.team_home))}</span>
       </div>
       <div class="score-cell">
@@ -350,11 +414,11 @@ function renderPalpiteRow(m) {
                  aria-label="Gols ${escapeHtml(teamPt(m.team_away))}"
                  value="${awayVal}" ${locked ? 'disabled' : ''}>
         </div>
-        ${renderOddDraw(m.id)}
+        ${renderOddDraw(m)}
       </div>
       <div class="team right away">
         <span class="team-name" data-team="${escapeHtml(m.team_away)}">${escapeHtml(teamPt(m.team_away))}</span>
-        ${renderOddSide(m.id, 'away')}
+        ${renderOddSide(m, 'away')}
         <span class="flag">${flag(m.team_away)}</span>
       </div>
       <div class="match-tail">
