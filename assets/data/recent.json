@@ -491,6 +491,13 @@
   ],
   "Canada": [
     [
+      "2026-06-02",
+      "Uzbekistan",
+      true,
+      "2-0",
+      "Amistoso"
+    ],
+    [
       "2026-03-31",
       "Tunisia",
       true,
@@ -552,16 +559,16 @@
       false,
       "3-0",
       "Amistoso"
-    ],
-    [
-      "2025-06-29",
-      "Guatemala",
-      true,
-      "1-1",
-      "Copa Ouro"
     ]
   ],
   "Colombia": [
+    [
+      "2026-06-01",
+      "Costa Rica",
+      true,
+      "3-1",
+      "Amistoso"
+    ],
     [
       "2026-03-29",
       "France",
@@ -623,13 +630,6 @@
       "Argentina",
       false,
       "1-1",
-      "Eliminatórias"
-    ],
-    [
-      "2025-06-06",
-      "Peru",
-      true,
-      "0-0",
       "Eliminatórias"
     ]
   ],
@@ -3120,6 +3120,13 @@
   ],
   "Uzbekistan": [
     [
+      "2026-06-02",
+      "Canada",
+      false,
+      "0-2",
+      "Amistoso"
+    ],
+    [
       "2026-03-30",
       "Venezuela",
       true,
@@ -3180,13 +3187,6 @@
       "Iran",
       false,
       "1-0",
-      "Copa CAFA"
-    ],
-    [
-      "2025-09-05",
-      "Kyrgyzstan",
-      true,
-      "4-0",
       "Copa CAFA"
     ]
   ],
