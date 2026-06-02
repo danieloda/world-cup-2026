@@ -104,7 +104,7 @@ function renderPage() {
         Palpites <span class="ct">${counts.totalRemaining}</span>
       </button>
       <button class="admin-tab ${activeTab === 'resultados' ? 'active' : ''}" data-tab="resultados">
-        Meus resultados <span class="ct">${counts.totalFinished}</span>
+        Resultados oficiais <span class="ct">${counts.totalFinished}</span>
       </button>
     </div>
 
@@ -130,7 +130,7 @@ function applyHashRoute() {
 }
 
 function heroTitle() {
-  return activeTab === 'resultados' ? 'Meus resultados' : 'Seus palpites';
+  return activeTab === 'resultados' ? 'Resultados oficiais' : 'Seus palpites';
 }
 
 function renderActiveTab(counts) {

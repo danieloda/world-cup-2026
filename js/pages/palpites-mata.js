@@ -271,7 +271,7 @@ function renderPage() {
   return `
     <section class="hero">
       <div class="hero-kicker">Palpitar placares · Mata-mata</div>
-      <h1 class="hero-title">${activeTab === 'palpites' ? 'Seus palpites' : 'Meus resultados'}</h1>
+      <h1 class="hero-title">${activeTab === 'palpites' ? 'Seus palpites' : 'Resultados oficiais'}</h1>
       <div class="hero-meta">
         <b>${matches.length} jogos</b><span class="sep"></span>
         Quanto mais perto da final, mais pontos<span class="sep"></span>
@@ -284,7 +284,7 @@ function renderPage() {
         Palpites <span class="ct">${counts.totalRemaining}</span>
       </button>
       <button class="admin-tab ${activeTab === 'resultados' ? 'active' : ''}" data-tab="resultados">
-        Meus resultados <span class="ct">${counts.totalFinished}</span>
+        Resultados oficiais <span class="ct">${counts.totalFinished}</span>
       </button>
     </div>
 

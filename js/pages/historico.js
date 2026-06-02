@@ -133,12 +133,29 @@ function stageDays() {
 // Render — página
 // ============================================================
 function renderPage() {
+  // Antes da Copa começar nenhum jogo foi revelado (nenhum começou): em vez de uma
+  // tela vazia, mostramos uma PRÉVIA desfocada do que a página vai exibir.
+  if (revealedMatches.length === 0) {
+    return `
+      <section class="hero">
+        <div class="hero-kicker">Veja o que cada jogador apostou, jogo a jogo</div>
+        <h1 class="hero-title">Palpites da galera</h1>
+        <div class="hero-meta">
+          <b>A Copa ainda não começou</b><span class="sep"></span>
+          os palpites de todos aparecem aqui assim que a bola rolar
+        </div>
+      </section>
+
+      ${renderPreview()}
+    `;
+  }
+
   const awaitingTotal = revealedMatches.filter(m => matchStatus(m) === 'awaiting').length;
 
   return `
     <section class="hero">
       <div class="hero-kicker">Veja o que cada jogador apostou, jogo a jogo</div>
-      <h1 class="hero-title">Palpites de todos</h1>
+      <h1 class="hero-title">Palpites da galera</h1>
       <div class="hero-meta">
         <b>${stats.finished_matches}</b> finalizados<span class="sep"></span>
         <b>${awaitingTotal}</b> aguardando resultado<span class="sep"></span>
@@ -152,6 +169,75 @@ function renderPage() {
 
     <div id="tabBody">
       ${renderTabBody()}
+    </div>
+  `;
+}
+
+// ============================================================
+// Prévia (pré-Copa) — ilustração desfocada, dados fictícios
+// ============================================================
+function renderPreview() {
+  // Exemplos 100% fictícios só para mostrar o formato da tela. Ninguém vê palpite
+  // de ninguém antes do apito inicial — por isso fica borrado e marcado como "Prévia".
+  const demos = [
+    {
+      home: 'Brazil', away: 'Croatia', sh: 2, sa: 1, stage: 'Grupo C',
+      bets: [
+        { name: 'Você',  ph: 2, pa: 1, pts: 7, cls: 'win-exact',   pcls: 'exact',   me: true },
+        { name: 'Ana',   ph: 2, pa: 0, pts: 5, cls: 'win-partial', pcls: 'partial' },
+        { name: 'Bruno', ph: 1, pa: 1, pts: 1, cls: 'win-partial', pcls: 'partial' },
+        { name: 'Carla', ph: 0, pa: 2, pts: 0, cls: 'miss',        pcls: 'zero' },
+      ],
+    },
+    {
+      home: 'Argentina', away: 'France', sh: 1, sa: 1, stage: 'Grupo D',
+      bets: [
+        { name: 'Diego', ph: 1, pa: 1, pts: 7, cls: 'win-exact',   pcls: 'exact' },
+        { name: 'Elis',  ph: 0, pa: 0, pts: 5, cls: 'win-partial', pcls: 'partial' },
+        { name: 'Você',  ph: 2, pa: 1, pts: 1, cls: 'win-partial', pcls: 'partial', me: true },
+      ],
+    },
+  ];
+
+  const cards = demos.map(d => `
+    <div class="history-card group">
+      <div class="history-head">
+        <div class="date">16:00</div>
+        <div class="matchup">
+          <span class="flag">${flag(d.home)}</span>
+          <span>${escapeHtml(teamPt(d.home))}</span>
+          <span style="color:var(--text-mute); font-weight:500;">×</span>
+          <span>${escapeHtml(teamPt(d.away))}</span>
+          <span class="flag">${flag(d.away)}</span>
+        </div>
+        <div class="score">${d.sh} — ${d.sa}</div>
+        <div class="stage">${d.stage}</div>
+      </div>
+      <div class="history-bets">
+        ${d.bets.map(b => `
+          <div class="hb-row ${b.cls} ${b.me ? 'me' : ''}">
+            <div class="av-mini">${avatarHtml({ full_name: b.name })}</div>
+            <div class="nm">${escapeHtml(b.name)}</div>
+            <span class="pred">${b.ph}<span class="x">–</span>${b.pa}</span>
+            <span class="pts ${b.pcls}">${b.pts > 0 ? '+' + b.pts : '0'}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+
+  return `
+    <div class="preview-wrap">
+      <div class="preview-blurred" aria-hidden="true">
+        <div class="history-list">${cards}</div>
+      </div>
+      <div class="preview-overlay">
+        <span class="preview-badge">👀 Prévia</span>
+        <h3>É assim que vai ficar</h3>
+        <p>Quando a Copa começar, cada jogo mostra aqui o <strong>palpite de todos os participantes</strong>,
+           com os pontos de cada um. Os nomes e placares acima são <strong>só de exemplo</strong> — nada aqui é real ainda.</p>
+        <a class="btn btn-green" href="palpites-grupos.html">Fazer meus palpites →</a>
+      </div>
     </div>
   `;
 }

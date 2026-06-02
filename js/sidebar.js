@@ -16,7 +16,7 @@ const NAV_SECTIONS = [
   {
     label: 'Bolão',
     items: [
-      { id: 'historico',  href: 'historico.html',  label: 'Palpites de todos', icon: iconClock },
+      { id: 'historico',  href: 'historico.html',  label: 'Palpites da galera', icon: iconClock },
       { id: 'ranking',    href: 'ranking.html',    label: 'Ranking',    icon: iconChart },
     ],
   },
