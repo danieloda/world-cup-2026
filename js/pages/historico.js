@@ -5,6 +5,7 @@ import {
   flag, escapeHtml, teamPt, formatBrShort, formatTime, stageLabel,
   isLive, avatarHtml,
 } from '../util.js';
+import { scorerBonus, stageMultiplier, scoreBreakdown } from '../scoring.js';
 
 // ============================================================
 // Estado
@@ -13,6 +14,7 @@ let profile, stats;
 let revealedMatches = [];          // jogos já iniciados (match_date <= now), desc por data
 let predsByMatch = new Map();      // match_id -> [{...prediction, profiles}]
 let goalsByMatch = new Map();      // match_id -> [{...goal, players}]
+let scorerPickByUser = new Map();  // user_id -> { playerId, name }  (artilheiro escolhido)
 let activeStage = 'group';         // ABA 1 (fase): 'group' | 'ko'
 let activeDay = null;              // ABA 2 (dia): 'YYYY-MM-DD' (sempre um dia específico)
 let activeStatus = 'finished';     // FILTRO: 'finished' | 'awaiting'
@@ -62,13 +64,17 @@ async function loadData() {
   if (revealedMatches.length === 0) return;
 
   const matchIds = revealedMatches.map(m => m.id);
-  const [predsRes, goalsRes] = await Promise.all([
+  // Artilheiros: o RLS só revela a escolha alheia após o deadline (10/jun). Como nenhum
+  // jogo termina antes disso, nos cards finalizados sempre dá pra cruzar quem pontuou.
+  const [predsRes, goalsRes, scorerRes] = await Promise.all([
     supabase.from('predictions')
       .select('*, profiles(full_name, email, paid, avatar_url)')
       .in('match_id', matchIds),
     supabase.from('player_goals')
       .select('*, players(full_name, team)')
       .in('match_id', matchIds),
+    supabase.from('top_scorer_picks')
+      .select('user_id, player_id, players(full_name, team)'),
   ]);
 
   for (const p of (predsRes.data ?? [])) {
@@ -79,6 +85,13 @@ async function loadData() {
   for (const g of (goalsRes.data ?? [])) {
     if (!goalsByMatch.has(g.match_id)) goalsByMatch.set(g.match_id, []);
     goalsByMatch.get(g.match_id).push(g);
+  }
+  for (const s of (scorerRes.data ?? [])) {
+    scorerPickByUser.set(s.user_id, {
+      playerId: s.player_id,
+      name: s.players?.full_name || 'seu artilheiro',
+      team: s.players?.team || null,
+    });
   }
 }
 
@@ -361,6 +374,80 @@ function predGoals(p) {
   return (p.pred_home ?? 0) + (p.pred_away ?? 0);
 }
 
+// Bônus de artilheiro que ESTE usuário ganhou NESTA partida (ou null se não pontuou aqui).
+// Cruza o artilheiro escolhido com os gols marcados no jogo.
+function scorerHitFor(bet, m) {
+  const pick = scorerPickByUser.get(bet.user_id);
+  if (!pick) return null;
+  const goal = (goalsByMatch.get(m.id) ?? []).find(g => g.player_id === pick.playerId);
+  const n = goal?.goals ?? 0;
+  if (n <= 0) return null;
+  return { goals: n, bonus: scorerBonus(n, m.stage), name: pick.name, team: pick.team };
+}
+
+// "1.5" / "2" / "5" — sem zeros à toa (multiplicador do bônus de artilheiro)
+function fmtMult(stage) {
+  return String(stageMultiplier(stage)).replace(/\.0$/, '');
+}
+
+// ----- Conteúdo dos popovers (tooltip estilizado, montado em hover) -----
+// Cada gatilho carrega seu HTML num <template hidden> irmão; ver initTooltips().
+function tipShell(kicker, tier, tierCls, rowsHtml, totalCls, totalTxt) {
+  return `
+    <div class="tip-head">
+      <span class="tip-kicker">${escapeHtml(kicker)}</span>
+      <span class="tip-tier ${tierCls}">${escapeHtml(tier)}</span>
+    </div>
+    <div class="tip-rows">${rowsHtml}</div>
+    <div class="tip-total">
+      <span class="tip-total-lbl">Total no jogo</span>
+      <span class="tip-total-sum ${totalCls}">${totalTxt}</span>
+    </div>`;
+}
+
+// Palpite: modelo ADITIVO — cada acerto soma; o "peso" é o valor da fase (não há ×N único).
+function betTipHtml(bet, m, pts, isExact) {
+  const tier = isExact ? ['Placar exato', 'exact']
+    : pts > 0 ? ['Acerto parcial', 'partial']
+    : ['Não pontuou', 'zero'];
+  const { parts } = scoreBreakdown(
+    bet.pred_home, bet.pred_away, bet.pred_pen_winner,
+    m.actual_home, m.actual_away, m.pen_winner, m.stage,
+  );
+  const rows = parts.length > 0
+    ? parts.map(p => `
+        <div class="tip-row">
+          <span class="tip-row-lbl">${escapeHtml(p.label)}</span>
+          <span class="tip-row-val add"><span class="op">+</span>${p.pts}</span>
+        </div>`).join('')
+    : `<div class="tip-row miss-row"><span class="tip-row-lbl">Errou gols, resultado e saldo</span></div>`;
+  return tipShell(stageDisp(m), tier[0], tier[1], rows, tier[1], pts > 0 ? `+${pts}` : '0');
+}
+
+// Artilheiro: bônus MULTIPLICATIVO — gols × 2 × peso da fase.
+function scorerTipHtml(sc, m) {
+  const mult = stageMultiplier(m.stage);
+  const golLbl = `Gols na partida${sc.goals > 1 ? ` (${sc.goals})` : ''}`;
+  let rows = `
+    <div class="tip-player">${flag(sc.team)} <span>${escapeHtml(sc.name)}</span></div>
+    <div class="tip-row">
+      <span class="tip-row-lbl">${golLbl}</span>
+      <span class="tip-row-val">${sc.goals}</span>
+    </div>
+    <div class="tip-row">
+      <span class="tip-row-lbl">Pontos por gol</span>
+      <span class="tip-row-val"><span class="op">×</span>2</span>
+    </div>`;
+  if (mult > 1) {
+    rows += `
+    <div class="tip-row">
+      <span class="tip-row-lbl">Peso · ${escapeHtml(stageLabel(m.stage))}</span>
+      <span class="tip-row-val mult"><span class="op">×</span>${fmtMult(m.stage)}</span>
+    </div>`;
+  }
+  return tipShell('Bônus de artilheiro', 'Seu artilheiro', 'scorer', rows, 'scorer', `+${sc.bonus}`);
+}
+
 // ----- Finalizada: resultado + pontos + gols -----
 function renderFinishedCard(m) {
   // Ordena: pontos desc → total de gols desc → mandante desc → nome
@@ -373,6 +460,9 @@ function renderFinishedCard(m) {
   const goals = goalsByMatch.get(m.id) ?? [];
   const penInfo = m.pen_winner
     ? `<small>pen: ${m.pen_winner === 'home' ? teamPt(m.team_home) : teamPt(m.team_away)}</small>` : '';
+  // Fases de peso (×>1) valem mais no bônus de artilheiro — sinaliza no topo do card.
+  const mult = stageMultiplier(m.stage);
+  const multBadge = mult > 1 ? ` <span class="stage-mult">· Artilheiro ×${fmtMult(m.stage)}</span>` : '';
 
   return `
     <div class="history-card ${m.stage}">
@@ -380,7 +470,7 @@ function renderFinishedCard(m) {
         <div class="date">${formatTime(m.match_date)}</div>
         ${matchupHtml(m)}
         <div class="score">${m.actual_home} — ${m.actual_away}${penInfo}</div>
-        <div class="stage">${stageDisp(m)}</div>
+        <div class="stage">${stageDisp(m)}${multBadge}</div>
       </div>
 
       ${renderBetsList(m, bets, true)}
@@ -388,7 +478,7 @@ function renderFinishedCard(m) {
       ${goals.length > 0 ? `
         <div class="history-scorers">
           <span class="label">⚽ Gols:</span>
-          ${goals.map(g => `<span class="scorer">${escapeHtml(g.players.full_name)} <span class="num">${g.goals}'</span></span>`).join('')}
+          ${goals.map(g => `<span class="scorer"><span class="fl">${flag(g.players.team)}</span> ${escapeHtml(g.players.full_name)} <span class="num">${g.goals}</span></span>`).join('')}
         </div>
       ` : ''}
     </div>
@@ -452,12 +542,21 @@ function renderBetRow(bet, m, finished) {
   const rowClass = isExact ? 'win-exact' : pts > 0 ? 'win-partial' : 'miss';
   const ptsClass = isExact ? 'exact' : pts > 0 ? 'partial' : 'zero';
 
+  // Bônus de artilheiro: chip discreto quando o artilheiro DESTA pessoa marcou no jogo.
+  const sc = scorerHitFor(bet, m);
+  const scorerChip = sc
+    ? `<span class="hb-scorer" data-tip>⚽+${sc.bonus}</span>` +
+      `<template class="tip-src">${scorerTipHtml(sc, m)}</template>`
+    : '';
+
   return `
     <div class="hb-row ${rowClass} ${isMe ? 'me' : ''}">
       <div class="av-mini">${avatarHtml(bet.profiles)}</div>
       <div class="nm">${escapeHtml(name)}</div>
       <span class="pred">${bet.pred_home}<span class="x">–</span>${bet.pred_away}</span>
-      <span class="pts ${ptsClass}" title="${isExact ? 'Placar exato' : pts > 0 ? 'Acerto parcial' : 'Errou'}">${pts > 0 ? '+' + pts : '0'}</span>
+      <span class="pts ${ptsClass}" data-tip>${pts > 0 ? '+' + pts : '0'}</span>
+      <template class="tip-src">${betTipHtml(bet, m, pts, isExact)}</template>
+      ${scorerChip}
     </div>
   `;
 }
@@ -505,4 +604,82 @@ function attachEventListeners() {
       return;
     }
   });
+
+  initTooltips();
+}
+
+// ============================================================
+// Tooltip flutuante (popover de pontos / artilheiro)
+// ------------------------------------------------------------
+// Um único elemento reaproveitado, anexado ao <body> e posicionado via JS.
+// O conteúdo de cada gatilho vem do <template.tip-src> irmão. Delegação no
+// document → sobrevive aos re-renders das abas. Hover no desktop, toque no mobile.
+// ============================================================
+function initTooltips() {
+  let tipEl = null;
+  let current = null;   // gatilho atualmente exibido (p/ toggle no toque)
+
+  const ensure = () => {
+    if (!tipEl) {
+      tipEl = document.createElement('div');
+      tipEl.className = 'hist-tip';
+      tipEl.setAttribute('role', 'tooltip');
+      document.body.appendChild(tipEl);
+    }
+    return tipEl;
+  };
+
+  function show(trigger) {
+    const src = trigger.nextElementSibling;
+    if (!src || !src.classList.contains('tip-src')) return;
+    const el = ensure();
+    el.innerHTML = src.innerHTML;
+    el.classList.add('show');
+    current = trigger;
+    position(trigger, el);
+  }
+
+  function hide() {
+    if (tipEl) tipEl.classList.remove('show');
+    current = null;
+  }
+
+  function position(trigger, el) {
+    // mede com a tip já visível mas fora da tela
+    el.style.left = '-9999px';
+    el.style.top = '0';
+    const r = trigger.getBoundingClientRect();
+    const tw = el.offsetWidth, th = el.offsetHeight;
+    const gap = 9, pad = 8;
+    // centraliza no gatilho, prefere ACIMA; cai pra baixo se não couber
+    let left = r.left + r.width / 2 - tw / 2;
+    left = Math.max(pad, Math.min(left, window.innerWidth - tw - pad));
+    let top = r.top - th - gap;
+    let place = 'top';
+    if (top < pad) { top = r.bottom + gap; place = 'bottom'; }
+    el.dataset.place = place;
+    // seta apontando pro centro do gatilho (clampada à largura da tip)
+    const ax = Math.max(14, Math.min(r.left + r.width / 2 - left, tw - 14));
+    el.style.setProperty('--tip-arrow', `${ax}px`);
+    el.style.left = `${Math.round(left + window.scrollX)}px`;
+    el.style.top = `${Math.round(top + window.scrollY)}px`;
+  }
+
+  // Desktop: hover
+  document.addEventListener('mouseover', (e) => {
+    const t = e.target.closest('[data-tip]');
+    if (t) show(t);
+  });
+  document.addEventListener('mouseout', (e) => {
+    const t = e.target.closest('[data-tip]');
+    if (t && !(e.relatedTarget && t.contains(e.relatedTarget))) hide();
+  });
+  // Mobile: toque alterna; tocar fora fecha
+  document.addEventListener('click', (e) => {
+    const t = e.target.closest('[data-tip]');
+    if (t) { (current === t) ? hide() : show(t); }
+    else if (current) hide();
+  });
+  // Some ao rolar (captura também o scroll de containers internos)
+  document.addEventListener('scroll', hide, { passive: true, capture: true });
 }
