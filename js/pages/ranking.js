@@ -5,7 +5,8 @@ import {
   flag, escapeHtml, teamPt, formatBrShort, formatTime, showToast,
   avatarHtml, getInitials,
 } from '../util.js';
-import { championBonus, scoreBreakdown } from '../scoring.js';
+import { championBonus, scoreBreakdown, scorerBonus } from '../scoring.js';
+import { renderRankChart } from '../rank-chart.js';
 
 // ============================================================
 // Estado
@@ -18,6 +19,14 @@ let scorerPicksByUser = new Map();    // user_id -> { player_id, players: {...} 
 let expandedUserId = null;
 let realChampion = null;     // string — campeão real (null se final não terminou)
 const profileCache = new Map();
+
+// Dados p/ o gráfico de evolução (reconstruído por replay; ver buildProgression)
+let finishedMatches = [];    // jogos finalizados, asc por data
+let predPtsByUserMatch = new Map();  // `${user}|${match}` -> points_earned
+let goalsByMatchPlayer = new Map();  // `${match}|${player}` -> goals
+let qualByUserMatch = new Map();     // `${user}|${match}` -> pts (bônus classificado, jogo JÁ disputado)
+let qualSpillByUser = new Map();     // user -> pts de classificado cujo jogo-ref ainda não foi disputado
+let finalMatchId = null;
 
 // ============================================================
 // Main
@@ -32,6 +41,12 @@ try {
   const pageBody = await renderShell({ active: 'ranking', profile, stats });
   pageBody.innerHTML = renderPage();
   pageBody.classList.add('fade-up');
+
+  const chartMount = document.getElementById('rankChart');
+  if (chartMount) {
+    const progression = buildProgression();
+    if (progression) renderRankChart(chartMount, { progression, meId: profile.id });
+  }
 
   attachEventListeners();
 } catch (err) {
@@ -49,7 +64,8 @@ try {
 // Data
 // ============================================================
 async function loadData() {
-  const [statsRes, leaderRes, scorerRes, settingsRes, champRes, sPickRes, profilesRes, finalRes] = await Promise.all([
+  const [statsRes, leaderRes, scorerRes, settingsRes, champRes, sPickRes, profilesRes, finalRes,
+         finMatchesRes, predPtsRes, goalsRes, qualRes] = await Promise.all([
     supabase.from('v_pool_stats').select('*').single(),
     supabase.from('v_leaderboard').select('*'),
     supabase.from('v_scorer_ranking').select('*'),
@@ -58,6 +74,12 @@ async function loadData() {
     supabase.from('top_scorer_picks').select('*, players(full_name, team)'),
     supabase.from('profiles').select('id, avatar_url'),
     supabase.from('matches').select('team_home, team_away, actual_home, actual_away, pen_winner, finished').eq('stage', 'final').maybeSingle(),
+    // ---- dados p/ reconstruir a evolução do ranking (replay por data do jogo) ----
+    supabase.from('matches').select('id, match_date, stage, group_name, team_home, team_away, actual_home, actual_away')
+      .eq('finished', true).order('match_date', { ascending: true }),
+    supabase.from('predictions').select('user_id, match_id, points_earned').not('points_earned', 'is', null),
+    supabase.from('player_goals').select('player_id, match_id, goals'),
+    supabase.from('user_qualifier_points').select('user_id, breakdown'),
   ]);
 
   if (leaderRes.error) throw leaderRes.error;
@@ -85,6 +107,118 @@ async function loadData() {
   settings = Object.fromEntries(
     (settingsRes.data ?? []).map(r => [r.key, typeof r.value === 'string' ? tryParse(r.value) : r.value])
   );
+
+  // ---- prepara os índices p/ o replay da evolução ----
+  finishedMatches = finMatchesRes.data ?? [];
+  finalMatchId = finishedMatches.find(m => m.stage === 'final')?.id ?? null;
+  const finishedIds = new Set(finishedMatches.map(m => m.id));
+
+  for (const p of (predPtsRes.data ?? [])) {
+    predPtsByUserMatch.set(`${p.user_id}|${p.match_id}`, p.points_earned ?? 0);
+  }
+  for (const g of (goalsRes.data ?? [])) {
+    goalsByMatchPlayer.set(`${g.match_id}|${g.player_id}`, g.goals ?? 0);
+  }
+  // Bônus de classificado: cada item referencia o JOGO do mata-mata da vaga. Esse
+  // jogo pode ainda não ter sido disputado (os pontos são creditados quando as
+  // vagas se definem, p.ex. fim dos grupos). Se já foi disputado, atribui ao jogo;
+  // senão joga no "spillover" (entra no último jogo disputado, garantindo que o
+  // fim de cada série == total_pts da tabela).
+  for (const row of (qualRes.data ?? [])) {
+    for (const it of (row.breakdown?.items ?? [])) {
+      const pts = it.pts ?? 0;
+      if (pts === 0) continue;
+      if (it.match_id != null && finishedIds.has(it.match_id)) {
+        const k = `${row.user_id}|${it.match_id}`;
+        qualByUserMatch.set(k, (qualByUserMatch.get(k) ?? 0) + pts);
+      } else {
+        qualSpillByUser.set(row.user_id, (qualSpillByUser.get(row.user_id) ?? 0) + pts);
+      }
+    }
+  }
+}
+
+// ============================================================
+// Evolução do ranking — replay determinístico
+// ============================================================
+// NÃO guardamos snapshots: a posição em qualquer momento é reconstruída
+// somando, em ordem de DATA do jogo, tudo que é atribuível a um jogo:
+//   • pontos do palpite (predictions.points_earned)
+//   • artilheiro (gols do escolhido naquele jogo × multiplicador da fase)
+//   • classificado (itens do breakdown, cada um com seu match_id)
+//   • campeão (no jogo da final)
+// A última coordenada de cada série == total_pts do v_leaderboard.
+function dayKey(iso) {
+  const d = new Date(iso);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function matchDelta(userId, m) {
+  let d = predPtsByUserMatch.get(`${userId}|${m.id}`) ?? 0;
+
+  // artilheiro: gols do jogador escolhido NESTE jogo
+  const sPick = scorerPicksByUser.get(userId);
+  if (sPick?.player_id != null) {
+    const goals = goalsByMatchPlayer.get(`${m.id}|${sPick.player_id}`) ?? 0;
+    if (goals > 0) d += scorerBonus(goals, m.stage);
+  }
+
+  // classificado: pontos atribuídos a este jogo
+  d += qualByUserMatch.get(`${userId}|${m.id}`) ?? 0;
+
+  // campeão: cai no jogo da final
+  if (m.id === finalMatchId) {
+    const champ = championPicksByUser.get(userId);
+    if (champ && realChampion && champ.team === realChampion) d += championBonus(true);
+  }
+
+  return d;
+}
+
+function buildProgression() {
+  const users = leaderboard.map(u => ({ userId: u.user_id, name: u.full_name, avatar_url: u.avatar_url }));
+  if (finishedMatches.length === 0 || users.length === 0) return null;
+
+  const lastIdx = finishedMatches.length - 1;
+
+  // ----- Por jogo: uma coluna por partida finalizada -----
+  const gameLabels = finishedMatches.map((_, i) => `Jogo ${i + 1}`);
+  const gameSeries = users.map(u => {
+    const spill = qualSpillByUser.get(u.userId) ?? 0;
+    const values = [0];  // ponto inicial (antes de qualquer jogo)
+    let acc = 0;
+    finishedMatches.forEach((m, i) => {
+      acc += matchDelta(u.userId, m);
+      if (i === lastIdx) acc += spill;
+      values.push(acc);
+    });
+    return { userId: u.userId, name: u.name, avatar_url: u.avatar_url, values };
+  });
+
+  // ----- Por dia: agrupa por data do jogo -----
+  const days = [...new Set(finishedMatches.map(m => dayKey(m.match_date)))].sort();
+  const dayLabels = days.map(k => {
+    const d = new Date(k + 'T12:00:00');
+    return `${d.getDate()}/${d.getMonth() + 1}`;
+  });
+  const matchesByDay = new Map(days.map(k => [k, finishedMatches.filter(m => dayKey(m.match_date) === k)]));
+  const lastDayIdx = days.length - 1;
+  const daySeries = users.map(u => {
+    const spill = qualSpillByUser.get(u.userId) ?? 0;
+    const values = [0];
+    let acc = 0;
+    days.forEach((k, i) => {
+      for (const m of matchesByDay.get(k)) acc += matchDelta(u.userId, m);
+      if (i === lastDayIdx) acc += spill;
+      values.push(acc);
+    });
+    return { userId: u.userId, name: u.name, avatar_url: u.avatar_url, values };
+  });
+
+  return {
+    game: { labels: gameLabels, series: gameSeries, matches: finishedMatches },
+    day:  { labels: dayLabels, series: daySeries },
+  };
 }
 
 function tryParse(s) { try { return JSON.parse(s); } catch { return s; } }
@@ -137,6 +271,21 @@ function renderPage() {
     ` : ''}
 
     <div id="drillDown"></div>
+
+    ${leaderboard.length > 0 ? renderChartSection() : ''}
+  `;
+}
+
+function renderChartSection() {
+  const hasData = finishedMatches.length > 0;
+  return `
+    <div class="section-head">
+      <h3>Evolução do ranking</h3>
+      <span class="see-all">posição ao longo da Copa</span>
+    </div>
+    ${hasData
+      ? `<div class="rank-chart" id="rankChart"></div>`
+      : `<div class="rank-chart empty"><p>O gráfico aparece assim que o primeiro jogo for finalizado — aí dá pra ver a virada de cada um, jogo a jogo e dia a dia.</p></div>`}
   `;
 }
 
