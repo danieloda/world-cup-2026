@@ -7,7 +7,7 @@ import {
   computeStandings as utilComputeStandings,
 } from '../util.js';
 import { fifaRank } from '../fifa-rank.js';
-import { matchPoints, scoreBreakdown } from '../scoring.js';
+import { matchPoints, scoreBreakdown, stageMultiplier, scorerBonus } from '../scoring.js';
 
 // ============================================================
 // Constantes
@@ -23,6 +23,19 @@ const STAGES = [
 
 // Placar exato de cada fase (pontuação aditiva, vem de js/scoring.js — sem drift).
 function stageExact(stageId) { return matchPoints(stageId).exact; }
+
+// Selos do cabeçalho de cada fase: placar exato + os dois multiplicadores
+// (multiplicador de fase e bônus de artilheiro por gol), tudo de js/scoring.js.
+function stageHeaderBadges(stageId) {
+  const exact = stageExact(stageId);
+  const multPt = String(stageMultiplier(stageId)).replace('.', ',');
+  const scorer = scorerBonus(1, stageId);
+  return `
+    <span class="mult" title="Placar exato vale ${exact} pts">exato ${exact}</span>
+    <span class="mult is-phase" title="Multiplicador desta fase (×${multPt})">fase ×${multPt}</span>
+    <span class="mult is-scorer" title="Bônus de artilheiro: +${scorer} pts por gol do seu artilheiro nesta fase">artilheiro +${scorer}/gol</span>
+  `;
+}
 
 const MEZES = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
 
@@ -340,7 +353,7 @@ function renderResultStageColumn(stage, grouped) {
     <div class="bracket-col">
       <h4>
         ${escapeHtml(stage.label)}
-        <span class="mult" title="Placar exato vale ${stageExact(stage.id)} pts">exato ${stageExact(stage.id)}</span>
+        ${stageHeaderBadges(stage.id)}
         <span class="count">${list.length} jogo${list.length !== 1 ? 's' : ''}</span>
       </h4>
       ${list.map(renderResultBracketMatch).join('')}
@@ -560,7 +573,7 @@ function renderStageColumn(stage, grouped) {
     <div class="bracket-col">
       <h4>
         ${escapeHtml(stage.label)}
-        <span class="mult" title="Placar exato vale ${stageExact(stage.id)} pts">exato ${stageExact(stage.id)}</span>
+        ${stageHeaderBadges(stage.id)}
         <span class="count">${list.length} jogo${list.length !== 1 ? 's' : ''}</span>
       </h4>
       ${list.map(renderBracketMatch).join('')}

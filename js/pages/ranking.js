@@ -48,6 +48,10 @@ try {
     if (progression) renderRankChart(chartMount, { progression, meId: profile.id });
   }
 
+  // Prévia do gráfico (mesma vibe de "Palpites da galera") enquanto não há jogos.
+  const chartPreviewMount = document.getElementById('rankChartPreview');
+  if (chartPreviewMount) renderRankChart(chartPreviewMount, { progression: demoProgression(), meId: 'demo-me' });
+
   attachEventListeners();
 } catch (err) {
   console.error('[ranking] FATAL:', err);
@@ -292,8 +296,44 @@ function renderChartSection() {
     </div>
     ${hasData
       ? `<div class="rank-chart" id="rankChart"></div>`
-      : `<div class="rank-chart empty"><p>O gráfico aparece assim que o primeiro jogo for finalizado — aí dá pra ver a virada de cada um, jogo a jogo e dia a dia.</p></div>`}
+      : renderChartPreview()}
   `;
+}
+
+// Prévia "É assim que vai ficar": um bump chart de exemplo, desfocado, com
+// chamada pra ação — espelha o preview de "Palpites da galera" (historico.js).
+function renderChartPreview() {
+  return `
+    <div class="preview-wrap">
+      <div class="preview-blurred" aria-hidden="true">
+        <div class="rank-chart" id="rankChartPreview"></div>
+      </div>
+      <div class="preview-overlay">
+        <span class="preview-badge">👀 Prévia</span>
+        <h3>É assim que vai ficar</h3>
+        <p>Assim que os jogos começarem, este gráfico mostra a <strong>posição de cada jogador ao longo da Copa</strong>
+           — jogo a jogo e dia a dia, com cada virada. Os nomes acima são <strong>só de exemplo</strong>.</p>
+        <a class="btn btn-green" href="palpites-grupos.html">Fazer meus palpites →</a>
+      </div>
+    </div>
+  `;
+}
+
+// Progressão fictícia (pontos acumulados) pra ilustrar a prévia do gráfico.
+// Mesmo formato de buildProgression: values[0] = 0 e cada etapa só soma.
+function demoProgression() {
+  const demo = [
+    { userId: 'demo-me', name: 'Você', game: [0, 7, 14, 21, 33, 40, 52], day: [0, 14, 33, 52] },
+    { userId: 'demo-1',  name: 'Diego', game: [0, 9, 12, 25, 28, 41, 47], day: [0, 12, 28, 47] },
+    { userId: 'demo-2',  name: 'Elis',  game: [0, 5, 16, 19, 31, 38, 50], day: [0, 16, 31, 50] },
+    { userId: 'demo-3',  name: 'Bia',   game: [0, 7, 11, 22, 30, 35, 44], day: [0, 11, 30, 44] },
+    { userId: 'demo-4',  name: 'Caio',  game: [0, 3, 13, 18, 26, 37, 48], day: [0, 13, 26, 48] },
+  ];
+  const series = (key) => demo.map(d => ({ userId: d.userId, name: d.name, avatar_url: null, values: d[key] }));
+  return {
+    game: { labels: ['Jogo 1', 'Jogo 2', 'Jogo 3', 'Jogo 4', 'Jogo 5', 'Jogo 6'], series: series('game') },
+    day:  { labels: ['11/6', '12/6', '13/6', '14/6'], series: series('day') },
+  };
 }
 
 function renderEmpty() {

@@ -1734,8 +1734,8 @@ img { max-width: 100%; height: auto; }
   min-height: 360px;
 }
 .preview-blurred {
-  filter: blur(2px) saturate(.9);
-  opacity: .7;
+  filter: blur(1.5px) saturate(.95);
+  opacity: .85;
   pointer-events: none;
   user-select: none;
 }
@@ -1745,7 +1745,7 @@ img { max-width: 100%; height: auto; }
   align-items: center; justify-content: center;
   text-align: center; gap: 10px;
   padding: 32px 24px;
-  background: radial-gradient(ellipse at center, rgba(18,18,18,.35) 0%, rgba(0,0,0,.6) 100%);
+  background: radial-gradient(ellipse at center, rgba(10,10,12,.2) 0%, rgba(0,0,0,.48) 100%);
 }
 .preview-overlay .preview-badge {
   font-size: 12px; font-weight: 800;
@@ -2410,6 +2410,9 @@ img { max-width: 100%; height: auto; }
   margin-left: 6px;
   vertical-align: middle;
 }
+/* Multiplicador de fase (neutro) e bônus de artilheiro (verde), ao lado do exato */
+.bracket-col h4 .mult.is-phase { background: var(--line-strong); color: var(--text-dim); }
+.bracket-col h4 .mult.is-scorer { background: var(--positive-dim); color: var(--positive); }
 .bracket-col h4 .count {
   display: inline-block;
   font-size: 10px;
