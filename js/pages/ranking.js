@@ -400,7 +400,7 @@ function renderPodium(totalPot, split) {
         if (!u) return '<div></div>';
         const place = idx + 1;
         return `
-          <div class="podium-card ${place === 1 ? 'first' : ''}" data-user-id="${u.user_id}">
+          <div class="podium-card ${place === 1 ? 'first' : place === 2 ? 'second' : 'third'}" data-user-id="${u.user_id}">
             <div class="podium-place">${place}º</div>
             <div class="podium-av">${avatarHtml(u)}</div>
             <div class="podium-name">${escapeHtml(u.full_name)}</div>
@@ -416,7 +416,7 @@ function renderPodium(totalPot, split) {
 function renderRankRow(u, idx) {
   const pos = idx + 1;
   const isMe = u.user_id === profile.id;
-  const posClass = pos <= 3 ? 'pos pos-top' : 'pos';
+  const posClass = pos <= 3 ? `pos pos-top pos-${pos}` : 'pos';
   const rowClass = isMe ? 'me-row' : '';
 
   // Campeão: mostra a escolha + pontos. Quando a Final terminou e errou, mostra "0" apagado.

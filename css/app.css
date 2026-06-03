@@ -1948,11 +1948,11 @@ img { max-width: 100%; height: auto; }
 }
 .podium-card:hover { background: var(--card-hover); transform: translateY(-2px); }
 .podium-card.first {
-  background: linear-gradient(160deg, var(--accent) 0%, #8b6a1f 100%);
+  background: linear-gradient(160deg, #ffd966 0%, var(--accent) 45%, #8b6a1f 100%);
   padding: 28px 20px;
   transform: translateY(-12px);
   border: none;
-  box-shadow: 0 30px 60px -20px rgba(244, 196, 48, .35);
+  box-shadow: 0 30px 60px -20px rgba(244, 196, 48, .45);
   color: #000;
 }
 .podium-card.first:hover { transform: translateY(-14px); }
@@ -1961,6 +1961,30 @@ img { max-width: 100%; height: auto; }
 .podium-card.first .podium-pts { color: rgba(0, 0, 0, .75); }
 .podium-card.first .podium-prize { color: #000; }
 .podium-card.first .podium-av { background: #000; color: var(--accent); border-color: rgba(0, 0, 0, .2); }
+
+.podium-card.second {
+  background: linear-gradient(160deg, #e8ecf2 0%, #b9c2cf 45%, #6e7787 100%);
+  border: none;
+  box-shadow: 0 24px 48px -22px rgba(185, 194, 207, .35);
+  color: #1a1d24;
+}
+.podium-card.second .podium-place { color: rgba(26, 29, 36, .55); }
+.podium-card.second .podium-name { color: #1a1d24; }
+.podium-card.second .podium-pts { color: rgba(26, 29, 36, .7); }
+.podium-card.second .podium-prize { color: #1a1d24; }
+.podium-card.second .podium-av { background: #1a1d24; color: #e8ecf2; border-color: rgba(26, 29, 36, .2); }
+
+.podium-card.third {
+  background: linear-gradient(160deg, #e8a87a 0%, #c87f4a 45%, #6b3a1c 100%);
+  border: none;
+  box-shadow: 0 24px 48px -22px rgba(200, 127, 74, .4);
+  color: #2a1408;
+}
+.podium-card.third .podium-place { color: rgba(42, 20, 8, .55); }
+.podium-card.third .podium-name { color: #2a1408; }
+.podium-card.third .podium-pts { color: rgba(42, 20, 8, .7); }
+.podium-card.third .podium-prize { color: #2a1408; }
+.podium-card.third .podium-av { background: #2a1408; color: #e8a87a; border-color: rgba(42, 20, 8, .2); }
 
 .podium-place {
   font-size: 48px; font-weight: 900;
@@ -2063,13 +2087,44 @@ img { max-width: 100%; height: auto; }
 .rank-table tbody tr:hover { background: rgba(255, 255, 255, .04); }
 .rank-table tbody tr.expanded { background: rgba(244, 196, 48, .06); }
 .rank-table .pos {
-  font-size: 14px; font-weight: 800;
-  color: var(--text-dim);
+  font-size: 14px; font-weight: 700;
+  color: var(--text-mute);
   width: 28px;
   display: inline-block;
   text-align: center;
+  font-variant-numeric: tabular-nums;
 }
 .rank-table .pos-top { color: var(--accent); }
+.rank-table .pos-top {
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
+  background-repeat: no-repeat;
+  background-size: 220% 100%, 100% 100%;
+  background-position: 150% 0, 0 0;
+  animation: pos-shine 4.5s ease-in-out infinite;
+}
+.rank-table .pos-1 {
+  background-image:
+    linear-gradient(100deg, transparent 42%, rgba(255,255,255,.65) 50%, transparent 58%),
+    linear-gradient(160deg, #ffd966 0%, var(--accent) 60%, #8b6a1f 100%);
+}
+.rank-table .pos-2 {
+  background-image:
+    linear-gradient(100deg, transparent 42%, rgba(255,255,255,.85) 50%, transparent 58%),
+    linear-gradient(160deg, #d8dde6 0%, #9aa3b2 40%, #6b7585 70%, #aab3c2 100%);
+}
+.rank-table .pos-3 {
+  background-image:
+    linear-gradient(100deg, transparent 42%, rgba(255,235,210,.6) 50%, transparent 58%),
+    linear-gradient(160deg, #f0b48a 0%, #c87f4a 55%, #6b3a1c 100%);
+}
+@keyframes pos-shine {
+  0%, 100% { background-position: 150% 0, 0 0; }
+  50%      { background-position: -50% 0, 0 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rank-table .pos-top { animation: none; }
+}
 .rank-table .user-cell {
   display: flex; align-items: center; gap: 10px;
   min-width: 0;
