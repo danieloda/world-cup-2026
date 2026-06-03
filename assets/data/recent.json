@@ -275,6 +275,13 @@
   ],
   "Belgium": [
     [
+      "2026-06-02",
+      "Croatia",
+      false,
+      "2-0",
+      "Amistoso"
+    ],
+    [
       "2026-04-01",
       "Mexico",
       false,
@@ -335,13 +342,6 @@
       "Wales",
       true,
       "4-3",
-      "Eliminatórias"
-    ],
-    [
-      "2025-06-06",
-      "FYR Macedonia",
-      false,
-      "1-1",
       "Eliminatórias"
     ]
   ],
@@ -635,6 +635,13 @@
   ],
   "Croatia": [
     [
+      "2026-06-02",
+      "Belgium",
+      true,
+      "0-2",
+      "Amistoso"
+    ],
+    [
       "2026-04-01",
       "Brazil",
       false,
@@ -695,13 +702,6 @@
       "Czech Republic",
       true,
       "5-1",
-      "Eliminatórias"
-    ],
-    [
-      "2025-06-06",
-      "Gibraltar",
-      false,
-      "7-0",
       "Eliminatórias"
     ]
   ],
@@ -1211,6 +1211,13 @@
   ],
   "Ghana": [
     [
+      "2026-06-02",
+      "Wales",
+      false,
+      "1-1",
+      "Amistoso"
+    ],
+    [
       "2026-05-23",
       "Mexico",
       false,
@@ -1272,16 +1279,16 @@
       false,
       "1-1",
       "Eliminatórias"
-    ],
-    [
-      "2025-05-31",
-      "Trinidad and Tobago",
-      false,
-      "4-0",
-      "Amistoso"
     ]
   ],
   "Haiti": [
+    [
+      "2026-06-03",
+      "New Zealand",
+      true,
+      "4-0",
+      "Amistoso"
+    ],
     [
       "2026-03-31",
       "Iceland",
@@ -1343,13 +1350,6 @@
       "USA",
       false,
       "1-2",
-      "Copa Ouro"
-    ],
-    [
-      "2025-06-19",
-      "Trinidad and Tobago",
-      false,
-      "1-1",
       "Copa Ouro"
     ]
   ],
@@ -1780,6 +1780,13 @@
   ],
   "Morocco": [
     [
+      "2026-06-02",
+      "Madagascar",
+      true,
+      "4-0",
+      "Amistoso"
+    ],
+    [
       "2026-05-26",
       "Burundi",
       true,
@@ -1840,13 +1847,6 @@
       "Mali",
       true,
       "1-1",
-      "Copa Africana"
-    ],
-    [
-      "2025-12-21",
-      "Comoros",
-      true,
-      "2-0",
       "Copa Africana"
     ]
   ],
@@ -1924,6 +1924,13 @@
   ],
   "New Zealand": [
     [
+      "2026-06-03",
+      "Haiti",
+      false,
+      "0-4",
+      "Amistoso"
+    ],
+    [
       "2026-03-30",
       "Chile",
       true,
@@ -1984,13 +1991,6 @@
       "Ukraine",
       true,
       "1-2",
-      "Amistoso"
-    ],
-    [
-      "2025-06-07",
-      "Ivory Coast",
-      false,
-      "1-0",
       "Amistoso"
     ]
   ],
