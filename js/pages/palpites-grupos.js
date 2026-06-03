@@ -25,6 +25,7 @@ let predsByMatch = new Map();        // match_id -> prediction row
 let goalsByMatch = new Map();        // match_id -> [{player, goals}]
 let oddsByMatch = new Map();         // match_id -> { odd_home, odd_draw, odd_away, bookmaker_name }
 let h2hByMatch = new Map();          // match_id -> { fixtures: [...], summary: {...}, api_team_home }
+let predictionsByMatch = new Map();  // match_id -> previsão normalizada (ver raiox.js / renderPredictionsBlock)
 let recentByTeam = new Map();        // team name -> [{ date, opponent, home, score, competition }] (forma recente)
 let activeTab = 'palpites';          // 'palpites' | 'resultados'
 let activeGroup = 'all';             // 'all' | 'A'..'L' (ambas as abas operam sempre por grupo)
@@ -36,7 +37,11 @@ const GROUPS = ['A','B','C','D','E','F','G','H','I','J','K','L'];
 // Dados que alimentam o Raio-X (módulo ../raiox.js). h2h é a linha de match_h2h
 // daquele jogo (ou null).
 function raioxData(m) {
-  return { recentByTeam, h2h: h2hByMatch.get(m.id) ?? null };
+  return {
+    recentByTeam,
+    h2h: h2hByMatch.get(m.id) ?? null,
+    predictions: predictionsByMatch.get(m.id) ?? null,
+  };
 }
 
 // ============================================================
@@ -76,13 +81,14 @@ try {
 // Data
 // ============================================================
 async function loadData() {
-  const [statsRes, matchesRes, predsRes, goalsRes, oddsRes, h2hRes] = await Promise.all([
+  const [statsRes, matchesRes, predsRes, goalsRes, oddsRes, h2hRes, forecastRes] = await Promise.all([
     supabase.from('v_pool_stats').select('*').single(),
     supabase.from('matches').select('*').eq('stage', 'group').order('match_date'),
     supabase.from('predictions').select('*').eq('user_id', profile.id),
     supabase.from('player_goals').select('*, players(full_name, team)'),
     supabase.from('match_odds').select('match_id, odd_home, odd_draw, odd_away, bookmaker_name'),
     supabase.from('match_h2h').select('match_id, fixtures, summary, api_team_home'),
+    supabase.from('match_predictions').select('match_id, payload'),
   ]);
 
   if (matchesRes.error) throw matchesRes.error;
@@ -93,6 +99,10 @@ async function loadData() {
   predsByMatch = new Map((predsRes.data ?? []).map(p => [p.match_id, p]));
   oddsByMatch = new Map((oddsRes.data ?? []).map(o => [o.match_id, o]));
   h2hByMatch  = new Map((h2hRes.data ?? []).map(h => [h.match_id, h]));
+  // Previsão normalizada (match_predictions.payload) — só existe pra jogos que a
+  // API trouxe dado útil; o front já não mostra nada pros demais. Degrada gracioso
+  // se a migration ainda não foi aplicada (data null → mapa vazio).
+  predictionsByMatch = new Map((forecastRes.data ?? []).map(p => [p.match_id, p.payload]));
 
   goalsByMatch = new Map();
   for (const g of (goalsRes.data ?? [])) {

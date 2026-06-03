@@ -36,7 +36,12 @@ const FIXTURES_PATH = join(__dirname, '..', 'assets', 'data', 'fixtures.json');
 const ONLY_TEAM = args.team || null;
 const DRY_RUN = args['dry-run'] === true;
 const MERGE = args.merge === true;
-const LIMIT = parseInt(args.last || '10', 10);
+// DISPLAY = quantos jogos COM resultado a gente quer guardar.
+// FETCH busca com FOLGA porque a API mistura jogos sem placar (adiado/cancelado/
+// agendado) nos "últimos N", e o filtro abaixo os remove — sem a folga, sobravam
+// <10 (ex.: Argentina caía pra 8). Buscar mais não custa request extra (1 por time).
+const DISPLAY = parseInt(args.last || '10', 10);
+const FETCH = Math.min(DISPLAY + 8, 30);
 
 // Rate limit: API-Football free plan = 10 req/min, paid = 30/min ou mais.
 // Vou pausar 6s entre requests pra ficar safe no free plan.
@@ -75,7 +80,7 @@ function loadExisting() {
 }
 
 async function fetchTeamMatches(teamId, teamName) {
-  const url = `${BASE_URL}/fixtures?team=${teamId}&last=${LIMIT}`;
+  const url = `${BASE_URL}/fixtures?team=${teamId}&last=${FETCH}`;
   const res = await fetch(url, { headers: { 'x-apisports-key': API_KEY } });
   if (!res.ok) {
     throw new Error(`HTTP ${res.status} ${res.statusText}`);
@@ -156,7 +161,7 @@ async function main() {
     console.log(`Modo MERGE: pulando ${before - teamsToProcess.length} times com dados já existentes.`);
   }
 
-  console.log(`📡 Buscando últimas ${LIMIT} partidas de ${teamsToProcess.length} time(s)...`);
+  console.log(`📡 Buscando últimas ${DISPLAY} partidas (busca ${FETCH} c/ folga) de ${teamsToProcess.length} time(s)...`);
   if (DRY_RUN) console.log('   (DRY-RUN — não vai chamar API)');
   console.log(`   Delay entre requests: ${REQ_DELAY_MS}ms (rate limit safe)`);
 
@@ -179,7 +184,9 @@ async function main() {
       const fixtures = await fetchTeamMatches(teamId, team);
       const tuples = fixtures
         .map((f) => toTuple(f, team, teamId))
-        .filter((t) => t[3] !== null);  // pula matches sem resultado
+        .filter((t) => t[3] !== null)                              // tira jogos sem resultado
+        .sort((a, b) => (a[0] < b[0] ? 1 : a[0] > b[0] ? -1 : 0))  // data desc (mais recente 1º)
+        .slice(0, DISPLAY);                                        // mantém só os DISPLAY já filtrados
       result[team] = tuples;
       console.log(`✓ ${tuples.length} matches`);
       okCount++;

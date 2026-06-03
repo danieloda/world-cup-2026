@@ -16,7 +16,8 @@
     "sync:squads": "node scripts/sync-squads.js",
     "sync:h2h": "node scripts/fetch-h2h.js",
     "sync:h2h-pairs": "node scripts/fetch-h2h-pairs.js",
-    "sync:odds": "node scripts/fetch-odds.js"
+    "sync:odds": "node scripts/fetch-odds.js",
+    "sync:predictions": "node scripts/fetch-predictions.js"
   },
   "devDependencies": {
     "@playwright/test": "^1.52.0",

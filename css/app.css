@@ -550,7 +550,10 @@ img { max-width: 100%; height: auto; }
 /* ===== Match row ===== */
 .match {
   display: grid;
-  grid-template-columns: 64px 1fr auto 1fr 96px;
+  /* Colunas laterais SIMÉTRICAS (96px = 96px) de propósito: mantém o traço do
+     placar (.score-cell, coluna central) no centro geométrico do card, pra que
+     o painel Raio-X abaixo — barra 1X2, radar — se alinhe ao mesmo eixo. */
+  grid-template-columns: 96px 1fr auto 1fr 96px;
   gap: 16px;
   align-items: center;
   padding: 14px 16px;
@@ -704,14 +707,13 @@ img { max-width: 100%; height: auto; }
   letter-spacing: .08em; text-transform: uppercase;
 }
 
-/* Botão Raio-X — linha própria no rodapé do card, alinhada ao PLACAR.
-   O card tem colunas laterais assimétricas (when 64px à esq, tail 96px à dir),
-   então o placar (coluna central) fica 16px à esquerda do centro do card.
-   padding-right: 32px desloca o botão centralizado 16px à esquerda → alinha. */
+/* Botão Raio-X — linha própria no rodapé do card. Como o grid do .match tem
+   colunas laterais SIMÉTRICAS, o placar fica no centro do card e o botão
+   centralizado (justify-content: center) já cai no mesmo eixo do traço. */
 .match-raiox {
   grid-column: 1 / -1;
   display: flex; justify-content: center;
-  margin-top: 4px; padding-top: 12px; padding-right: 32px;
+  margin-top: 4px; padding-top: 12px;
   border-top: 1px solid var(--line);
 }
 .match-raiox .ctx-toggle { margin-top: 0; }
@@ -1041,12 +1043,132 @@ body.raiox-modal-open { overflow: hidden; }
   margin-top: 8px;
 }
 
+/* ----- Previsão: 1X2 + comparação por eixo (API-Football) ----- */
+.rx-pred {
+  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.015));
+  border: 1px solid var(--line); border-radius: 12px;
+  padding: 14px 14px 16px;
+}
+.rx-1x2-head {
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px;
+  margin-bottom: 9px;
+}
+.rx-1x2-team {
+  display: inline-flex; align-items: center; gap: 8px; min-width: 0;
+  font: 800 13px/1 var(--font); color: var(--text);
+}
+.rx-1x2-team.away { justify-content: flex-end; }
+.rx-1x2-team .flag, .rx-1x2-team .fi {
+  width: 24px; height: 17px; border-radius: 3px; flex: none;
+  box-shadow: 0 1px 3px rgba(0,0,0,.5);
+}
+.rx-1x2-draw {
+  font: 700 9px/1 var(--font); letter-spacing: .14em; text-transform: uppercase;
+  color: var(--text-mute); white-space: nowrap;
+}
+
+/* barra 1X2 proporcional — mesma linguagem da balança de confronto direto */
+.rx-1x2-bar { display: flex; gap: 3px; height: 30px; margin-bottom: 4px; }
+.rx-1x2-seg {
+  display: grid; place-items: center; border-radius: 6px; min-width: 30px;
+  font: 800 13px/1 var(--font); color: #0c0c0c; font-variant-numeric: tabular-nums;
+  overflow: hidden; white-space: nowrap;
+  animation: rx-seg-in .5s cubic-bezier(.22,1,.36,1) both;
+}
+.rx-1x2-seg.home { background: linear-gradient(180deg, #25d366, var(--positive)); }
+.rx-1x2-seg.draw { background: linear-gradient(180deg, var(--accent-bright), var(--accent)); }
+.rx-1x2-seg.away { background: linear-gradient(180deg, #f57484, var(--red)); color: #fff; }
+
+.rx-1x2-verdict {
+  text-align: center; font: 600 12px/1 var(--font); color: var(--text-mute);
+  padding: 9px 0 2px;
+}
+.rx-1x2-verdict b { font-weight: 800; }
+.rx-1x2-verdict.home b { color: var(--positive); }
+.rx-1x2-verdict.draw b { color: var(--accent-bright); }
+.rx-1x2-verdict.away b { color: var(--red); }
+
+/* divisor "Comparação por eixo" */
+.rx-cmp-label-head {
+  font: 800 9px/1 var(--font); letter-spacing: .16em; text-transform: uppercase;
+  color: var(--text-mute); text-align: center;
+  margin: 14px 0 12px; display: flex; align-items: center; gap: 10px;
+}
+.rx-cmp-label-head::before, .rx-cmp-label-head::after {
+  content: ''; flex: 1; height: 1px;
+}
+.rx-cmp-label-head::before { background: linear-gradient(90deg, transparent, var(--line-strong)); }
+.rx-cmp-label-head::after  { background: linear-gradient(90deg, var(--line-strong), transparent); }
+
+/* linhas de comparação (cabo de guerra por eixo) */
+.rx-pred-compare { display: flex; flex-direction: column; gap: 11px; }
+.rx-cmp-row {
+  display: grid; grid-template-columns: 38px 1fr 38px; align-items: center; gap: 10px;
+}
+.rx-cmp-num { font: 800 12px/1 var(--font); font-variant-numeric: tabular-nums; }
+.rx-cmp-num i { font: 700 8px/1 var(--font); font-style: normal; opacity: .7; margin-left: 1px; }
+.rx-cmp-num.home { color: var(--positive); text-align: left; }
+.rx-cmp-num.away { color: var(--red); text-align: right; }
+.rx-cmp-mid { display: flex; flex-direction: column; gap: 5px; }
+.rx-cmp-label {
+  font: 700 9px/1 var(--font); letter-spacing: .08em; text-transform: uppercase;
+  color: var(--text-dim); text-align: center;
+}
+.rx-cmp-track {
+  display: flex; height: 8px; border-radius: 5px; overflow: hidden;
+  background: rgba(0,0,0,.35); border: 1px solid var(--line);
+}
+.rx-cmp-fill {
+  height: 100%;
+  animation: rx-fill .6s cubic-bezier(.22,1,.36,1) both; animation-delay: var(--d, 0s);
+}
+.rx-cmp-fill.home { background: linear-gradient(90deg, #25d366, var(--positive)); transform-origin: left; }
+.rx-cmp-fill.away { background: linear-gradient(90deg, var(--red), #f57484); transform-origin: right; }
+
+@keyframes rx-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes rx-seg-in { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+
+/* radar de força (pentágono SVG) */
+.rx-radar { display: flex; flex-direction: column; align-items: center; }
+.rx-radar-svg { width: 100%; max-width: 300px; height: auto; overflow: visible; }
+.rx-radar-ring { fill: none; stroke: rgba(255,255,255,.06); stroke-width: 1; }
+.rx-radar-grid > .rx-radar-ring:last-of-type { stroke: rgba(255,255,255,.13); }
+.rx-radar-spoke { stroke: rgba(255,255,255,.06); stroke-width: 1; }
+.rx-radar-axis {
+  fill: var(--text-mute); font: 800 8.5px/1 var(--font);
+  letter-spacing: .04em; text-transform: uppercase; dominant-baseline: middle;
+}
+.rx-radar-area { stroke-width: 2; stroke-linejoin: round; }
+.rx-radar-area.home { fill: rgba(29,185,84,.16);  stroke: var(--positive); }
+.rx-radar-area.away { fill: rgba(241,94,108,.16); stroke: var(--red); }
+.rx-radar-dot { stroke: #0c0c0c; stroke-width: 1; }
+.rx-radar-dot.home { fill: var(--positive); }
+.rx-radar-dot.away { fill: var(--red); }
+.rx-radar-plot { animation: rx-radar-in .6s cubic-bezier(.22,1,.36,1) both; transform-origin: 120px 106px; }
+@keyframes rx-radar-in { from { opacity: 0; transform: scale(.55); } to { opacity: 1; transform: none; } }
+.rx-radar-legend { display: flex; gap: 18px; margin-top: 4px; }
+.rx-radar-legend .lg {
+  display: inline-flex; align-items: center; gap: 6px;
+  font: 700 11px/1 var(--font);
+}
+.rx-radar-legend .lg .flag, .rx-radar-legend .lg .fi {
+  width: 18px; height: 13px; border-radius: 2px; flex: none;
+}
+.rx-radar-legend .lg.home { color: var(--positive); }
+.rx-radar-legend .lg.away { color: var(--red); }
+
+@media (prefers-reduced-motion: reduce) {
+  .rx-cmp-fill, .rx-1x2-seg, .rx-radar-plot { animation: none; }
+}
+
 @media (max-width: 720px) {
   .ctx-inner { padding: 16px 14px 16px; }
   .rx-recent { grid-template-columns: 1fr; gap: 10px; }
   .ctx-h2h-list li { grid-template-columns: 44px 1fr; gap: 6px; }
   .h2h-comp { display: none; }
   .h2h-fix { gap: 8px; }
+  .rx-1x2-team { font-size: 12px; }
+  .rx-cmp-row { grid-template-columns: 32px 1fr 32px; gap: 8px; }
 }
 
 /* ===== Status pills ===== */
@@ -4108,7 +4230,7 @@ input[type="number"].score-input {
     flex-direction: row; flex-wrap: wrap; align-items: center;
     justify-content: center; gap: 8px;
   }
-  .match-raiox { margin-top: 2px; padding-top: 10px; padding-right: 0; }
+  .match-raiox { margin-top: 2px; padding-top: 10px; }
 }
 
 .menu-toggle {
