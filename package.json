@@ -12,7 +12,11 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "test:all": "npm run test && npm run test:e2e"
+    "test:all": "npm run test && npm run test:e2e",
+    "sync:squads": "node scripts/sync-squads.js",
+    "sync:h2h": "node scripts/fetch-h2h.js",
+    "sync:h2h-pairs": "node scripts/fetch-h2h-pairs.js",
+    "sync:odds": "node scripts/fetch-odds.js"
   },
   "devDependencies": {
     "@playwright/test": "^1.52.0",
