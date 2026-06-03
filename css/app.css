@@ -695,8 +695,358 @@ img { max-width: 100%; height: auto; }
 .score-input.locked { background: transparent; border-color: transparent; }
 .score-sep { color: var(--text-mute); font-weight: 700; }
 .match-tail {
-  font-size: 12px; color: var(--text-dim);
-  text-align: right; font-weight: 600;
+  display: flex; flex-direction: column;
+  align-items: flex-end; gap: 4px;
+  font-size: 12px; color: var(--text-dim); font-weight: 600;
+}
+.match-group {
+  font-size: 10px; color: var(--text-mute);
+  letter-spacing: .08em; text-transform: uppercase;
+}
+
+/* Botão Raio-X — linha própria no rodapé do card, alinhada ao PLACAR.
+   O card tem colunas laterais assimétricas (when 64px à esq, tail 96px à dir),
+   então o placar (coluna central) fica 16px à esquerda do centro do card.
+   padding-right: 32px desloca o botão centralizado 16px à esquerda → alinha. */
+.match-raiox {
+  grid-column: 1 / -1;
+  display: flex; justify-content: center;
+  margin-top: 4px; padding-top: 12px; padding-right: 32px;
+  border-top: 1px solid var(--line);
+}
+.match-raiox .ctx-toggle { margin-top: 0; }
+
+/* Dica que apresenta o Raio-X (sotaque dourado em vez do verde padrão).
+   Dupla classe p/ vencer o .tooltip-hint (definido depois no arquivo). */
+.tooltip-hint.raiox-hint { border-left-color: var(--accent); }
+
+/* ----- Raio-X no mata-mata: botão compacto no card + modal ----- */
+.bm-raiox { display: flex; justify-content: center; margin-top: 8px; }
+.rx-modal-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: transparent; color: var(--text-dim);
+  border: 1px solid var(--line-strong); border-radius: 500px;
+  font: 700 9px/1 var(--font); letter-spacing: .12em; text-transform: uppercase;
+  padding: 6px 11px; cursor: pointer;
+  transition: background .18s, color .18s, border-color .18s;
+}
+.rx-modal-btn:hover {
+  background: var(--accent-dim); color: var(--accent-bright);
+  border-color: rgba(244, 196, 48, .35);
+}
+
+body.raiox-modal-open { overflow: hidden; }
+.raiox-modal {
+  position: fixed; inset: 0; z-index: 400;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.raiox-modal[hidden] { display: none; }
+.raiox-modal-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(0, 0, 0, .68);
+  backdrop-filter: blur(3px);
+  animation: rxFade .2s ease-out;
+}
+@keyframes rxFade { from { opacity: 0; } to { opacity: 1; } }
+.raiox-modal-box {
+  position: relative; z-index: 1;
+  width: min(680px, 100%); max-height: min(86vh, 900px);
+  display: flex; flex-direction: column;
+  border: 1px solid var(--line-strong); border-radius: 16px;
+  background:
+    radial-gradient(120% 60% at 50% 0%, rgba(244, 196, 48, .08), transparent 60%),
+    linear-gradient(180deg, #161616, #101010);
+  box-shadow: 0 30px 80px -20px rgba(0, 0, 0, .9);
+  overflow: hidden;
+  animation: rxPop .24s cubic-bezier(.22, 1, .36, 1);
+}
+@keyframes rxPop { from { opacity: 0; transform: translateY(12px) scale(.98); } to { opacity: 1; transform: none; } }
+.raiox-modal-head {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px 14px 20px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(255, 255, 255, .02);
+}
+.raiox-modal-title {
+  flex: 1; min-width: 0;
+  font: 800 16px/1.2 var(--font); color: var(--text);
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.raiox-modal-title .rx-vs { color: var(--accent); font-weight: 900; font-size: 13px; }
+.raiox-modal-x {
+  flex: none; width: 32px; height: 32px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: rgba(255, 255, 255, .06); color: var(--text-dim);
+  font-size: 13px; cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.raiox-modal-x:hover { background: var(--red-dim); color: var(--red); }
+.raiox-modal-body { overflow-y: auto; }
+.raiox-modal-body .ctx-inner { padding: 18px 20px 22px; }
+@media (max-width: 720px) {
+  .raiox-modal { padding: 0; align-items: flex-end; }
+  .raiox-modal-box { width: 100%; max-height: 92vh; border-radius: 16px 16px 0 0; }
+}
+
+/* ============================================================
+   Raio-X do confronto — forma recente + H2H
+   Estética: ledger esportivo refinado, tabular, dark + ouro
+   ============================================================ */
+.ctx-toggle {
+  margin-top: 8px;
+  display: inline-flex; align-items: center; gap: 5px;
+  background: transparent; color: var(--text-dim);
+  border: 1px solid var(--line-strong);
+  border-radius: 500px;
+  font: 700 10px/1 var(--font);
+  letter-spacing: .12em; text-transform: uppercase;
+  padding: 6px 11px; cursor: pointer;
+  transition: background .18s, color .18s, border-color .18s, transform .18s;
+}
+.ctx-toggle-ic { font-size: 12px; line-height: 0; opacity: .8; }
+.ctx-toggle:hover {
+  background: var(--accent-dim);
+  color: var(--accent-bright);
+  border-color: rgba(244, 196, 48, .35);
+}
+.ctx-toggle[aria-expanded="true"] {
+  background: var(--accent);
+  color: #0c0c0c;
+  border-color: var(--accent);
+}
+.ctx-toggle[aria-expanded="true"] .ctx-toggle-ic { opacity: 1; }
+
+/* Quando o painel está aberto, o card acima encosta e perde os cantos de baixo */
+.match:has(+ .match-context:not([hidden])) {
+  border-bottom-left-radius: 0; border-bottom-right-radius: 0;
+  margin-bottom: 0;
+  background: var(--card-elev);
+}
+.match-context {
+  margin: 0 0 16px;
+  border: 1px solid var(--line);
+  border-top: none;
+  border-radius: 0 0 14px 14px;
+  background:
+    radial-gradient(120% 80% at 50% -10%, rgba(244, 196, 48, .07), transparent 60%),
+    linear-gradient(180deg, #161616, #101010);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .03), 0 18px 40px -24px rgba(0, 0, 0, .9);
+  overflow: hidden;
+  animation: ctxReveal .26s cubic-bezier(.22, 1, .36, 1);
+}
+@keyframes ctxReveal {
+  from { opacity: 0; transform: translateY(-8px); clip-path: inset(0 0 100% 0); }
+  to   { opacity: 1; transform: none; clip-path: inset(0 0 0 0); }
+}
+.ctx-inner { padding: 18px 20px 20px; }
+
+/* topo dourado fininho que "costura" o painel ao card */
+.match-context::before {
+  content: ''; display: block; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-dim) 20%, rgba(244,196,48,.4) 50%, var(--accent-dim) 80%, transparent);
+}
+
+.ctx-section-label {
+  font: 800 10px/1 var(--font);
+  letter-spacing: .18em; text-transform: uppercase;
+  color: var(--text-mute);
+  display: flex; align-items: center; gap: 10px;
+  margin: 22px 0 14px;
+}
+.ctx-inner > .ctx-section-label:first-child { margin-top: 0; }
+.ctx-section-label .ctx-section-sub {
+  letter-spacing: .04em; text-transform: none; font-weight: 600;
+  color: var(--text-mute); opacity: .75;
+}
+.ctx-section-label::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(90deg, var(--line-strong), transparent);
+}
+
+/* ----- Forma recente: duas colunas com últimos jogos ----- */
+.rx-recent {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+}
+.rx-recent-col {
+  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.015));
+  border: 1px solid var(--line); border-radius: 12px;
+  padding: 11px 12px;
+}
+.rx-recent-col.is-empty { display: flex; flex-direction: column; gap: 8px; opacity: .7; }
+.rx-recent-head {
+  display: flex; align-items: center; gap: 8px;
+  padding-bottom: 9px; margin-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+.rx-recent-head .flag, .rx-recent-head .fi {
+  width: 24px; height: 17px; border-radius: 3px; flex: none;
+  box-shadow: 0 1px 3px rgba(0,0,0,.5);
+}
+.rx-recent-name {
+  font: 800 13px/1 var(--font); color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.rx-recent-tally { margin-left: auto; display: inline-flex; gap: 7px; flex: none; }
+.rx-recent-tally .t {
+  display: inline-flex; align-items: baseline; gap: 1px;
+  font: 800 12px/1 var(--font); font-variant-numeric: tabular-nums;
+}
+.rx-recent-tally .t i {
+  font: 700 8px/1 var(--font); font-style: normal; letter-spacing: .02em; opacity: .85;
+}
+.rx-recent-tally .t.v { color: var(--positive); }
+.rx-recent-tally .t.e { color: var(--text-mute); }
+.rx-recent-tally .t.d { color: var(--red); }
+.rx-recent-empty { font: 500 12px/1.4 var(--font); color: var(--text-mute); font-style: italic; }
+
+.rx-recent-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.rx-recent-list li {
+  display: grid; grid-template-columns: 17px 34px 1fr auto; align-items: center; gap: 8px;
+  padding: 5px 2px;
+}
+.rx-recent-list li + li { border-top: 1px solid rgba(255,255,255,.04); }
+
+/* Divisor de ano — sutil, separa as partidas por temporada */
+.rx-recent-list li.rx-year {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 2px 5px; border-top: none;
+}
+.rx-recent-list li.rx-year:first-child { padding-top: 0; }
+.rx-recent-list li.rx-year + li { border-top: none; }
+.rx-recent-list li.rx-year span {
+  font: 800 9px/1 var(--font); letter-spacing: .14em;
+  color: var(--text-mute); font-variant-numeric: tabular-nums; flex: none;
+}
+.rx-recent-list li.rx-year::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(90deg, var(--line-strong), transparent);
+}
+.rx-r {
+  display: grid; place-items: center; width: 17px; height: 17px; border-radius: 4px;
+  font: 800 9px/1 var(--font); color: #0c0c0c;
+}
+.rx-r.v { background: var(--positive); }
+.rx-r.e { background: rgba(255,255,255,.18); color: var(--text); }
+.rx-r.d { background: var(--red); color: #fff; }
+.rx-when { font: 600 10px/1.2 var(--font); color: var(--text-mute); font-variant-numeric: tabular-nums; }
+.rx-opp { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+.rx-loc {
+  font: 800 8px/1 var(--font); letter-spacing: .04em;
+  width: 14px; height: 14px; border-radius: 3px; flex: none;
+  display: grid; place-items: center;
+}
+.rx-loc.home { color: var(--accent); background: var(--accent-dim); }
+.rx-loc.away { color: var(--text-mute); background: rgba(255,255,255,.06); }
+.rx-opp .flag, .rx-opp .fi { width: 18px; height: 13px; border-radius: 2px; flex: none; }
+.rx-opp-name {
+  font: 600 12px/1.2 var(--font); color: var(--text-dim);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.rx-score {
+  font: 800 12px/1 var(--font); color: var(--text); font-variant-numeric: tabular-nums;
+  justify-self: end;
+}
+
+/* ----- Confronto direto: balança proporcional + ledger ----- */
+.ctx-h2h-top {
+  display: flex; align-items: baseline; gap: 8px;
+  margin: -4px 0 10px;
+}
+.ctx-h2h-tot {
+  font: 600 11px/1 var(--font); color: var(--text-mute);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .02em;
+}
+
+.ctx-balance {
+  display: flex; gap: 3px; height: 26px;
+  margin-bottom: 8px;
+}
+.ctx-balance .bal-seg {
+  display: grid; place-items: center;
+  border-radius: 5px; min-width: 26px;
+  font: 800 12px/1 var(--font); color: #0c0c0c;
+  font-variant-numeric: tabular-nums;
+  transition: flex .4s cubic-bezier(.22,1,.36,1);
+}
+.ctx-balance .bal-seg.v { background: linear-gradient(180deg, #25d366, var(--positive)); }
+.ctx-balance .bal-seg.e { background: linear-gradient(180deg, var(--accent-bright), var(--accent)); }
+.ctx-balance .bal-seg.a { background: linear-gradient(180deg, #f57484, var(--red)); color: #fff; }
+
+.ctx-balance-legend {
+  display: flex; justify-content: space-between; gap: 8px;
+  margin-bottom: 14px;
+}
+.ctx-balance-legend .lg {
+  display: inline-flex; align-items: center; gap: 5px;
+  font: 600 11px/1.2 var(--font); color: var(--text-dim);
+  min-width: 0;
+}
+.ctx-balance-legend .lg b { color: var(--text); font-weight: 800; font-variant-numeric: tabular-nums; }
+.ctx-balance-legend .lg::before {
+  content: ''; width: 7px; height: 7px; border-radius: 2px; flex: none;
+}
+.ctx-balance-legend .lg.v::before { background: var(--positive); }
+.ctx-balance-legend .lg.e::before { background: var(--accent); }
+.ctx-balance-legend .lg.a::before { background: var(--red); }
+.ctx-balance-legend .lg.e { color: var(--text-mute); }
+.ctx-balance-legend .lg.a { flex-direction: row-reverse; text-align: right; }
+
+.ctx-h2h-list {
+  list-style: none; margin: 0; padding: 0;
+  display: flex; flex-direction: column; gap: 5px;
+}
+.ctx-h2h-list li {
+  display: grid; grid-template-columns: 52px 1fr 78px; align-items: center;
+  gap: 10px; padding: 8px 12px;
+  background: rgba(255,255,255,.025);
+  border: 1px solid transparent;
+  border-radius: 9px;
+  transition: background .15s, border-color .15s;
+}
+.ctx-h2h-list li:hover { background: rgba(255,255,255,.05); border-color: var(--line); }
+.h2h-date {
+  font: 600 10px/1.2 var(--font); color: var(--text-mute);
+  font-variant-numeric: tabular-nums;
+}
+.h2h-fix {
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px;
+}
+.h2h-t {
+  font: 600 12px/1.2 var(--font); color: var(--text-dim);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.h2h-t.home { text-align: right; }
+.h2h-t.away { text-align: left; }
+.h2h-t.win { color: var(--text); font-weight: 800; }
+.h2h-sc {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px; border-radius: 7px;
+  background: rgba(0,0,0,.35); border: 1px solid var(--line);
+  font-variant-numeric: tabular-nums;
+}
+.h2h-sc b { font: 800 14px/1 var(--font); color: var(--text-dim); min-width: 9px; text-align: center; }
+.h2h-sc b.win { color: var(--accent-bright); }
+.h2h-sc i { font-style: normal; color: var(--text-mute); font-size: 10px; }
+.h2h-comp {
+  justify-self: end; text-align: right;
+  font: 600 9px/1.2 var(--font); letter-spacing: .04em; text-transform: uppercase;
+  color: var(--text-mute);
+}
+
+.ctx-h2h.is-empty { padding: 4px 0; }
+.ctx-h2h-none {
+  font: 500 12px/1.5 var(--font); color: var(--text-mute); font-style: italic;
+  margin-top: 8px;
+}
+
+@media (max-width: 720px) {
+  .ctx-inner { padding: 16px 14px 16px; }
+  .rx-recent { grid-template-columns: 1fr; gap: 10px; }
+  .ctx-h2h-list li { grid-template-columns: 44px 1fr; gap: 6px; }
+  .h2h-comp { display: none; }
+  .h2h-fix { gap: 8px; }
 }
 
 /* ===== Status pills ===== */
@@ -883,10 +1233,13 @@ img { max-width: 100%; height: auto; }
 .bracket-date-list .bracket-match { width: auto; margin: 0; }
 
 /* ===== Team tooltip (hover popover) ===== */
-.team-name {
+/* Afordância de tooltip — só nas páginas onde o hover de últimos jogos existe
+   (body.has-team-tooltips, setado por attachTeamTooltips). Em palpites-grupos o
+   hover virou Raio-X, então o "?" e o sublinhado pontilhado não aparecem. */
+.team-name { transition: color .12s, border-color .12s; }
+.has-team-tooltips .team-name {
   cursor: help;
   border-bottom: 1px dashed rgba(255, 255, 255, .25);
-  transition: color .12s, border-color .12s;
 }
 .tooltip-hint {
   display: block;
@@ -986,7 +1339,7 @@ img { max-width: 100%; height: auto; }
 .flag-select-item .name { color: var(--text); }
 .flag-select-item .meta { color: var(--text-mute); font-size: 12px; }
 .flag-select .fi { width: 1.2em; }
-.team-name:hover {
+.has-team-tooltips .team-name:hover {
   color: var(--accent);
   border-bottom-color: var(--accent);
 }
@@ -3750,7 +4103,12 @@ input[type="number"].score-input {
   .team.home   { grid-area: home; }
   .team.away   { grid-area: away; }
   .score-cell  { grid-area: score; justify-content: center; }
-  .match-tail  { grid-area: tail; text-align: left; }
+  .match-tail  {
+    grid-area: tail;
+    flex-direction: row; flex-wrap: wrap; align-items: center;
+    justify-content: center; gap: 8px;
+  }
+  .match-raiox { margin-top: 2px; padding-top: 10px; padding-right: 0; }
 }
 
 .menu-toggle {

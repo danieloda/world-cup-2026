@@ -3,13 +3,16 @@ import { renderShell } from '../sidebar.js';
 import { supabase } from '../supabase.js';
 import {
   flag, escapeHtml, formatBrDate, formatBrShort, formatTime,
-  isLocked, isLive, lockCountdownLabel, showToast, attachTeamTooltips, loadRecentMatches,
+  isLocked, isLive, lockCountdownLabel, showToast, loadRecentMatches,
   teamPt, groundShort,
 } from '../util.js';
 import { matchPoints, scoreBreakdown } from '../scoring.js';
 import {
   renderGroupCard, computeThirds, countThirdsComplete, renderThirdsTable,
 } from '../standings-view.js';
+import {
+  renderRaioXToggle, renderRaioXPanel, attachRaioXInline,
+} from '../raiox.js';
 
 const GP = matchPoints('group'); // { ag:1, ave:4, dg:1, exact:7 }
 
@@ -21,12 +24,20 @@ let matches = [];                    // 72 group-stage matches, ordered by date
 let predsByMatch = new Map();        // match_id -> prediction row
 let goalsByMatch = new Map();        // match_id -> [{player, goals}]
 let oddsByMatch = new Map();         // match_id -> { odd_home, odd_draw, odd_away, bookmaker_name }
+let h2hByMatch = new Map();          // match_id -> { fixtures: [...], summary: {...}, api_team_home }
+let recentByTeam = new Map();        // team name -> [{ date, opponent, home, score, competition }] (forma recente)
 let activeTab = 'palpites';          // 'palpites' | 'resultados'
 let activeGroup = 'all';             // 'all' | 'A'..'L' (ambas as abas operam sempre por grupo)
 let groupBy = 'group';               // 'group' | 'date' — dimensão do filtro/agrupamento
 let activeDate = null;               // ISO yyyy-mm-dd quando groupBy === 'date'
 const saveTimers = new Map();        // match_id -> setTimeout handle
 const GROUPS = ['A','B','C','D','E','F','G','H','I','J','K','L'];
+
+// Dados que alimentam o Raio-X (módulo ../raiox.js). h2h é a linha de match_h2h
+// daquele jogo (ou null).
+function raioxData(m) {
+  return { recentByTeam, h2h: h2hByMatch.get(m.id) ?? null };
+}
 
 // ============================================================
 // Main
@@ -40,14 +51,16 @@ try {
 
   applyHashRoute();  // deep-link opcional (ex.: redirects de grupos.html / terceiros.html)
 
-  const recentByTeam = await loadRecentMatches();
+  // Forma recente (últimos jogos de cada seleção) — antes ficava num hover no
+  // nome do time; agora vai pro painel Raio-X. Guardado em var de módulo.
+  recentByTeam = await loadRecentMatches();
 
   const pageBody = await renderShell({ active: 'palpites-g', profile, stats });
   pageBody.innerHTML = renderPage();
   pageBody.classList.add('fade-up');
   attachEventListeners();
-  attachTeamTooltips(recentByTeam);
   attachOddsTooltip();
+  attachRaioXInline();
 } catch (err) {
   console.error('[palpites-grupos] FATAL:', err);
   document.body.innerHTML = `
@@ -63,12 +76,13 @@ try {
 // Data
 // ============================================================
 async function loadData() {
-  const [statsRes, matchesRes, predsRes, goalsRes, oddsRes] = await Promise.all([
+  const [statsRes, matchesRes, predsRes, goalsRes, oddsRes, h2hRes] = await Promise.all([
     supabase.from('v_pool_stats').select('*').single(),
     supabase.from('matches').select('*').eq('stage', 'group').order('match_date'),
     supabase.from('predictions').select('*').eq('user_id', profile.id),
     supabase.from('player_goals').select('*, players(full_name, team)'),
     supabase.from('match_odds').select('match_id, odd_home, odd_draw, odd_away, bookmaker_name'),
+    supabase.from('match_h2h').select('match_id, fixtures, summary, api_team_home'),
   ]);
 
   if (matchesRes.error) throw matchesRes.error;
@@ -78,6 +92,7 @@ async function loadData() {
   matches = matchesRes.data ?? [];
   predsByMatch = new Map((predsRes.data ?? []).map(p => [p.match_id, p]));
   oddsByMatch = new Map((oddsRes.data ?? []).map(o => [o.match_id, o]));
+  h2hByMatch  = new Map((h2hRes.data ?? []).map(h => [h.match_id, h]));
 
   goalsByMatch = new Map();
   for (const g of (goalsRes.data ?? [])) {
@@ -176,6 +191,10 @@ function renderPalpitesTab(counts) {
           : GROUPS.map(g => renderChip(g, 'Grupo ' + g, counts.openByGroup[g]?.done ?? 0, counts.openByGroup[g]?.total ?? 0)).join('')}
       </div>
       ${groupBy === 'group' ? renderThirdsPop('sim') : ''}
+    </div>
+
+    <div class="tooltip-hint raiox-hint">
+      🔍 Toque em <b>Raio-X</b> em cada jogo para ver a <b>forma recente</b> das seleções e o histórico de <b>confrontos diretos</b> entre elas.
     </div>
 
     <div id="matchesList">
@@ -384,9 +403,12 @@ function renderPalpiteRow(m) {
   const homeVal = pred?.pred_home ?? '';
   const awayVal = pred?.pred_away ?? '';
 
+  // Horário já aparece no .match-when (canto esquerdo); aqui a pill é só de
+  // STATUS (ao vivo / travado). Jogo aberto não repete o horário — o aviso
+  // "Bloqueia em X" abaixo já comunica que está aberto.
   const status = live ? `<span class="pill live">Ao vivo</span>`
     : locked ? `<span class="pill locked">Travado</span>`
-    : `<span class="pill open">${formatTime(m.match_date)}</span>`;
+    : '';
   const lockNote = (!live && !locked)
     ? `<div class="lock-note">${lockCountdownLabel(m.match_date)}</div>`
     : '';
@@ -424,9 +446,11 @@ function renderPalpiteRow(m) {
       <div class="match-tail">
         ${status}
         ${lockNote}
-        <div style="margin-top:2px; color:var(--text-mute); font-size:10px; letter-spacing:.08em; text-transform:uppercase;">Grupo ${m.group_name}</div>
+        <div class="match-group">Grupo ${m.group_name}</div>
       </div>
+      ${renderRaioXToggle(m.id, m.team_home, m.team_away, raioxData(m))}
     </div>
+    ${renderRaioXPanel(m.id, m.team_home, m.team_away, raioxData(m))}
   `;
 }
 

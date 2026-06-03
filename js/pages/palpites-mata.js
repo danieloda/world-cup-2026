@@ -3,11 +3,14 @@ import { renderShell } from '../sidebar.js';
 import { supabase } from '../supabase.js';
 import {
   flag, escapeHtml, formatTime, formatBrDate, formatBrShort, isLocked, lockCountdownLabel, showToast,
-  attachTeamTooltips, loadRecentMatches, teamPt,
+  loadRecentMatches, teamPt,
   computeStandings as utilComputeStandings,
 } from '../util.js';
 import { fifaRank } from '../fifa-rank.js';
 import { matchPoints, scoreBreakdown, stageMultiplier, scorerBonus } from '../scoring.js';
+import {
+  renderRaioXModalButton, openRaioXModal,
+} from '../raiox.js';
 
 // ============================================================
 // Constantes
@@ -50,6 +53,7 @@ let goalsByMatch = new Map();        // match_id -> [{player, goals}]
 let slotResolution = new Map();      // slot string -> { team, source } (real-first: resultado real ou palpite)
 let predSlotResolution = new Map();  // slot string -> { team, source } (apenas palpites do user)
 let qualifierBySide = new Map();     // "matchId:side" -> { kind:'bpe'|'bp', pts, pred, actual } (do cache SQL)
+let recentByTeam = new Map();        // team -> forma recente (Raio-X)
 let activeTab = 'palpites';          // 'palpites' | 'resultados'
 let viewMode = 'bracket';            // 'bracket' | 'date' — layout: chave ou lista por data
 let activeDate = null;               // ISO yyyy-mm-dd quando viewMode === 'date'
@@ -68,14 +72,14 @@ try {
 
   await loadData();
 
-  const recentByTeam = await loadRecentMatches();
+  // Forma recente (Raio-X) — antes alimentava o hover, agora o modal.
+  recentByTeam = await loadRecentMatches();
 
   const pageBody = await renderShell({ active: 'palpites-k', profile, stats });
   pageBody.innerHTML = renderPage();
   pageBody.classList.add('fade-up');
 
   attachEventListeners();
-  attachTeamTooltips(recentByTeam);
 } catch (err) {
   console.error('[palpites-mata] FATAL:', err);
   document.body.innerHTML = `
@@ -131,6 +135,44 @@ async function loadData() {
 function isRealTeam(name) {
   if (!name) return false;
   return !/^[\dLW]/.test(name) && !name.includes('/');
+}
+
+// Resolve o time real de um lado do confronto (via palpites do user). null se
+// ainda é um slot não resolvido. Usado pelo Raio-X (só aparece com 2 times reais).
+function resolveSide(m, side) {
+  const slotOriginal = side === 'home' ? m.slot_home : m.slot_away;
+  const realTeam = side === 'home' ? m.team_home : m.team_away;
+  const slot = slotOriginal || realTeam;
+  if (isRealTeam(slot)) return slot;
+  return predSlotResolution.get(slot)?.team ?? null;
+}
+
+// Dados que alimentam o Raio-X (módulo ../raiox.js). No render do botão o H2H
+// ainda não foi buscado (h2h null); ele é resolvido on-demand ao abrir o modal.
+function raioxData(h2h = null) {
+  return { recentByTeam, h2h };
+}
+
+// Busca o confronto direto entre dois times (tabela team_h2h, par canônico
+// alfabético). Reorienta o summary para a ótica do mandante do confronto.
+async function fetchH2HPair(homeTeam, awayTeam) {
+  const [a, b] = [homeTeam, awayTeam].slice().sort();
+  const { data } = await supabase
+    .from('team_h2h').select('fixtures, summary')
+    .eq('team_a', a).eq('team_b', b).maybeSingle();
+  if (!data) return null;
+  let summary = data.summary;
+  if (homeTeam !== a) {  // mandante é o team_b canônico → inverte vitórias
+    summary = { home_wins: summary.away_wins, draws: summary.draws, away_wins: summary.home_wins, total: summary.total };
+  }
+  return { fixtures: data.fixtures, summary };
+}
+
+// Busca o H2H do par e abre o modal do Raio-X (forma recente + confronto direto).
+async function openRaioXForMata(homeTeam, awayTeam) {
+  let h2h = null;
+  try { h2h = await fetchH2HPair(homeTeam, awayTeam); } catch (e) { console.warn('[h2h]', e); }
+  openRaioXModal({ homeTeam, awayTeam, data: raioxData(h2h) });
 }
 
 /**
@@ -696,6 +738,9 @@ function renderBracketMatch(m) {
     ? renderPointsBadge(pred.points_earned, stageExact(m.stage))
     : '';
 
+  // Raio-X só quando os dois lados já são times reais (slots resolvidos).
+  const raioxBtn = renderRaioXModalButton(m.id, resolveSide(m, 'home'), resolveSide(m, 'away'), raioxData());
+
   return `
     <div class="${classes.join(' ')}" data-match-id="${m.id}">
       <div class="bm-id">
@@ -710,6 +755,7 @@ function renderBracketMatch(m) {
       ${showPen ? renderPenToggle(m, penWinner) : ''}
 
       ${pointsBadge}
+      ${raioxBtn ? `<div class="bm-raiox">${raioxBtn}</div>` : ''}
     </div>
   `;
 }
@@ -861,6 +907,17 @@ function attachEventListeners() {
   });
 
   document.addEventListener('click', (e) => {
+    // Raio-X (modal) — resolve os times na hora (slot pode ter mudado)
+    const raioxBtn = e.target.closest('[data-raiox-modal]');
+    if (raioxBtn) {
+      const matchId = parseInt(raioxBtn.dataset.raioxModal, 10);
+      const m = matches.find(mm => mm.id === matchId);
+      const homeTeam = m && resolveSide(m, 'home');
+      const awayTeam = m && resolveSide(m, 'away');
+      if (homeTeam && awayTeam) openRaioXForMata(homeTeam, awayTeam);
+      return;
+    }
+
     const tabBtn = e.target.closest('.admin-tab[data-tab]');
     if (tabBtn) {
       const t = tabBtn.dataset.tab;

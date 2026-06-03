@@ -436,6 +436,11 @@ export async function loadRecentMatches() {
 let tooltipState = null;
 
 export function attachTeamTooltips(recentByTeam) {
+  // Marca o body: a afordância visual (cursor help + sublinhado pontilhado)
+  // dos .team-name só aparece quando o tooltip está realmente ativo na página.
+  // Páginas que não chamam esta função não exibem o "?" órfão.
+  document.body.classList.add('has-team-tooltips');
+
   // Singleton tooltip element
   let tooltip = document.getElementById('teamTooltip');
   if (!tooltip) {

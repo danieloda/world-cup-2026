@@ -3,7 +3,6 @@ import { renderShell } from '../sidebar.js';
 import { supabase } from '../supabase.js';
 import {
   flag, escapeHtml, teamPt, showToast,
-  attachTeamTooltips, loadRecentMatches,
 } from '../util.js';
 import { matchPoints, championBonus } from '../scoring.js';
 
@@ -52,9 +51,6 @@ try {
   pageBody.innerHTML = renderPage();
   pageBody.classList.add('fade-up');
   attachEventListeners();
-
-  const recentByTeam = await loadRecentMatches();
-  attachTeamTooltips(recentByTeam);
 
   // Atualiza countdown a cada minuto
   startCountdown();
