@@ -33,7 +33,7 @@ const ONLY = args.only || null;
 const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
 const TELEGRAM_CHAT_ID = args.chat || process.env.TELEGRAM_CHAT_ID;
 const SUPABASE_URL = process.env.SUPABASE_URL ?? '';
-const SITE_URL = 'https://bolaobsbcopadomundo2026.netlify.app';
+const SITE_URL = 'https://superbolaocopa.netlify.app';
 
 const C = { reset: '\x1b[0m', green: '\x1b[32m', red: '\x1b[31m', yellow: '\x1b[33m', blue: '\x1b[34m', bold: '\x1b[1m', dim: '\x1b[2m' };
 

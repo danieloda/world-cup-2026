@@ -135,3 +135,6 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
 scripts/e2e/_test-avatar.png
+
+# Local Netlify folder
+.netlify
