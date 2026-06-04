@@ -330,23 +330,13 @@ function renderQualGroupCard(group, focus) {
     </div>`;
 }
 
-// Confederação inteira: os grupos com algum time em foco aparecem primeiro
-// (visíveis); o restante fica num <details> ("ver toda a confederação") para
-// não estourar a tela em confederações grandes (UEFA tem 12 grupos).
+// Mostra apenas o(s) grupo(s) do(s) time(s) em foco (não a confederação inteira).
 function renderConfederation(conf, focus) {
   const focusTeams = new Set(focus.keys());
   const hasFocus = g => g.rows.some(r => focusTeams.has(r.team));
   const focusGroups = conf.groups.filter(hasFocus);
-  const restGroups = conf.groups.filter(g => !hasFocus(g));
-  const head = (focusGroups.length ? focusGroups : conf.groups)
-    .map(g => renderQualGroupCard(g, focus)).join('');
-  const rest = (focusGroups.length && restGroups.length)
-    ? `<details class="rx-qmore">
-         <summary>Ver toda a confederação (${restGroups.length} ${restGroups.length === 1 ? 'grupo' : 'grupos'})</summary>
-         <div class="groups-grid">${restGroups.map(g => renderQualGroupCard(g, focus)).join('')}</div>
-       </details>`
-    : '';
-  return `<div class="groups-grid">${head}</div>${rest}`;
+  const groups = focusGroups.length ? focusGroups : conf.groups;
+  return `<div class="groups-grid">${groups.map(g => renderQualGroupCard(g, focus)).join('')}</div>`;
 }
 
 function campaignSummaryLine(conf, team) {

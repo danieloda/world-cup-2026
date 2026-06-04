@@ -40,6 +40,18 @@ export const FLAGS = {
   Syria: 'sy', Tanzania: 'tz', 'Trinidad & Tobago': 'tt',
   Ukraine: 'ua', 'United Arab Emirates': 'ae', Venezuela: 've',
   Wales: 'gb-wls', Zambia: 'zm', Zimbabwe: 'zw',
+  // Demais seleções das eliminatórias (fora da Copa, mas aparecem nas tabelas)
+  Andorra: 'ad', Benin: 'bj', Burundi: 'bi', 'Central African Republic': 'cf',
+  Chad: 'td', Congo: 'cg', Djibouti: 'dj', Eritrea: 'er', Ethiopia: 'et',
+  'FYR Macedonia': 'mk', Fiji: 'fj', Guinea: 'gn', 'Guinea-Bissau': 'gw',
+  Indonesia: 'id', Israel: 'il', Kenya: 'ke', Kuwait: 'kw', Kyrgyzstan: 'kg',
+  Lesotho: 'ls', Liberia: 'lr', Libya: 'ly', Madagascar: 'mg', Malawi: 'mw',
+  Mauritius: 'mu', Moldova: 'md', Mozambique: 'mz', Namibia: 'na',
+  'New Caledonia': 'nc', Niger: 'ne', 'North Korea': 'kp', Oman: 'om',
+  'Rep. Of Ireland': 'ie', Rwanda: 'rw', 'Sao Tome and Principe': 'st',
+  Seychelles: 'sc', 'Sierra Leone': 'sl', Somalia: 'so', 'South Sudan': 'ss',
+  Suriname: 'sr', Tahiti: 'pf', Togo: 'tg', 'Trinidad and Tobago': 'tt',
+  Uganda: 'ug',
   // Alias para nomes alternativos
   'United States': 'us',
 };
@@ -121,6 +133,21 @@ const TEAM_PT = {
   Syria: 'Síria', Tanzania: 'Tanzânia', 'Trinidad & Tobago': 'Trinidad e Tobago',
   Ukraine: 'Ucrânia', 'United Arab Emirates': 'Emirados Árabes Unidos', Venezuela: 'Venezuela',
   Wales: 'País de Gales', Zambia: 'Zâmbia', Zimbabwe: 'Zimbábue',
+  // Demais seleções das eliminatórias (fora da Copa)
+  Andorra: 'Andorra', Benin: 'Benin', Burundi: 'Burundi',
+  'Central African Republic': 'Rep. Centro-Africana', Chad: 'Chade', Congo: 'Congo',
+  Djibouti: 'Djibuti', Eritrea: 'Eritreia', Ethiopia: 'Etiópia',
+  'FYR Macedonia': 'Macedônia do Norte', Fiji: 'Fiji', Guinea: 'Guiné',
+  'Guinea-Bissau': 'Guiné-Bissau', Indonesia: 'Indonésia', Israel: 'Israel',
+  Kenya: 'Quênia', Kuwait: 'Kuwait', Kyrgyzstan: 'Quirguistão', Lesotho: 'Lesoto',
+  Liberia: 'Libéria', Libya: 'Líbia', Madagascar: 'Madagascar', Malawi: 'Malaui',
+  Mauritius: 'Maurício', Moldova: 'Moldávia', Mozambique: 'Moçambique',
+  Namibia: 'Namíbia', 'New Caledonia': 'Nova Caledônia', Niger: 'Níger',
+  'North Korea': 'Coreia do Norte', Oman: 'Omã', 'Rep. Of Ireland': 'Irlanda',
+  Rwanda: 'Ruanda', 'Sao Tome and Principe': 'São Tomé e Príncipe',
+  Seychelles: 'Seicheles', 'Sierra Leone': 'Serra Leoa', Somalia: 'Somália',
+  'South Sudan': 'Sudão do Sul', Suriname: 'Suriname', Tahiti: 'Taiti',
+  Togo: 'Togo', 'Trinidad and Tobago': 'Trinidad e Tobago', Uganda: 'Uganda',
 };
 
 /**
@@ -273,6 +300,117 @@ export function stageLabel(s) {
     group: 'Grupos', r32: '32-avos', r16: 'Oitavas', qf: 'Quartas',
     sf: 'Semis', third: '3º Lugar', final: 'Final',
   }[s] || s;
+}
+
+// ===== Calendário "Por data" =====
+const MESES_LONG = [
+  'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+  'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
+];
+const DOW_SHORT = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+
+// Fases para a legenda/cores do calendário (rótulo + ordem de exibição).
+const CAL_PHASES = [
+  { id: 'group', label: 'Fase de grupos' },
+  { id: 'ko',    label: 'Mata-mata' },
+  { id: 'final', label: 'Final & 3º' },
+];
+
+function calDateKey(y, mo, d) {
+  return `${y}-${String(mo + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+}
+
+/**
+ * Calendário de seleção de datas (substitui a fileira de chips no modo "Por data").
+ * Mostra os meses do torneio em grade semanal, colore cada dia pela fase e traz
+ * uma informação curta do dia (grupos que jogam ou nome da fase) + contador.
+ *
+ * @param dates       array de yyyy-mm-dd selecionáveis (dias com jogo na aba atual)
+ * @param meta        { [yyyy-mm-dd]: { phase, info, title, done, total } }
+ *                    phase ∈ 'group' | 'ko' | 'final'
+ * @param activeDate  yyyy-mm-dd atualmente selecionado
+ */
+export function renderDateCalendar({ dates, meta = {}, activeDate } = {}) {
+  if (!dates || !dates.length) return '';
+  const set = new Set(dates);
+  const sorted = [...dates].sort();
+  const first = new Date(sorted[0] + 'T12:00:00');
+  const last = new Date(sorted[sorted.length - 1] + 'T12:00:00');
+  const todayKey = new Date().toISOString().slice(0, 10);
+
+  // Quais fases aparecem de fato (para a legenda enxugar o que não há).
+  const present = new Set(dates.map(k => meta[k]?.phase || 'group'));
+
+  const months = [];
+  let cur = new Date(first.getFullYear(), first.getMonth(), 1);
+  const end = new Date(last.getFullYear(), last.getMonth(), 1);
+  while (cur <= end) { months.push(new Date(cur)); cur.setMonth(cur.getMonth() + 1); }
+
+  const monthsHtml = months.map(mDate => {
+    const y = mDate.getFullYear();
+    const mo = mDate.getMonth();
+    const daysInMonth = new Date(y, mo + 1, 0).getDate();
+    const startDow = new Date(y, mo, 1).getDay();
+
+    // Cada célula: { match, html }. Marcamos quais são dias com jogo para depois
+    // descartar as semanas inteiras sem jogo (enxuga a altura do calendário).
+    const cells = [];
+    for (let i = 0; i < startDow; i++) cells.push({ match: false, html: '<div class="cal-cell cal-pad"></div>' });
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const key = calDateKey(y, mo, d);
+      if (!set.has(key)) {
+        cells.push({ match: false, html: `<div class="cal-cell cal-off"><span class="cal-dnum">${d}</span></div>` });
+        continue;
+      }
+      const m = meta[key] || {};
+      const phase = m.phase || 'group';
+      const total = m.total ?? 0;
+      const done = m.done ?? 0;
+      const complete = total > 0 && done === total;
+      const cls = ['cal-cell', 'cal-day', `is-${phase}`];
+      if (key === activeDate) cls.push('active');
+      if (complete) cls.push('complete');
+      if (key === todayKey) cls.push('today');
+      cells.push({ match: true, html: `
+        <button class="${cls.join(' ')}" data-date="${key}"${m.title ? ` title="${escapeHtml(m.title)}"` : ''}>
+          <span class="cal-dnum">${d}</span>
+          ${m.info ? `<span class="cal-info">${escapeHtml(m.info)}</span>` : ''}
+          <span class="cal-ct">${done}/${total}</span>
+        </button>` });
+    }
+
+    while (cells.length % 7) cells.push({ match: false, html: '<div class="cal-cell cal-pad"></div>' });
+
+    // Mantém só as semanas (linhas de 7) que têm ao menos um jogo.
+    let grid = '';
+    for (let i = 0; i < cells.length; i += 7) {
+      const week = cells.slice(i, i + 7);
+      if (week.some(c => c.match)) grid += week.map(c => c.html).join('');
+    }
+
+    return `
+      <div class="cal-month">
+        <div class="cal-mhead">${MESES_LONG[mo]} ${y}</div>
+        <div class="cal-grid">
+          ${DOW_SHORT.map(d => `<div class="cal-dow">${d}</div>`).join('')}
+          ${grid}
+        </div>
+      </div>`;
+  }).join('');
+
+  const legend = CAL_PHASES.filter(p => present.has(p.id)).map(p =>
+    `<span class="cal-leg is-${p.id}"><i></i>${p.label}</span>`
+  ).join('');
+
+  return `
+    <div class="cal" id="cal">
+      <div class="cal-months">${monthsHtml}</div>
+      <div class="cal-legend">
+        ${legend}
+        <span class="cal-leg is-complete"><i></i>Tudo palpitado</span>
+      </div>
+    </div>`;
 }
 
 /**
