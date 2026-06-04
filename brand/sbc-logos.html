@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Super Bolão Copa · Estudo de Marca</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Bebas+Neue&family=Oswald:wght@300;400;500;600;700&family=Playfair+Display:wght@700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0c0e13;
+    --panel:#13161d;
+    --panel-2:#171b24;
+    --line:rgba(255,255,255,.08);
+    --gold:#f4c430;
+    --gold-br:#ffd54a;
+    --gold-dim:rgba(244,196,48,.14);
+    --ink:#0a0b0e;
+    --paper:#f4f1e8;
+    --text:#e9eaed;
+    --mute:#8a8f9a;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--bg);color:var(--text);
+    font-family:'Oswald',sans-serif;font-weight:300;
+    -webkit-font-smoothing:antialiased;
+    background-image:
+      radial-gradient(900px 500px at 85% -10%, rgba(244,196,48,.10), transparent 60%),
+      radial-gradient(700px 500px at 0% 110%, rgba(244,196,48,.05), transparent 55%);
+  }
+  /* grain */
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.035;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  }
+  .wrap{position:relative;z-index:1;max-width:1240px;margin:0 auto;padding:0 24px 100px}
+
+  /* ── header ── */
+  header.hero{padding:72px 0 30px;text-align:center;animation:rise .8s cubic-bezier(.2,.7,.2,1) both}
+  .kicker{
+    font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.42em;text-transform:uppercase;
+    color:var(--gold);margin:0 0 18px;padding-left:.42em
+  }
+  .hero h1{
+    font-family:'Anton',sans-serif;font-weight:400;margin:0;line-height:.92;
+    font-size:clamp(40px,8vw,96px);letter-spacing:.01em;text-transform:uppercase;
+  }
+  .hero h1 .b{color:var(--gold)}
+  .hero .sub{max-width:560px;margin:22px auto 0;color:var(--mute);font-size:16px;font-weight:300;line-height:1.6}
+  .hero .tag{
+    display:inline-flex;gap:8px;align-items:center;margin-top:26px;padding:8px 16px;
+    border:1px solid var(--line);border-radius:100px;background:rgba(255,255,255,.02);
+    font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.16em;color:var(--mute);text-transform:uppercase
+  }
+  .tag b{color:var(--gold);font-weight:700}
+
+  .rule{height:1px;background:linear-gradient(90deg,transparent,var(--line) 20%,var(--line) 80%,transparent);margin:30px 0 46px}
+
+  /* ── grid ── */
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:26px}
+  @media(max-width:820px){.grid{grid-template-columns:1fr}}
+
+  .card{
+    position:relative;background:linear-gradient(180deg,var(--panel),var(--panel-2));
+    border:1px solid var(--line);border-radius:20px;overflow:hidden;
+    animation:rise .7s cubic-bezier(.2,.7,.2,1) both;
+  }
+  .card::after{content:"";position:absolute;inset:0;border-radius:20px;pointer-events:none;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+  .card:hover{border-color:rgba(244,196,48,.35)}
+  .card .num{
+    position:absolute;top:16px;right:20px;font-family:'Space Mono',monospace;font-size:12px;
+    color:var(--mute);letter-spacing:.1em;z-index:3
+  }
+  /* stage = dark preview */
+  .stage{
+    position:relative;height:230px;display:grid;place-items:center;
+    background:radial-gradient(120% 120% at 50% 0%, #181c25, #0e1015);
+    border-bottom:1px solid var(--line);
+  }
+  .stage::before{content:"";position:absolute;inset:0;opacity:.5;
+    background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:26px 26px;mask-image:radial-gradient(circle at 50% 50%,#000,transparent 75%)}
+  .stage svg{position:relative;z-index:1;max-height:160px;width:auto;filter:drop-shadow(0 10px 24px rgba(0,0,0,.5))}
+
+  /* meta row */
+  .meta{padding:20px 22px 22px;display:flex;gap:18px;align-items:flex-start;justify-content:space-between}
+  .meta .info h3{margin:0;font-family:'Bebas Neue',sans-serif;font-weight:400;font-size:24px;letter-spacing:.04em}
+  .meta .info p{margin:4px 0 0;color:var(--mute);font-size:13.5px;font-weight:300;line-height:1.45;max-width:38ch}
+  .style-tag{
+    flex:none;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--gold);background:var(--gold-dim);border:1px solid rgba(244,196,48,.25);
+    padding:5px 9px;border-radius:7px;white-space:nowrap
+  }
+  /* variants strip: light chip + favicon */
+  .variants{display:flex;gap:12px;padding:0 22px 22px}
+  .chip{flex:1;border:1px solid var(--line);border-radius:12px;display:grid;place-items:center;height:74px;overflow:hidden}
+  .chip svg{max-height:46px;width:auto}
+  .chip.light{background:var(--paper)}
+  .chip.fav{flex:none;width:74px;background:#0e1015}
+  .chip.fav svg{max-height:38px}
+  .chip-label{position:absolute}
+
+  footer{margin-top:60px;text-align:center;color:var(--mute);font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.1em}
+  footer b{color:var(--gold)}
+
+  @keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+  .card:nth-child(1){animation-delay:.05s}.card:nth-child(2){animation-delay:.12s}
+  .card:nth-child(3){animation-delay:.19s}.card:nth-child(4){animation-delay:.26s}
+  .card:nth-child(5){animation-delay:.33s}.card:nth-child(6){animation-delay:.40s}
+  .card:nth-child(7){animation-delay:.47s}.card:nth-child(8){animation-delay:.54s}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <p class="kicker">Estudo de Identidade Visual</p>
+    <h1>Super <span class="b">Bolão</span> Copa</h1>
+    <p class="sub">Oito direções de marca para o <b style="color:#fff;font-weight:500">SBC</b>. Mesma alma — o dourado da casa — em personalidades diferentes. Escolha a que te representa.</p>
+    <span class="tag">SIGLA <b>SBC</b> · COPA 2026 · BOLÃO PRIVADO</span>
+  </header>
+
+  <div class="rule"></div>
+
+  <div class="grid">
+
+    <!-- 1 · CREST / HERITAGE -->
+    <article class="card">
+      <span class="num">01</span>
+      <div class="stage">
+        <svg viewBox="0 0 130 150" role="img" aria-label="SBC crest">
+          <defs>
+            <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#ffe07a"/><stop offset="1" stop-color="#e0a91e"/>
+            </linearGradient>
+          </defs>
+          <path d="M65 8 L116 25 V74 C116 108 92 130 65 142 C38 130 14 108 14 74 V25 Z"
+                fill="#11141b" stroke="url(#g1)" stroke-width="3"/>
+          <path d="M65 16 L108 30 V73 C108 102 87 122 65 133 C43 122 22 102 22 73 V30 Z"
+                fill="none" stroke="rgba(244,196,48,.35)" stroke-width="1"/>
+          <g fill="var(--gold-br)">
+            <path d="M65 26 l1.6 3.4 3.7.4-2.8 2.5.8 3.7-3.3-1.9-3.3 1.9.8-3.7-2.8-2.5 3.7-.4Z"/>
+            <path d="M48 31 l1.1 2.3 2.5.3-1.9 1.7.6 2.5-2.3-1.3-2.3 1.3.6-2.5-1.9-1.7 2.5-.3Z" opacity=".75"/>
+            <path d="M82 31 l1.1 2.3 2.5.3-1.9 1.7.6 2.5-2.3-1.3-2.3 1.3.6-2.5-1.9-1.7 2.5-.3Z" opacity=".75"/>
+          </g>
+          <text x="65" y="86" text-anchor="middle" font-family="'Playfair Display',serif" font-weight="900" font-size="44" fill="url(#g1)">SBC</text>
+          <line x1="34" y1="96" x2="96" y2="96" stroke="rgba(244,196,48,.4)" stroke-width="1"/>
+          <text x="65" y="110" text-anchor="middle" font-family="'Oswald',sans-serif" font-weight="600" font-size="8.5" letter-spacing="3" fill="#cdd1d8">SUPER BOLÃO COPA</text>
+          <text x="65" y="125" text-anchor="middle" font-family="'Oswald',sans-serif" font-weight="500" font-size="9" letter-spacing="5" fill="var(--gold)">— 2026 —</text>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="info"><h3>Brasão</h3><p>Tradição de clube de futebol. Sério, premium, “time de respeito”.</p></div>
+        <span class="style-tag">Heritage</span>
+      </div>
+      <div class="variants">
+        <div class="chip light">
+          <svg viewBox="0 0 130 150" aria-hidden="true">
+            <path d="M65 8 L116 25 V74 C116 108 92 130 65 142 C38 130 14 108 14 74 V25 Z" fill="#11141b" stroke="#c8961a" stroke-width="3"/>
+            <text x="65" y="86" text-anchor="middle" font-family="'Playfair Display',serif" font-weight="900" font-size="44" fill="#e6b52a">SBC</text>
+            <line x1="34" y1="96" x2="96" y2="96" stroke="rgba(244,196,48,.5)" stroke-width="1"/>
+            <text x="65" y="123" text-anchor="middle" font-family="'Oswald',sans-serif" font-weight="500" font-size="9" letter-spacing="5" fill="#e6b52a">2026</text>
+          </svg>
+        </div>
+        <div class="chip fav">
+          <svg viewBox="0 0 130 150" aria-hidden="true">
+            <path d="M65 8 L116 25 V74 C116 108 92 130 65 142 C38 130 14 108 14 74 V25 Z" fill="#11141b" stroke="#f4c430" stroke-width="4"/>
+            <text x="65" y="92" text-anchor="middle" font-family="'Playfair Display',serif" font-weight="900" font-size="50" fill="#f4c430">SBC</text>
+          </svg>
+        </div>
+      </div>
+    </article>
+
+    <!-- 2 · BALL MONOGRAM / MODERN -->
+    <article class="card">
+      <span class="num">02</span>
+      <div class="stage">
+        <svg viewBox="0 0 240 96" role="img" aria-label="SBC com bola">
+          <g>
+            <circle cx="44" cy="48" r="32" fill="#11141b" stroke="var(--gold)" stroke-width="2.5"/>
+            <path d="M44 30 l11.4 8.3 -4.35 13.4 -14.1 0 -4.35 -13.4 Z" fill="var(--gold)"/>
+            <g stroke="var(--gold)" stroke-width="2" stroke-linecap="round">
+              <line x1="44" y1="30" x2="44" y2="18"/>
+              <line x1="55.4" y1="38.3" x2="66.5" y2="32.7"/>
+              <line x1="51" y1="51.7" x2="58.6" y2="63.3"/>
+              <line x1="36.9" y1="51.7" x2="29.4" y2="63.3"/>
+              <line x1="32.6" y1="38.3" x2="21.5" y2="32.7"/>
+            </g>
+          </g>
+          <text x="92" y="62" font-family="'Archivo Black',sans-serif" font-size="44" fill="#fff" letter-spacing="-1">SBC</text>
+          <text x="93" y="80" font-family="'Oswald',sans-serif" font-weight="500" font-size="11" letter-spacing="4.2" fill="var(--gold)">SUPER BOLÃO COPA</text>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="info"><h3>Bola + Letra</h3><p>Limpo e direto. A bola já diz “futebol”; a tipografia pesada diz “app de confiança”.</p></div>
+        <span class="style-tag">Moderno</span>
+      </div>
+      <div class="variants">
+        <div class="chip light">
+          <svg viewBox="0 0 240 96" aria-hidden="true">
+            <circle cx="44" cy="48" r="32" fill="#11141b" stroke="#caa01c" stroke-width="2.5"/>
+            <path d="M44 30 l11.4 8.3 -4.35 13.4 -14.1 0 -4.35 -13.4 Z" fill="#e6b52a"/>
+            <text x="92" y="62" font-family="'Archivo Black',sans-serif" font-size="44" fill="#11141b" letter-spacing="-1">SBC</text>
+            <text x="93" y="80" font-family="'Oswald',sans-serif" font-weight="500" font-size="11" letter-spacing="4.2" fill="#c8961a">SUPER BOLÃO COPA</text>
+          </svg>
+        </div>
+        <div class="chip fav">
+          <svg viewBox="0 0 96 96" aria-hidden="true">
+            <circle cx="48" cy="48" r="34" fill="#11141b" stroke="var(--gold)" stroke-width="3"/>
+            <path d="M48 28 l12.4 9 -4.75 14.6 -15.3 0 -4.75 -14.6 Z" fill="var(--gold)"/>
+            <g stroke="var(--gold)" stroke-width="2.4" stroke-linecap="round">
+              <line x1="48" y1="28" x2="48" y2="15"/><line x1="60.4" y1="37" x2="72" y2="31"/>
+              <line x1="55.6" y1="51.6" x2="63" y2="64"/><line x1="40.4" y1="51.6" x2="33" y2="64"/>
+              <line x1="35.6" y1="37" x2="24" y2="31"/>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </article>
+
+    <!-- 3 · STACKED TYPO / BETTING ENERGY -->
+    <article class="card">
+      <span class="num">03</span>
+      <div class="stage">
+        <svg viewBox="0 0 230 130" role="img" aria-label="Super Bolão Copa empilhado">
+          <path d="M0 0 L60 0 L30 130 L0 130 Z" fill="var(--gold-dim)"/>
+          <line x1="150" y1="14" x2="150" y2="116" stroke="var(--gold)" stroke-width="3"/>
+          <text x="40" y="36" font-family="'Oswald',sans-serif" font-weight="700" font-size="15" letter-spacing="9" fill="var(--gold)">SUPER</text>
+          <text x="38" y="78" font-family="'Anton',sans-serif" font-size="50" fill="#fff" letter-spacing="0">BOLÃO</text>
+          <text x="40" y="116" font-family="'Anton',sans-serif" font-size="40" fill="none" stroke="var(--gold)" stroke-width="1.1" letter-spacing="2">COPA</text>
+          <text x="165" y="108" font-family="'Anton',sans-serif" font-size="40" fill="var(--gold)">26</text>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="info"><h3>Bloco Tipográfico</h3><p>Energia de casa de aposta / esportes. Grita o nome, sem precisar de ícone.</p></div>
+        <span class="style-tag">Impacto</span>
+      </div>
+      <div class="variants">
+        <div class="chip light">
+          <svg viewBox="0 0 230 130" aria-hidden="true">
+            <path d="M0 0 L60 0 L30 130 L0 130 Z" fill="rgba(244,196,48,.22)"/>
+            <text x="40" y="36" font-family="'Oswald',sans-serif" font-weight="700" font-size="15" letter-spacing="9" fill="#c8961a">SUPER</text>
+            <text x="38" y="78" font-family="'Anton',sans-serif" font-size="50" fill="#11141b">BOLÃO</text>
+            <text x="40" y="116" font-family="'Anton',sans-serif" font-size="40" fill="none" stroke="#c8961a" stroke-width="1.1" letter-spacing="2">COPA</text>
+          </svg>
+        </div>
+        <div class="chip fav">
+          <svg viewBox="0 0 96 96" aria-hidden="true">
+            <text x="48" y="40" text-anchor="middle" font-family="'Anton',sans-serif" font-size="30" fill="#fff">SB</text>
+            <text x="48" y="78" text-anchor="middle" font-family="'Anton',sans-serif" font-size="30" fill="var(--gold)">C</text>
+          </svg>
+        </div>
+      </div>
+    </article>
+
+    <!-- 4 · CIRCULAR SEAL / PREMIUM -->
+    <article class="card">
+      <span class="num">04</span>
+      <div class="stage">
+        <svg viewBox="0 0 150 150" role="img" aria-label="Selo SBC">
+          <defs>
+            <path id="arcTop" d="M75 75 m-58 0 a58 58 0 1 1 116 0" fill="none"/>
+            <path id="arcBot" d="M21 75 a54 54 0 0 0 108 0" fill="none"/>
+          </defs>
+          <circle cx="75" cy="75" r="68" fill="#11141b" stroke="var(--gold)" stroke-width="2"/>
+          <circle cx="75" cy="75" r="60" fill="none" stroke="rgba(244,196,48,.35)" stroke-width="1"/>
+          <text font-family="'Oswald',sans-serif" font-weight="600" font-size="11.5" letter-spacing="5.5" fill="var(--gold)">
+            <textPath href="#arcTop" startOffset="50%" text-anchor="middle">SUPER BOLÃO COPA</textPath>
+          </text>
+          <text font-family="'Oswald',sans-serif" font-weight="500" font-size="10" letter-spacing="6" fill="#aeb3bd">
+            <textPath href="#arcBot" startOffset="50%" text-anchor="middle">★ EDIÇÃO 2026 ★</textPath>
+          </text>
+          <circle cx="60" cy="58" r="2.3" fill="var(--gold-br)"/><circle cx="90" cy="58" r="2.3" fill="var(--gold-br)"/>
+          <text x="75" y="88" text-anchor="middle" font-family="'Anton',sans-serif" font-size="38" fill="var(--gold-br)">SBC</text>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="info"><h3>Selo Oficial</h3><p>Cara de campeonato carimbado. Funciona lindo como “selo de aprovado”.</p></div>
+        <span class="style-tag">Premium</span>
+      </div>
+      <div class="variants">
+        <div class="chip light">
+          <svg viewBox="0 0 150 150" aria-hidden="true">
+            <circle cx="75" cy="75" r="68" fill="#11141b" stroke="#caa01c" stroke-width="2"/>
+            <circle cx="75" cy="75" r="60" fill="none" stroke="rgba(200,150,26,.5)" stroke-width="1"/>
+            <text x="75" y="88" text-anchor="middle" font-family="'Anton',sans-serif" font-size="38" fill="#e6b52a">SBC</text>
+          </svg>
+        </div>
+        <div class="chip fav">
+          <svg viewBox="0 0 150 150" aria-hidden="true">
+            <circle cx="75" cy="75" r="68" fill="#11141b" stroke="var(--gold)" stroke-width="4"/>
+            <text x="75" y="92" text-anchor="middle" font-family="'Anton',sans-serif" font-size="48" fill="var(--gold)">SBC</text>
+          </svg>
+        </div>
+      </div>
+    </article>
+
+    <!-- 5 · TROPHY / CHAMPION -->
+    <article class="card">
+      <span class="num">05</span>
+      <div class="stage">
+        <svg viewBox="0 0 150 150" role="img" aria-label="Troféu SBC">
+          <defs>
+            <linearGradient id="g5" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#fff0b8"/><stop offset=".5" stop-color="#f4c430"/><stop offset="1" stop-color="#b9851a"/>
+            </linearGradient>
+          </defs>
+          <g fill="none" stroke="url(#g5)" stroke-width="4" stroke-linejoin="round">
+            <path d="M52 30 H98 V46 C98 64 88 74 75 74 C62 74 52 64 52 46 Z"/>
+            <path d="M52 34 H40 C40 50 47 56 54 57"/>
+            <path d="M98 34 H110 C110 50 103 56 96 57"/>
+          </g>
+          <path d="M52 30 H98 V46 C98 64 88 74 75 74 C62 74 52 64 52 46 Z" fill="url(#g5)" opacity=".14"/>
+          <line x1="75" y1="74" x2="75" y2="92" stroke="url(#g5)" stroke-width="5"/>
+          <path d="M58 92 H92 L88 104 H62 Z" fill="url(#g5)"/>
+          <rect x="52" y="104" width="46" height="7" rx="2" fill="url(#g5)"/>
+          <g fill="#11141b" font-family="'Anton',sans-serif">
+            <text x="75" y="56" text-anchor="middle" font-size="22">SBC</text>
+          </g>
+          <text x="75" y="130" text-anchor="middle" font-family="'Oswald',sans-serif" font-weight="600" font-size="11" letter-spacing="3.5" fill="var(--gold)">SUPER BOLÃO COPA</text>
+          <g fill="var(--gold-br)">
+            <path d="M40 18 l1.4 3 3.3.3-2.5 2.2.7 3.2-2.9-1.7-2.9 1.7.7-3.2-2.5-2.2 3.3-.3Z"/>
+            <path d="M110 18 l1.4 3 3.3.3-2.5 2.2.7 3.2-2.9-1.7-2.9 1.7.7-3.2-2.5-2.2 3.3-.3Z"/>
+          </g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="info"><h3>Troféu</h3><p>Foco no prêmio. Quem entra no bolão quer levantar a taça — a marca já mostra.</p></div>
+        <span class="style-tag">Campeão</span>
+      </div>
+      <div class="variants">
+        <div class="chip light">
+          <svg viewBox="0 0 150 150" aria-hidden="true">
+            <g fill="none" stroke="#c8961a" stroke-width="4" stroke-linejoin="round">
+              <path d="M52 30 H98 V46 C98 64 88 74 75 74 C62 74 52 64 52 46 Z"/>
+              <path d="M52 34 H40 C40 50 47 56 54 57"/><path d="M98 34 H110 C110 50 103 56 96 57"/>
+            </g>
+            <line x1="75" y1="74" x2="75" y2="92" stroke="#c8961a" stroke-width="5"/>
+            <path d="M58 92 H92 L88 104 H62 Z" fill="#c8961a"/><rect x="52" y="104" width="46" height="7" rx="2" fill="#c8961a"/>
+          </svg>
+        </div>
+        <div class="chip fav">
+          <svg viewBox="0 0 150 150" aria-hidden="true">
+            <g fill="none" stroke="var(--gold)" stroke-width="6" stroke-linejoin="round">
+              <path d="M48 34 H102 V52 C102 74 90 84 75 84 C60 84 48 74 48 52 Z"/>
+              <path d="M48 38 H34 C34 56 42 62 51 63"/><path d="M102 38 H116 C116 56 108 62 99 63"/>
+            </g>
+            <line x1="75" y1="84" x2="75" y2="104" stroke="var(--gold)" stroke-width="7"/>
+            <rect x="50" y="112" width="50" height="9" rx="2" fill="var(--gold)"/>
+          </svg>
+        </div>
+      </div>
+    </article>
+
+    <!-- 6 · HEX TECH / DATA -->
+    <article class="card">
+      <span class="num">06</span>
+      <div class="stage">
+        <svg viewBox="0 0 150 150" role="img" aria-label="Hexágono SBC">
+          <polygon points="75,12 128,42 128,108 75,138 22,108 22,42" fill="#11141b" stroke="var(--gold)" stroke-width="2.5"/>
+          <polygon points="75,24 117,48 117,102 75,126 33,102 33,48" fill="none" stroke="rgba(244,196,48,.3)" stroke-width="1"/>
+          <g stroke="var(--gold)" stroke-width="1.5">
+            <path d="M28 42 h8 M122 42 h-8 M28 108 h8 M122 108 h-8" />
+          </g>
+          <text x="75" y="84" text-anchor="middle" font-family="'Space Mono',monospace" font-weight="700" font-size="34" fill="#fff">SBC</text>
+          <text x="75" y="104" text-anchor="middle" font-family="'Space Mono',monospace" font-size="8" letter-spacing="3" fill="var(--gold)">SUPER·BOLÃO·COPA</text>
+          <circle cx="75" cy="118" r="1.6" fill="var(--gold-br)"/>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="info"><h3>Hexágono Tech</h3><p>Combina com o Raio-X / previsões. Vibe de dados, painel, “app inteligente”.</p></div>
+        <span class="style-tag">Data / Tech</span>
+      </div>
+      <div class="variants">
+        <div class="chip light">
+          <svg viewBox="0 0 150 150" aria-hidden="true">
+            <polygon points="75,12 128,42 128,108 75,138 22,108 22,42" fill="#11141b" stroke="#caa01c" stroke-width="2.5"/>
+            <text x="75" y="86" text-anchor="middle" font-family="'Space Mono',monospace" font-weight="700" font-size="34" fill="#e6b52a">SBC</text>
+          </svg>
+        </div>
+        <div class="chip fav">
+          <svg viewBox="0 0 150 150" aria-hidden="true">
+            <polygon points="75,10 130,42 130,108 75,140 20,108 20,42" fill="#11141b" stroke="var(--gold)" stroke-width="4"/>
+            <text x="75" y="90" text-anchor="middle" font-family="'Space Mono',monospace" font-weight="700" font-size="40" fill="var(--gold)">SBC</text>
+          </svg>
+        </div>
+      </div>
+    </article>
+
+    <!-- 7 · DYNAMIC / SPEED -->
+    <article class="card">
+      <span class="num">07</span>
+      <div class="stage">
+        <svg viewBox="0 0 240 100" role="img" aria-label="SBC dinâmico">
+          <g transform="skewX(-12)">
+            <rect x="8"  y="30" width="26" height="9" rx="4" fill="var(--gold)" opacity=".35"/>
+            <rect x="14" y="46" width="38" height="9" rx="4" fill="var(--gold)" opacity=".6"/>
+            <rect x="20" y="62" width="26" height="9" rx="4" fill="var(--gold)" opacity=".35"/>
+            <text x="58" y="74" font-family="'Anton',sans-serif" font-size="62" fill="#fff">SBC</text>
+          </g>
+          <path d="M70 86 H214" stroke="var(--gold)" stroke-width="4" stroke-linecap="round"/>
+          <text x="214" y="80" text-anchor="end" font-family="'Oswald',sans-serif" font-weight="600" font-size="11" letter-spacing="3" fill="var(--gold)">SUPER BOLÃO COPA</text>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="info"><h3>Velocidade</h3><p>Movimento e atitude. Jovem, competitivo, “bora pra cima”.</p></div>
+        <span class="style-tag">Dinâmico</span>
+      </div>
+      <div class="variants">
+        <div class="chip light">
+          <svg viewBox="0 0 240 100" aria-hidden="true">
+            <g transform="skewX(-12)">
+              <rect x="14" y="46" width="38" height="9" rx="4" fill="#caa01c"/>
+              <text x="58" y="74" font-family="'Anton',sans-serif" font-size="62" fill="#11141b">SBC</text>
+            </g>
+            <path d="M70 86 H214" stroke="#c8961a" stroke-width="4" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="chip fav">
+          <svg viewBox="0 0 96 96" aria-hidden="true">
+            <g transform="skewX(-12)">
+              <rect x="6" y="40" width="18" height="7" rx="3" fill="var(--gold)" opacity=".5"/>
+              <text x="22" y="66" font-family="'Anton',sans-serif" font-size="46" fill="var(--gold)">S</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </article>
+
+    <!-- 8 · MINIMAL MONOLINE -->
+    <article class="card">
+      <span class="num">08</span>
+      <div class="stage">
+        <svg viewBox="0 0 240 90" role="img" aria-label="SBC minimalista">
+          <text x="20" y="60" font-family="'Oswald',sans-serif" font-weight="300" font-size="46" letter-spacing="10" fill="#fff">SBC</text>
+          <circle cx="186" cy="44" r="7" fill="var(--gold)"/>
+          <text x="22" y="78" font-family="'Oswald',sans-serif" font-weight="300" font-size="10" letter-spacing="7.5" fill="var(--mute)">SUPER BOLÃO COPA</text>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="info"><h3>Minimalista</h3><p>Elegante e silencioso. A bolinha dourada é o único toque. Escala até favicon sem perder.</p></div>
+        <span class="style-tag">Clean</span>
+      </div>
+      <div class="variants">
+        <div class="chip light">
+          <svg viewBox="0 0 240 90" aria-hidden="true">
+            <text x="20" y="60" font-family="'Oswald',sans-serif" font-weight="300" font-size="46" letter-spacing="10" fill="#11141b">SBC</text>
+            <circle cx="186" cy="44" r="7" fill="#e6b52a"/>
+            <text x="22" y="78" font-family="'Oswald',sans-serif" font-weight="300" font-size="10" letter-spacing="7.5" fill="#7a7f88">SUPER BOLÃO COPA</text>
+          </svg>
+        </div>
+        <div class="chip fav">
+          <svg viewBox="0 0 96 96" aria-hidden="true">
+            <text x="14" y="60" font-family="'Oswald',sans-serif" font-weight="300" font-size="40" letter-spacing="2" fill="#fff">SBC</text>
+            <circle cx="84" cy="30" r="6" fill="var(--gold)"/>
+          </svg>
+        </div>
+      </div>
+    </article>
+
+  </div>
+
+  <footer>
+    8 conceitos · troca de cor é 1 variável CSS (<b>--gold</b>) · me diga o número que curtir e eu aplico no site
+  </footer>
+
+</div>
+</body>
+</html>

@@ -932,7 +932,7 @@ async function renderSettingsTab() {
     <div class="setting-form">
       <div class="field">
         <label>Nome do bolão</label>
-        <input id="setPoolName" type="text" value="${escapeHtml(s.pool_name || 'Bolão Copa 2026')}">
+        <input id="setPoolName" type="text" value="${escapeHtml(s.pool_name || 'SBC 2026')}">
       </div>
       <div class="field">
         <label>Valor da taxa (R$ por jogador)

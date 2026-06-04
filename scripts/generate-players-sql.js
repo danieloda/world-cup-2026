@@ -31,7 +31,7 @@ async function main() {
   const squads = JSON.parse(readFileSync(squadsPath, 'utf-8'));
 
   let sql = `-- ============================================================
--- Bolão Copa 2026 — Full player list from API-Football
+-- SBC 2026 — Full player list from API-Football
 -- ============================================================
 -- Generated: ${new Date().toISOString()}
 -- Run this in Supabase SQL Editor

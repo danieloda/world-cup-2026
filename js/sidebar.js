@@ -72,7 +72,11 @@ export async function renderShell({ active, profile, stats, stageLabel }) {
   app.innerHTML = `
     <aside class="sidebar ${startCollapsed ? 'collapsed' : ''}" id="sidebar">
       <div class="sb-brand">
-        <a href="inicio.html" class="sb-brand-link">
+        <a href="inicio.html" class="sb-brand-link sb-brand-link--sbc" aria-label="SBC 2026">
+          <img src="assets/icons/logo-social.png" alt="SBC 2026" class="sb-sbc-logo">
+        </a>
+        <span class="sb-brand-sep" aria-hidden="true"></span>
+        <a href="inicio.html" class="sb-brand-link" aria-label="FIFA World Cup 2026">
           <img src="assets/fifa-2026-logo.png" alt="FIFA 2026" class="sb-fifa-logo">
         </a>
       </div>

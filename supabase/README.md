@@ -1,6 +1,6 @@
-# Supabase — Bolão Copa 2026
+# Supabase — SBC 2026
 
-Setup do banco de dados em Supabase para o Bolão Copa 2026.
+Setup do banco de dados em Supabase para o SBC 2026.
 
 ## O que tem aqui
 

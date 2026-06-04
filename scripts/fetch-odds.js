@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Fetch pre-match "Match Winner" (1X2) odds from API-Football (Betano)
- * para todas as partidas de fase de grupos do Bolão Copa 2026.
+ * para todas as partidas de fase de grupos do SBC 2026.
  *
  * Etapas:
  *   1) Garante que public.matches.api_fixture_id está populado (linkage com
@@ -178,7 +178,7 @@ async function fetchAllOdds() {
 }
 
 async function main() {
-  console.log('=== Bolão Copa 2026 · fetch-odds ===');
+  console.log('=== SBC 2026 · fetch-odds ===');
   await linkFixtureIds();
   await fetchAllOdds();
 }

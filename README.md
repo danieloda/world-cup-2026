@@ -1,4 +1,4 @@
-# Bolão Copa 2026
+# SBC 2026
 
 A World Cup 2026 betting pool application with real-time scoring, leaderboards, and admin management.
 

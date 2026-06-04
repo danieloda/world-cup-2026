@@ -10,6 +10,17 @@ const submitBtn = document.getElementById('submitBtn');
 const errorBox = document.getElementById('errorBox');
 const successBox = document.getElementById('successBox');
 
+// Mostrar/ocultar senha
+const pwToggle = document.getElementById('pwToggle');
+pwToggle?.addEventListener('click', () => {
+  const show = passwordInput.type === 'password';
+  passwordInput.type = show ? 'text' : 'password';
+  pwToggle.classList.toggle('is-on', show);
+  pwToggle.setAttribute('aria-pressed', String(show));
+  pwToggle.setAttribute('aria-label', show ? 'Ocultar senha' : 'Mostrar senha');
+  passwordInput.focus();
+});
+
 // Mensagens vindas de redirect
 const urlParams = new URLSearchParams(window.location.search);
 if (urlParams.get('error') === 'profile') {

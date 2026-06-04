@@ -144,7 +144,7 @@ async function fetchAllPredictions() {
 }
 
 async function main() {
-  console.log('=== Bolão Copa 2026 · fetch-predictions ===');
+  console.log('=== SBC 2026 · fetch-predictions ===');
   if (DRY_RUN) console.log('(DRY-RUN — não grava nada no Supabase)\n');
   await linkFixtureIds();
   await fetchAllPredictions();

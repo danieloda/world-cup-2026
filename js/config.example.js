@@ -1,4 +1,4 @@
-// Bolão Copa 2026 — Frontend config
+// SBC 2026 — Frontend config
 //
 // Copie este arquivo para `js/config.js` e preencha com os valores do seu projeto Supabase:
 //   Project Settings → API → Project URL + Publishable key

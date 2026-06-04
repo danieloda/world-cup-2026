@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SBC · Logo oficial (SVG)</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Oswald:wght@400;600&family=Space+Mono&display=swap" rel="stylesheet">
+<style>
+  :root{--gold:#f4c430}
+  *{box-sizing:border-box}
+  body{margin:0;background:#0c0e13;color:#e9eaed;font-family:'Oswald',sans-serif;font-weight:300;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1100px;margin:0 auto;padding:40px 24px 90px}
+  h1{font-family:'Oswald';font-weight:600;letter-spacing:.04em;text-align:center;font-size:22px;margin:0 0 4px}
+  .sub{text-align:center;color:#8a8f9a;font-size:13px;margin:0 0 30px;font-family:'Space Mono',monospace;letter-spacing:.06em}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px}
+  @media(max-width:760px){.row{grid-template-columns:1fr}}
+  .tile{border:1px solid rgba(255,255,255,.09);border-radius:18px;overflow:hidden;position:relative}
+  .tile .lab{position:absolute;top:12px;left:16px;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.1em;color:#8a8f9a;z-index:2}
+  .pad{display:grid;place-items:center;height:340px}
+  .dark{background:radial-gradient(120% 120% at 50% 0%,#1a1a1a,#0c0c0c)}
+  .ref{background:#1b1b1b}
+  .light{background:#f4f1e8}
+  .tile svg,.tile img{max-height:280px;max-width:88%;width:auto}
+  .small-row{display:flex;gap:20px;align-items:center;justify-content:center;height:160px;background:radial-gradient(120% 120% at 50% 0%,#1a1a1a,#0c0c0c)}
+  .small-row .b{display:grid;place-items:center;gap:8px}
+  .small-row .b span{font-family:'Space Mono',monospace;font-size:10px;color:#8a8f9a}
+  .fav{background:#000;border-radius:14px;display:grid;place-items:center}
+  .footer{text-align:center;color:#8a8f9a;font-family:'Space Mono',monospace;font-size:11px;margin-top:18px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Super Bolão Copa — logo em vetor</h1>
+  <p class="sub">recriação SVG da sua logo · dourado #f4c430 · transparente, escalável, anima</p>
+
+  <div class="row">
+    <div class="tile"><span class="lab">SVG · fundo escuro</span><div class="pad dark" id="big"></div></div>
+    <div class="tile"><span class="lab">sua referência</span><div class="pad ref"><img src="_ref.png" alt="ref" id="refimg"></div></div>
+  </div>
+
+  <div class="row">
+    <div class="tile"><span class="lab">fundo claro</span><div class="pad light" id="lightlogo"></div></div>
+    <div class="tile"><span class="lab">tamanhos pequenos / favicon</span>
+      <div class="small-row" id="smalls"></div>
+    </div>
+  </div>
+
+  <p class="footer">se ficou fiel, eu aplico no site (favicon, login, sidebar, títulos) · ajusto chama/letras se precisar</p>
+</div>
+
+<script>
+const R1=n=>Math.round(n*100)/100; let S=0;
+function poly(cx,cy,rad,rot,n=5){let p='';for(let i=0;i<n;i++){const a=(rot-90+i*360/n)*Math.PI/180;p+=(i?'L':'M')+R1(cx+rad*Math.cos(a))+','+R1(cy+rad*Math.sin(a));}return p+'Z';}
+function tongue(bx,by,aDeg,len,wid){
+  const a=aDeg*Math.PI/180,dx=Math.cos(a),dy=Math.sin(a),px=-dy,py=dx,hw=wid/2,m=.55,bg=1.3;
+  return `M${R1(bx+px*hw)},${R1(by+py*hw)} Q${R1(bx+dx*len*m+px*hw*bg)},${R1(by+dy*len*m+py*hw*bg)} ${R1(bx+dx*len)},${R1(by+dy*len)} Q${R1(bx+dx*len*m-px*hw*bg)},${R1(by+dy*len*m-py*hw*bg)} ${R1(bx-px*hw)},${R1(by-py*hw)}Z`;
+}
+
+/* black & white 3D soccer ball */
+function ball(R){
+  const id='b'+(S++), dark='#101015';
+  let panels=`<path d="${poly(0,0,R*.34,0,5)}" fill="${dark}"/>`;
+  for(let k=0;k<5;k++){
+    const ang=-90+72*k,a=ang*Math.PI/180;
+    panels+=`<path d="${poly(R*.66*Math.cos(a),R*.66*Math.sin(a),R*.205,ang+180,5)}" fill="${dark}"/>`;
+    panels+=`<line x1="${R1(R*.34*Math.cos(a))}" y1="${R1(R*.34*Math.sin(a))}" x2="${R1(R*.52*Math.cos(a))}" y2="${R1(R*.52*Math.sin(a))}" stroke="#d8d8d8" stroke-width="${R1(R*.02)}"/>`;
+  }
+  return `<defs>
+    <radialGradient id="${id}b" cx="38%" cy="32%" r="72%"><stop offset="0" stop-color="#ffffff"/><stop offset=".55" stop-color="#ececec"/><stop offset=".85" stop-color="#cccccc"/><stop offset="1" stop-color="#a9a9a9"/></radialGradient>
+    <radialGradient id="${id}v" cx="40%" cy="36%" r="68%"><stop offset="0" stop-color="rgba(0,0,0,0)"/><stop offset=".6" stop-color="rgba(0,0,0,0)"/><stop offset=".92" stop-color="rgba(0,0,0,.3)"/><stop offset="1" stop-color="rgba(0,0,0,.55)"/></radialGradient>
+    <clipPath id="${id}c"><circle r="${R}"/></clipPath>
+    <filter id="${id}s"><feGaussianBlur stdDeviation="${R1(R*.012)}"/></filter></defs>
+    <circle r="${R}" fill="url(#${id}b)"/>
+    <g clip-path="url(#${id}c)" filter="url(#${id}s)">${panels}</g>
+    <circle r="${R}" fill="url(#${id}v)"/>
+    <ellipse cx="${R1(-R*.3)}" cy="${R1(-R*.36)}" rx="${R1(R*.33)}" ry="${R1(R*.19)}" fill="rgba(255,255,255,.6)" filter="url(#${id}s)"/>
+    <circle r="${R}" fill="none" stroke="rgba(0,0,0,.28)" stroke-width="${R1(R*.025)}"/>`;
+}
+
+/* golden flame arc hugging left+top, bursting upper-right */
+// smooth tapered crescent ribbon hugging the ball
+function crescent(R, Sang, Eang, wMax){
+  const steps=48, out=[], inn=[];
+  for(let i=0;i<=steps;i++){
+    const t=i/steps, ang=(Sang+(Eang-Sang)*t)*Math.PI/180;
+    const w=wMax*(0.10+0.90*Math.pow(t,0.65));      // point at tail → thick near head
+    const ri=R*1.04, ro=ri+w;
+    out.push([Math.cos(ang)*ro, Math.sin(ang)*ro]);
+    inn.push([Math.cos(ang)*ri, Math.sin(ang)*ri]);
+  }
+  let d='M'+out.map(p=>R1(p[0])+','+R1(p[1])).join('L');
+  for(let i=inn.length-1;i>=0;i--) d+='L'+R1(inn[i][0])+','+R1(inn[i][1]);
+  return d+'Z';
+}
+function flameArc(R, anim=true){
+  const id='fa'+(S++);
+  // arco fino: começa embaixo-esquerda, sobe a esquerda até o topo
+  const arc=(s)=>crescent(R,112,262,R*0.34*s);
+  // labaredas no topo→direita (pontudas)
+  const heads=[{ang:256,d:303,l:1.35,w:.38},{ang:272,d:318,l:2.05,w:.48},{ang:289,d:331,l:2.15,w:.48},{ang:307,d:344,l:1.7,w:.4},{ang:326,d:356,l:1.15,w:.3}];
+  const heLayer=(sl,sw)=>heads.map(h=>{const a=h.ang*Math.PI/180,ar=R*1.02;return tongue(ar*Math.cos(a),ar*Math.sin(a),h.d,R*h.l*sl,R*h.w*sw);}).join(' ');
+  const animTag = anim?`<animate attributeName="baseFrequency" dur="3.2s" values="0.01 0.018;0.015 0.026;0.01 0.018" repeatCount="indefinite"/>`:'';
+  return `<defs>
+    <linearGradient id="${id}g" x1="0" y1="${-R*2}" x2="0" y2="${R*1.4}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff0b0"/><stop offset=".5" stop-color="#f4c430"/><stop offset="1" stop-color="#cf9a1c"/></linearGradient>
+    <filter id="${id}f" x="-60%" y="-60%" width="220%" height="220%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.01 0.018" numOctaves="2" seed="${(S*9)%97}" result="n">${animTag}</feTurbulence>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="${R1(R*.13)}" xChannelSelector="R" yChannelSelector="G"/>
+      <feGaussianBlur stdDeviation="${R1(R*.008)}"/>
+    </filter>
+    <filter id="${id}gl" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="${R1(R*.13)}"/></filter></defs>
+    <g filter="url(#${id}gl)"><path d="${arc(1.15)}" fill="#f0b020" opacity=".35"/><path d="${heLayer(1,1.25)}" fill="#f0b020" opacity=".35"/></g>
+    <g filter="url(#${id}f)">
+      <path d="${arc(1.18)}" fill="#b8821a"/><path d="${heLayer(1.02,1.2)}" fill="#b8821a"/>
+      <path d="${arc(0.92)}" fill="url(#${id}g)"/><path d="${heLayer(0.9,0.82)}" fill="url(#${id}g)"/>
+      <path d="${arc(0.5)}" fill="#ffe79a"/><path d="${heLayer(0.62,0.44)}" fill="#ffe79a"/>
+    </g>`;
+}
+
+function sbcText(R){
+  return `<text x="0" y="${R1(R*1.18)}" text-anchor="middle" font-family="'Playfair Display',serif" font-weight="900" font-size="${R1(R*.66)}" letter-spacing="${R1(R*.02)}" fill="url(#sbcg)" stroke="#5a4208" stroke-width="${R1(R*.012)}" paint-order="stroke">SBC</text>`;
+}
+function logo(R, anim=true){
+  const W=5.6*R,H=5.2*R;
+  return `<svg viewBox="0 0 ${R1(W)} ${R1(H)}" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="sbcg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe487"/><stop offset="1" stop-color="#e0a417"/></linearGradient></defs>
+    <g transform="translate(${R1(2.5*R)},${R1(3*R)})">
+      ${flameArc(R,anim)}
+      ${ball(R)}
+      ${sbcText(R)}
+    </g></svg>`;
+}
+
+document.getElementById('big').innerHTML = logo(100,true);
+document.getElementById('lightlogo').innerHTML = logo(100,true);
+const sizes=[64,40,24];
+document.getElementById('smalls').innerHTML = sizes.map(px=>
+  `<div class="b"><div class="fav" style="width:${px+24}px;height:${px+24}px">${logo(px*0.34,false)}</div><span>${px}px</span></div>`
+).join('');
+</script>
+</body>
+</html>

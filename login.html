@@ -3,11 +3,26 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Login · Bolão Copa 2026</title>
-  <meta name="description" content="Entre no Bolão Copa 2026.">
+  <title>Login · SBC 2026</title>
+  <meta name="description" content="Entre no SBC 2026.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- Favicons & PWA — Super Bolão Copa -->
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/assets/icons/site.webmanifest">
+  <meta name="theme-color" content="#000000">
+  <!-- Open Graph / social share -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Super Bolão Copa">
+  <meta property="og:title" content="SBC 2026 — Super Bolão Copa">
+  <meta property="og:description" content="O bolão da Copa do Mundo FIFA 2026 entre amigos: palpites, ranking e disputa em tempo real.">
+  <meta property="og:image" content="https://superbolaocopa.netlify.app/assets/icons/logo-social.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:image" content="https://superbolaocopa.netlify.app/assets/icons/logo-social.png">
   <link href="css/app.css" rel="stylesheet">
 </head>
 <body>
@@ -15,19 +30,31 @@
 <main class="login-page">
   <form id="loginForm" class="login-card" autocomplete="on">
     <div class="login-brand">
-      <div class="login-brand-logo">⚽</div>
-      <h1>Bolão Copa <span style="color:var(--accent)">2026</span></h1>
+      <div class="login-brand-logo">
+        <img src="assets/icons/logo-social.png" alt="SBC 2026" width="78" height="78">
+      </div>
+      <h1>SBC <span style="color:var(--accent)">2026</span></h1>
       <p>Copa do Mundo FIFA · Bolão privado</p>
     </div>
 
     <div class="login-field">
       <label for="email">Email</label>
-      <input id="email" name="email" type="email" required autocomplete="email" autofocus>
+      <div class="login-input">
+        <svg class="login-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+        <input id="email" name="email" type="email" required autocomplete="email" autofocus placeholder="voce@email.com">
+      </div>
     </div>
 
     <div class="login-field">
       <label for="password">Senha</label>
-      <input id="password" name="password" type="password" required autocomplete="current-password" minlength="6">
+      <div class="login-input login-input--pw">
+        <svg class="login-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        <input id="password" name="password" type="password" required autocomplete="current-password" minlength="6" placeholder="••••••••">
+        <button type="button" class="login-pw-toggle" id="pwToggle" aria-label="Mostrar senha" aria-pressed="false">
+          <svg class="i-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+          <svg class="i-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.9 5A10.8 10.8 0 0 1 12 5c6.5 0 10 7 10 7a13.2 13.2 0 0 1-2.2 2.9M6.6 6.6A13.2 13.2 0 0 0 2 12s3.5 7 10 7a10.9 10.9 0 0 0 4.4-.9"/><path d="m2 2 20 20"/><path d="M9.5 9.5a3 3 0 0 0 4 4"/></svg>
+        </button>
+      </div>
     </div>
 
     <div id="errorBox" class="login-error" hidden></div>
@@ -36,7 +63,7 @@
     <button type="submit" id="submitBtn" class="btn btn-green">Entrar</button>
 
     <div class="login-foot">
-      Sem conta? <a href="signup.html" style="color:var(--accent); font-weight:700;">Criar conta</a>
+      Sem conta? <a href="signup.html">Criar conta</a>
     </div>
   </form>
 </main>
