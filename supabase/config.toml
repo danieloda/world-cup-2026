@@ -245,6 +245,14 @@ otp_expiry = 3600
 # subject = "You have been invited"
 # content_path = "./supabase/templates/invite.html"
 
+# Reset de senha — template PT-BR (marca SBC 2026).
+# Vale para o ambiente LOCAL (supabase start -> Mailpit). Em PRODUCAO o mesmo
+# HTML e colado no Dashboard -> Authentication -> Emails -> Reset Password,
+# pois nada aqui roda `supabase config push`.
+[auth.email.template.recovery]
+subject = "Redefina sua senha — SBC 2026"
+content_path = "./supabase/templates/recovery.html"
+
 # Uncomment to customize notification email template
 # [auth.email.notification.password_changed]
 # enabled = true
