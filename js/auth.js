@@ -77,6 +77,31 @@ export async function signUp(email, password, fullName) {
 }
 
 /**
+ * Dispara o email de redefinição de senha. O link leva o usuário pra
+ * reset-password.html com uma sessão de recuperação ativa.
+ * Por segurança NÃO revelamos se o email existe — em caso de sucesso a UI
+ * mostra sempre a mesma mensagem genérica. Só retorna erro em rate limit/rede.
+ * Retorna { ok, error }.
+ */
+export async function requestPasswordReset(email) {
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${window.location.origin}/reset-password.html`,
+  });
+  if (error) return { ok: false, error: humanizeAuthError(error) };
+  return { ok: true };
+}
+
+/**
+ * Define uma nova senha para a sessão atual (sessão de recuperação vinda do
+ * link do email, ou usuário já logado). Retorna { ok, error }.
+ */
+export async function updatePassword(newPassword) {
+  const { error } = await supabase.auth.updateUser({ password: newPassword });
+  if (error) return { ok: false, error: humanizeAuthError(error) };
+  return { ok: true };
+}
+
+/**
  * Logout e redireciona pra /login.
  */
 export async function signOut() {
@@ -174,6 +199,8 @@ function humanizeAuthError(error) {
   if (msg.includes('already registered') || msg.includes('already been registered')) return 'Este email já está cadastrado. Tente entrar.';
   if (msg.includes('password') && msg.includes('least')) return 'A senha precisa ter no mínimo 6 caracteres.';
   if (msg.includes('weak password') || msg.includes('password is too')) return 'Senha muito fraca. Use ao menos 6 caracteres.';
+  if (msg.includes('new password should be different') || msg.includes('same_password')) return 'A nova senha precisa ser diferente da anterior.';
+  if (msg.includes('auth session missing') || msg.includes('session not found') || msg.includes('session_not_found')) return 'Link expirado ou inválido. Solicite um novo email de redefinição.';
   if (msg.includes('unable to validate email') || msg.includes('invalid format') || msg.includes('email address') && msg.includes('invalid')) return 'Email inválido.';
   if (msg.includes('network') || msg.includes('failed to fetch')) return 'Sem conexão. Verifique sua internet.';
   return error.message || 'Erro. Tente novamente.';

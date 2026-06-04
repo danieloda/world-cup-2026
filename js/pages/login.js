@@ -29,6 +29,9 @@ if (urlParams.get('error') === 'profile') {
 if (urlParams.get('confirmed') === '1') {
   showSuccess('Email confirmado! Agora entre com seu email e senha.');
 }
+if (urlParams.get('reset') === '1') {
+  showSuccess('Senha redefinida! Entre com sua nova senha.');
+}
 
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
