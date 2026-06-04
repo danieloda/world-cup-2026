@@ -52,6 +52,39 @@ export function renderGroupCard(g, groupMatches, mode, predsByMatch) {
   `;
 }
 
+// ------------------------------------------------------------
+// Linha/tabela canônica — markup COMPARTILHADO por todas as tabelas de
+// classificação do site (grupos, e a seção Eliminatórias do Raio-X). Manter
+// um só renderizador garante que todas fiquem visualmente idênticas.
+// `r` normalizado: { pos, team, j, v, e, d, sg, pts, cls?, hl? }
+//   cls: 'qualified' | 'third' | 'out'  → cor base por status (verde/bronze/—)
+//   hl:  'home' | 'away' | 'focus'      → destaque do confronto (só no Raio-X)
+// ------------------------------------------------------------
+export function renderStandingRow(r) {
+  const sgStr = r.sg > 0 ? `+${r.sg}` : `${r.sg}`;
+  const cls = [r.cls, r.hl && `hl-${r.hl}`].filter(Boolean).join(' ');
+  return `
+    <tr class="${cls}">
+      <td class="team-cell">
+        <span class="position">${r.pos}</span>
+        <span class="flag">${flag(r.team)}</span>
+        <span class="team-name" data-team="${escapeHtml(r.team)}">${escapeHtml(teamPt(r.team))}</span>
+      </td>
+      <td>${r.j}</td><td>${r.v}</td><td>${r.e}</td><td>${r.d}</td>
+      <td>${sgStr}</td><td class="pts">${r.pts}</td>
+    </tr>`;
+}
+
+export function renderStandingTable(rows) {
+  return `
+    <table class="group-table">
+      <thead><tr>
+        <th class="left">Time</th><th>J</th><th>V</th><th>E</th><th>D</th><th>SG</th><th>PTS</th>
+      </tr></thead>
+      <tbody>${rows.map(renderStandingRow).join('')}</tbody>
+    </table>`;
+}
+
 function renderStandingsRows(standings, matches) {
   // Se nenhum jogo finalizado/palpitado, mostra times sem stats
   if (standings.length === 0) {
@@ -60,37 +93,14 @@ function renderStandingsRows(standings, matches) {
       teams.add(m.team_home);
       teams.add(m.team_away);
     }
-    return [...teams].map((team, i) => `
-      <tr class="out">
-        <td class="team-cell">
-          <span class="position">${i + 1}</span>
-          <span class="flag">${flag(team)}</span>
-          <span class="team-name" data-team="${escapeHtml(team)}">${escapeHtml(teamPt(team))}</span>
-        </td>
-        <td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td class="pts">0</td>
-      </tr>
-    `).join('');
+    return [...teams].map((team, i) =>
+      renderStandingRow({ pos: i + 1, team, j: 0, v: 0, e: 0, d: 0, sg: 0, pts: 0, cls: 'out' })).join('');
   }
 
   return standings.map((s, idx) => {
     const pos = idx + 1;
-    const rowClass = pos <= 2 ? 'qualified' : (pos === 3 ? 'third' : 'out');
-    const sgStr = s.sg > 0 ? `+${s.sg}` : s.sg;
-    return `
-      <tr class="${rowClass}">
-        <td class="team-cell">
-          <span class="position">${pos}</span>
-          <span class="flag">${flag(s.team)}</span>
-          <span class="team-name" data-team="${escapeHtml(s.team)}">${escapeHtml(teamPt(s.team))}</span>
-        </td>
-        <td>${s.j}</td>
-        <td>${s.v}</td>
-        <td>${s.e}</td>
-        <td>${s.d}</td>
-        <td>${sgStr}</td>
-        <td class="pts">${s.pts}</td>
-      </tr>
-    `;
+    const cls = pos <= 2 ? 'qualified' : (pos === 3 ? 'third' : 'out');
+    return renderStandingRow({ pos, team: s.team, j: s.j, v: s.v, e: s.e, d: s.d, sg: s.sg, pts: s.pts, cls });
   }).join('');
 }
 

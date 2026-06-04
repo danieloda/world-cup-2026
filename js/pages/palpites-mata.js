@@ -3,7 +3,7 @@ import { renderShell } from '../sidebar.js';
 import { supabase } from '../supabase.js';
 import {
   flag, escapeHtml, formatTime, formatBrDate, formatBrShort, isLocked, lockCountdownLabel, showToast,
-  loadRecentMatches, teamPt,
+  loadRecentMatches, loadQualifiers, teamPt,
   computeStandings as utilComputeStandings,
 } from '../util.js';
 import { fifaRank } from '../fifa-rank.js';
@@ -54,6 +54,7 @@ let slotResolution = new Map();      // slot string -> { team, source } (real-fi
 let predSlotResolution = new Map();  // slot string -> { team, source } (apenas palpites do user)
 let qualifierBySide = new Map();     // "matchId:side" -> { kind:'bpe'|'bp', pts, pred, actual } (do cache SQL)
 let recentByTeam = new Map();        // team -> forma recente (Raio-X)
+let qualifiers = null;               // assets/data/qualifiers.json — campanha de eliminatórias (Raio-X)
 let activeTab = 'palpites';          // 'palpites' | 'resultados'
 let viewMode = 'bracket';            // 'bracket' | 'date' — layout: chave ou lista por data
 let activeDate = null;               // ISO yyyy-mm-dd quando viewMode === 'date'
@@ -74,6 +75,7 @@ try {
 
   // Forma recente (Raio-X) — antes alimentava o hover, agora o modal.
   recentByTeam = await loadRecentMatches();
+  qualifiers = await loadQualifiers();
 
   const pageBody = await renderShell({ active: 'palpites-k', profile, stats });
   pageBody.innerHTML = renderPage();
@@ -150,7 +152,7 @@ function resolveSide(m, side) {
 // Dados que alimentam o Raio-X (módulo ../raiox.js). No render do botão o H2H
 // ainda não foi buscado (h2h null); ele é resolvido on-demand ao abrir o modal.
 function raioxData(h2h = null) {
-  return { recentByTeam, h2h };
+  return { recentByTeam, h2h, qualifiers };
 }
 
 // Busca o confronto direto entre dois times (tabela team_h2h, par canônico

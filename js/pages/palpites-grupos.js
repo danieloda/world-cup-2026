@@ -4,7 +4,7 @@ import { supabase } from '../supabase.js';
 import {
   flag, escapeHtml, formatBrDate, formatBrShort, formatTime,
   isLocked, isLive, lockCountdownLabel, showToast, loadRecentMatches,
-  teamPt, groundShort,
+  loadQualifiers, teamPt, groundShort,
 } from '../util.js';
 import { matchPoints, scoreBreakdown } from '../scoring.js';
 import {
@@ -27,6 +27,7 @@ let oddsByMatch = new Map();         // match_id -> { odd_home, odd_draw, odd_aw
 let h2hByMatch = new Map();          // match_id -> { fixtures: [...], summary: {...}, api_team_home }
 let predictionsByMatch = new Map();  // match_id -> previsão normalizada (ver raiox.js / renderPredictionsBlock)
 let recentByTeam = new Map();        // team name -> [{ date, opponent, home, score, competition }] (forma recente)
+let qualifiers = null;               // assets/data/qualifiers.json — campanha de eliminatórias (Raio-X)
 let activeTab = 'palpites';          // 'palpites' | 'resultados'
 let activeGroup = 'all';             // 'all' | 'A'..'L' (ambas as abas operam sempre por grupo)
 let groupBy = 'group';               // 'group' | 'date' — dimensão do filtro/agrupamento
@@ -41,6 +42,7 @@ function raioxData(m) {
     recentByTeam,
     h2h: h2hByMatch.get(m.id) ?? null,
     predictions: predictionsByMatch.get(m.id) ?? null,
+    qualifiers,
   };
 }
 
@@ -59,6 +61,7 @@ try {
   // Forma recente (últimos jogos de cada seleção) — antes ficava num hover no
   // nome do time; agora vai pro painel Raio-X. Guardado em var de módulo.
   recentByTeam = await loadRecentMatches();
+  qualifiers = await loadQualifiers();
 
   const pageBody = await renderShell({ active: 'palpites-g', profile, stats });
   pageBody.innerHTML = renderPage();

@@ -1,0 +1,2604 @@
+{
+  "generatedAt": "2026-06-04T23:07:49.086Z",
+  "confederations": {
+    "CONMEBOL": {
+      "namePt": "Eliminatórias da América do Sul",
+      "format": "table",
+      "groups": [
+        {
+          "name": "WC Qualification South America",
+          "rows": [
+            {
+              "rank": 1,
+              "team": "Argentina",
+              "played": 18,
+              "win": 12,
+              "draw": 2,
+              "lose": 4,
+              "gf": 31,
+              "ga": 10,
+              "gd": 21,
+              "points": 38,
+              "description": "Promotion - World Championship"
+            },
+            {
+              "rank": 2,
+              "team": "Ecuador",
+              "played": 18,
+              "win": 8,
+              "draw": 8,
+              "lose": 2,
+              "gf": 14,
+              "ga": 5,
+              "gd": 9,
+              "points": 29,
+              "description": "Promotion - World Championship"
+            },
+            {
+              "rank": 3,
+              "team": "Colombia",
+              "played": 18,
+              "win": 7,
+              "draw": 7,
+              "lose": 4,
+              "gf": 28,
+              "ga": 18,
+              "gd": 10,
+              "points": 28,
+              "description": "Promotion - World Championship"
+            },
+            {
+              "rank": 4,
+              "team": "Uruguay",
+              "played": 18,
+              "win": 7,
+              "draw": 7,
+              "lose": 4,
+              "gf": 22,
+              "ga": 12,
+              "gd": 10,
+              "points": 28,
+              "description": "Promotion - World Championship"
+            },
+            {
+              "rank": 5,
+              "team": "Brazil",
+              "played": 18,
+              "win": 8,
+              "draw": 4,
+              "lose": 6,
+              "gf": 24,
+              "ga": 17,
+              "gd": 7,
+              "points": 28,
+              "description": "Promotion - World Championship"
+            },
+            {
+              "rank": 6,
+              "team": "Paraguay",
+              "played": 18,
+              "win": 7,
+              "draw": 7,
+              "lose": 4,
+              "gf": 14,
+              "ga": 10,
+              "gd": 4,
+              "points": 28,
+              "description": "Promotion - World Championship"
+            },
+            {
+              "rank": 7,
+              "team": "Bolivia",
+              "played": 18,
+              "win": 6,
+              "draw": 2,
+              "lose": 10,
+              "gf": 17,
+              "ga": 35,
+              "gd": -18,
+              "points": 20,
+              "description": "Promotion - World Championship (Promotion: )"
+            },
+            {
+              "rank": 8,
+              "team": "Venezuela",
+              "played": 18,
+              "win": 4,
+              "draw": 6,
+              "lose": 8,
+              "gf": 18,
+              "ga": 28,
+              "gd": -10,
+              "points": 18,
+              "description": null
+            },
+            {
+              "rank": 9,
+              "team": "Peru",
+              "played": 18,
+              "win": 2,
+              "draw": 6,
+              "lose": 10,
+              "gf": 6,
+              "ga": 21,
+              "gd": -15,
+              "points": 12,
+              "description": null
+            },
+            {
+              "rank": 10,
+              "team": "Chile",
+              "played": 18,
+              "win": 2,
+              "draw": 5,
+              "lose": 11,
+              "gf": 9,
+              "ga": 27,
+              "gd": -18,
+              "points": 11,
+              "description": null
+            }
+          ]
+        }
+      ]
+    },
+    "UEFA": {
+      "namePt": "Eliminatórias da Europa",
+      "format": "table",
+      "groups": [
+        {
+          "name": "Group A",
+          "rows": [
+            {
+              "rank": 1,
+              "team": "Germany",
+              "played": 6,
+              "win": 5,
+              "draw": 0,
+              "lose": 1,
+              "gf": 16,
+              "ga": 3,
+              "gd": 13,
+              "points": 15,
+              "description": "Promotion - World Cup"
+            },
+            {
+              "rank": 2,
+              "team": "Slovakia",
+              "played": 6,
+              "win": 4,
+              "draw": 0,
+              "lose": 2,
+              "gf": 6,
+              "ga": 8,
+              "gd": -2,
+              "points": 12,
+              "description": "Promotion - World Cup (Promotion)"
+            },
+            {
+              "rank": 3,
+              "team": "Northern Ireland",
+              "played": 6,
+              "win": 3,
+              "draw": 0,
+              "lose": 3,
+              "gf": 7,
+              "ga": 6,
+              "gd": 1,
+              "points": 9,
+              "description": null
+            },
+            {
+              "rank": 4,
+              "team": "Luxembourg",
+              "played": 6,
+              "win": 0,
+              "draw": 0,
+              "lose": 6,
+              "gf": 1,
+              "ga": 13,
+              "gd": -12,
+              "points": 0,
+              "description": null
+            }
+          ]
+        },
+        {
+          "name": "Group B",
+          "rows": [
+            {
+              "rank": 1,
+              "team": "Switzerland",
+              "played": 6,
+              "win": 4,
+              "draw": 2,
+              "lose": 0,
+              "gf": 14,
+              "ga": 2,
+              "gd": 12,
+              "points": 14,
+              "description": "Promotion - World Cup"
+            },
+            {
+              "rank": 2,
+              "team": "Kosovo",
+              "played": 6,
+              "win": 3,
+              "draw": 2,
+              "lose": 1,
+              "gf": 6,
+              "ga": 5,
+              "gd": 1,
+              "points": 11,
+              "description": "Promotion - World Cup (Promotion)"
+            },
+            {
+              "rank": 3,
+              "team": "Slovenia",
+              "played": 6,
+              "win": 0,
+              "draw": 4,
+              "lose": 2,
+              "gf": 3,
+              "ga": 8,
+              "gd": -5,
+              "points": 4,
+              "description": null
+            },
+            {
+              "rank": 4,
+              "team": "Sweden",
+              "played": 6,
+              "win": 0,
+              "draw": 2,
+              "lose": 4,
+              "gf": 4,
+              "ga": 12,
+              "gd": -8,
+              "points": 2,
+              "description": null
+            }
+          ]
+        },
+        {
+          "name": "Group C",
+          "rows": [
+            {
+              "rank": 1,
+              "team": "Scotland",
+              "played": 6,
+              "win": 4,
+              "draw": 1,
+              "lose": 1,
+              "gf": 13,
+              "ga": 7,
+              "gd": 6,
+              "points": 13,
+              "description": "Promotion - World Cup"
+            },
+            {
+              "rank": 2,
+              "team": "Denmark",
+              "played": 6,
+              "win": 3,
+              "draw": 2,
+              "lose": 1,
+              "gf": 16,
+              "ga": 7,
+              "gd": 9,
+              "points": 11,
+              "description": "Promotion - World Cup (Promotion)"
+            },
+            {
+              "rank": 3,
+              "team": "Greece",
+              "played": 6,
+              "win": 2,
+              "draw": 1,
+              "lose": 3,
+              "gf": 10,
+              "ga": 12,
+              "gd": -2,
+              "points": 7,
+              "description": null
+            },
+            {
+              "rank": 4,
+              "team": "Belarus",
+              "played": 6,
+              "win": 0,
+              "draw": 2,
+              "lose": 4,
+              "gf": 4,
+              "ga": 17,
+              "gd": -13,
+              "points": 2,
+              "description": null
+            }
+          ]
+        },
+        {
+          "name": "Group D",
+          "rows": [
+            {
+              "rank": 1,
+              "team": "France",
+              "played": 6,
+              "win": 5,
+              "draw": 1,
+              "lose": 0,
+              "gf": 16,
+              "ga": 4,
+              "gd": 12,
+              "points": 16,
+              "description": "Promotion - World Cup"
+            },
+            {
+              "rank": 2,
+              "team": "Ukraine",
+              "played": 6,
+              "win": 3,
+              "draw": 1,
+              "lose": 2,
+              "gf": 10,
+              "ga": 11,
+              "gd": -1,
+              "points": 10,
+              "description": "Promotion - World Cup (Promotion)"
+            },
+            {
+              "rank": 3,
+              "team": "Iceland",
+              "played": 6,
+              "win": 2,
+              "draw": 1,
+              "lose": 3,
+              "gf": 13,
+              "ga": 11,
+              "gd": 2,
+              "points": 7,
+              "description": null
+            },
+            {
+              "rank": 4,
+              "team": "Azerbaijan",
+              "played": 6,
+              "win": 0,
+              "draw": 1,
+              "lose": 5,
+              "gf": 3,
+              "ga": 16,
+              "gd": -13,
+              "points": 1,
+              "description": null
+            }
+          ]
+        },
+        {
+          "name": "Group E",
+          "rows": [
+            {
+              "rank": 1,
+              "team": "Spain",
+              "played": 6,
+              "win": 5,
+              "draw": 1,
+              "lose": 0,
+              "gf": 21,
+              "ga": 2,
+              "gd": 19,
+              "points": 16,
+              "description": "Promotion - World Cup"
+            },
+            {
+              "rank": 2,
+              "team": "Turkey",
+              "played": 6,
+              "win": 4,
+              "draw": 1,
+              "lose": 1,
+              "gf": 17,
+              "ga": 12,
+              "gd": 5,
+              "points": 13,
+              "description": "Promotion - World Cup (Promotion)"
+            },
+            {
+              "rank": 3,
+              "team": "Georgia",
+              "played": 6,
+              "win": 1,
+              "draw": 0,
+              "lose": 5,
+              "gf": 7,
+              "ga": 15,
+              "gd": -8,
+              "points": 3,
+              "description": null
+            },
+            {
+              "rank": 4,
+              "team": "Bulgaria",
+              "played": 6,
+              "win": 1,
+              "draw": 0,
+              "lose": 5,
+              "gf": 3,
+              "ga": 19,
+              "gd": -16,
+              "points": 3,
+              "description": null
+            }
+          ]
+        },
+        {
+          "name": "Group F",
+          "rows": [
+            {
+              "rank": 1,
+              "team": "Portugal",
+              "played": 6,
+              "win": 4,
+              "draw": 1,
+              "lose": 1,
+              "gf": 20,
+              "ga": 7,
+              "gd": 13,
+              "points": 13,
+              "description": "Promotion - World Cup"
+            },
+            {
+              "rank": 2,
+              "team": "Rep. Of Ireland",
+              "played": 6,
+              "win": 3,
+              "draw": 1,
+              "lose": 2,
+              "gf": 9,
+              "ga": 7,
+              "gd": 2,
+              "points": 10,
+              "description": "Promotion - World Cup (Promotion)"
+            },
+            {
+              "rank": 3,
+              "team": "Hungary",
+              "played": 6,
+              "win": 2,
+              "draw": 2,
+              "lose": 2,
+              "gf": 11,
+              "ga": 10,
+              "gd": 1,
+              "points": 8,
+              "description": null
+            },
+            {
+              "rank": 4,
+              "team": "Armenia",
+              "played": 6,
+              "win": 1,
+              "draw": 0,
+              "lose": 5,
+              "gf": 3,
+              "ga": 19,
+              "gd": -16,
+              "points": 3,
+              "description": null
+            }
+          ]
+        },
+        {
+          "name": "Group G",
+          "rows": [
+            {
+              "rank": 1,
+              "team": "Netherlands",
+              "played": 8,
+              "win": 6,
+              "draw": 2,
+              "lose": 0,
+              "gf": 27,
+              "ga": 4,
+              "gd": 23,
+              "points": 20,
+              "description": "Promotion - World Cup"
+            },
+            {
+              "rank": 2,
+              "team": "Poland",
+              "played": 8,
+              "win": 5,
+              "draw": 2,
+              "lose": 1,
+              "gf": 14,
+              "ga": 7,
+              "gd": 7,
+              "points": 17,
+              "description": "Promotion - World Cup (Promotion)"
+            },
+            {
+              "rank": 3,
+              "team": "Finland",
+              "played": 8,
+              "win": 3,
+              "draw": 1,
+              "lose": 4,
+              "gf": 8,
+              "ga": 14,
+              "gd": -6,
+              "points": 10,
+              "description": null
+            },
+            {
+              "rank": 4,
+              "team": "Malta",
+              "played": 8,
+              "win": 1,
+              "draw": 2,
+              "lose": 5,
+              "gf": 4,
+              "ga": 19,
+              "gd": -15,
+              "points": 5,
+              "description": null
+            },
+            {
+              "rank": 5,
+              "team": "Lithuania",
+              "played": 8,
+              "win": 0,
+              "draw": 3,
+              "lose": 5,
+              "gf": 6,
+              "ga": 15,
+              "gd": -9,
+              "points": 3,
+              "description": null
+            }
+          ]
+        },
+        {
+          "name": "Group H",
+          "rows": [
+            {
+              "rank": 1,
+              "team": "Austria",
+              "played": 8,
+              "win": 6,
+              "draw": 1,
+              "lose": 1,
+              "gf": 22,
+              "ga": 4,
+              "gd": 18,
+              "points": 19,
+              "description": "Promotion - World Cup"
+            },
+            {
+              "rank": 2,
+              "team": "Bosnia & Herzegovina",
+              "played": 8,
+              "win": 5,
+              "draw": 2,
+              "lose": 1,
+              "gf": 17,
+              "ga": 7,
+              "gd": 10,
+              "points": 17,
+              "description": "Promotion - World Cup (Promotion)"
+            },
+            {
+              "rank": 3,
+              "team": "Romania",
+              "played": 8,
+              "win": 4,
+              "draw": 1,
+              "lose": 3,
+              "gf": 19,
+              "ga": 10,
+              "gd": 9,
+              "points": 13,
+              "description": null
+            },
+            {
+              "rank": 4,
+              "team": "Cyprus",
+              "played": 8,
+              "win": 2,
+              "draw": 2,
+              "lose": 4,
+              "gf": 11,
+              "ga": 11,
+              "gd": 0,
+              "points": 8,
+              "description": null
+            },
+            {
+              "rank": 5,
+              "team": "San Marino",
+              "played": 8,
+              "win": 0,
+              "draw": 0,
+              "lose": 8,
+              "gf": 2,
+              "ga": 39,
+              "gd": -37,
+              "points": 0,
+              "description": null
+            }
+          ]
+        },
+        {
+          "name": "Group I",
+          "rows": [
+            {
+              "rank": 1,
+              "team": "Norway",
+              "played": 8,
+              "win": 8,
+              "draw": 0,
+              "lose": 0,
+              "gf": 37,
+              "ga": 5,
+              "gd": 32,
+              "points": 24,
+              "description": "Promotion - World Cup"
+            },
+            {
+              "rank": 2,
+              "team": "Italy",
+              "played": 8,
+              "win": 6,
+              "draw": 0,
+              "lose": 2,
+              "gf": 21,
+              "ga": 12,
+              "gd": 9,
+              "points": 18,
+              "description": "Promotion - World Cup (Promotion)"
+            },
+            {
+              "rank": 3,
+              "team": "Israel",
+              "played": 8,
+              "win": 4,
+              "draw": 0,
+              "lose": 4,
+              "gf": 19,
+              "ga": 20,
+              "gd": -1,
+              "points": 12,
+              "description": null
+            },
+            {
+              "rank": 4,
+              "team": "Estonia",
+              "played": 8,
+              "win": 1,
+              "draw": 1,
+              "lose": 6,
+              "gf": 8,
+              "ga": 21,
+              "gd": -13,
+              "points": 4,
+              "description": null
+            },
+            {
+              "rank": 5,
+              "team": "Moldova",
+              "played": 8,
+              "win": 0,
+              "draw": 1,
+              "lose": 7,
+              "gf": 5,
+              "ga": 32,
+              "gd": -27,
+              "points": 1,
+              "description": null
+            }
+          ]
+        },
+        {
+          "name": "Group J",
+          "rows": [
+            {
+              "rank": 1,
+              "team": "Belgium",
+              "played": 8,
+              "win": 5,
+              "draw": 3,
+              "lose": 0,
+              "gf": 29,
+              "ga": 7,
+              "gd": 22,
+              "points": 18,
+              "description": "Promotion - World Cup"
+            },
+            {
+              "rank": 2,
+              "team": "Wales",
+              "played": 8,
+              "win": 5,
+              "draw": 1,
+              "lose": 2,
+              "gf": 21,
+              "ga": 11,
+              "gd": 10,
+              "points": 16,
+              "description": "Promotion - World Cup (Promotion)"
+            },
+            {
+              "rank": 3,
+              "team": "FYR Macedonia",
+              "played": 8,
+              "win": 3,
+              "draw": 4,
+              "lose": 1,
+              "gf": 13,
+              "ga": 10,
+              "gd": 3,
+              "points": 13,
+              "description": null
+            },
+            {
+              "rank": 4,
+              "team": "Kazakhstan",
+              "played": 8,
+              "win": 2,
+              "draw": 2,
+              "lose": 4,
+              "gf": 9,
+              "ga": 13,
+              "gd": -4,
+              "points": 8,
+              "description": null
+            },
+            {
+              "rank": 5,
+              "team": "Liechtenstein",
+              "played": 8,
+              "win": 0,
+              "draw": 0,
+              "lose": 8,
+              "gf": 0,
+              "ga": 31,
+              "gd": -31,
+              "points": 0,
+              "description": null
+            }
+          ]
+        },
+        {
+          "name": "Group K",
+          "rows": [
+            {
+              "rank": 1,
+              "team": "England",
+              "played": 8,
+              "win": 8,
+              "draw": 0,
+              "lose": 0,
+              "gf": 22,
+              "ga": 0,
+              "gd": 22,
+              "points": 24,
+              "description": "Promotion - World Cup"
+            },
+            {
+              "rank": 2,
+              "team": "Albania",
+              "played": 8,
+              "win": 4,
+              "draw": 2,
+              "lose": 2,
+              "gf": 7,
+              "ga": 5,
+              "gd": 2,
+              "points": 14,
+              "description": "Promotion - World Cup (Promotion)"
+            },
+            {
+              "rank": 3,
+              "team": "Serbia",
+              "played": 8,
+              "win": 4,
+              "draw": 1,
+              "lose": 3,
+              "gf": 9,
+              "ga": 10,
+              "gd": -1,
+              "points": 13,
+              "description": null
+            },
+            {
+              "rank": 4,
+              "team": "Latvia",
+              "played": 8,
+              "win": 1,
+              "draw": 2,
+              "lose": 5,
+              "gf": 5,
+              "ga": 15,
+              "gd": -10,
+              "points": 5,
+              "description": null
+            },
+            {
+              "rank": 5,
+              "team": "Andorra",
+              "played": 8,
+              "win": 0,
+              "draw": 1,
+              "lose": 7,
+              "gf": 3,
+              "ga": 16,
+              "gd": -13,
+              "points": 1,
+              "description": null
+            }
+          ]
+        },
+        {
+          "name": "Group L",
+          "rows": [
+            {
+              "rank": 1,
+              "team": "Croatia",
+              "played": 8,
+              "win": 7,
+              "draw": 1,
+              "lose": 0,
+              "gf": 26,
+              "ga": 4,
+              "gd": 22,
+              "points": 22,
+              "description": "Promotion - World Cup"
+            },
+            {
+              "rank": 2,
+              "team": "Czech Republic",
+              "played": 8,
+              "win": 5,
+              "draw": 1,
+              "lose": 2,
+              "gf": 18,
+              "ga": 8,
+              "gd": 10,
+              "points": 16,
+              "description": "Promotion - World Cup (Promotion)"
+            },
+            {
+              "rank": 3,
+              "team": "Faroe Islands",
+              "played": 8,
+              "win": 4,
+              "draw": 0,
+              "lose": 4,
+              "gf": 11,
+              "ga": 9,
+              "gd": 2,
+              "points": 12,
+              "description": null
+            },
+            {
+              "rank": 4,
+              "team": "Montenegro",
+              "played": 8,
+              "win": 3,
+              "draw": 0,
+              "lose": 5,
+              "gf": 8,
+              "ga": 17,
+              "gd": -9,
+              "points": 9,
+              "description": null
+            },
+            {
+              "rank": 5,
+              "team": "Gibraltar",
+              "played": 8,
+              "win": 0,
+              "draw": 0,
+              "lose": 8,
+              "gf": 3,
+              "ga": 28,
+              "gd": -25,
+              "points": 0,
+              "description": null
+            }
+          ]
+        }
+      ]
+    },
+    "CAF": {
+      "namePt": "Eliminatórias da África",
+      "format": "table",
+      "groups": [
+        {
+          "name": "Group A",
+          "rows": [
+            {
+              "rank": 1,
+              "team": "Egypt",
+              "played": 10,
+              "win": 8,
+              "draw": 2,
+              "lose": 0,
+              "gf": 20,
+              "ga": 2,
+              "gd": 18,
+              "points": 26,
+              "description": "Promotion - World Cup (Promotion: )"
+            },
+            {
+              "rank": 2,
+              "team": "Burkina Faso",
+              "played": 10,
+              "win": 6,
+              "draw": 3,
+              "lose": 1,
+              "gf": 23,
+              "ga": 8,
+              "gd": 15,
+              "points": 21,
+              "description": "Ranking of second-placed teams"
+            },
+            {
+              "rank": 3,
+              "team": "Sierra Leone",
+              "played": 10,
+              "win": 4,
+              "draw": 3,
+              "lose": 3,
+              "gf": 12,
+              "ga": 10,
+              "gd": 2,
+              "points": 15,
+              "description": null
+            },
+            {
+              "rank": 4,
+              "team": "Guinea-Bissau",
+              "played": 10,
+              "win": 2,
+              "draw": 4,
+              "lose": 4,
+              "gf": 8,
+              "ga": 10,
+              "gd": -2,
+              "points": 10,
+              "description": null
+            },
+            {
+              "rank": 5,
+              "team": "Ethiopia",
+              "played": 10,
+              "win": 2,
+              "draw": 3,
+              "lose": 5,
+              "gf": 9,
+              "ga": 14,
+              "gd": -5,
+              "points": 9,
+              "description": null
+            },
+            {
+              "rank": 6,
+              "team": "Djibouti",
+              "played": 10,
+              "win": 0,
+              "draw": 1,
+              "lose": 9,
+              "gf": 5,
+              "ga": 33,
+              "gd": -28,
+              "points": 1,
+              "description": null
+            }
+          ]
+        },
+        {
+          "name": "Group B",
+          "rows": [
+            {
+              "rank": 1,
+              "team": "Senegal",
+              "played": 10,
+              "win": 7,
+              "draw": 3,
+              "lose": 0,
+              "gf": 22,
+              "ga": 3,
+              "gd": 19,
+              "points": 24,
+              "description": "Promotion - World Cup (Promotion: )"
+            },
+            {
+              "rank": 2,
+              "team": "DR Congo",
+              "played": 10,
+              "win": 7,
+              "draw": 1,
+              "lose": 2,
+              "gf": 15,
+              "ga": 6,
+              "gd": 9,
+              "points": 22,
+              "description": "Ranking of second-placed teams"
+            },
+            {
+              "rank": 3,
+              "team": "Sudan",
+              "played": 10,
+              "win": 3,
+              "draw": 4,
+              "lose": 3,
+              "gf": 8,
+              "ga": 6,
+              "gd": 2,
+              "points": 13,
+              "description": null
+            },
+            {
+              "rank": 4,
+              "team": "Togo",
+              "played": 10,
+              "win": 1,
+              "draw": 5,
+              "lose": 4,
+              "gf": 5,
+              "ga": 10,
+              "gd": -5,
+              "points": 8,
+              "description": null
+            },
+            {
+              "rank": 5,
+              "team": "Mauritania",
+              "played": 10,
+              "win": 1,
+              "draw": 4,
+              "lose": 5,
+              "gf": 4,
+              "ga": 13,
+              "gd": -9,
+              "points": 7,
+              "description": null
+            },
+            {
+              "rank": 6,
+              "team": "South Sudan",
+              "played": 10,
+              "win": 0,
+              "draw": 5,
+              "lose": 5,
+              "gf": 3,
+              "ga": 19,
+              "gd": -16,
+              "points": 5,
+              "description": null
+            }
+          ]
+        },
+        {
+          "name": "Group C",
+          "rows": [
+            {
+              "rank": 1,
+              "team": "South Africa",
+              "played": 10,
+              "win": 5,
+              "draw": 3,
+              "lose": 2,
+              "gf": 15,
+              "ga": 9,
+              "gd": 6,
+              "points": 18,
+              "description": "Promotion - World Cup (Promotion: )"
+            },
+            {
+              "rank": 2,
+              "team": "Nigeria",
+              "played": 10,
+              "win": 4,
+              "draw": 5,
+              "lose": 1,
+              "gf": 15,
+              "ga": 8,
+              "gd": 7,
+              "points": 17,
+              "description": "Ranking of second-placed teams"
+            },
+            {
+              "rank": 3,
+              "team": "Benin",
+              "played": 10,
+              "win": 5,
+              "draw": 2,
+              "lose": 3,
+              "gf": 12,
+              "ga": 11,
+              "gd": 1,
+              "points": 17,
+              "description": null
+            },
+            {
+              "rank": 4,
+              "team": "Lesotho",
+              "played": 10,
+              "win": 3,
+              "draw": 3,
+              "lose": 4,
+              "gf": 9,
+              "ga": 12,
+              "gd": -3,
+              "points": 12,
+              "description": null
+            },
+            {
+              "rank": 5,
+              "team": "Rwanda",
+              "played": 10,
+              "win": 3,
+              "draw": 2,
+              "lose": 5,
+              "gf": 5,
+              "ga": 9,
+              "gd": -4,
+              "points": 11,
+              "description": null
+            },
+            {
+              "rank": 6,
+              "team": "Zimbabwe",
+              "played": 10,
+              "win": 0,
+              "draw": 5,
+              "lose": 5,
+              "gf": 5,
+              "ga": 12,
+              "gd": -7,
+              "points": 5,
+              "description": null
+            }
+          ]
+        },
+        {
+          "name": "Group D",
+          "rows": [
+            {
+              "rank": 1,
+              "team": "Cape Verde",
+              "played": 10,
+              "win": 7,
+              "draw": 2,
+              "lose": 1,
+              "gf": 16,
+              "ga": 8,
+              "gd": 8,
+              "points": 23,
+              "description": "Promotion - World Cup (Promotion: )"
+            },
+            {
+              "rank": 2,
+              "team": "Cameroon",
+              "played": 10,
+              "win": 5,
+              "draw": 4,
+              "lose": 1,
+              "gf": 17,
+              "ga": 5,
+              "gd": 12,
+              "points": 19,
+              "description": "Ranking of second-placed teams"
+            },
+            {
+              "rank": 3,
+              "team": "Libya",
+              "played": 10,
+              "win": 4,
+              "draw": 4,
+              "lose": 2,
+              "gf": 12,
+              "ga": 10,
+              "gd": 2,
+              "points": 16,
+              "description": null
+            },
+            {
+              "rank": 4,
+              "team": "Angola",
+              "played": 10,
+              "win": 2,
+              "draw": 6,
+              "lose": 2,
+              "gf": 9,
+              "ga": 8,
+              "gd": 1,
+              "points": 12,
+              "description": null
+            },
+            {
+              "rank": 5,
+              "team": "Mauritius",
+              "played": 10,
+              "win": 1,
+              "draw": 3,
+              "lose": 6,
+              "gf": 7,
+              "ga": 17,
+              "gd": -10,
+              "points": 6,
+              "description": null
+            },
+            {
+              "rank": 6,
+              "team": "Eswatini",
+              "played": 10,
+              "win": 0,
+              "draw": 3,
+              "lose": 7,
+              "gf": 6,
+              "ga": 19,
+              "gd": -13,
+              "points": 3,
+              "description": null
+            }
+          ]
+        },
+        {
+          "name": "Group E",
+          "rows": [
+            {
+              "rank": 1,
+              "team": "Morocco",
+              "played": 8,
+              "win": 8,
+              "draw": 0,
+              "lose": 0,
+              "gf": 22,
+              "ga": 2,
+              "gd": 20,
+              "points": 24,
+              "description": "Promotion - World Cup (Promotion: )"
+            },
+            {
+              "rank": 2,
+              "team": "Niger",
+              "played": 8,
+              "win": 5,
+              "draw": 0,
+              "lose": 3,
+              "gf": 11,
+              "ga": 10,
+              "gd": 1,
+              "points": 15,
+              "description": "Ranking of second-placed teams"
+            },
+            {
+              "rank": 3,
+              "team": "Tanzania",
+              "played": 8,
+              "win": 3,
+              "draw": 1,
+              "lose": 4,
+              "gf": 6,
+              "ga": 7,
+              "gd": -1,
+              "points": 10,
+              "description": null
+            },
+            {
+              "rank": 4,
+              "team": "Zambia",
+              "played": 8,
+              "win": 3,
+              "draw": 0,
+              "lose": 5,
+              "gf": 10,
+              "ga": 10,
+              "gd": 0,
+              "points": 9,
+              "description": null
+            },
+            {
+              "rank": 5,
+              "team": "Congo",
+              "played": 8,
+              "win": 0,
+              "draw": 1,
+              "lose": 7,
+              "gf": 4,
+              "ga": 24,
+              "gd": -20,
+              "points": 1,
+              "description": null
+            },
+            {
+              "rank": 6,
+              "team": "Eritrea",
+              "played": 0,
+              "win": 0,
+              "draw": 0,
+              "lose": 0,
+              "gf": 0,
+              "ga": 0,
+              "gd": 0,
+              "points": 0,
+              "description": null
+            }
+          ]
+        },
+        {
+          "name": "Group F",
+          "rows": [
+            {
+              "rank": 1,
+              "team": "Ivory Coast",
+              "played": 10,
+              "win": 8,
+              "draw": 2,
+              "lose": 0,
+              "gf": 25,
+              "ga": 0,
+              "gd": 25,
+              "points": 26,
+              "description": "Promotion - World Cup (Promotion: )"
+            },
+            {
+              "rank": 2,
+              "team": "Gabon",
+              "played": 10,
+              "win": 8,
+              "draw": 1,
+              "lose": 1,
+              "gf": 22,
+              "ga": 9,
+              "gd": 13,
+              "points": 25,
+              "description": "Ranking of second-placed teams"
+            },
+            {
+              "rank": 3,
+              "team": "Gambia",
+              "played": 10,
+              "win": 4,
+              "draw": 1,
+              "lose": 5,
+              "gf": 27,
+              "ga": 18,
+              "gd": 9,
+              "points": 13,
+              "description": null
+            },
+            {
+              "rank": 4,
+              "team": "Kenya",
+              "played": 10,
+              "win": 3,
+              "draw": 3,
+              "lose": 4,
+              "gf": 18,
+              "ga": 14,
+              "gd": 4,
+              "points": 12,
+              "description": null
+            },
+            {
+              "rank": 5,
+              "team": "Burundi",
+              "played": 10,
+              "win": 3,
+              "draw": 1,
+              "lose": 6,
+              "gf": 13,
+              "ga": 13,
+              "gd": 0,
+              "points": 10,
+              "description": null
+            },
+            {
+              "rank": 6,
+              "team": "Seychelles",
+              "played": 10,
+              "win": 0,
+              "draw": 0,
+              "lose": 10,
+              "gf": 2,
+              "ga": 53,
+              "gd": -51,
+              "points": 0,
+              "description": null
+            }
+          ]
+        },
+        {
+          "name": "Group G",
+          "rows": [
+            {
+              "rank": 1,
+              "team": "Algeria",
+              "played": 10,
+              "win": 8,
+              "draw": 1,
+              "lose": 1,
+              "gf": 24,
+              "ga": 8,
+              "gd": 16,
+              "points": 25,
+              "description": "Promotion - World Cup (Promotion: )"
+            },
+            {
+              "rank": 2,
+              "team": "Uganda",
+              "played": 10,
+              "win": 6,
+              "draw": 0,
+              "lose": 4,
+              "gf": 14,
+              "ga": 9,
+              "gd": 5,
+              "points": 18,
+              "description": "Ranking of second-placed teams"
+            },
+            {
+              "rank": 3,
+              "team": "Mozambique",
+              "played": 10,
+              "win": 6,
+              "draw": 0,
+              "lose": 4,
+              "gf": 14,
+              "ga": 17,
+              "gd": -3,
+              "points": 18,
+              "description": null
+            },
+            {
+              "rank": 4,
+              "team": "Guinea",
+              "played": 10,
+              "win": 4,
+              "draw": 3,
+              "lose": 3,
+              "gf": 11,
+              "ga": 8,
+              "gd": 3,
+              "points": 15,
+              "description": null
+            },
+            {
+              "rank": 5,
+              "team": "Botswana",
+              "played": 10,
+              "win": 3,
+              "draw": 1,
+              "lose": 6,
+              "gf": 12,
+              "ga": 16,
+              "gd": -4,
+              "points": 10,
+              "description": null
+            },
+            {
+              "rank": 6,
+              "team": "Somalia",
+              "played": 10,
+              "win": 0,
+              "draw": 1,
+              "lose": 9,
+              "gf": 3,
+              "ga": 20,
+              "gd": -17,
+              "points": 1,
+              "description": null
+            }
+          ]
+        },
+        {
+          "name": "Group H",
+          "rows": [
+            {
+              "rank": 1,
+              "team": "Tunisia",
+              "played": 10,
+              "win": 9,
+              "draw": 1,
+              "lose": 0,
+              "gf": 22,
+              "ga": 0,
+              "gd": 22,
+              "points": 28,
+              "description": "Promotion - World Cup (Promotion: )"
+            },
+            {
+              "rank": 2,
+              "team": "Namibia",
+              "played": 10,
+              "win": 4,
+              "draw": 3,
+              "lose": 3,
+              "gf": 13,
+              "ga": 10,
+              "gd": 3,
+              "points": 15,
+              "description": "Ranking of second-placed teams"
+            },
+            {
+              "rank": 3,
+              "team": "Liberia",
+              "played": 10,
+              "win": 4,
+              "draw": 3,
+              "lose": 3,
+              "gf": 13,
+              "ga": 11,
+              "gd": 2,
+              "points": 15,
+              "description": null
+            },
+            {
+              "rank": 4,
+              "team": "Malawi",
+              "played": 10,
+              "win": 4,
+              "draw": 1,
+              "lose": 5,
+              "gf": 11,
+              "ga": 10,
+              "gd": 1,
+              "points": 13,
+              "description": null
+            },
+            {
+              "rank": 5,
+              "team": "Equatorial Guinea",
+              "played": 10,
+              "win": 3,
+              "draw": 2,
+              "lose": 5,
+              "gf": 8,
+              "ga": 15,
+              "gd": -7,
+              "points": 11,
+              "description": null
+            },
+            {
+              "rank": 6,
+              "team": "Sao Tome and Principe",
+              "played": 10,
+              "win": 1,
+              "draw": 0,
+              "lose": 9,
+              "gf": 5,
+              "ga": 26,
+              "gd": -21,
+              "points": 3,
+              "description": null
+            }
+          ]
+        },
+        {
+          "name": "Group I",
+          "rows": [
+            {
+              "rank": 1,
+              "team": "Ghana",
+              "played": 10,
+              "win": 8,
+              "draw": 1,
+              "lose": 1,
+              "gf": 23,
+              "ga": 6,
+              "gd": 17,
+              "points": 25,
+              "description": "Promotion - World Cup (Promotion: )"
+            },
+            {
+              "rank": 2,
+              "team": "Madagascar",
+              "played": 10,
+              "win": 6,
+              "draw": 1,
+              "lose": 3,
+              "gf": 17,
+              "ga": 12,
+              "gd": 5,
+              "points": 19,
+              "description": "Ranking of second-placed teams"
+            },
+            {
+              "rank": 3,
+              "team": "Mali",
+              "played": 10,
+              "win": 5,
+              "draw": 3,
+              "lose": 2,
+              "gf": 17,
+              "ga": 6,
+              "gd": 11,
+              "points": 18,
+              "description": null
+            },
+            {
+              "rank": 4,
+              "team": "Comoros",
+              "played": 10,
+              "win": 5,
+              "draw": 0,
+              "lose": 5,
+              "gf": 12,
+              "ga": 13,
+              "gd": -1,
+              "points": 15,
+              "description": null
+            },
+            {
+              "rank": 5,
+              "team": "Central African Republic",
+              "played": 10,
+              "win": 2,
+              "draw": 2,
+              "lose": 6,
+              "gf": 11,
+              "ga": 24,
+              "gd": -13,
+              "points": 8,
+              "description": null
+            },
+            {
+              "rank": 6,
+              "team": "Chad",
+              "played": 10,
+              "win": 0,
+              "draw": 1,
+              "lose": 9,
+              "gf": 5,
+              "ga": 24,
+              "gd": -19,
+              "points": 1,
+              "description": null
+            }
+          ]
+        },
+        {
+          "name": "Ranking of second-placed teams",
+          "rows": [
+            {
+              "rank": 1,
+              "team": "Gabon",
+              "played": 8,
+              "win": 6,
+              "draw": 1,
+              "lose": 1,
+              "gf": 15,
+              "ga": 9,
+              "gd": 6,
+              "points": 19,
+              "description": "Promotion - World Cup (Promotion: )"
+            },
+            {
+              "rank": 2,
+              "team": "DR Congo",
+              "played": 8,
+              "win": 5,
+              "draw": 1,
+              "lose": 2,
+              "gf": 10,
+              "ga": 5,
+              "gd": 5,
+              "points": 16,
+              "description": "Promotion - World Cup (Promotion: )"
+            },
+            {
+              "rank": 3,
+              "team": "Cameroon",
+              "played": 8,
+              "win": 4,
+              "draw": 3,
+              "lose": 1,
+              "gf": 14,
+              "ga": 5,
+              "gd": 9,
+              "points": 15,
+              "description": "Promotion - World Cup (Promotion: )"
+            },
+            {
+              "rank": 4,
+              "team": "Nigeria",
+              "played": 8,
+              "win": 4,
+              "draw": 3,
+              "lose": 1,
+              "gf": 13,
+              "ga": 6,
+              "gd": 7,
+              "points": 15,
+              "description": "Promotion - World Cup (Promotion: )"
+            },
+            {
+              "rank": 5,
+              "team": "Burkina Faso",
+              "played": 8,
+              "win": 4,
+              "draw": 3,
+              "lose": 1,
+              "gf": 13,
+              "ga": 7,
+              "gd": 6,
+              "points": 15,
+              "description": null
+            },
+            {
+              "rank": 6,
+              "team": "Niger",
+              "played": 8,
+              "win": 5,
+              "draw": 0,
+              "lose": 3,
+              "gf": 11,
+              "ga": 10,
+              "gd": 1,
+              "points": 15,
+              "description": null
+            },
+            {
+              "rank": 7,
+              "team": "Madagascar",
+              "played": 8,
+              "win": 4,
+              "draw": 1,
+              "lose": 3,
+              "gf": 11,
+              "ga": 11,
+              "gd": 0,
+              "points": 13,
+              "description": null
+            },
+            {
+              "rank": 8,
+              "team": "Uganda",
+              "played": 8,
+              "win": 4,
+              "draw": 0,
+              "lose": 4,
+              "gf": 11,
+              "ga": 9,
+              "gd": 2,
+              "points": 12,
+              "description": null
+            },
+            {
+              "rank": 9,
+              "team": "Namibia",
+              "played": 8,
+              "win": 2,
+              "draw": 3,
+              "lose": 3,
+              "gf": 8,
+              "ga": 10,
+              "gd": -2,
+              "points": 9,
+              "description": null
+            }
+          ]
+        }
+      ]
+    },
+    "CONCACAF": {
+      "namePt": "Eliminatórias da Concacaf",
+      "format": "table",
+      "groups": [
+        {
+          "name": "Group A",
+          "rows": [
+            {
+              "rank": 1,
+              "team": "Panama",
+              "played": 6,
+              "win": 3,
+              "draw": 3,
+              "lose": 0,
+              "gf": 9,
+              "ga": 4,
+              "gd": 5,
+              "points": 12,
+              "description": "Promotion - World Cup"
+            },
+            {
+              "rank": 2,
+              "team": "Suriname",
+              "played": 6,
+              "win": 2,
+              "draw": 3,
+              "lose": 1,
+              "gf": 9,
+              "ga": 6,
+              "gd": 3,
+              "points": 9,
+              "description": "Promotion - World Cup (Promotion: )"
+            },
+            {
+              "rank": 3,
+              "team": "Guatemala",
+              "played": 6,
+              "win": 2,
+              "draw": 2,
+              "lose": 2,
+              "gf": 8,
+              "ga": 7,
+              "gd": 1,
+              "points": 8,
+              "description": null
+            },
+            {
+              "rank": 4,
+              "team": "El Salvador",
+              "played": 6,
+              "win": 1,
+              "draw": 0,
+              "lose": 5,
+              "gf": 2,
+              "ga": 11,
+              "gd": -9,
+              "points": 3,
+              "description": null
+            }
+          ]
+        },
+        {
+          "name": "Group B",
+          "rows": [
+            {
+              "rank": 1,
+              "team": "Curaçao",
+              "played": 6,
+              "win": 3,
+              "draw": 3,
+              "lose": 0,
+              "gf": 13,
+              "ga": 3,
+              "gd": 10,
+              "points": 12,
+              "description": "Promotion - World Cup"
+            },
+            {
+              "rank": 2,
+              "team": "Jamaica",
+              "played": 6,
+              "win": 3,
+              "draw": 2,
+              "lose": 1,
+              "gf": 11,
+              "ga": 3,
+              "gd": 8,
+              "points": 11,
+              "description": "Promotion - World Cup (Promotion: )"
+            },
+            {
+              "rank": 3,
+              "team": "Trinidad and Tobago",
+              "played": 6,
+              "win": 1,
+              "draw": 4,
+              "lose": 1,
+              "gf": 7,
+              "ga": 6,
+              "gd": 1,
+              "points": 7,
+              "description": null
+            },
+            {
+              "rank": 4,
+              "team": "Bermuda",
+              "played": 6,
+              "win": 0,
+              "draw": 1,
+              "lose": 5,
+              "gf": 4,
+              "ga": 23,
+              "gd": -19,
+              "points": 1,
+              "description": null
+            }
+          ]
+        },
+        {
+          "name": "Group C",
+          "rows": [
+            {
+              "rank": 1,
+              "team": "Haiti",
+              "played": 6,
+              "win": 3,
+              "draw": 2,
+              "lose": 1,
+              "gf": 9,
+              "ga": 6,
+              "gd": 3,
+              "points": 11,
+              "description": "Promotion - World Cup"
+            },
+            {
+              "rank": 2,
+              "team": "Honduras",
+              "played": 6,
+              "win": 2,
+              "draw": 3,
+              "lose": 1,
+              "gf": 5,
+              "ga": 2,
+              "gd": 3,
+              "points": 9,
+              "description": null
+            },
+            {
+              "rank": 3,
+              "team": "Costa Rica",
+              "played": 6,
+              "win": 1,
+              "draw": 4,
+              "lose": 1,
+              "gf": 8,
+              "ga": 6,
+              "gd": 2,
+              "points": 7,
+              "description": null
+            },
+            {
+              "rank": 4,
+              "team": "Nicaragua",
+              "played": 6,
+              "win": 1,
+              "draw": 1,
+              "lose": 4,
+              "gf": 4,
+              "ga": 12,
+              "gd": -8,
+              "points": 4,
+              "description": null
+            }
+          ]
+        }
+      ]
+    },
+    "AFC": {
+      "namePt": "Eliminatórias da Ásia",
+      "format": "table",
+      "groups": [
+        {
+          "name": "3ª fase · Grupo A",
+          "rows": [
+            {
+              "rank": 1,
+              "team": "Japan",
+              "played": 10,
+              "win": 7,
+              "draw": 2,
+              "lose": 1,
+              "gf": 30,
+              "ga": 3,
+              "gd": 27,
+              "points": 23,
+              "description": "Promotion - World Cup"
+            },
+            {
+              "rank": 2,
+              "team": "Australia",
+              "played": 10,
+              "win": 5,
+              "draw": 4,
+              "lose": 1,
+              "gf": 16,
+              "ga": 7,
+              "gd": 9,
+              "points": 19,
+              "description": "Promotion - World Cup"
+            },
+            {
+              "rank": 3,
+              "team": "Saudi Arabia",
+              "played": 10,
+              "win": 3,
+              "draw": 4,
+              "lose": 3,
+              "gf": 7,
+              "ga": 8,
+              "gd": -1,
+              "points": 13,
+              "description": "Play-offs - 4ª fase"
+            },
+            {
+              "rank": 4,
+              "team": "Indonesia",
+              "played": 10,
+              "win": 3,
+              "draw": 3,
+              "lose": 4,
+              "gf": 9,
+              "ga": 20,
+              "gd": -11,
+              "points": 12,
+              "description": "Play-offs - 4ª fase"
+            },
+            {
+              "rank": 5,
+              "team": "China",
+              "played": 10,
+              "win": 3,
+              "draw": 0,
+              "lose": 7,
+              "gf": 7,
+              "ga": 20,
+              "gd": -13,
+              "points": 9,
+              "description": null
+            },
+            {
+              "rank": 6,
+              "team": "Bahrain",
+              "played": 10,
+              "win": 1,
+              "draw": 3,
+              "lose": 6,
+              "gf": 5,
+              "ga": 16,
+              "gd": -11,
+              "points": 6,
+              "description": null
+            }
+          ]
+        },
+        {
+          "name": "3ª fase · Grupo B",
+          "rows": [
+            {
+              "rank": 1,
+              "team": "Iran",
+              "played": 10,
+              "win": 7,
+              "draw": 2,
+              "lose": 1,
+              "gf": 19,
+              "ga": 8,
+              "gd": 11,
+              "points": 23,
+              "description": "Promotion - World Cup"
+            },
+            {
+              "rank": 2,
+              "team": "Uzbekistan",
+              "played": 10,
+              "win": 6,
+              "draw": 3,
+              "lose": 1,
+              "gf": 14,
+              "ga": 7,
+              "gd": 7,
+              "points": 21,
+              "description": "Promotion - World Cup"
+            },
+            {
+              "rank": 3,
+              "team": "United Arab Emirates",
+              "played": 10,
+              "win": 4,
+              "draw": 3,
+              "lose": 3,
+              "gf": 15,
+              "ga": 8,
+              "gd": 7,
+              "points": 15,
+              "description": "Play-offs - 4ª fase"
+            },
+            {
+              "rank": 4,
+              "team": "Qatar",
+              "played": 10,
+              "win": 4,
+              "draw": 1,
+              "lose": 5,
+              "gf": 17,
+              "ga": 24,
+              "gd": -7,
+              "points": 13,
+              "description": "Play-offs - 4ª fase"
+            },
+            {
+              "rank": 5,
+              "team": "Kyrgyzstan",
+              "played": 10,
+              "win": 2,
+              "draw": 2,
+              "lose": 6,
+              "gf": 12,
+              "ga": 18,
+              "gd": -6,
+              "points": 8,
+              "description": null
+            },
+            {
+              "rank": 6,
+              "team": "North Korea",
+              "played": 10,
+              "win": 0,
+              "draw": 3,
+              "lose": 7,
+              "gf": 9,
+              "ga": 21,
+              "gd": -12,
+              "points": 3,
+              "description": null
+            }
+          ]
+        },
+        {
+          "name": "3ª fase · Grupo C",
+          "rows": [
+            {
+              "rank": 1,
+              "team": "South Korea",
+              "played": 10,
+              "win": 6,
+              "draw": 4,
+              "lose": 0,
+              "gf": 20,
+              "ga": 7,
+              "gd": 13,
+              "points": 22,
+              "description": "Promotion - World Cup"
+            },
+            {
+              "rank": 2,
+              "team": "Jordan",
+              "played": 10,
+              "win": 4,
+              "draw": 4,
+              "lose": 2,
+              "gf": 16,
+              "ga": 8,
+              "gd": 8,
+              "points": 16,
+              "description": "Promotion - World Cup"
+            },
+            {
+              "rank": 3,
+              "team": "Iraq",
+              "played": 10,
+              "win": 4,
+              "draw": 3,
+              "lose": 3,
+              "gf": 9,
+              "ga": 9,
+              "gd": 0,
+              "points": 15,
+              "description": "Play-offs - 4ª fase"
+            },
+            {
+              "rank": 4,
+              "team": "Oman",
+              "played": 10,
+              "win": 3,
+              "draw": 2,
+              "lose": 5,
+              "gf": 9,
+              "ga": 14,
+              "gd": -5,
+              "points": 11,
+              "description": "Play-offs - 4ª fase"
+            },
+            {
+              "rank": 5,
+              "team": "Palestine",
+              "played": 10,
+              "win": 2,
+              "draw": 4,
+              "lose": 4,
+              "gf": 10,
+              "ga": 13,
+              "gd": -3,
+              "points": 10,
+              "description": null
+            },
+            {
+              "rank": 6,
+              "team": "Kuwait",
+              "played": 10,
+              "win": 0,
+              "draw": 5,
+              "lose": 5,
+              "gf": 7,
+              "ga": 20,
+              "gd": -13,
+              "points": 5,
+              "description": null
+            }
+          ]
+        },
+        {
+          "name": "4ª fase · Group A",
+          "rows": [
+            {
+              "rank": 1,
+              "team": "Qatar",
+              "played": 2,
+              "win": 1,
+              "draw": 1,
+              "lose": 0,
+              "gf": 2,
+              "ga": 1,
+              "gd": 1,
+              "points": 4,
+              "description": "Promotion - World Cup"
+            },
+            {
+              "rank": 2,
+              "team": "United Arab Emirates",
+              "played": 2,
+              "win": 1,
+              "draw": 0,
+              "lose": 1,
+              "gf": 3,
+              "ga": 3,
+              "gd": 0,
+              "points": 3,
+              "description": "Promotion - World Cup (Fifth stage: )"
+            },
+            {
+              "rank": 3,
+              "team": "Oman",
+              "played": 2,
+              "win": 0,
+              "draw": 1,
+              "lose": 1,
+              "gf": 1,
+              "ga": 2,
+              "gd": -1,
+              "points": 1,
+              "description": null
+            }
+          ]
+        },
+        {
+          "name": "4ª fase · Group B",
+          "rows": [
+            {
+              "rank": 1,
+              "team": "Saudi Arabia",
+              "played": 2,
+              "win": 1,
+              "draw": 1,
+              "lose": 0,
+              "gf": 3,
+              "ga": 2,
+              "gd": 1,
+              "points": 4,
+              "description": "Promotion - World Cup"
+            },
+            {
+              "rank": 2,
+              "team": "Iraq",
+              "played": 2,
+              "win": 1,
+              "draw": 1,
+              "lose": 0,
+              "gf": 1,
+              "ga": 0,
+              "gd": 1,
+              "points": 4,
+              "description": "Promotion - World Cup (Fifth stage: )"
+            },
+            {
+              "rank": 3,
+              "team": "Indonesia",
+              "played": 2,
+              "win": 0,
+              "draw": 0,
+              "lose": 2,
+              "gf": 2,
+              "ga": 4,
+              "gd": -2,
+              "points": 0,
+              "description": null
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "brackets": {
+    "OFC": {
+      "namePt": "Eliminatórias da Oceania",
+      "format": "bracket",
+      "rounds": [
+        {
+          "name": "Semi-finals",
+          "ties": [
+            {
+              "date": "2025-03-21",
+              "home": "New Caledonia",
+              "away": "Tahiti",
+              "homeGoals": 3,
+              "awayGoals": 0,
+              "homeWinner": true,
+              "awayWinner": false,
+              "status": "FT"
+            },
+            {
+              "date": "2025-03-21",
+              "home": "New Zealand",
+              "away": "Fiji",
+              "homeGoals": 7,
+              "awayGoals": 0,
+              "homeWinner": true,
+              "awayWinner": false,
+              "status": "FT"
+            }
+          ]
+        },
+        {
+          "name": "Final",
+          "ties": [
+            {
+              "date": "2025-03-24",
+              "home": "New Caledonia",
+              "away": "New Zealand",
+              "homeGoals": 0,
+              "awayGoals": 3,
+              "homeWinner": false,
+              "awayWinner": true,
+              "status": "FT"
+            }
+          ]
+        }
+      ]
+    },
+    "INTERCONT": {
+      "namePt": "Repescagem Intercontinental",
+      "format": "bracket",
+      "rounds": [
+        {
+          "name": "Semi-finals",
+          "ties": [
+            {
+              "date": "2026-03-26",
+              "home": "Bolivia",
+              "away": "Suriname",
+              "homeGoals": 2,
+              "awayGoals": 1,
+              "homeWinner": true,
+              "awayWinner": false,
+              "status": "FT"
+            },
+            {
+              "date": "2026-03-27",
+              "home": "New Caledonia",
+              "away": "Jamaica",
+              "homeGoals": 0,
+              "awayGoals": 1,
+              "homeWinner": false,
+              "awayWinner": true,
+              "status": "FT"
+            }
+          ]
+        },
+        {
+          "name": "Final",
+          "ties": [
+            {
+              "date": "2026-03-31",
+              "home": "DR Congo",
+              "away": "Jamaica",
+              "homeGoals": 1,
+              "awayGoals": 0,
+              "homeWinner": true,
+              "awayWinner": false,
+              "status": "AET"
+            },
+            {
+              "date": "2026-04-01",
+              "home": "Iraq",
+              "away": "Bolivia",
+              "homeGoals": 2,
+              "awayGoals": 1,
+              "homeWinner": true,
+              "awayWinner": false,
+              "status": "FT"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "teams": {
+    "Mexico": {
+      "format": "host"
+    },
+    "South Africa": {
+      "format": "table",
+      "confederation": "CAF"
+    },
+    "South Korea": {
+      "format": "table",
+      "confederation": "AFC"
+    },
+    "Czech Republic": {
+      "format": "table",
+      "confederation": "UEFA"
+    },
+    "Canada": {
+      "format": "host"
+    },
+    "Bosnia & Herzegovina": {
+      "format": "table",
+      "confederation": "UEFA"
+    },
+    "Qatar": {
+      "format": "table",
+      "confederation": "AFC"
+    },
+    "Switzerland": {
+      "format": "table",
+      "confederation": "UEFA"
+    },
+    "Brazil": {
+      "format": "table",
+      "confederation": "CONMEBOL"
+    },
+    "Morocco": {
+      "format": "table",
+      "confederation": "CAF"
+    },
+    "Haiti": {
+      "format": "table",
+      "confederation": "CONCACAF"
+    },
+    "Scotland": {
+      "format": "table",
+      "confederation": "UEFA"
+    },
+    "USA": {
+      "format": "host"
+    },
+    "Paraguay": {
+      "format": "table",
+      "confederation": "CONMEBOL"
+    },
+    "Australia": {
+      "format": "table",
+      "confederation": "AFC"
+    },
+    "Turkey": {
+      "format": "table",
+      "confederation": "UEFA"
+    },
+    "Germany": {
+      "format": "table",
+      "confederation": "UEFA"
+    },
+    "Curaçao": {
+      "format": "table",
+      "confederation": "CONCACAF"
+    },
+    "Ivory Coast": {
+      "format": "table",
+      "confederation": "CAF"
+    },
+    "Ecuador": {
+      "format": "table",
+      "confederation": "CONMEBOL"
+    },
+    "Netherlands": {
+      "format": "table",
+      "confederation": "UEFA"
+    },
+    "Japan": {
+      "format": "table",
+      "confederation": "AFC"
+    },
+    "Sweden": {
+      "format": "table",
+      "confederation": "UEFA"
+    },
+    "Tunisia": {
+      "format": "table",
+      "confederation": "CAF"
+    },
+    "Belgium": {
+      "format": "table",
+      "confederation": "UEFA"
+    },
+    "Egypt": {
+      "format": "table",
+      "confederation": "CAF"
+    },
+    "Iran": {
+      "format": "table",
+      "confederation": "AFC"
+    },
+    "New Zealand": {
+      "format": "bracket",
+      "bracket": "OFC"
+    },
+    "Spain": {
+      "format": "table",
+      "confederation": "UEFA"
+    },
+    "Cape Verde": {
+      "format": "table",
+      "confederation": "CAF"
+    },
+    "Saudi Arabia": {
+      "format": "table",
+      "confederation": "AFC"
+    },
+    "Uruguay": {
+      "format": "table",
+      "confederation": "CONMEBOL"
+    },
+    "France": {
+      "format": "table",
+      "confederation": "UEFA"
+    },
+    "Senegal": {
+      "format": "table",
+      "confederation": "CAF"
+    },
+    "Iraq": {
+      "format": "table",
+      "confederation": "AFC"
+    },
+    "Norway": {
+      "format": "table",
+      "confederation": "UEFA"
+    },
+    "Argentina": {
+      "format": "table",
+      "confederation": "CONMEBOL"
+    },
+    "Algeria": {
+      "format": "table",
+      "confederation": "CAF"
+    },
+    "Austria": {
+      "format": "table",
+      "confederation": "UEFA"
+    },
+    "Jordan": {
+      "format": "table",
+      "confederation": "AFC"
+    },
+    "Portugal": {
+      "format": "table",
+      "confederation": "UEFA"
+    },
+    "DR Congo": {
+      "format": "table",
+      "confederation": "CAF"
+    },
+    "Uzbekistan": {
+      "format": "table",
+      "confederation": "AFC"
+    },
+    "Colombia": {
+      "format": "table",
+      "confederation": "CONMEBOL"
+    },
+    "England": {
+      "format": "table",
+      "confederation": "UEFA"
+    },
+    "Croatia": {
+      "format": "table",
+      "confederation": "UEFA"
+    },
+    "Ghana": {
+      "format": "table",
+      "confederation": "CAF"
+    },
+    "Panama": {
+      "format": "table",
+      "confederation": "CONCACAF"
+    }
+  }
+}

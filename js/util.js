@@ -422,6 +422,27 @@ export async function loadRecentMatches() {
 }
 
 // ============================================================
+// Qualifiers loader (campanha classificatória — Eliminatórias)
+// ============================================================
+// Carrega assets/data/qualifiers.json (gerado por scripts/fetch-qualifiers.js)
+// e devolve a estrutura { confederations, brackets, teams } usada pela seção
+// "Eliminatórias" do Raio-X (ver js/raiox.js). Cacheado em memória.
+
+let _qualifiersCache = null;
+export async function loadQualifiers() {
+  if (_qualifiersCache) return _qualifiersCache;
+  try {
+    const res = await fetch('assets/data/qualifiers.json', { cache: 'no-cache' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    _qualifiersCache = await res.json();
+    return _qualifiersCache;
+  } catch (err) {
+    console.warn('[loadQualifiers] failed:', err);
+    return null;
+  }
+}
+
+// ============================================================
 // Team Tooltip — hover popover com últimos 5 jogos da seleção
 // ============================================================
 // Uso:
