@@ -793,6 +793,13 @@
   ],
   "Czech Republic": [
     [
+      "2026-06-05",
+      "Guatemala",
+      true,
+      "3-1",
+      "Amistoso"
+    ],
+    [
       "2026-05-31",
       "Kosovo",
       true,
@@ -853,13 +860,6 @@
       "Montenegro",
       false,
       "2-0",
-      "Eliminatórias"
-    ],
-    [
-      "2025-06-09",
-      "Croatia",
-      false,
-      "1-5",
       "Eliminatórias"
     ]
   ],
@@ -1081,6 +1081,13 @@
   ],
   "France": [
     [
+      "2026-06-04",
+      "Ivory Coast",
+      true,
+      "1-2",
+      "Amistoso"
+    ],
+    [
       "2026-03-29",
       "Colombia",
       false,
@@ -1141,13 +1148,6 @@
       "Germany",
       false,
       "2-0",
-      "Nations League"
-    ],
-    [
-      "2025-06-05",
-      "Spain",
-      false,
-      "4-5",
       "Nations League"
     ]
   ],
@@ -1369,6 +1369,13 @@
   ],
   "Iran": [
     [
+      "2026-06-04",
+      "Mali",
+      true,
+      "2-0",
+      "Amistoso"
+    ],
+    [
       "2026-05-29",
       "Gambia",
       true,
@@ -1430,16 +1437,16 @@
       false,
       "2-2",
       "Copa CAFA"
-    ],
-    [
-      "2025-09-01",
-      "India",
-      false,
-      "3-0",
-      "Copa CAFA"
     ]
   ],
   "Iraq": [
+    [
+      "2026-06-04",
+      "Spain",
+      false,
+      "1-1",
+      "Amistoso"
+    ],
     [
       "2026-05-29",
       "Andorra",
@@ -1502,16 +1509,16 @@
       false,
       "0-0",
       "Eliminatórias"
-    ],
-    [
-      "2025-10-11",
-      "Indonesia",
-      true,
-      "1-0",
-      "Eliminatórias"
     ]
   ],
   "Ivory Coast": [
+    [
+      "2026-06-04",
+      "France",
+      false,
+      "2-1",
+      "Amistoso"
+    ],
     [
       "2026-03-31",
       "Scotland",
@@ -1574,13 +1581,6 @@
       false,
       "0-1",
       "Amistoso"
-    ],
-    [
-      "2025-10-14",
-      "Kenya",
-      true,
-      "3-0",
-      "Eliminatórias"
     ]
   ],
   "Japan": [
@@ -1729,6 +1729,13 @@
   ],
   "Mexico": [
     [
+      "2026-06-05",
+      "Serbia",
+      true,
+      "5-1",
+      "Amistoso"
+    ],
+    [
       "2026-05-31",
       "Australia",
       true,
@@ -1789,13 +1796,6 @@
       "Uruguay",
       true,
       "0-0",
-      "Amistoso"
-    ],
-    [
-      "2025-10-15",
-      "Ecuador",
-      true,
-      "1-1",
       "Amistoso"
     ]
   ],
@@ -2737,6 +2737,13 @@
   ],
   "Spain": [
     [
+      "2026-06-04",
+      "Iraq",
+      true,
+      "1-1",
+      "Amistoso"
+    ],
+    [
       "2026-03-31",
       "Egypt",
       true,
@@ -2798,16 +2805,16 @@
       false,
       "2-2",
       "Nations League"
-    ],
-    [
-      "2025-06-05",
-      "France",
-      true,
-      "5-4",
-      "Nations League"
     ]
   ],
   "Sweden": [
+    [
+      "2026-06-04",
+      "Greece",
+      true,
+      "2-2",
+      "Amistoso"
+    ],
     [
       "2026-06-01",
       "Norway",
@@ -2870,13 +2877,6 @@
       false,
       "2-2",
       "Eliminatórias"
-    ],
-    [
-      "2025-06-10",
-      "Algeria",
-      true,
-      "4-3",
-      "Amistoso"
     ]
   ],
   "Switzerland": [
