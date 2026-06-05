@@ -32,7 +32,10 @@ export async function loadLockAlerts(userId) {
   const [matchesRes, predsRes] = await Promise.all([
     supabase
       .from('matches')
-      .select('match_id, match_date, team_home, team_away, group_name, stage')
+      // matches.id é a PK (não existe match_id) — apelida pra id=match_id manter
+      // o resto do módulo igual. Sem o alias, o select dava 400 e o alerta de
+      // bloqueio ficava sempre vazio (silenciosamente).
+      .select('match_id:id, match_date, team_home, team_away, group_name, stage')
       .eq('finished', false),
     supabase.from('predictions').select('match_id').eq('user_id', userId),
   ]);

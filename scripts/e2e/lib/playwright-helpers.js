@@ -24,6 +24,14 @@ export async function fillGroupPredictions(page, predictions, tracker) {
   tracker?.setContext({ step: 'palpitar_grupos' });
   await page.goto(`${BASE_URL}/palpites-grupos.html`);
 
+  // A UI tem toggle data/grupo e abre POR DATA (padrão). Pra iterar por grupo
+  // (chips A..L), troca pra visão "Por grupo" primeiro.
+  try {
+    await page.waitForSelector('[data-view="group"]', { timeout: 15000 });
+    await page.click('[data-view="group"]');
+    await page.waitForTimeout(250);
+  } catch { /* layout antigo sem toggle */ }
+
   // Aguarda a UI carregar. A aba "palpites" renderiza UM grupo por vez (chips A..L),
   // então precisamos iterar os grupos — não dá pra preencher os 72 numa página só.
   await page.waitForSelector('.chip[data-group], [data-match]', { timeout: 15000 });
@@ -87,6 +95,12 @@ export async function fillGroupPredictions(page, predictions, tracker) {
 export async function fillKnockoutPredictions(page, predictions, tracker) {
   tracker?.setContext({ step: 'palpitar_mata' });
   await page.goto(`${BASE_URL}/palpites-mata.html`);
+  // Abre POR DATA (padrão); troca pra visão "Chave" (bracket) pra ver os 32 KO juntos.
+  try {
+    await page.waitForSelector('[data-view="bracket"]', { timeout: 15000 });
+    await page.click('[data-view="bracket"]');
+    await page.waitForTimeout(250);
+  } catch { /* layout antigo */ }
   await page.waitForSelector('.bracket-match', { timeout: 15000 });
 
   for (const p of predictions) {
