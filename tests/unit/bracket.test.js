@@ -24,7 +24,10 @@ import { makeRng } from '../../scripts/e2e/lib/prng.js';
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const SEED_SQL = join(REPO, 'supabase', 'seed', '01_matches.sql');
-const GOLDEN = join(REPO, 'scripts', 'e2e', 'expected-tournament.json');
+// Cópia CONGELADA do torneio dourado (o original em scripts/e2e/ é gitignored,
+// então ausente no CI). Determinístico (seed wc2026-e2e-v1). Regenerar com:
+//   cp scripts/e2e/expected-tournament.json tests/fixtures/
+const GOLDEN = join(REPO, 'tests', 'fixtures', 'expected-tournament.json');
 
 // ---- Topologia: parse do seed -------------------------------------------------
 // Linhas: (id, 'stage', 'round', GROUP, 'date'::timestamptz, 'ground', 'home', 'away')

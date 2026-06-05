@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
 import { join, dirname, resolve, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { execFileSync } from 'node:child_process';
 
 /**
  * Teste estático dos paths construídos com join(__dirname, ...) nos scripts.
@@ -58,6 +59,39 @@ function extractDirnameJoins(content) {
 
 const scriptFiles = collectJs(SCRIPTS_DIR);
 
+/**
+ * Set de paths (relativos ao REPO) que o git ignora — artefatos gerados em
+ * runtime (screenshots/, .tmp/, *.json de saída). Esses legitimamente não
+ * existem num checkout limpo (CI), então o teste de "diretório existe" não pode
+ * cobrá-los; o que importa é o path ESTAR CERTO, não o artefato estar presente.
+ */
+function gitIgnored(relPaths) {
+  // Filtra vazios: uma string vazia (ex.: join(__dirname,'..') de um script em
+  // scripts/ resolve p/ a raiz → relative()==='') faz o git check-ignore --stdin
+  // abortar TODO o batch com 'fatal: empty string is not a valid pathspec',
+  // esvaziando o set de ignorados. Foi o que quebrou o CI.
+  const clean = [...new Set(relPaths.map((p) => p.trim()).filter(Boolean))];
+  if (clean.length === 0) return new Set();
+  try {
+    const out = execFileSync('git', ['check-ignore', '--stdin'], {
+      cwd: REPO, input: clean.join('\n'), encoding: 'utf8',
+    });
+    return new Set(out.split('\n').map((s) => s.trim()).filter(Boolean));
+  } catch (e) {
+    return new Set((e.stdout || '').split('\n').map((s) => s.trim()).filter(Boolean));
+  }
+}
+
+// Resolve todos os join(__dirname,...) uma vez; usado pelos checks abaixo.
+const allResolved = [];
+for (const file of scriptFiles) {
+  const fileDir = dirname(file);
+  for (const parts of extractDirnameJoins(readFileSync(file, 'utf8'))) {
+    allResolved.push({ file, parts, resolved: resolve(fileDir, ...parts) });
+  }
+}
+const ignored = gitIgnored(allResolved.map((r) => relative(REPO, r.resolved)));
+
 describe('paths dos scripts (join(__dirname, ...))', () => {
   it('acha scripts e paths estáticos (sentinela anti-regex-quebrado)', () => {
     expect(scriptFiles.length).toBeGreaterThan(20);
@@ -68,21 +102,20 @@ describe('paths dos scripts (join(__dirname, ...))', () => {
 
   it('todo join(__dirname,...) resolve p/ um diretório que existe', () => {
     const broken = [];
-    for (const file of scriptFiles) {
-      const fileDir = dirname(file);
-      for (const parts of extractDirnameJoins(readFileSync(file, 'utf8'))) {
-        const resolved = resolve(fileDir, ...parts);
-        // O diretório que contém o alvo precisa existir. Não exigimos que o
-        // arquivo exista (pode ser saída gerada: .sql, screenshots, .tmp...).
-        const containingDir = parts.length && /\.[a-z0-9]+$/i.test(parts.at(-1))
-          ? dirname(resolved)   // último segmento é arquivo → pai
-          : resolved;           // sem extensão → trata como diretório-alvo
-        const dirToCheck = existsSync(containingDir) && statSync(containingDir).isDirectory()
-          ? containingDir
-          : dirname(resolved);
-        if (!existsSync(dirToCheck)) {
-          broken.push(`${relative(REPO, file)} → ${relative(REPO, resolved)} (falta ${relative(REPO, dirToCheck)}/)`);
-        }
+    for (const { file, parts, resolved } of allResolved) {
+      // Artefato gerado (gitignored: screenshots/, .tmp/, saídas) não existe em
+      // checkout limpo — o que validamos é o path estar certo, não estar presente.
+      if (ignored.has(relative(REPO, resolved))) continue;
+      // O diretório que contém o alvo precisa existir. Não exigimos que o
+      // arquivo exista (pode ser saída gerada: .sql, etc.).
+      const containingDir = parts.length && /\.[a-z0-9]+$/i.test(parts.at(-1))
+        ? dirname(resolved)   // último segmento é arquivo → pai
+        : resolved;           // sem extensão → trata como diretório-alvo
+      const dirToCheck = existsSync(containingDir) && statSync(containingDir).isDirectory()
+        ? containingDir
+        : dirname(resolved);
+      if (!existsSync(dirToCheck)) {
+        broken.push(`${relative(REPO, file)} → ${relative(REPO, resolved)} (falta ${relative(REPO, dirToCheck)}/)`);
       }
     }
     expect(broken, `paths quebrados:\n${broken.join('\n')}`).toEqual([]);
@@ -90,14 +123,10 @@ describe('paths dos scripts (join(__dirname, ...))', () => {
 
   it('arquivos de dado de produção (src/assets/data/*.json) existem de fato', () => {
     const missing = [];
-    for (const file of scriptFiles) {
-      const fileDir = dirname(file);
-      for (const parts of extractDirnameJoins(readFileSync(file, 'utf8'))) {
-        const resolved = resolve(fileDir, ...parts);
-        const rel = relative(REPO, resolved);
-        if (/^src\/assets\/data\/.+\.json$/.test(rel) && !existsSync(resolved)) {
-          missing.push(`${relative(REPO, file)} → ${rel}`);
-        }
+    for (const { file, resolved } of allResolved) {
+      const rel = relative(REPO, resolved);
+      if (/^src\/assets\/data\/.+\.json$/.test(rel) && !existsSync(resolved)) {
+        missing.push(`${relative(REPO, file)} → ${rel}`);
       }
     }
     expect(missing, `dados de produção ausentes:\n${missing.join('\n')}`).toEqual([]);

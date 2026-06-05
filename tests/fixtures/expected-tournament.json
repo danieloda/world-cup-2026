@@ -1,0 +1,2836 @@
+{
+  "matches": [
+    {
+      "id": 1,
+      "stage": "group",
+      "team_home": "Mexico",
+      "team_away": "South Africa",
+      "actual_home": 3,
+      "actual_away": 0,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 407,
+          "full_name": "Á. Sepúlveda",
+          "team": "Mexico",
+          "goals": 2
+        },
+        {
+          "player_id": 379,
+          "full_name": "R. Alvarado",
+          "team": "Mexico",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "stage": "group",
+      "team_home": "South Korea",
+      "team_away": "Czech Republic",
+      "actual_home": 3,
+      "actual_away": 2,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 431,
+          "full_name": "Cho Gue-Sung",
+          "team": "South Korea",
+          "goals": 1
+        },
+        {
+          "player_id": 425,
+          "full_name": "Lee Dong-Gyeong",
+          "team": "South Korea",
+          "goals": 1
+        },
+        {
+          "player_id": 420,
+          "full_name": "Bae Jun-Ho",
+          "team": "South Korea",
+          "goals": 1
+        },
+        {
+          "player_id": 723,
+          "full_name": "L. Provod",
+          "team": "Czech Republic",
+          "goals": 1
+        },
+        {
+          "player_id": 727,
+          "full_name": "T. Chorý",
+          "team": "Czech Republic",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "stage": "group",
+      "team_home": "Czech Republic",
+      "team_away": "South Africa",
+      "actual_home": 3,
+      "actual_away": 1,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 727,
+          "full_name": "T. Chorý",
+          "team": "Czech Republic",
+          "goals": 1
+        },
+        {
+          "player_id": 721,
+          "full_name": "V. Darida",
+          "team": "Czech Republic",
+          "goals": 1
+        },
+        {
+          "player_id": 723,
+          "full_name": "L. Provod",
+          "team": "Czech Republic",
+          "goals": 1
+        },
+        {
+          "player_id": 991,
+          "full_name": "S. Campbell",
+          "team": "South Africa",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "stage": "group",
+      "team_home": "Mexico",
+      "team_away": "South Korea",
+      "actual_home": 2,
+      "actual_away": 1,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 400,
+          "full_name": "A. González",
+          "team": "Mexico",
+          "goals": 1
+        },
+        {
+          "player_id": 404,
+          "full_name": "G. Martínez",
+          "team": "Mexico",
+          "goals": 1
+        },
+        {
+          "player_id": 434,
+          "full_name": "Son Heung-Min",
+          "team": "South Korea",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "stage": "group",
+      "team_home": "Czech Republic",
+      "team_away": "Mexico",
+      "actual_home": 1,
+      "actual_away": 3,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 730,
+          "full_name": "P. Schick",
+          "team": "Czech Republic",
+          "goals": 1
+        },
+        {
+          "player_id": 402,
+          "full_name": "D. Lainez",
+          "team": "Mexico",
+          "goals": 2
+        },
+        {
+          "player_id": 400,
+          "full_name": "A. González",
+          "team": "Mexico",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "stage": "group",
+      "team_home": "South Africa",
+      "team_away": "South Korea",
+      "actual_home": 0,
+      "actual_away": 1,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 420,
+          "full_name": "Bae Jun-Ho",
+          "team": "South Korea",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "stage": "group",
+      "team_home": "Canada",
+      "team_away": "Bosnia & Herzegovina",
+      "actual_home": 2,
+      "actual_away": 2,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 1348,
+          "full_name": "D. Jebbison",
+          "team": "Canada",
+          "goals": 1
+        },
+        {
+          "player_id": 1342,
+          "full_name": "M. Aiyenero",
+          "team": "Canada",
+          "goals": 1
+        },
+        {
+          "player_id": 859,
+          "full_name": "E. Bajraktarevic",
+          "team": "Bosnia & Herzegovina",
+          "goals": 1
+        },
+        {
+          "player_id": 858,
+          "full_name": "Kerim-Sam Alajbegović",
+          "team": "Bosnia & Herzegovina",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "stage": "group",
+      "team_home": "Qatar",
+      "team_away": "Switzerland",
+      "actual_home": 3,
+      "actual_away": 2,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 1166,
+          "full_name": "Ahmed Alaa",
+          "team": "Qatar",
+          "goals": 2
+        },
+        {
+          "player_id": 1162,
+          "full_name": "G. Laye",
+          "team": "Qatar",
+          "goals": 1
+        },
+        {
+          "player_id": 358,
+          "full_name": "D. Ndoye",
+          "team": "Switzerland",
+          "goals": 2
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "stage": "group",
+      "team_home": "Switzerland",
+      "team_away": "Bosnia & Herzegovina",
+      "actual_home": 0,
+      "actual_away": 0,
+      "pen_winner": null,
+      "scorers": []
+    },
+    {
+      "id": 10,
+      "stage": "group",
+      "team_home": "Canada",
+      "team_away": "Qatar",
+      "actual_home": 2,
+      "actual_away": 0,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 1348,
+          "full_name": "D. Jebbison",
+          "team": "Canada",
+          "goals": 1
+        },
+        {
+          "player_id": 1349,
+          "full_name": "C. Larin",
+          "team": "Canada",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "stage": "group",
+      "team_home": "Switzerland",
+      "team_away": "Canada",
+      "actual_home": 0,
+      "actual_away": 0,
+      "pen_winner": null,
+      "scorers": []
+    },
+    {
+      "id": 12,
+      "stage": "group",
+      "team_home": "Bosnia & Herzegovina",
+      "team_away": "Qatar",
+      "actual_home": 0,
+      "actual_away": 4,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 1168,
+          "full_name": "M. Gouda",
+          "team": "Qatar",
+          "goals": 1
+        },
+        {
+          "player_id": 1167,
+          "full_name": "Edmilson Junior",
+          "team": "Qatar",
+          "goals": 1
+        },
+        {
+          "player_id": 1159,
+          "full_name": "Ali",
+          "team": "Qatar",
+          "goals": 1
+        },
+        {
+          "player_id": 1161,
+          "full_name": "Abdulaziz Hatem",
+          "team": "Qatar",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "stage": "group",
+      "team_home": "Brazil",
+      "team_away": "Morocco",
+      "actual_home": 0,
+      "actual_away": 5,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 668,
+          "full_name": "A. Ezzalzouli",
+          "team": "Morocco",
+          "goals": 3
+        },
+        {
+          "player_id": 671,
+          "full_name": "C. Talbi",
+          "team": "Morocco",
+          "goals": 1
+        },
+        {
+          "player_id": 669,
+          "full_name": "H. Igamane",
+          "team": "Morocco",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "stage": "group",
+      "team_home": "Haiti",
+      "team_away": "Scotland",
+      "actual_home": 1,
+      "actual_away": 4,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 1290,
+          "full_name": "R. Providence",
+          "team": "Haiti",
+          "goals": 1
+        },
+        {
+          "player_id": 831,
+          "full_name": "A. Irving",
+          "team": "Scotland",
+          "goals": 1
+        },
+        {
+          "player_id": 836,
+          "full_name": "C. Adams",
+          "team": "Scotland",
+          "goals": 2
+        },
+        {
+          "player_id": 838,
+          "full_name": "B. Doak",
+          "team": "Scotland",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "stage": "group",
+      "team_home": "Scotland",
+      "team_away": "Morocco",
+      "actual_home": 3,
+      "actual_away": 3,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 839,
+          "full_name": "L. Dykes",
+          "team": "Scotland",
+          "goals": 1
+        },
+        {
+          "player_id": 829,
+          "full_name": "L. Ferguson",
+          "team": "Scotland",
+          "goals": 1
+        },
+        {
+          "player_id": 828,
+          "full_name": "Findlay Curtis",
+          "team": "Scotland",
+          "goals": 1
+        },
+        {
+          "player_id": 665,
+          "full_name": "E. Ben Seghir",
+          "team": "Morocco",
+          "goals": 1
+        },
+        {
+          "player_id": 651,
+          "full_name": "A. Adli",
+          "team": "Morocco",
+          "goals": 1
+        },
+        {
+          "player_id": 670,
+          "full_name": "S. Rahimi",
+          "team": "Morocco",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "stage": "group",
+      "team_home": "Brazil",
+      "team_away": "Haiti",
+      "actual_home": 2,
+      "actual_away": 1,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 108,
+          "full_name": "Luiz Henrique",
+          "team": "Brazil",
+          "goals": 2
+        },
+        {
+          "player_id": 1288,
+          "full_name": "D. Nazon",
+          "team": "Haiti",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "stage": "group",
+      "team_home": "Scotland",
+      "team_away": "Brazil",
+      "actual_home": 1,
+      "actual_away": 0,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 828,
+          "full_name": "Findlay Curtis",
+          "team": "Scotland",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "stage": "group",
+      "team_home": "Morocco",
+      "team_away": "Haiti",
+      "actual_home": 0,
+      "actual_away": 1,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 1287,
+          "full_name": "L. Joseph",
+          "team": "Haiti",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "stage": "group",
+      "team_home": "USA",
+      "team_away": "Paraguay",
+      "actual_home": 2,
+      "actual_away": 0,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 1261,
+          "full_name": "M. Arfsten",
+          "team": "United States",
+          "goals": 2
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "stage": "group",
+      "team_home": "Australia",
+      "team_away": "Türkiye",
+      "actual_home": 1,
+      "actual_away": 4,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 454,
+          "full_name": "M. Boyle",
+          "team": "Australia",
+          "goals": 1
+        },
+        {
+          "player_id": 785,
+          "full_name": "İ. Kahveci",
+          "team": "Türkiye",
+          "goals": 1
+        },
+        {
+          "player_id": 774,
+          "full_name": "H. Çalhanoğlu",
+          "team": "Türkiye",
+          "goals": 2
+        },
+        {
+          "player_id": 788,
+          "full_name": "K. Yıldız",
+          "team": "Türkiye",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 21,
+      "stage": "group",
+      "team_home": "USA",
+      "team_away": "Australia",
+      "actual_home": 2,
+      "actual_away": 3,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 1248,
+          "full_name": "B. Aaronson",
+          "team": "United States",
+          "goals": 1
+        },
+        {
+          "player_id": 1265,
+          "full_name": "H. Wright",
+          "team": "United States",
+          "goals": 1
+        },
+        {
+          "player_id": 457,
+          "full_name": "A. Mabil",
+          "team": "Australia",
+          "goals": 1
+        },
+        {
+          "player_id": 458,
+          "full_name": "C. Metcalfe",
+          "team": "Australia",
+          "goals": 1
+        },
+        {
+          "player_id": 459,
+          "full_name": "A. Šuto",
+          "team": "Australia",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "stage": "group",
+      "team_home": "Türkiye",
+      "team_away": "Paraguay",
+      "actual_home": 4,
+      "actual_away": 1,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 786,
+          "full_name": "Y. Sarı",
+          "team": "Türkiye",
+          "goals": 1
+        },
+        {
+          "player_id": 785,
+          "full_name": "İ. Kahveci",
+          "team": "Türkiye",
+          "goals": 1
+        },
+        {
+          "player_id": 787,
+          "full_name": "A. Şimşir",
+          "team": "Türkiye",
+          "goals": 1
+        },
+        {
+          "player_id": 783,
+          "full_name": "K. Aktürkoğlu",
+          "team": "Türkiye",
+          "goals": 1
+        },
+        {
+          "player_id": 1192,
+          "full_name": "M. Almirón",
+          "team": "Paraguay",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "stage": "group",
+      "team_home": "Türkiye",
+      "team_away": "USA",
+      "actual_home": 1,
+      "actual_away": 1,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 785,
+          "full_name": "İ. Kahveci",
+          "team": "Türkiye",
+          "goals": 1
+        },
+        {
+          "player_id": 1265,
+          "full_name": "H. Wright",
+          "team": "United States",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "stage": "group",
+      "team_home": "Paraguay",
+      "team_away": "Australia",
+      "actual_home": 5,
+      "actual_away": 0,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 1196,
+          "full_name": "A. Sanabria",
+          "team": "Paraguay",
+          "goals": 1
+        },
+        {
+          "player_id": 1185,
+          "full_name": "M. Galarza",
+          "team": "Paraguay",
+          "goals": 3
+        },
+        {
+          "player_id": 1184,
+          "full_name": "J. Enciso",
+          "team": "Paraguay",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 25,
+      "stage": "group",
+      "team_home": "Germany",
+      "team_away": "Curaçao",
+      "actual_home": 1,
+      "actual_away": 4,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 553,
+          "full_name": "N. Woltemade",
+          "team": "Germany",
+          "goals": 1
+        },
+        {
+          "player_id": 1380,
+          "full_name": "J. Margaritha",
+          "team": "Curaçao",
+          "goals": 1
+        },
+        {
+          "player_id": 1375,
+          "full_name": "T. Chong",
+          "team": "Curaçao",
+          "goals": 2
+        },
+        {
+          "player_id": 1370,
+          "full_name": "K. Felida",
+          "team": "Curaçao",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 26,
+      "stage": "group",
+      "team_home": "Ivory Coast",
+      "team_away": "Ecuador",
+      "actual_home": 5,
+      "actual_away": 0,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 911,
+          "full_name": "A. Diallo",
+          "team": "Ivory Coast",
+          "goals": 1
+        },
+        {
+          "player_id": 909,
+          "full_name": "A. Bonny",
+          "team": "Ivory Coast",
+          "goals": 2
+        },
+        {
+          "player_id": 908,
+          "full_name": "S. Adingra",
+          "team": "Ivory Coast",
+          "goals": 1
+        },
+        {
+          "player_id": 910,
+          "full_name": "O. Diakité",
+          "team": "Ivory Coast",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 27,
+      "stage": "group",
+      "team_home": "Germany",
+      "team_away": "Ivory Coast",
+      "actual_home": 2,
+      "actual_away": 2,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 551,
+          "full_name": "L. Sané",
+          "team": "Germany",
+          "goals": 2
+        },
+        {
+          "player_id": 914,
+          "full_name": "P. Guiagon",
+          "team": "Ivory Coast",
+          "goals": 2
+        }
+      ]
+    },
+    {
+      "id": 28,
+      "stage": "group",
+      "team_home": "Ecuador",
+      "team_away": "Curaçao",
+      "actual_home": 4,
+      "actual_away": 1,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 1227,
+          "full_name": "J. Mercado",
+          "team": "Ecuador",
+          "goals": 1
+        },
+        {
+          "player_id": 1222,
+          "full_name": "N. Angulo",
+          "team": "Ecuador",
+          "goals": 1
+        },
+        {
+          "player_id": 1224,
+          "full_name": "J. Corozo",
+          "team": "Ecuador",
+          "goals": 2
+        },
+        {
+          "player_id": 1379,
+          "full_name": "J. Locadia",
+          "team": "Curaçao",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 29,
+      "stage": "group",
+      "team_home": "Curaçao",
+      "team_away": "Ivory Coast",
+      "actual_home": 4,
+      "actual_away": 0,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 1377,
+          "full_name": "S. Hansen",
+          "team": "Curaçao",
+          "goals": 1
+        },
+        {
+          "player_id": 1376,
+          "full_name": "K. Gorré",
+          "team": "Curaçao",
+          "goals": 2
+        },
+        {
+          "player_id": 1369,
+          "full_name": "L. Comenencia",
+          "team": "Curaçao",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 30,
+      "stage": "group",
+      "team_home": "Ecuador",
+      "team_away": "Germany",
+      "actual_home": 2,
+      "actual_away": 0,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 1225,
+          "full_name": "Jeremy Arévalo",
+          "team": "Ecuador",
+          "goals": 2
+        }
+      ]
+    },
+    {
+      "id": 31,
+      "stage": "group",
+      "team_home": "Netherlands",
+      "team_away": "Japan",
+      "actual_home": 2,
+      "actual_away": 0,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 887,
+          "full_name": "C. Gakpo",
+          "team": "Netherlands",
+          "goals": 1
+        },
+        {
+          "player_id": 880,
+          "full_name": "T. Reijnders",
+          "team": "Netherlands",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 32,
+      "stage": "group",
+      "team_home": "Sweden",
+      "team_away": "Tunisia",
+      "actual_home": 0,
+      "actual_away": 4,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 627,
+          "full_name": "E. Achouri",
+          "team": "Tunisia",
+          "goals": 1
+        },
+        {
+          "player_id": 620,
+          "full_name": "H. Mahmoud",
+          "team": "Tunisia",
+          "goals": 2
+        },
+        {
+          "player_id": 629,
+          "full_name": "F. Chaouat",
+          "team": "Tunisia",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 33,
+      "stage": "group",
+      "team_home": "Netherlands",
+      "team_away": "Sweden",
+      "actual_home": 0,
+      "actual_away": 2,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 81,
+          "full_name": "J. Karlström",
+          "team": "Sweden",
+          "goals": 2
+        }
+      ]
+    },
+    {
+      "id": 34,
+      "stage": "group",
+      "team_home": "Tunisia",
+      "team_away": "Japan",
+      "actual_home": 1,
+      "actual_away": 3,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 628,
+          "full_name": "K. Ayari",
+          "team": "Tunisia",
+          "goals": 1
+        },
+        {
+          "player_id": 300,
+          "full_name": "Y. Suzuki",
+          "team": "Japan",
+          "goals": 3
+        }
+      ]
+    },
+    {
+      "id": 35,
+      "stage": "group",
+      "team_home": "Japan",
+      "team_away": "Sweden",
+      "actual_home": 0,
+      "actual_away": 4,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 83,
+          "full_name": "E. Smith",
+          "team": "Sweden",
+          "goals": 1
+        },
+        {
+          "player_id": 80,
+          "full_name": "L. Bergvall",
+          "team": "Sweden",
+          "goals": 1
+        },
+        {
+          "player_id": 82,
+          "full_name": "K. Sema",
+          "team": "Sweden",
+          "goals": 2
+        }
+      ]
+    },
+    {
+      "id": 36,
+      "stage": "group",
+      "team_home": "Tunisia",
+      "team_away": "Netherlands",
+      "actual_home": 4,
+      "actual_away": 0,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 622,
+          "full_name": "Ismaël Gharbi",
+          "team": "Tunisia",
+          "goals": 2
+        },
+        {
+          "player_id": 628,
+          "full_name": "K. Ayari",
+          "team": "Tunisia",
+          "goals": 2
+        }
+      ]
+    },
+    {
+      "id": 37,
+      "stage": "group",
+      "team_home": "Belgium",
+      "team_away": "Egypt",
+      "actual_home": 0,
+      "actual_away": 4,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 706,
+          "full_name": "Mostafa Mohamed",
+          "team": "Egypt",
+          "goals": 1
+        },
+        {
+          "player_id": 701,
+          "full_name": "Mostafa Fathi",
+          "team": "Egypt",
+          "goals": 3
+        }
+      ]
+    },
+    {
+      "id": 38,
+      "stage": "group",
+      "team_home": "Iran",
+      "team_away": "New Zealand",
+      "actual_home": 5,
+      "actual_away": 0,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 480,
+          "full_name": "A. Hosseinzadeh",
+          "team": "Iran",
+          "goals": 2
+        },
+        {
+          "player_id": 481,
+          "full_name": "A. Jahanbakhsh",
+          "team": "Iran",
+          "goals": 3
+        }
+      ]
+    },
+    {
+      "id": 39,
+      "stage": "group",
+      "team_home": "Belgium",
+      "team_away": "Iran",
+      "actual_home": 5,
+      "actual_away": 0,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 21,
+          "full_name": "J. Doku",
+          "team": "Belgium",
+          "goals": 2
+        },
+        {
+          "player_id": 22,
+          "full_name": "M. Fernandez-Pardo",
+          "team": "Belgium",
+          "goals": 2
+        },
+        {
+          "player_id": 13,
+          "full_name": "K. De Bruyne",
+          "team": "Belgium",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 40,
+      "stage": "group",
+      "team_home": "New Zealand",
+      "team_away": "Egypt",
+      "actual_home": 4,
+      "actual_away": 1,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 1316,
+          "full_name": "C. Wood",
+          "team": "New Zealand",
+          "goals": 1
+        },
+        {
+          "player_id": 1305,
+          "full_name": "M. Garbett",
+          "team": "New Zealand",
+          "goals": 2
+        },
+        {
+          "player_id": 1311,
+          "full_name": "K. Barbarouses",
+          "team": "New Zealand",
+          "goals": 1
+        },
+        {
+          "player_id": 699,
+          "full_name": "Ibrahim Adel",
+          "team": "Egypt",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 41,
+      "stage": "group",
+      "team_home": "Egypt",
+      "team_away": "Iran",
+      "actual_home": 1,
+      "actual_away": 1,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 701,
+          "full_name": "Mostafa Fathi",
+          "team": "Egypt",
+          "goals": 1
+        },
+        {
+          "player_id": 483,
+          "full_name": "S. Moghanlou",
+          "team": "Iran",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 42,
+      "stage": "group",
+      "team_home": "New Zealand",
+      "team_away": "Belgium",
+      "actual_home": 0,
+      "actual_away": 3,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 21,
+          "full_name": "J. Doku",
+          "team": "Belgium",
+          "goals": 1
+        },
+        {
+          "player_id": 15,
+          "full_name": "Diego Moreira",
+          "team": "Belgium",
+          "goals": 1
+        },
+        {
+          "player_id": 22,
+          "full_name": "M. Fernandez-Pardo",
+          "team": "Belgium",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 43,
+      "stage": "group",
+      "team_home": "Spain",
+      "team_away": "Cape Verde",
+      "actual_home": 1,
+      "actual_away": 3,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 199,
+          "full_name": "Ferran Torres",
+          "team": "Spain",
+          "goals": 1
+        },
+        {
+          "player_id": 1056,
+          "full_name": "Hélio Varela",
+          "team": "Cape Verde",
+          "goals": 2
+        },
+        {
+          "player_id": 1043,
+          "full_name": "Deroy Duarte",
+          "team": "Cape Verde",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 44,
+      "stage": "group",
+      "team_home": "Saudi Arabia",
+      "team_away": "Uruguay",
+      "actual_home": 4,
+      "actual_away": 0,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 506,
+          "full_name": "Mohammed Abu Al Shamat",
+          "team": "Saudi Arabia",
+          "goals": 1
+        },
+        {
+          "player_id": 526,
+          "full_name": "Saleh Al Shehri",
+          "team": "Saudi Arabia",
+          "goals": 1
+        },
+        {
+          "player_id": 521,
+          "full_name": "Feras Al Brikan",
+          "team": "Saudi Arabia",
+          "goals": 1
+        },
+        {
+          "player_id": 528,
+          "full_name": "Ayman Yahya",
+          "team": "Saudi Arabia",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 45,
+      "stage": "group",
+      "team_home": "Spain",
+      "team_away": "Saudi Arabia",
+      "actual_home": 3,
+      "actual_away": 1,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 191,
+          "full_name": "Álex Baena",
+          "team": "Spain",
+          "goals": 2
+        },
+        {
+          "player_id": 199,
+          "full_name": "Ferran Torres",
+          "team": "Spain",
+          "goals": 1
+        },
+        {
+          "player_id": 506,
+          "full_name": "Mohammed Abu Al Shamat",
+          "team": "Saudi Arabia",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 46,
+      "stage": "group",
+      "team_home": "Uruguay",
+      "team_away": "Cape Verde",
+      "actual_home": 3,
+      "actual_away": 2,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 140,
+          "full_name": "F. Pellistri",
+          "team": "Uruguay",
+          "goals": 2
+        },
+        {
+          "player_id": 135,
+          "full_name": "R. Aguirre",
+          "team": "Uruguay",
+          "goals": 1
+        },
+        {
+          "player_id": 1049,
+          "full_name": "Gilson Benchimol",
+          "team": "Cape Verde",
+          "goals": 2
+        }
+      ]
+    },
+    {
+      "id": 47,
+      "stage": "group",
+      "team_home": "Cape Verde",
+      "team_away": "Saudi Arabia",
+      "actual_home": 4,
+      "actual_away": 0,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 1042,
+          "full_name": "Telmo Arcanjo",
+          "team": "Cape Verde",
+          "goals": 1
+        },
+        {
+          "player_id": 1054,
+          "full_name": "Garry Rodrigues",
+          "team": "Cape Verde",
+          "goals": 1
+        },
+        {
+          "player_id": 1052,
+          "full_name": "D. Livramento",
+          "team": "Cape Verde",
+          "goals": 2
+        }
+      ]
+    },
+    {
+      "id": 48,
+      "stage": "group",
+      "team_home": "Uruguay",
+      "team_away": "Spain",
+      "actual_home": 3,
+      "actual_away": 1,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 142,
+          "full_name": "F. Torres",
+          "team": "Uruguay",
+          "goals": 2
+        },
+        {
+          "player_id": 135,
+          "full_name": "R. Aguirre",
+          "team": "Uruguay",
+          "goals": 1
+        },
+        {
+          "player_id": 196,
+          "full_name": "Mikel Oyarzabal",
+          "team": "Spain",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 49,
+      "stage": "group",
+      "team_home": "France",
+      "team_away": "Senegal",
+      "actual_home": 0,
+      "actual_away": 1,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 322,
+          "full_name": "B. Dia",
+          "team": "Senegal",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 50,
+      "stage": "group",
+      "team_home": "Iraq",
+      "team_away": "Norway",
+      "actual_home": 0,
+      "actual_away": 5,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 809,
+          "full_name": "J. Hauge",
+          "team": "Norway",
+          "goals": 1
+        },
+        {
+          "player_id": 813,
+          "full_name": "A. Sørloth",
+          "team": "Norway",
+          "goals": 2
+        },
+        {
+          "player_id": 802,
+          "full_name": "P. Berg",
+          "team": "Norway",
+          "goals": 2
+        }
+      ]
+    },
+    {
+      "id": 51,
+      "stage": "group",
+      "team_home": "France",
+      "team_away": "Iraq",
+      "actual_home": 3,
+      "actual_away": 2,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 46,
+          "full_name": "M. Thuram",
+          "team": "France",
+          "goals": 1
+        },
+        {
+          "player_id": 37,
+          "full_name": "M. Koné",
+          "team": "France",
+          "goals": 2
+        },
+        {
+          "player_id": 1115,
+          "full_name": "H. Abdulkareem",
+          "team": "Iraq",
+          "goals": 1
+        },
+        {
+          "player_id": 1108,
+          "full_name": "Ibraheem Bayesh",
+          "team": "Iraq",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 52,
+      "stage": "group",
+      "team_home": "Norway",
+      "team_away": "Senegal",
+      "actual_home": 0,
+      "actual_away": 5,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 322,
+          "full_name": "B. Dia",
+          "team": "Senegal",
+          "goals": 1
+        },
+        {
+          "player_id": 330,
+          "full_name": "C. Ndiaye",
+          "team": "Senegal",
+          "goals": 1
+        },
+        {
+          "player_id": 324,
+          "full_name": "H. Diallo",
+          "team": "Senegal",
+          "goals": 1
+        },
+        {
+          "player_id": 323,
+          "full_name": "M. Diakhon",
+          "team": "Senegal",
+          "goals": 2
+        }
+      ]
+    },
+    {
+      "id": 53,
+      "stage": "group",
+      "team_home": "Norway",
+      "team_away": "France",
+      "actual_home": 4,
+      "actual_away": 2,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 802,
+          "full_name": "P. Berg",
+          "team": "Norway",
+          "goals": 2
+        },
+        {
+          "player_id": 804,
+          "full_name": "Oscar Bobb",
+          "team": "Norway",
+          "goals": 2
+        },
+        {
+          "player_id": 45,
+          "full_name": "Kylian Mbappé",
+          "team": "France",
+          "goals": 2
+        }
+      ]
+    },
+    {
+      "id": 54,
+      "stage": "group",
+      "team_home": "Senegal",
+      "team_away": "Iraq",
+      "actual_home": 0,
+      "actual_away": 1,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 1108,
+          "full_name": "Ibraheem Bayesh",
+          "team": "Iraq",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 55,
+      "stage": "group",
+      "team_home": "Argentina",
+      "team_away": "Algeria",
+      "actual_home": 4,
+      "actual_away": 0,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 577,
+          "full_name": "J. López",
+          "team": "Argentina",
+          "goals": 1
+        },
+        {
+          "player_id": 567,
+          "full_name": "E. Fernández",
+          "team": "Argentina",
+          "goals": 3
+        }
+      ]
+    },
+    {
+      "id": 56,
+      "stage": "group",
+      "team_home": "Austria",
+      "team_away": "Jordan",
+      "actual_home": 0,
+      "actual_away": 4,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 1086,
+          "full_name": "O. Al Fakhouri",
+          "team": "Jordan",
+          "goals": 1
+        },
+        {
+          "player_id": 1075,
+          "full_name": "M. Abu Dahab",
+          "team": "Jordan",
+          "goals": 1
+        },
+        {
+          "player_id": 1094,
+          "full_name": "Mousa Tamari",
+          "team": "Jordan",
+          "goals": 2
+        }
+      ]
+    },
+    {
+      "id": 57,
+      "stage": "group",
+      "team_home": "Argentina",
+      "team_away": "Austria",
+      "actual_home": 1,
+      "actual_away": 0,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 576,
+          "full_name": "N. González",
+          "team": "Argentina",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 58,
+      "stage": "group",
+      "team_home": "Jordan",
+      "team_away": "Algeria",
+      "actual_home": 4,
+      "actual_away": 1,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 1087,
+          "full_name": "Yazan Al Naimat",
+          "team": "Jordan",
+          "goals": 2
+        },
+        {
+          "player_id": 1090,
+          "full_name": "Baha&apos; Faisal",
+          "team": "Jordan",
+          "goals": 1
+        },
+        {
+          "player_id": 1086,
+          "full_name": "O. Al Fakhouri",
+          "team": "Jordan",
+          "goals": 1
+        },
+        {
+          "player_id": 1026,
+          "full_name": "Amin Chiakha",
+          "team": "Algeria",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 59,
+      "stage": "group",
+      "team_home": "Algeria",
+      "team_away": "Austria",
+      "actual_home": 5,
+      "actual_away": 0,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 1028,
+          "full_name": "A. Gouiri",
+          "team": "Algeria",
+          "goals": 1
+        },
+        {
+          "player_id": 1030,
+          "full_name": "R. Mahrez",
+          "team": "Algeria",
+          "goals": 2
+        },
+        {
+          "player_id": 1025,
+          "full_name": "F. Chaïbi",
+          "team": "Algeria",
+          "goals": 1
+        },
+        {
+          "player_id": 1029,
+          "full_name": "A. Hadj-Moussa",
+          "team": "Algeria",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 60,
+      "stage": "group",
+      "team_home": "Jordan",
+      "team_away": "Argentina",
+      "actual_home": 2,
+      "actual_away": 0,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 1091,
+          "full_name": "Ali Olwan",
+          "team": "Jordan",
+          "goals": 2
+        }
+      ]
+    },
+    {
+      "id": 61,
+      "stage": "group",
+      "team_home": "Portugal",
+      "team_away": "DR Congo",
+      "actual_home": 1,
+      "actual_away": 3,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 592,
+          "full_name": "Bruno Fernandes",
+          "team": "Portugal",
+          "goals": 1
+        },
+        {
+          "player_id": 957,
+          "full_name": "B. Cipenga",
+          "team": "DR Congo",
+          "goals": 1
+        },
+        {
+          "player_id": 968,
+          "full_name": "Y. Wissa",
+          "team": "DR Congo",
+          "goals": 2
+        }
+      ]
+    },
+    {
+      "id": 62,
+      "stage": "group",
+      "team_home": "Uzbekistan",
+      "team_away": "Colombia",
+      "actual_home": 5,
+      "actual_away": 0,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 1143,
+          "full_name": "A. Odilov",
+          "team": "Uzbekistan",
+          "goals": 1
+        },
+        {
+          "player_id": 1136,
+          "full_name": "J. Iskanderov",
+          "team": "Uzbekistan",
+          "goals": 1
+        },
+        {
+          "player_id": 1142,
+          "full_name": "D. Khamdamov",
+          "team": "Uzbekistan",
+          "goals": 2
+        },
+        {
+          "player_id": 1137,
+          "full_name": "O. Hamrobekov",
+          "team": "Uzbekistan",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 63,
+      "stage": "group",
+      "team_home": "Portugal",
+      "team_away": "Uzbekistan",
+      "actual_home": 1,
+      "actual_away": 4,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 604,
+          "full_name": "Pedro Neto",
+          "team": "Portugal",
+          "goals": 1
+        },
+        {
+          "player_id": 1134,
+          "full_name": "A. Gʻaniyev",
+          "team": "Uzbekistan",
+          "goals": 1
+        },
+        {
+          "player_id": 1145,
+          "full_name": "E. Shomurodov",
+          "team": "Uzbekistan",
+          "goals": 1
+        },
+        {
+          "player_id": 1144,
+          "full_name": "I. Sergeev",
+          "team": "Uzbekistan",
+          "goals": 1
+        },
+        {
+          "player_id": 1136,
+          "full_name": "J. Iskanderov",
+          "team": "Uzbekistan",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 64,
+      "stage": "group",
+      "team_home": "Colombia",
+      "team_away": "DR Congo",
+      "actual_home": 0,
+      "actual_away": 0,
+      "pen_winner": null,
+      "scorers": []
+    },
+    {
+      "id": 65,
+      "stage": "group",
+      "team_home": "Colombia",
+      "team_away": "Portugal",
+      "actual_home": 0,
+      "actual_away": 5,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 592,
+          "full_name": "Bruno Fernandes",
+          "team": "Portugal",
+          "goals": 1
+        },
+        {
+          "player_id": 593,
+          "full_name": "Mateus Fernandes",
+          "team": "Portugal",
+          "goals": 1
+        },
+        {
+          "player_id": 602,
+          "full_name": "Ricardo Horta",
+          "team": "Portugal",
+          "goals": 1
+        },
+        {
+          "player_id": 600,
+          "full_name": "Francisco Conceição",
+          "team": "Portugal",
+          "goals": 1
+        },
+        {
+          "player_id": 603,
+          "full_name": "João Félix",
+          "team": "Portugal",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 66,
+      "stage": "group",
+      "team_home": "DR Congo",
+      "team_away": "Uzbekistan",
+      "actual_home": 0,
+      "actual_away": 3,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 1146,
+          "full_name": "O. O&apos;runov",
+          "team": "Uzbekistan",
+          "goals": 2
+        },
+        {
+          "player_id": 1137,
+          "full_name": "O. Hamrobekov",
+          "team": "Uzbekistan",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 67,
+      "stage": "group",
+      "team_home": "England",
+      "team_away": "Croatia",
+      "actual_home": 2,
+      "actual_away": 3,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 217,
+          "full_name": "P. Foden",
+          "team": "England",
+          "goals": 1
+        },
+        {
+          "player_id": 230,
+          "full_name": "M. Rashford",
+          "team": "England",
+          "goals": 1
+        },
+        {
+          "player_id": 70,
+          "full_name": "P. Musa",
+          "team": "Croatia",
+          "goals": 2
+        },
+        {
+          "player_id": 61,
+          "full_name": "L. Modrić",
+          "team": "Croatia",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 68,
+      "stage": "group",
+      "team_home": "Ghana",
+      "team_away": "Panama",
+      "actual_home": 3,
+      "actual_away": 0,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 937,
+          "full_name": "J. Ayew",
+          "team": "Ghana",
+          "goals": 2
+        },
+        {
+          "player_id": 939,
+          "full_name": "A. Fatawu",
+          "team": "Ghana",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 69,
+      "stage": "group",
+      "team_home": "England",
+      "team_away": "Ghana",
+      "actual_home": 1,
+      "actual_away": 1,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 229,
+          "full_name": "N. Madueke",
+          "team": "England",
+          "goals": 1
+        },
+        {
+          "player_id": 932,
+          "full_name": "K. Sibo",
+          "team": "Ghana",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 70,
+      "stage": "group",
+      "team_home": "Panama",
+      "team_away": "Croatia",
+      "actual_home": 4,
+      "actual_away": 1,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 273,
+          "full_name": "H. Hurtado",
+          "team": "Panama",
+          "goals": 2
+        },
+        {
+          "player_id": 270,
+          "full_name": "J. Fajardo",
+          "team": "Panama",
+          "goals": 1
+        },
+        {
+          "player_id": 266,
+          "full_name": "Y. Bárcenas",
+          "team": "Panama",
+          "goals": 1
+        },
+        {
+          "player_id": 70,
+          "full_name": "P. Musa",
+          "team": "Croatia",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 71,
+      "stage": "group",
+      "team_home": "Panama",
+      "team_away": "England",
+      "actual_home": 0,
+      "actual_away": 0,
+      "pen_winner": null,
+      "scorers": []
+    },
+    {
+      "id": 72,
+      "stage": "group",
+      "team_home": "Croatia",
+      "team_away": "Ghana",
+      "actual_home": 2,
+      "actual_away": 2,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 60,
+          "full_name": "M. Kovačić",
+          "team": "Croatia",
+          "goals": 1
+        },
+        {
+          "player_id": 68,
+          "full_name": "A. Kramarić",
+          "team": "Croatia",
+          "goals": 1
+        },
+        {
+          "player_id": 935,
+          "full_name": "P. Adu",
+          "team": "Ghana",
+          "goals": 2
+        }
+      ]
+    },
+    {
+      "id": 73,
+      "stage": "r32",
+      "team_home": "South Korea",
+      "team_away": "Canada",
+      "actual_home": 1,
+      "actual_away": 1,
+      "pen_winner": "away",
+      "scorers": [
+        {
+          "player_id": 423,
+          "full_name": "Hwang In-Beom",
+          "team": "South Korea",
+          "goals": 1
+        },
+        {
+          "player_id": 1350,
+          "full_name": "L. Millar",
+          "team": "Canada",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 74,
+      "stage": "r32",
+      "team_home": "Curaçao",
+      "team_away": "Paraguay",
+      "actual_home": 0,
+      "actual_away": 1,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 1195,
+          "full_name": "G. Caballero",
+          "team": "Paraguay",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 75,
+      "stage": "r32",
+      "team_home": "Tunisia",
+      "team_away": "Morocco",
+      "actual_home": 0,
+      "actual_away": 2,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 665,
+          "full_name": "E. Ben Seghir",
+          "team": "Morocco",
+          "goals": 2
+        }
+      ]
+    },
+    {
+      "id": 76,
+      "stage": "r32",
+      "team_home": "Scotland",
+      "team_away": "Sweden",
+      "actual_home": 1,
+      "actual_away": 2,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 829,
+          "full_name": "L. Ferguson",
+          "team": "Scotland",
+          "goals": 1
+        },
+        {
+          "player_id": 92,
+          "full_name": "B. Nygren",
+          "team": "Sweden",
+          "goals": 2
+        }
+      ]
+    },
+    {
+      "id": 77,
+      "stage": "r32",
+      "team_home": "Senegal",
+      "team_away": "Iran",
+      "actual_home": 3,
+      "actual_away": 2,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 326,
+          "full_name": "B. Dieng",
+          "team": "Senegal",
+          "goals": 2
+        },
+        {
+          "player_id": 325,
+          "full_name": "Assane Diao",
+          "team": "Senegal",
+          "goals": 1
+        },
+        {
+          "player_id": 478,
+          "full_name": "A. Alipour",
+          "team": "Iran",
+          "goals": 2
+        }
+      ]
+    },
+    {
+      "id": 78,
+      "stage": "r32",
+      "team_home": "Ecuador",
+      "team_away": "Norway",
+      "actual_home": 2,
+      "actual_away": 0,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 1225,
+          "full_name": "Jeremy Arévalo",
+          "team": "Ecuador",
+          "goals": 1
+        },
+        {
+          "player_id": 1223,
+          "full_name": "J. Caicedo",
+          "team": "Ecuador",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 79,
+      "stage": "r32",
+      "team_home": "Mexico",
+      "team_away": "Ivory Coast",
+      "actual_home": 2,
+      "actual_away": 2,
+      "pen_winner": "away",
+      "scorers": [
+        {
+          "player_id": 404,
+          "full_name": "G. Martínez",
+          "team": "Mexico",
+          "goals": 1
+        },
+        {
+          "player_id": 379,
+          "full_name": "R. Alvarado",
+          "team": "Mexico",
+          "goals": 1
+        },
+        {
+          "player_id": 912,
+          "full_name": "Y. Diomande",
+          "team": "Ivory Coast",
+          "goals": 2
+        }
+      ]
+    },
+    {
+      "id": 80,
+      "stage": "r32",
+      "team_home": "Ghana",
+      "team_away": "Portugal",
+      "actual_home": 0,
+      "actual_away": 3,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 607,
+          "full_name": "Trincão",
+          "team": "Portugal",
+          "goals": 1
+        },
+        {
+          "player_id": 600,
+          "full_name": "Francisco Conceição",
+          "team": "Portugal",
+          "goals": 1
+        },
+        {
+          "player_id": 603,
+          "full_name": "João Félix",
+          "team": "Portugal",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 81,
+      "stage": "r32",
+      "team_home": "Türkiye",
+      "team_away": "Algeria",
+      "actual_home": 2,
+      "actual_away": 0,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 783,
+          "full_name": "K. Aktürkoğlu",
+          "team": "Türkiye",
+          "goals": 1
+        },
+        {
+          "player_id": 784,
+          "full_name": "D. Gül",
+          "team": "Türkiye",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 82,
+      "stage": "r32",
+      "team_home": "Belgium",
+      "team_away": "Czech Republic",
+      "actual_home": 1,
+      "actual_away": 3,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 21,
+          "full_name": "J. Doku",
+          "team": "Belgium",
+          "goals": 1
+        },
+        {
+          "player_id": 721,
+          "full_name": "V. Darida",
+          "team": "Czech Republic",
+          "goals": 1
+        },
+        {
+          "player_id": 727,
+          "full_name": "T. Chorý",
+          "team": "Czech Republic",
+          "goals": 1
+        },
+        {
+          "player_id": 722,
+          "full_name": "A. Karabec",
+          "team": "Czech Republic",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 83,
+      "stage": "r32",
+      "team_home": "DR Congo",
+      "team_away": "Panama",
+      "actual_home": 1,
+      "actual_away": 1,
+      "pen_winner": "home",
+      "scorers": [
+        {
+          "player_id": 957,
+          "full_name": "B. Cipenga",
+          "team": "DR Congo",
+          "goals": 1
+        },
+        {
+          "player_id": 266,
+          "full_name": "Y. Bárcenas",
+          "team": "Panama",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 84,
+      "stage": "r32",
+      "team_home": "Cape Verde",
+      "team_away": "Argentina",
+      "actual_home": 2,
+      "actual_away": 1,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 1055,
+          "full_name": "Willy Semedo",
+          "team": "Cape Verde",
+          "goals": 2
+        },
+        {
+          "player_id": 576,
+          "full_name": "N. González",
+          "team": "Argentina",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 85,
+      "stage": "r32",
+      "team_home": "Qatar",
+      "team_away": "France",
+      "actual_home": 0,
+      "actual_away": 0,
+      "pen_winner": "home",
+      "scorers": []
+    },
+    {
+      "id": 86,
+      "stage": "r32",
+      "team_home": "Jordan",
+      "team_away": "Uruguay",
+      "actual_home": 2,
+      "actual_away": 1,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 1093,
+          "full_name": "M. Taha",
+          "team": "Jordan",
+          "goals": 1
+        },
+        {
+          "player_id": 1094,
+          "full_name": "Mousa Tamari",
+          "team": "Jordan",
+          "goals": 1
+        },
+        {
+          "player_id": 143,
+          "full_name": "F. Viñas",
+          "team": "Uruguay",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 87,
+      "stage": "r32",
+      "team_home": "Uzbekistan",
+      "team_away": "Croatia",
+      "actual_home": 1,
+      "actual_away": 3,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 1137,
+          "full_name": "O. Hamrobekov",
+          "team": "Uzbekistan",
+          "goals": 1
+        },
+        {
+          "player_id": 71,
+          "full_name": "I. Perišić",
+          "team": "Croatia",
+          "goals": 1
+        },
+        {
+          "player_id": 68,
+          "full_name": "A. Kramarić",
+          "team": "Croatia",
+          "goals": 1
+        },
+        {
+          "player_id": 70,
+          "full_name": "P. Musa",
+          "team": "Croatia",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 88,
+      "stage": "r32",
+      "team_home": "USA",
+      "team_away": "Egypt",
+      "actual_home": 0,
+      "actual_away": 3,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 705,
+          "full_name": "Salah Mohsen",
+          "team": "Egypt",
+          "goals": 2
+        },
+        {
+          "player_id": 707,
+          "full_name": "Mohamed Salah",
+          "team": "Egypt",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 89,
+      "stage": "r16",
+      "team_home": "Paraguay",
+      "team_away": "Senegal",
+      "actual_home": 0,
+      "actual_away": 3,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 328,
+          "full_name": "S. Mané",
+          "team": "Senegal",
+          "goals": 1
+        },
+        {
+          "player_id": 329,
+          "full_name": "I. Mbaye",
+          "team": "Senegal",
+          "goals": 1
+        },
+        {
+          "player_id": 327,
+          "full_name": "N. Jackson",
+          "team": "Senegal",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 90,
+      "stage": "r16",
+      "team_home": "Canada",
+      "team_away": "Morocco",
+      "actual_home": 0,
+      "actual_away": 3,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 672,
+          "full_name": "M. Zabiri",
+          "team": "Morocco",
+          "goals": 2
+        },
+        {
+          "player_id": 668,
+          "full_name": "A. Ezzalzouli",
+          "team": "Morocco",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 91,
+      "stage": "r16",
+      "team_home": "Sweden",
+      "team_away": "Ecuador",
+      "actual_home": 0,
+      "actual_away": 0,
+      "pen_winner": "home",
+      "scorers": []
+    },
+    {
+      "id": 92,
+      "stage": "r16",
+      "team_home": "Ivory Coast",
+      "team_away": "Portugal",
+      "actual_home": 0,
+      "actual_away": 0,
+      "pen_winner": "away",
+      "scorers": []
+    },
+    {
+      "id": 93,
+      "stage": "r16",
+      "team_home": "DR Congo",
+      "team_away": "Cape Verde",
+      "actual_home": 1,
+      "actual_away": 1,
+      "pen_winner": "away",
+      "scorers": [
+        {
+          "player_id": 957,
+          "full_name": "B. Cipenga",
+          "team": "DR Congo",
+          "goals": 1
+        },
+        {
+          "player_id": 1050,
+          "full_name": "Nuno da Costa",
+          "team": "Cape Verde",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 94,
+      "stage": "r16",
+      "team_home": "Türkiye",
+      "team_away": "Czech Republic",
+      "actual_home": 0,
+      "actual_away": 2,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 721,
+          "full_name": "V. Darida",
+          "team": "Czech Republic",
+          "goals": 1
+        },
+        {
+          "player_id": 729,
+          "full_name": "J. Kliment",
+          "team": "Czech Republic",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 95,
+      "stage": "r16",
+      "team_home": "Jordan",
+      "team_away": "Egypt",
+      "actual_home": 0,
+      "actual_away": 3,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 708,
+          "full_name": "Zizo",
+          "team": "Egypt",
+          "goals": 1
+        },
+        {
+          "player_id": 699,
+          "full_name": "Ibrahim Adel",
+          "team": "Egypt",
+          "goals": 2
+        }
+      ]
+    },
+    {
+      "id": 96,
+      "stage": "r16",
+      "team_home": "Qatar",
+      "team_away": "Croatia",
+      "actual_home": 3,
+      "actual_away": 1,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 1168,
+          "full_name": "M. Gouda",
+          "team": "Qatar",
+          "goals": 2
+        },
+        {
+          "player_id": 1167,
+          "full_name": "Edmilson Junior",
+          "team": "Qatar",
+          "goals": 1
+        },
+        {
+          "player_id": 68,
+          "full_name": "A. Kramarić",
+          "team": "Croatia",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 97,
+      "stage": "qf",
+      "team_home": "Senegal",
+      "team_away": "Morocco",
+      "actual_home": 0,
+      "actual_away": 0,
+      "pen_winner": "away",
+      "scorers": []
+    },
+    {
+      "id": 98,
+      "stage": "qf",
+      "team_home": "Cape Verde",
+      "team_away": "Czech Republic",
+      "actual_home": 3,
+      "actual_away": 0,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 1054,
+          "full_name": "Garry Rodrigues",
+          "team": "Cape Verde",
+          "goals": 2
+        },
+        {
+          "player_id": 1056,
+          "full_name": "Hélio Varela",
+          "team": "Cape Verde",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 99,
+      "stage": "qf",
+      "team_home": "Sweden",
+      "team_away": "Portugal",
+      "actual_home": 2,
+      "actual_away": 0,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 91,
+          "full_name": "G. Nilsson",
+          "team": "Sweden",
+          "goals": 2
+        }
+      ]
+    },
+    {
+      "id": 100,
+      "stage": "qf",
+      "team_home": "Egypt",
+      "team_away": "Qatar",
+      "actual_home": 2,
+      "actual_away": 1,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 703,
+          "full_name": "N. Mansy",
+          "team": "Egypt",
+          "goals": 2
+        },
+        {
+          "player_id": 1159,
+          "full_name": "Ali",
+          "team": "Qatar",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 101,
+      "stage": "sf",
+      "team_home": "Morocco",
+      "team_away": "Cape Verde",
+      "actual_home": 1,
+      "actual_away": 3,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 672,
+          "full_name": "M. Zabiri",
+          "team": "Morocco",
+          "goals": 1
+        },
+        {
+          "player_id": 1050,
+          "full_name": "Nuno da Costa",
+          "team": "Cape Verde",
+          "goals": 1
+        },
+        {
+          "player_id": 1051,
+          "full_name": "Jovane Cabral",
+          "team": "Cape Verde",
+          "goals": 1
+        },
+        {
+          "player_id": 1049,
+          "full_name": "Gilson Benchimol",
+          "team": "Cape Verde",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 102,
+      "stage": "sf",
+      "team_home": "Sweden",
+      "team_away": "Egypt",
+      "actual_home": 0,
+      "actual_away": 1,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 706,
+          "full_name": "Mostafa Mohamed",
+          "team": "Egypt",
+          "goals": 1
+        }
+      ]
+    },
+    {
+      "id": 103,
+      "stage": "third",
+      "team_home": "Morocco",
+      "team_away": "Sweden",
+      "actual_home": 2,
+      "actual_away": 3,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 667,
+          "full_name": "Y. En-Nesyri",
+          "team": "Morocco",
+          "goals": 2
+        },
+        {
+          "player_id": 88,
+          "full_name": "T. Ali",
+          "team": "Sweden",
+          "goals": 3
+        }
+      ]
+    },
+    {
+      "id": 104,
+      "stage": "final",
+      "team_home": "Cape Verde",
+      "team_away": "Egypt",
+      "actual_home": 3,
+      "actual_away": 1,
+      "pen_winner": null,
+      "scorers": [
+        {
+          "player_id": 1054,
+          "full_name": "Garry Rodrigues",
+          "team": "Cape Verde",
+          "goals": 3
+        },
+        {
+          "player_id": 703,
+          "full_name": "N. Mansy",
+          "team": "Egypt",
+          "goals": 1
+        }
+      ]
+    }
+  ],
+  "slotMap": {
+    "1A": "Mexico",
+    "2A": "South Korea",
+    "3A": "Czech Republic",
+    "1B": "Qatar",
+    "2B": "Canada",
+    "3B": "Switzerland",
+    "1C": "Scotland",
+    "2C": "Morocco",
+    "3C": "Haiti",
+    "1D": "Türkiye",
+    "2D": "USA",
+    "3D": "Paraguay",
+    "1E": "Curaçao",
+    "2E": "Ecuador",
+    "3E": "Ivory Coast",
+    "1F": "Tunisia",
+    "2F": "Sweden",
+    "3F": "Japan",
+    "1G": "Belgium",
+    "2G": "Egypt",
+    "3G": "Iran",
+    "1H": "Cape Verde",
+    "2H": "Uruguay",
+    "3H": "Spain",
+    "1I": "Senegal",
+    "2I": "Norway",
+    "3I": "France",
+    "1J": "Jordan",
+    "2J": "Argentina",
+    "3J": "Algeria",
+    "1K": "Uzbekistan",
+    "2K": "DR Congo",
+    "3K": "Portugal",
+    "1L": "Ghana",
+    "2L": "Panama",
+    "3L": "Croatia",
+    "3A/B/C/D/F": "Paraguay",
+    "3C/D/F/G/H": "Iran",
+    "3C/E/F/H/I": "Ivory Coast",
+    "3E/H/I/J/K": "Portugal",
+    "3B/E/F/I/J": "Algeria",
+    "3A/E/H/I/J": "Czech Republic",
+    "3E/F/G/I/J": "France",
+    "3D/E/I/J/L": "Croatia",
+    "W73": "Canada",
+    "L73": "South Korea",
+    "W76": "Sweden",
+    "L76": "Scotland",
+    "W74": "Paraguay",
+    "L74": "Curaçao",
+    "W75": "Morocco",
+    "L75": "Tunisia",
+    "W78": "Ecuador",
+    "L78": "Norway",
+    "W77": "Senegal",
+    "L77": "Iran",
+    "W79": "Ivory Coast",
+    "L79": "Mexico",
+    "W80": "Portugal",
+    "L80": "Ghana",
+    "W82": "Czech Republic",
+    "L82": "Belgium",
+    "W81": "Türkiye",
+    "L81": "Algeria",
+    "W84": "Cape Verde",
+    "L84": "Argentina",
+    "W83": "DR Congo",
+    "L83": "Panama",
+    "W85": "Qatar",
+    "L85": "France",
+    "W88": "Egypt",
+    "L88": "USA",
+    "W86": "Jordan",
+    "L86": "Uruguay",
+    "W87": "Croatia",
+    "L87": "Uzbekistan",
+    "W90": "Morocco",
+    "L90": "Canada",
+    "W89": "Senegal",
+    "L89": "Paraguay",
+    "W91": "Sweden",
+    "L91": "Ecuador",
+    "W92": "Portugal",
+    "L92": "Ivory Coast",
+    "W93": "Cape Verde",
+    "L93": "DR Congo",
+    "W94": "Czech Republic",
+    "L94": "Türkiye",
+    "W95": "Egypt",
+    "L95": "Jordan",
+    "W96": "Qatar",
+    "L96": "Croatia",
+    "W97": "Morocco",
+    "L97": "Senegal",
+    "W98": "Cape Verde",
+    "L98": "Czech Republic",
+    "W99": "Sweden",
+    "L99": "Portugal",
+    "W100": "Egypt",
+    "L100": "Qatar",
+    "W101": "Cape Verde",
+    "L101": "Morocco",
+    "W102": "Egypt",
+    "L102": "Sweden",
+    "W103": "Sweden",
+    "L103": "Morocco",
+    "W104": "Cape Verde",
+    "L104": "Egypt"
+  },
+  "topScorer": {
+    "player_id": 1054,
+    "full_name": "Garry Rodrigues",
+    "team": "Cape Verde",
+    "total_goals": 6
+  },
+  "champion": "Cape Verde",
+  "seed": "wc2026-e2e-v1"
+}
