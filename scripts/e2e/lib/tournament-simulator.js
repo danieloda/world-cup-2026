@@ -10,6 +10,7 @@
 
 import { mulberry32, hashSeed } from './prng.js';
 import { fifaRank } from '../../../src/js/fifa-rank.js';
+import { assignCompositeThirds } from '../../../src/js/thirds-assign.js';
 
 const REALISTIC_SCORES = [
   [0, 0], [1, 0], [0, 1], [1, 1], [2, 0], [0, 2],
@@ -193,30 +194,12 @@ export function simulateTournament(matches, players, seed = 'wc2026-e2e-v1') {
     }
   }
 
-  // Backtracking: tenta atribuir cada slot a um third valido
-  function backtrack(idx, assignment, used) {
-    if (idx >= compositeSlots.length) return assignment;
-    const { slot, validGroups } = compositeSlots[idx];
-    // Tenta cada third compatível (em ordem da classificação FIFA)
-    for (const third of thirds) {
-      if (used.has(third.team)) continue;
-      if (!validGroups.includes(third.group)) continue;
-      assignment.set(slot, third.team);
-      used.add(third.team);
-      const result = backtrack(idx + 1, assignment, used);
-      if (result) return result;
-      assignment.delete(slot);
-      used.delete(third.team);
-    }
-    return null;  // sem solução nesse branch
+  // Backtracking (lógica compartilhada com a página e o servidor)
+  const thirdAssignment = assignCompositeThirds(compositeSlots, thirds);
+  for (const [slot, third] of thirdAssignment) {
+    slotMap.set(slot, third.team);
   }
-
-  const result = backtrack(0, new Map(), new Set());
-  if (result) {
-    for (const [slot, team] of result) {
-      slotMap.set(slot, team);
-    }
-  } else {
+  if (thirdAssignment.size < compositeSlots.length) {
     console.error('[simulator] BACKTRACKING falhou — nenhuma atribuicao valida de terceiros');
   }
 

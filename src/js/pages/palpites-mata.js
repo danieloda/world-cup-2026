@@ -7,6 +7,7 @@ import {
   computeStandings as utilComputeStandings, localDateKey,
 } from '../util.js';
 import { fifaRank } from '../fifa-rank.js';
+import { assignCompositeThirds } from '../thirds-assign.js';
 import { matchPoints, scoreBreakdown, stageMultiplier, scorerBonus } from '../scoring.js';
 import {
   renderRaioXModalButton, openRaioXModal, attachRaioXTabs,
@@ -231,21 +232,18 @@ function computeSlotResolution(mode = 'real-first') {
   thirdsRanked.sort((a, b) =>
     b.pts - a.pts || b.sg - a.sg || b.gp - a.gp || fifaRank(a.team) - fifaRank(b.team)
   );
-  const usedThirds = new Set();
-  const koMatchesSorted = [...matches].sort((a, b) => a.id - b.id);
-  for (const m of koMatchesSorted) {
-    // Use slot_home/slot_away (original slot reference) — team_home may already be resolved to a real team
+  // Slots compostos distintos, em ordem de match id (= ordem do servidor/simulador).
+  // Usa slot_home/slot_away (slot original) — team_home/away pode já estar resolvido.
+  const compositeSlots = [];
+  for (const m of [...matches].sort((a, b) => a.id - b.id)) {
     for (const slotKey of [m.slot_home, m.slot_away]) {
       if (!slotKey || !slotKey.startsWith('3') || !slotKey.includes('/')) continue;
-      const validGroups = slotKey.slice(1).split('/');
-      const candidate = thirdsRanked.find(t =>
-        validGroups.includes(t.group) && !usedThirds.has(t.team)
-      );
-      if (candidate) {
-        res.set(slotKey, { team: candidate.team, source: candidate.source });
-        usedThirds.add(candidate.team);
-      }
+      if (compositeSlots.some(s => s.slot === slotKey)) continue;
+      compositeSlots.push({ slot: slotKey, validGroups: slotKey.slice(1).split('/') });
     }
+  }
+  for (const [slotKey, third] of assignCompositeThirds(compositeSlots, thirdsRanked)) {
+    res.set(slotKey, { team: third.team, source: third.source });
   }
 
   // === 2) W### e L### dos jogos de mata-mata ===
