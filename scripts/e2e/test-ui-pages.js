@@ -156,7 +156,7 @@ async function main() {
     // ============================================================
     console.log(`\n${C.b}3) recent.json — integridade + tooltip${C.x}`);
     // 3a) integridade do arquivo
-    const recentRaw = JSON.parse(readFileSync(join(__dirname, '..', '..', 'assets', 'data', 'recent.json'), 'utf8'));
+    const recentRaw = JSON.parse(readFileSync(join(__dirname, '..', '..', 'src', 'assets', 'data', 'recent.json'), 'utf8'));
     const teams = Object.keys(recentRaw);
     const shapeOk = teams.length > 0 && teams.every((t) =>
       Array.isArray(recentRaw[t]) && recentRaw[t].every((r) =>
