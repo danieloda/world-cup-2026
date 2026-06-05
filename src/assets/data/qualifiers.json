@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-04T23:07:49.086Z",
+  "generatedAt": "2026-06-05T19:57:12.424Z",
   "confederations": {
     "CONMEBOL": {
       "namePt": "Eliminatórias da América do Sul",
@@ -2408,6 +2408,142 @@
           ]
         }
       ]
+    },
+    "UEFA_PO": {
+      "namePt": "Repescagem Europeia",
+      "format": "bracket",
+      "rounds": [
+        {
+          "name": "Semi-finals",
+          "ties": [
+            {
+              "date": "2026-03-26",
+              "home": "Turkey",
+              "away": "Romania",
+              "homeGoals": 1,
+              "awayGoals": 0,
+              "homeWinner": true,
+              "awayWinner": false,
+              "status": "FT"
+            },
+            {
+              "date": "2026-03-26",
+              "home": "Denmark",
+              "away": "FYR Macedonia",
+              "homeGoals": 4,
+              "awayGoals": 0,
+              "homeWinner": true,
+              "awayWinner": false,
+              "status": "FT"
+            },
+            {
+              "date": "2026-03-26",
+              "home": "Poland",
+              "away": "Albania",
+              "homeGoals": 2,
+              "awayGoals": 1,
+              "homeWinner": true,
+              "awayWinner": false,
+              "status": "FT"
+            },
+            {
+              "date": "2026-03-26",
+              "home": "Wales",
+              "away": "Bosnia & Herzegovina",
+              "homeGoals": 1,
+              "awayGoals": 1,
+              "homeWinner": false,
+              "awayWinner": true,
+              "status": "PEN"
+            },
+            {
+              "date": "2026-03-26",
+              "home": "Italy",
+              "away": "Northern Ireland",
+              "homeGoals": 2,
+              "awayGoals": 0,
+              "homeWinner": true,
+              "awayWinner": false,
+              "status": "FT"
+            },
+            {
+              "date": "2026-03-26",
+              "home": "Czech Republic",
+              "away": "Rep. Of Ireland",
+              "homeGoals": 2,
+              "awayGoals": 2,
+              "homeWinner": true,
+              "awayWinner": false,
+              "status": "PEN"
+            },
+            {
+              "date": "2026-03-26",
+              "home": "Ukraine",
+              "away": "Sweden",
+              "homeGoals": 1,
+              "awayGoals": 3,
+              "homeWinner": false,
+              "awayWinner": true,
+              "status": "FT"
+            },
+            {
+              "date": "2026-03-26",
+              "home": "Slovakia",
+              "away": "Kosovo",
+              "homeGoals": 3,
+              "awayGoals": 4,
+              "homeWinner": false,
+              "awayWinner": true,
+              "status": "FT"
+            }
+          ]
+        },
+        {
+          "name": "Final",
+          "ties": [
+            {
+              "date": "2026-03-31",
+              "home": "Sweden",
+              "away": "Poland",
+              "homeGoals": 3,
+              "awayGoals": 2,
+              "homeWinner": true,
+              "awayWinner": false,
+              "status": "FT"
+            },
+            {
+              "date": "2026-03-31",
+              "home": "Czech Republic",
+              "away": "Denmark",
+              "homeGoals": 1,
+              "awayGoals": 1,
+              "homeWinner": true,
+              "awayWinner": false,
+              "status": "PEN"
+            },
+            {
+              "date": "2026-03-31",
+              "home": "Kosovo",
+              "away": "Turkey",
+              "homeGoals": 0,
+              "awayGoals": 1,
+              "homeWinner": false,
+              "awayWinner": true,
+              "status": "FT"
+            },
+            {
+              "date": "2026-03-31",
+              "home": "Bosnia & Herzegovina",
+              "away": "Italy",
+              "homeGoals": 1,
+              "awayGoals": 1,
+              "homeWinner": true,
+              "awayWinner": false,
+              "status": "PEN"
+            }
+          ]
+        }
+      ]
     }
   },
   "teams": {
@@ -2424,14 +2560,16 @@
     },
     "Czech Republic": {
       "format": "table",
-      "confederation": "UEFA"
+      "confederation": "UEFA",
+      "playoff": "UEFA_PO"
     },
     "Canada": {
       "format": "host"
     },
     "Bosnia & Herzegovina": {
       "format": "table",
-      "confederation": "UEFA"
+      "confederation": "UEFA",
+      "playoff": "UEFA_PO"
     },
     "Qatar": {
       "format": "table",
@@ -2470,7 +2608,8 @@
     },
     "Turkey": {
       "format": "table",
-      "confederation": "UEFA"
+      "confederation": "UEFA",
+      "playoff": "UEFA_PO"
     },
     "Germany": {
       "format": "table",
@@ -2498,7 +2637,8 @@
     },
     "Sweden": {
       "format": "table",
-      "confederation": "UEFA"
+      "confederation": "UEFA",
+      "playoff": "UEFA_PO"
     },
     "Tunisia": {
       "format": "table",

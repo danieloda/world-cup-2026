@@ -1192,10 +1192,12 @@ body.raiox-modal-open { overflow: hidden; }
 .rx-tie-t.away { flex-direction: row-reverse; text-align: right; }
 .rx-tie-t.win { color: var(--text); }
 .rx-tie-t.foc { color: var(--accent); font-weight: 800; }
-.rx-tie-sc { font: 800 13px/1 var(--font); color: var(--text-mute); display: flex; align-items: center; gap: 4px; font-variant-numeric: tabular-nums; }
+.rx-tie-sc { position: relative; font: 800 13px/1 var(--font); color: var(--text-mute); display: flex; align-items: center; justify-content: center; gap: 4px; font-variant-numeric: tabular-nums; }
 .rx-tie-sc b { color: var(--text-dim); }
 .rx-tie-sc b.win { color: var(--text); }
 .rx-tie-sc i { font-style: normal; opacity: .5; }
+/* fora do fluxo: o "pên" não pode empurrar o placar e desalinhar o × entre as linhas */
+.rx-tie-pen { position: absolute; left: calc(100% + 6px); top: 50%; transform: translateY(-50%); font: 700 9px/1 var(--font); color: var(--text-mute); text-transform: uppercase; letter-spacing: .04em; opacity: .7; white-space: nowrap; }
 
 @media (max-width: 720px) {
   .ctx-inner { padding: 16px 14px 16px; }

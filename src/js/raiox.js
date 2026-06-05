@@ -299,23 +299,21 @@ function roundPt(r) {
 }
 
 // Status AUTORITATIVO de uma linha: 'q' classificado direto, 'p' repescagem,
-// '' não classificou (eliminado). Antes era um heurístico só de descrição que
-// dava falso-positivo — campeão de grupo da CAF ("(Promotion: )") vinha como
-// "repescagem". Agora a base é o time estar na Copa (qualifiers.teams):
-//   - campo `playoff` (repescagem intercontinental confirmada)             → 'p'
-//   - descrição de playoff inequívoca: AFC "Play-offs"/"Fifth stage", ou o
-//     vice de grupo da UEFA "(Promotion)" SEM os dois-pontos do direto       → 'p'
-//   - time da Copa sem sinal de playoff = classificou direto                 → 'q'
-//   - linha de contexto (não está na Copa) = não classificou                → ''
+// '' não classificou (eliminado).
+//
+// Para TIME DA COPA o critério é o campo `playoff` (chave de repescagem real:
+// UEFA_PO / INTERCONT), não a descrição. Isso evita o falso-positivo do Qatar e
+// da Arábia, que ganharam a 4ª fase da AFC (= classificação DIRETA; a repescagem
+// asiática é a 5ª fase, caminho do Iraque) mas cujas linhas da 3ª fase trazem
+// "Play-offs - 4ª fase" — o heurístico antigo as marcava como repescagem.
+//
+// Só PARA LINHA DE CONTEXTO (time que NÃO está na Copa) o heurístico de
+// descrição segue valendo, pra colorir na tabela quem foi à repescagem e caiu.
 function qualStatusFor(qualifiers, team, desc) {
   const rec = qualifiers?.teams?.[team];
+  if (rec && rec.format !== 'unknown') return rec.playoff ? 'p' : 'q';
   const d = String(desc || '').toLowerCase();
-  const playoff = !!rec?.playoff
-    || d.includes('play')
-    || d.includes('fifth stage')
-    || /\(promotion\)\s*$/.test(d);   // "...(promotion)" sem ": " (vice UEFA)
-  if (playoff) return 'p';
-  if (rec && rec.format !== 'unknown') return 'q'; // está na Copa, sem playoff
+  if (d.includes('play') || d.includes('fifth stage') || /\(promotion\)\s*$/.test(d)) return 'p';
   return '';
 }
 
@@ -420,7 +418,7 @@ function renderQualBracket(br, focusTeam) {
       return `
         <div class="rx-tie${focH || focA ? ' is-focus' : ''}">
           <span class="rx-tie-t home ${hw ? 'win' : ''}${focH ? ' foc' : ''}"><span class="flag">${flag(t.home)}</span>${escapeHtml(teamPt(t.home))}</span>
-          <span class="rx-tie-sc"><b class="${hw ? 'win' : ''}">${t.homeGoals ?? '–'}</b><i>×</i><b class="${aw ? 'win' : ''}">${t.awayGoals ?? '–'}</b></span>
+          <span class="rx-tie-sc"><b class="${hw ? 'win' : ''}">${t.homeGoals ?? '–'}</b><i>×</i><b class="${aw ? 'win' : ''}">${t.awayGoals ?? '–'}</b>${t.status === 'PEN' ? '<small class="rx-tie-pen">pên</small>' : ''}</span>
           <span class="rx-tie-t away ${aw ? 'win' : ''}${focA ? ' foc' : ''}">${escapeHtml(teamPt(t.away))}<span class="flag">${flag(t.away)}</span></span>
         </div>`;
     }).join('');

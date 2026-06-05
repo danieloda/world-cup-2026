@@ -43,9 +43,16 @@ const TABLE_QUALIFIERS = [
 // AFC é reconstruída de fixtures (3ª fase) + /standings (4ª fase).
 const AFC = { conf: 'AFC', namePt: 'Eliminatórias da Ásia', id: 30, season: 2026 };
 // Mata-mata → chave.
+// UEFA_PO: a repescagem europeia NÃO é uma liga própria na API — é o round
+// Semi-finals/Final dentro da própria liga 32 (a mesma da tabela, season 2024).
+// buildBracket filtra só os rounds de KO_ROUNDS, então a fase de grupos da 32
+// é ignorada e sobram só os 16 times dos play-offs. Os vices de grupo (Tchéquia,
+// Turquia, Bósnia...) jogam tabela E aparecem aqui → ganham `playoff: 'UEFA_PO'`
+// pelo mesmo mapeamento da Intercontinental, e o Raio-X mostra a chave deles.
 const BRACKET_QUALIFIERS = [
   { key: 'OFC',       namePt: 'Eliminatórias da Oceania',      id: 33, season: 2026 },
   { key: 'INTERCONT', namePt: 'Repescagem Intercontinental',   id: 37, season: 2026 },
+  { key: 'UEFA_PO',   namePt: 'Repescagem Europeia',           id: 32, season: 2024 },
 ];
 
 // A API-Football usa grafias diferentes do bolão para algumas seleções.
