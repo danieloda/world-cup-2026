@@ -3,7 +3,7 @@ import { renderShell } from '../sidebar.js';
 import { supabase } from '../supabase.js';
 import {
   flag, flagEmoji, escapeHtml, teamPt, groundShort, formatTime, formatBrDate,
-  stageLabel, roundLabelPt, showToast,
+  stageLabel, roundLabelPt, showToast, localDateKey,
 } from '../util.js';
 
 // ============================================================
@@ -443,10 +443,6 @@ async function renderResultsTab() {
   if (!cache.matches) await loadMatches();
 
   const matches = cache.matches;
-
-  // Agrupa por data
-  const today = new Date(); today.setHours(0,0,0,0);
-  const todayKey = today.toISOString().slice(0,10);
 
   const pending = matches.filter(m => !m.finished);
   const launched = matches.filter(m => m.finished)
@@ -1035,7 +1031,7 @@ function toLocalDatetimeStr(d) {
 function groupMatchesByDate(matches) {
   const map = new Map();
   for (const m of matches) {
-    const key = new Date(m.match_date).toISOString().slice(0, 10);
+    const key = localDateKey(m.match_date);
     if (!map.has(key)) map.set(key, []);
     map.get(key).push(m);
   }

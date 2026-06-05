@@ -4,7 +4,7 @@ import { supabase } from '../supabase.js';
 import {
   flag, escapeHtml, formatTime, formatBrDate, isLocked, lockCountdownLabel, showToast,
   loadRecentMatches, loadQualifiers, teamPt, renderDateCalendar, predictionDeadline,
-  computeStandings as utilComputeStandings,
+  computeStandings as utilComputeStandings, localDateKey,
 } from '../util.js';
 import { fifaRank } from '../fifa-rank.js';
 import { matchPoints, scoreBreakdown, stageMultiplier, scorerBonus } from '../scoring.js';
@@ -329,7 +329,7 @@ function isExactPred(m, pred) {
 // Visão por data
 // ============================================================
 function dateKey(m) {
-  return new Date(m.match_date).toISOString().slice(0, 10);
+  return localDateKey(m.match_date);
 }
 
 // Datas distintas (yyyy-mm-dd) dos jogos de mata-mata, em ordem cronológica.

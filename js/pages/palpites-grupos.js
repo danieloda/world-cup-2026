@@ -5,6 +5,7 @@ import {
   flag, escapeHtml, formatBrDate, formatTime,
   isLocked, isLive, lockCountdownLabel, showToast, loadRecentMatches,
   loadQualifiers, teamPt, groundShort, renderDateCalendar, predictionDeadline,
+  localDateKey,
 } from '../util.js';
 import { matchPoints, scoreBreakdown } from '../scoring.js';
 import {
@@ -635,7 +636,7 @@ function renderResultadosTab(counts) {
 // Helpers
 // ============================================================
 function dateKey(m) {
-  return new Date(m.match_date).toISOString().slice(0, 10);
+  return localDateKey(m.match_date);
 }
 
 // Datas distintas (yyyy-mm-dd) relevantes para a aba: abertas (palpites) ou

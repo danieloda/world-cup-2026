@@ -323,6 +323,24 @@ function calDateKey(y, mo, d) {
 }
 
 /**
+ * Chave de data (yyyy-mm-dd) no fuso do NAVEGADOR — consistente com formatTime,
+ * que exibe o horário local. Usar isto para agrupar jogos por dia.
+ *
+ * ⚠️ NÃO usar `new Date(iso).toISOString().slice(0,10)`: toISOString() devolve
+ * UTC, então jogos noturnos (ex.: 20:00 -06:00 = 02:00 UTC do dia seguinte)
+ * caem no dia errado e somem da contagem do dia correto.
+ */
+export function localDateKey(dateLike) {
+  const d = dateLike instanceof Date ? dateLike : new Date(dateLike);
+  return calDateKey(d.getFullYear(), d.getMonth(), d.getDate());
+}
+
+/** Chave do dia de hoje (yyyy-mm-dd) no fuso do navegador. */
+export function todayKey() {
+  return localDateKey(new Date());
+}
+
+/**
  * Estado de palpite de um dia, para a cor do calendário:
  *  'done'    = todos os jogos do dia já palpitados
  *  'urgent'  = pendente e o bloqueio é em <48h (muito perto)
@@ -361,7 +379,7 @@ export function renderDateCalendar({ dates, meta = {}, activeDate } = {}) {
   const sorted = [...dates].sort();
   const first = new Date(sorted[0] + 'T12:00:00');
   const last = new Date(sorted[sorted.length - 1] + 'T12:00:00');
-  const todayKey = new Date().toISOString().slice(0, 10);
+  const todayKeyStr = todayKey();
 
   const statusOf = (m) => dayPredictionStatus(m.done ?? 0, m.total ?? 0, m.deadline);
 
@@ -396,7 +414,7 @@ export function renderDateCalendar({ dates, meta = {}, activeDate } = {}) {
       const status = statusOf(m);
       const cls = ['cal-cell', 'cal-day', `st-${status}`];
       if (key === activeDate) cls.push('active');
-      if (key === todayKey) cls.push('today');
+      if (key === todayKeyStr) cls.push('today');
       cells.push({ match: true, html: `
         <button class="${cls.join(' ')}" data-date="${key}"${m.title ? ` title="${escapeHtml(m.title)}"` : ''}>
           <span class="cal-dnum">${d}</span>
