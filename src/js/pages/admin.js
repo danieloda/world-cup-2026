@@ -170,6 +170,7 @@ function attachListeners() {
     }
     if (a === 'save-result')   await saveResult(action.dataset.matchId);
     if (a === 'clear-result')  await clearResult(action.dataset.matchId);
+    if (a === 'set-status')    await setMatchStatus(action.dataset.matchId, action.dataset.status);
     if (a === 'set-pen')       setPenWinner(action.dataset.matchId, action.dataset.side);
     if (a === 'save-settings') await saveSettings();
     if (a === 'add-scorer')    await addScorer(action.dataset.matchId);
@@ -551,7 +552,8 @@ function renderResultRow(m) {
   const playersLoaded = cache.playersByTeam?.[m.team_home] !== undefined && cache.playersByTeam?.[m.team_away] !== undefined;
 
   return `
-    <div class="result-row ${m.finished ? 'done' : ''}" data-match-id="${m.id}">
+    <div class="result-row ${m.finished ? 'done' : ''} ${m.status === 'void' ? 'voided' : ''}" data-match-id="${m.id}">
+      ${m.status === 'void' ? `<div style="font-size:11px; font-weight:700; color:var(--red); padding:2px 4px;">⊘ JOGO ANULADO — não pontua</div>` : ''}
       <div class="result-row-top">
         <div class="when">
           <strong>${formatTime(m.match_date)}</strong>
@@ -643,6 +645,9 @@ function renderResultRow(m) {
           !goalsValid ? '⚠ atribua os marcadores' :
           (isKO && isDraw && !m.pen_winner) ? '⚠ defina vencedor dos pênaltis' : ''
         }</span>` : ''}
+        ${m.status === 'void'
+          ? `<button class="admin-action" data-action="set-status" data-match-id="${m.id}" data-status="scheduled">↩ Reativar jogo</button>`
+          : `<button class="admin-action danger" data-action="set-status" data-match-id="${m.id}" data-status="void">Anular jogo</button>`}
         ${m.finished ? `<button class="admin-action danger" data-action="clear-result" data-match-id="${m.id}">Limpar resultado</button>` : ''}
         <button class="btn btn-green btn-sm" data-action="save-result" data-match-id="${m.id}" ${!canSave ? 'disabled' : ''}>
           ${m.finished ? 'Atualizar' : 'Lançar'}
@@ -825,6 +830,25 @@ async function saveResult(matchId) {
   const finishedTotal = cache.matches.filter(x => x.finished).length;
   stats.finished_matches = finishedTotal;
   stats.pct_played = Math.round(finishedTotal / cache.matches.length * 100 * 10) / 10;
+}
+
+// Anula (void) ou reativa um jogo. 'void' = anulado: não conta em pontuação
+// nenhuma (migration 039). Re-pontua via RPC atômica admin_set_match_status.
+async function setMatchStatus(matchId, status) {
+  const id = parseInt(matchId, 10);
+  const isVoid = status === 'void';
+  const msg = isVoid
+    ? 'Anular este jogo? Ele deixa de contar no ranking e os pontos são zerados.'
+    : 'Reativar este jogo? Se já tiver resultado, os pontos voltam a contar.';
+  if (!confirm(msg)) return;
+
+  const { error } = await supabase.rpc('admin_set_match_status', { p_match_id: id, p_status: status });
+  if (error) { showToast('Erro: ' + error.message, 'error', 3500); return; }
+
+  const m = cache.matches.find(x => x.id === id);
+  if (m) m.status = status;
+  showToast(isVoid ? 'Jogo anulado' : 'Jogo reativado', 'info');
+  document.getElementById('tabBody').innerHTML = await renderResultsTab();
 }
 
 async function clearResult(matchId) {

@@ -11,6 +11,13 @@
  *   5. Alice NÃO pode marcar a si mesma como paid/admin (escalonamento)
  *   6. Alice NÃO vê champion_pick do Bob antes do deadline
  *   7. Alice NÃO pode inserir champion_pick com user_id do Bob
+ *   8. Alice NÃO pode gravar points_earned no próprio palpite (C1, migration 034)
+ *   9. Alice NÃO lê o bracket palpitado do Bob via compute_predicted_slots (H1)
+ *  10. Alice NÃO chama qualifier_bonus_for de outro usuário (H1)
+ *  11. Alice NÃO chama recompute_* via RPC (H2)
+ *  12. Alice NÃO escreve em settings/matches sem ser admin
+ *  13. Toda escrita em palpite gera linha no prediction_audit (H3, migration 035)
+ *  14. Alice NÃO lê o prediction_audit (só admin)
  *
  * Usa clientes ANON autenticados (RLS aplica). Admin só pra setup/teardown.
  * Salva/restaura match_date + deadline.
@@ -84,6 +91,7 @@ async function teardown() {
       await admin.from('predictions').delete().eq('user_id', u.id);
       await admin.from('champion_picks').delete().eq('user_id', u.id);
       await admin.from('top_scorer_picks').delete().eq('user_id', u.id);
+      await admin.from('prediction_audit').delete().eq('row_user_id', u.id);
       await admin.from('profiles').delete().eq('id', u.id);
       await admin.auth.admin.deleteUser(u.id);
     } catch {}
@@ -134,6 +142,50 @@ async function main() {
   log('blue', '\n[7] Alice tenta INSERIR champion_pick com user_id do Bob:');
   r = await aliceClient.from('champion_picks').insert({ user_id: bob.id, team: 'Brazil' });
   check('Insert champion spoofando user_id → bloqueado', !!r.error, r.error ? '' : 'PASSOU (vulnerável!)');
+
+  // ===== Achados da auditoria (migrations 034/035) =====
+
+  log('blue', '\n[8] Alice tenta gravar points_earned no próprio palpite (C1):');
+  let r8 = await aliceClient.from('predictions')
+    .insert({ user_id: alice.id, match_id: TEST_MATCH, pred_home: 0, pred_away: 0, points_earned: 99999 });
+  check('Insert com points_earned → bloqueado (C1)', !!r8.error, r8.error ? '' : 'PASSOU (vulnerável!)');
+  // insert limpo, depois tenta forçar pontos via update
+  await aliceClient.from('predictions').insert({ user_id: alice.id, match_id: TEST_MATCH, pred_home: 1, pred_away: 1 });
+  await aliceClient.from('predictions').update({ points_earned: 99999 }).eq('user_id', alice.id).eq('match_id', TEST_MATCH);
+  const { data: a1 } = await admin.from('predictions').select('points_earned').eq('user_id', alice.id).eq('match_id', TEST_MATCH).single();
+  check('Update de points_earned → sem efeito (C1)', (a1?.points_earned ?? null) === null, `points_earned=${a1?.points_earned}`);
+
+  log('blue', '\n[9] Alice chama compute_predicted_slots(bob) — IDOR do bracket (H1):');
+  const r9 = await aliceClient.rpc('compute_predicted_slots', { p_user_id: bob.id });
+  check('compute_predicted_slots alheio → negado (H1)', !!r9.error || (r9.data?.length ?? 0) === 0,
+        r9.error ? '' : `retornou ${r9.data?.length} linhas do bracket alheio`);
+
+  log('blue', '\n[10] Alice chama qualifier_bonus_for(bob) (H1):');
+  const r10 = await aliceClient.rpc('qualifier_bonus_for', { p_user_id: bob.id });
+  check('qualifier_bonus_for alheio → negado (H1)', !!r10.error, r10.error ? '' : 'PASSOU (vulnerável!)');
+
+  log('blue', '\n[11] Alice chama recompute_* via RPC (H2 — DoS):');
+  const r11a = await aliceClient.rpc('recompute_prediction_points', { p_match_id: null });
+  const r11b = await aliceClient.rpc('recompute_qualifier_points', { p_user_id: null });
+  check('recompute_prediction_points → negado (H2)', !!r11a.error, r11a.error ? '' : 'PASSOU (vulnerável!)');
+  check('recompute_qualifier_points → negado (H2)', !!r11b.error, r11b.error ? '' : 'PASSOU (vulnerável!)');
+
+  log('blue', '\n[12] Alice tenta escrever em settings / matches sem ser admin:');
+  const r12a = await aliceClient.from('settings').upsert({ key: 'fee_amount', value: 0 });
+  await aliceClient.from('matches').update({ finished: true }).eq('id', TEST_MATCH);
+  const { data: m1 } = await admin.from('matches').select('finished').eq('id', TEST_MATCH).single();
+  check('Escrita em settings (não-admin) → bloqueada', !!r12a.error, r12a.error ? '' : 'PASSOU (vulnerável!)');
+  check('Marcar match finished (não-admin) → sem efeito', m1?.finished === false, `finished=${m1?.finished}`);
+
+  log('blue', '\n[13] Trilha de auditoria registra escrita em palpite (H3):');
+  await admin.from('predictions').update({ pred_home: 5 }).eq('user_id', bob.id).eq('match_id', TEST_MATCH);
+  const { data: audit } = await admin.from('prediction_audit').select('id')
+    .eq('table_name', 'predictions').eq('row_user_id', bob.id).eq('match_id', TEST_MATCH);
+  check('Mudança em palpite gera linha em prediction_audit (H3)', (audit?.length ?? 0) >= 1, `${audit?.length ?? 0} linhas`);
+
+  log('blue', '\n[14] Alice (não-admin) NÃO lê o prediction_audit:');
+  const { data: auditLeak } = await aliceClient.from('prediction_audit').select('id').limit(1);
+  check('prediction_audit invisível a não-admin', (auditLeak?.length ?? 0) === 0, `viu ${auditLeak?.length} linhas`);
 
   console.log('');
   const allOk = checks.every(([, p]) => p);
