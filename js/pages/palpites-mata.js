@@ -2,8 +2,8 @@ import { requireAuth } from '../auth.js';
 import { renderShell } from '../sidebar.js';
 import { supabase } from '../supabase.js';
 import {
-  flag, escapeHtml, formatTime, formatBrDate, formatBrShort, isLocked, lockCountdownLabel, showToast,
-  loadRecentMatches, loadQualifiers, teamPt,
+  flag, escapeHtml, formatTime, formatBrDate, isLocked, lockCountdownLabel, showToast,
+  loadRecentMatches, loadQualifiers, teamPt, renderDateCalendar, predictionDeadline,
   computeStandings as utilComputeStandings,
 } from '../util.js';
 import { fifaRank } from '../fifa-rank.js';
@@ -56,7 +56,7 @@ let qualifierBySide = new Map();     // "matchId:side" -> { kind:'bpe'|'bp', pts
 let recentByTeam = new Map();        // team -> forma recente (Raio-X)
 let qualifiers = null;               // assets/data/qualifiers.json — campanha de eliminatórias (Raio-X)
 let activeTab = 'palpites';          // 'palpites' | 'resultados'
-let viewMode = 'bracket';            // 'bracket' | 'date' — layout: chave ou lista por data
+let viewMode = 'date';               // 'bracket' | 'date' — layout: chave ou lista por data (padrão: por data)
 let activeDate = null;               // ISO yyyy-mm-dd quando viewMode === 'date'
 const saveTimers = new Map();        // match_id -> setTimeout handle
 
@@ -356,14 +356,33 @@ function renderViewToggle() {
   `;
 }
 
-function renderDateChip(dk, done, total) {
-  const isActive = activeDate === dk;
-  const complete = total > 0 && done === total;
-  const cls = ['chip'];
-  if (isActive) cls.push('active');
-  if (complete) cls.push('complete');
-  const label = formatBrShort(new Date(dk + 'T12:00:00'));
-  return `<button class="${cls.join(' ')}" data-date="${dk}">${label} <span class="ct">${done}/${total}</span></button>`;
+// Metadados por data para o calendário "Por data": nome curto da(s) fase(s) do
+// dia, contador palpitados/total e prazo de bloqueio (para o alerta de cor).
+function buildDateMeta(byDate) {
+  const stagesByDate = {};
+  const deadlineByDate = {};
+  for (const m of matches) {
+    const dk = dateKey(m);
+    (stagesByDate[dk] ??= new Set()).add(m.stage);
+    const dl = predictionDeadline(m.match_date).getTime();
+    deadlineByDate[dk] = Math.min(deadlineByDate[dk] ?? Infinity, dl);
+  }
+  const meta = {};
+  for (const dk of datesFor()) {
+    const labels = [...(stagesByDate[dk] ?? [])].map(s => STAGE_LABELS[s] ?? s);
+    meta[dk] = {
+      info: labels[0] ?? '',
+      title: labels.join(' · '),
+      done: byDate[dk]?.done ?? 0,
+      total: byDate[dk]?.total ?? 0,
+      deadline: deadlineByDate[dk],
+    };
+  }
+  return meta;
+}
+
+function renderDatePicker(byDate) {
+  return renderDateCalendar({ dates: datesFor(), meta: buildDateMeta(byDate), activeDate });
 }
 
 // Selo de fase mostrado no card só quando em "Por data" (na chave a fase é a coluna).
@@ -393,7 +412,7 @@ function renderDateView(counts, cardRenderer) {
     ? matches.filter(m => dateKey(m) === activeDate).sort((a, b) => new Date(a.match_date) - new Date(b.match_date))
     : [];
 
-  const chips = ks.map(k => renderDateChip(k, counts.byDate[k]?.done ?? 0, counts.byDate[k]?.total ?? 0)).join('');
+  const chips = renderDatePicker(counts.byDate);
 
   const body = dayMatches.length
     ? `
@@ -943,10 +962,10 @@ function attachEventListeners() {
       return;
     }
 
-    // Chip de data (modo "por data")
-    const dateChip = e.target.closest('.chip[data-date]');
-    if (dateChip) {
-      activeDate = dateChip.dataset.date;
+    // Dia do calendário (modo "por data")
+    const dateCell = e.target.closest('.cal-day[data-date]');
+    if (dateCell) {
+      activeDate = dateCell.dataset.date;
       rerenderTabBody();
       return;
     }
@@ -1127,10 +1146,7 @@ function updateKpis() {
   // No modo "por data", mantém a contagem dos chips em dia após salvar.
   if (viewMode === 'date') {
     const chips = document.getElementById('chips');
-    if (chips) {
-      chips.innerHTML = datesFor()
-        .map(k => renderDateChip(k, counts.byDate[k]?.done ?? 0, counts.byDate[k]?.total ?? 0)).join('');
-    }
+    if (chips) chips.innerHTML = renderDatePicker(counts.byDate);
   }
 }
 

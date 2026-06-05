@@ -309,11 +309,13 @@ const MESES_LONG = [
 ];
 const DOW_SHORT = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
-// Fases para a legenda/cores do calendário (rótulo + ordem de exibição).
-const CAL_PHASES = [
-  { id: 'group', label: 'Fase de grupos' },
-  { id: 'ko',    label: 'Mata-mata' },
-  { id: 'final', label: 'Final & 3º' },
+// Estados de palpite por dia (cor + rótulo da legenda, na ordem de exibição).
+const CAL_STATUSES = [
+  { id: 'done',    label: 'Palpitado' },
+  { id: 'urgent',  label: 'Bloqueia em <48h' },
+  { id: 'soon',    label: 'Bloqueia em <1 semana' },
+  { id: 'pending', label: 'Pendente' },
+  { id: 'locked',  label: 'Bloqueado' },
 ];
 
 function calDateKey(y, mo, d) {
@@ -321,13 +323,36 @@ function calDateKey(y, mo, d) {
 }
 
 /**
+ * Estado de palpite de um dia, para a cor do calendário:
+ *  'done'    = todos os jogos do dia já palpitados
+ *  'urgent'  = pendente e o bloqueio é em <48h (muito perto)
+ *  'soon'    = pendente e o bloqueio é em <1 semana (perto)
+ *  'pending' = pendente, bloqueio ainda distante
+ *  'locked'  = pendente mas o prazo já passou (não dá mais pra palpitar)
+ * @param done      jogos palpitados no dia
+ * @param total     jogos do dia
+ * @param deadline  instante de bloqueio do dia (Date|ms) — opcional
+ */
+export function dayPredictionStatus(done, total, deadline) {
+  if (!total || done >= total) return 'done';
+  if (deadline == null) return 'pending';
+  const ms = deadline instanceof Date ? deadline.getTime() : +deadline;
+  const diff = ms - Date.now();
+  if (diff <= 0) return 'locked';
+  const hours = diff / 3600000;
+  if (hours <= 48) return 'urgent';
+  if (hours <= 168) return 'soon';
+  return 'pending';
+}
+
+/**
  * Calendário de seleção de datas (substitui a fileira de chips no modo "Por data").
- * Mostra os meses do torneio em grade semanal, colore cada dia pela fase e traz
- * uma informação curta do dia (grupos que jogam ou nome da fase) + contador.
+ * Mostra os meses do torneio em grade semanal e colore cada dia pelo estado dos
+ * palpites (palpitado, pendente, alerta de bloqueio perto/muito perto, bloqueado),
+ * com uma informação curta do dia (grupos que jogam ou nome da fase) + contador.
  *
  * @param dates       array de yyyy-mm-dd selecionáveis (dias com jogo na aba atual)
- * @param meta        { [yyyy-mm-dd]: { phase, info, title, done, total } }
- *                    phase ∈ 'group' | 'ko' | 'final'
+ * @param meta        { [yyyy-mm-dd]: { info, title, done, total, deadline } }
  * @param activeDate  yyyy-mm-dd atualmente selecionado
  */
 export function renderDateCalendar({ dates, meta = {}, activeDate } = {}) {
@@ -338,8 +363,10 @@ export function renderDateCalendar({ dates, meta = {}, activeDate } = {}) {
   const last = new Date(sorted[sorted.length - 1] + 'T12:00:00');
   const todayKey = new Date().toISOString().slice(0, 10);
 
-  // Quais fases aparecem de fato (para a legenda enxugar o que não há).
-  const present = new Set(dates.map(k => meta[k]?.phase || 'group'));
+  const statusOf = (m) => dayPredictionStatus(m.done ?? 0, m.total ?? 0, m.deadline);
+
+  // Quais estados aparecem de fato (para a legenda enxugar o que não há).
+  const present = new Set(dates.map(k => statusOf(meta[k] || {})));
 
   const months = [];
   let cur = new Date(first.getFullYear(), first.getMonth(), 1);
@@ -364,13 +391,11 @@ export function renderDateCalendar({ dates, meta = {}, activeDate } = {}) {
         continue;
       }
       const m = meta[key] || {};
-      const phase = m.phase || 'group';
       const total = m.total ?? 0;
       const done = m.done ?? 0;
-      const complete = total > 0 && done === total;
-      const cls = ['cal-cell', 'cal-day', `is-${phase}`];
+      const status = statusOf(m);
+      const cls = ['cal-cell', 'cal-day', `st-${status}`];
       if (key === activeDate) cls.push('active');
-      if (complete) cls.push('complete');
       if (key === todayKey) cls.push('today');
       cells.push({ match: true, html: `
         <button class="${cls.join(' ')}" data-date="${key}"${m.title ? ` title="${escapeHtml(m.title)}"` : ''}>
@@ -399,17 +424,14 @@ export function renderDateCalendar({ dates, meta = {}, activeDate } = {}) {
       </div>`;
   }).join('');
 
-  const legend = CAL_PHASES.filter(p => present.has(p.id)).map(p =>
-    `<span class="cal-leg is-${p.id}"><i></i>${p.label}</span>`
+  const legend = CAL_STATUSES.filter(s => present.has(s.id)).map(s =>
+    `<span class="cal-leg st-${s.id}"><i></i>${s.label}</span>`
   ).join('');
 
   return `
     <div class="cal" id="cal">
       <div class="cal-months">${monthsHtml}</div>
-      <div class="cal-legend">
-        ${legend}
-        <span class="cal-leg is-complete"><i></i>Tudo palpitado</span>
-      </div>
+      <div class="cal-legend">${legend}</div>
     </div>`;
 }
 

@@ -1351,11 +1351,9 @@ body.raiox-modal-open { overflow: hidden; }
 .chip.active.complete .ct { background: var(--accent); color: #000; }
 
 /* ===== Calendário "Por data" =====
-   Cores das fases: grupos (azul), mata-mata (roxo), final (dourado/marca). */
+   Cores por estado do palpite: palpitado (verde), pendente (neutro),
+   bloqueio perto (amarelo), bloqueio muito perto (vermelho), bloqueado (cinza). */
 .cal {
-  --cal-group: #4a9eff;
-  --cal-ko: #b07cff;
-  --cal-final: var(--accent);
   flex: 1 1 100%;
   width: 100%;
 }
@@ -1403,27 +1401,29 @@ body.raiox-modal-open { overflow: hidden; }
 }
 .cal-off .cal-dnum { font-size: 11px; font-weight: 600; }
 
-/* Dia com jogo (selecionável) */
+/* Dia com jogo (selecionável). --st = cor do estado do palpite. */
 .cal-day {
   position: relative;
-  border: 1px solid var(--line);
-  background: var(--card);
+  border: 1px solid var(--st-line, var(--line));
+  background: var(--st-bg, var(--card));
   color: var(--text);
   cursor: pointer;
   font-family: var(--font);
   transition: background .12s, border-color .12s, transform .12s;
   overflow: hidden;
 }
-.cal-day::before {                 /* faixa de cor da fase no topo */
+.cal-day::before {                 /* faixa de cor do estado no topo */
   content: '';
   position: absolute;
   inset: 0 0 auto 0;
   height: 3px;
-  background: var(--ph, var(--cal-group));
+  background: var(--st, var(--text-mute));
 }
-.cal-day.is-group { --ph: var(--cal-group); }
-.cal-day.is-ko    { --ph: var(--cal-ko); }
-.cal-day.is-final { --ph: var(--cal-final); }
+.cal-day.st-done    { --st: var(--positive); --st-bg: var(--positive-dim); --st-line: rgba(29, 185, 84, .3); }
+.cal-day.st-soon    { --st: var(--accent);   --st-bg: var(--accent-dim);   --st-line: rgba(244, 196, 48, .3); }
+.cal-day.st-urgent  { --st: var(--red);      --st-bg: var(--red-dim);      --st-line: rgba(241, 94, 108, .35); }
+.cal-day.st-pending { --st: var(--text-mute); }
+.cal-day.st-locked  { --st: var(--text-mute); opacity: .6; }
 .cal-day:hover {
   background: var(--card-hover);
   border-color: var(--line-strong);
@@ -1455,28 +1455,32 @@ body.raiox-modal-open { overflow: hidden; }
   line-height: 1.3;
   font-variant-numeric: tabular-nums;
 }
-.cal-day.today { border-color: var(--line-strong); }
 .cal-day.today .cal-dnum::after {
   content: '';
   display: block;
   width: 4px; height: 4px;
   margin: 1px auto 0;
   border-radius: 50%;
-  background: var(--ph);
+  background: var(--st);
 }
-.cal-day.complete .cal-ct {
+.cal-day.st-done .cal-ct {
   background: var(--positive-dim);
   color: var(--positive);
 }
+.cal-day.st-urgent .cal-ct {
+  background: var(--red-dim);
+  color: var(--red);
+}
+/* Dia selecionado: preenche com a cor do estado. */
 .cal-day.active {
-  background: var(--ph);
-  border-color: var(--ph);
+  background: var(--st);
+  border-color: var(--st);
   color: #000;
   transform: translateY(-1px);
 }
-.cal-day.active.is-ko { color: #fff; }
+.cal-day.active.st-urgent { color: #fff; }
 .cal-day.active .cal-info { color: rgba(0, 0, 0, .65); }
-.cal-day.active.is-ko .cal-info { color: rgba(255, 255, 255, .8); }
+.cal-day.active.st-urgent .cal-info { color: rgba(255, 255, 255, .85); }
 .cal-day.active .cal-ct { background: rgba(0, 0, 0, .22); color: inherit; }
 .cal-day.active::before { display: none; }
 
@@ -1495,10 +1499,11 @@ body.raiox-modal-open { overflow: hidden; }
   border-radius: 3px;
   display: inline-block;
 }
-.cal-leg.is-group i { background: var(--cal-group); }
-.cal-leg.is-ko i { background: var(--cal-ko); }
-.cal-leg.is-final i { background: var(--cal-final); }
-.cal-leg.is-complete i { background: var(--positive); }
+.cal-leg.st-done i { background: var(--positive); }
+.cal-leg.st-soon i { background: var(--accent); }
+.cal-leg.st-urgent i { background: var(--red); }
+.cal-leg.st-pending i { background: var(--text-mute); }
+.cal-leg.st-locked i { background: var(--text-mute); opacity: .5; }
 
 @media (max-width: 560px) {
   /* Mantém os dois meses lado a lado (não empilha) para caber sem rolar. */
@@ -1509,7 +1514,7 @@ body.raiox-modal-open { overflow: hidden; }
   .cal-ct { padding: 0 3px; }
 }
 @media (max-width: 360px) {
-  /* Telas bem estreitas: prioriza dia + cor da fase (info sai). */
+  /* Telas bem estreitas: prioriza dia + cor do estado (info sai). */
   .cal-info { display: none; }
 }
 
@@ -2815,6 +2820,16 @@ body.raiox-modal-open { overflow: hidden; }
   font-size: 22px; font-weight: 900;
   letter-spacing: -.02em; color: var(--accent);
 }
+/* Nota de empate/rateio no card do pódio */
+.podium-split {
+  margin-top: 6px;
+  font-size: 11px; font-weight: 800;
+  letter-spacing: .04em; text-transform: uppercase;
+  color: var(--text-mute);
+}
+.podium-card.first  .podium-split { color: rgba(0, 0, 0, .6); }
+.podium-card.second .podium-split { color: rgba(26, 29, 36, .65); }
+.podium-card.third  .podium-split { color: rgba(42, 20, 8, .65); }
 
 /* ===== Pot banner ===== */
 .pot {
@@ -2853,7 +2868,7 @@ body.raiox-modal-open { overflow: hidden; }
 }
 .rank-table {
   width: 100%;
-  min-width: 850px;
+  min-width: 1060px;
   background: var(--card);
   border-collapse: collapse;
   table-layout: fixed;
@@ -3011,6 +3026,28 @@ body.raiox-modal-open { overflow: hidden; }
   border-radius: 4px;
   margin-left: 6px;
 }
+
+/* Colunas de desempate (Exatos, V+S) — destacadas: são os critérios do ranking */
+.rank-table thead th.col-tiebreak { color: var(--accent); }
+.rank-table tbody td.tb { color: var(--text); font-weight: 700; }
+/* Colunas de detalhe secundário (Venc., Parc., Erros) — discretas */
+.rank-table thead th.col-soft { color: var(--text-mute); }
+.rank-table tbody td.soft { color: var(--text-mute); }
+
+/* Marcador de empate na posição (mesma casa, prêmio rateado) */
+.rank-table .pos-tie {
+  display: inline-block;
+  margin-left: 3px;
+  font-size: 12px; font-weight: 900;
+  color: var(--accent);
+  cursor: help;
+  vertical-align: middle;
+}
+.rank-table tr.tied-row td { background: rgba(244, 196, 48, .035); }
+
+/* Legenda abaixo da tabela de ranking (explica colunas + desempate) */
+.rank-legend { margin: 12px 0 8px; }
+.rank-legend a { color: var(--accent); white-space: nowrap; }
 
 /* ===== Drill-down (perfil expandido) ===== */
 .profile-drill {
@@ -4694,6 +4731,16 @@ input[type="number"].score-input {
 .rules-tier-pts .pts small { font-size: 12px; font-weight: 700; color: var(--text-mute); margin-left: 2px; }
 .rules-tier-name { font-size: 15px; font-weight: 800; margin-bottom: 3px; }
 .rules-tier-desc { font-size: 13px; line-height: 1.5; color: var(--text-dim); }
+.rules-tier-desc strong { color: var(--text); }
+/* Linha de exemplo dentro de um tier (usada nos critérios de desempate) */
+.rules-tier-ex {
+  margin-top: 8px;
+  font-size: 13px; line-height: 1.5; color: var(--text-dim);
+  background: var(--accent-dim); border-radius: 6px;
+  padding: 7px 10px;
+}
+.rules-tier-ex b { color: var(--accent); }
+.rules-tier-ex strong { color: var(--text); }
 
 /* Matriz de multiplicadores */
 .rules-table-wrap { overflow-x: auto; border-radius: 10px; }

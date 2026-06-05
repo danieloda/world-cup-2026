@@ -2,9 +2,9 @@ import { requireAuth } from '../auth.js';
 import { renderShell } from '../sidebar.js';
 import { supabase } from '../supabase.js';
 import {
-  flag, escapeHtml, formatBrDate, formatBrShort, formatTime,
+  flag, escapeHtml, formatBrDate, formatTime,
   isLocked, isLive, lockCountdownLabel, showToast, loadRecentMatches,
-  loadQualifiers, teamPt, groundShort,
+  loadQualifiers, teamPt, groundShort, renderDateCalendar, predictionDeadline,
 } from '../util.js';
 import { matchPoints, scoreBreakdown } from '../scoring.js';
 import {
@@ -30,7 +30,7 @@ let recentByTeam = new Map();        // team name -> [{ date, opponent, home, sc
 let qualifiers = null;               // assets/data/qualifiers.json — campanha de eliminatórias (Raio-X)
 let activeTab = 'palpites';          // 'palpites' | 'resultados'
 let activeGroup = 'all';             // 'all' | 'A'..'L' (ambas as abas operam sempre por grupo)
-let groupBy = 'group';               // 'group' | 'date' — dimensão do filtro/agrupamento
+let groupBy = 'date';                // 'group' | 'date' — dimensão do filtro/agrupamento (padrão: por data)
 let activeDate = null;               // ISO yyyy-mm-dd quando groupBy === 'date'
 const saveTimers = new Map();        // match_id -> setTimeout handle
 const GROUPS = ['A','B','C','D','E','F','G','H','I','J','K','L'];
@@ -200,7 +200,7 @@ function renderPalpitesTab(counts) {
     <div class="palpites-toolbar">
       <div class="chips" id="chips">
         ${groupBy === 'date'
-          ? datesFor('palpites').map(k => renderDateChip(k, counts.openByDate[k]?.done ?? 0, counts.openByDate[k]?.total ?? 0)).join('')
+          ? renderDatePicker(counts.openByDate, 'palpites')
           : GROUPS.map(g => renderChip(g, 'Grupo ' + g, counts.openByGroup[g]?.done ?? 0, counts.openByGroup[g]?.total ?? 0)).join('')}
       </div>
       ${groupBy === 'group' ? renderThirdsPop('sim') : ''}
@@ -615,7 +615,7 @@ function renderResultadosTab(counts) {
     <div class="palpites-toolbar">
       <div class="chips" id="chips">
         ${groupBy === 'date'
-          ? datesFor('resultados').map(k => renderDateChip(k, counts.finishedByDate[k]?.done ?? 0, counts.finishedByDate[k]?.total ?? 0)).join('')
+          ? renderDatePicker(counts.finishedByDate, 'resultados')
           : GROUPS.map(g => renderChip(g, 'Grupo ' + g, counts.finishedByGroup[g]?.done ?? 0, counts.finishedByGroup[g]?.total ?? 0)).join('')}
       </div>
       ${groupBy === 'group' ? renderThirdsPop('real') : ''}
@@ -664,18 +664,38 @@ function renderViewToggle() {
   `;
 }
 
-function renderDateChip(dk, done, total) {
-  const isActive = activeDate === dk;
-  const complete = total > 0 && done === total;
-  const cls = ['chip'];
-  if (isActive) cls.push('active');
-  if (complete) cls.push('complete');
-  const label = formatBrShort(new Date(dk + 'T12:00:00'));
-  return `
-    <button class="${cls.join(' ')}" data-date="${dk}">
-      ${label} <span class="ct">${done}/${total}</span>
-    </button>
-  `;
+// Metadados por data para o calendário "Por data": grupos que jogam no dia,
+// contador palpitados/total e prazo de bloqueio (para o alerta de cor).
+function buildDateMeta(byDate) {
+  const groupsByDate = {};
+  const deadlineByDate = {};
+  for (const m of matches) {
+    const dk = dateKey(m);
+    (groupsByDate[dk] ??= new Set()).add(m.group_name);
+    const dl = predictionDeadline(m.match_date).getTime();
+    deadlineByDate[dk] = Math.min(deadlineByDate[dk] ?? Infinity, dl);
+  }
+  const meta = {};
+  for (const dk of Object.keys(byDate)) {
+    const gs = [...(groupsByDate[dk] ?? [])].filter(Boolean).sort();
+    meta[dk] = {
+      info: gs.length ? gs.join(' ') : '',
+      title: gs.length ? `Grupo${gs.length > 1 ? 's' : ''} ${gs.join(', ')}` : '',
+      done: byDate[dk]?.done ?? 0,
+      total: byDate[dk]?.total ?? 0,
+      deadline: deadlineByDate[dk],
+    };
+  }
+  return meta;
+}
+
+// Calendário de datas para a aba ('palpites' | 'resultados').
+function renderDatePicker(byDate, tab) {
+  return renderDateCalendar({
+    dates: datesFor(tab),
+    meta: buildDateMeta(byDate),
+    activeDate,
+  });
 }
 
 function renderGroupedByDate(list, rowRenderer, descDate = false) {
@@ -804,10 +824,10 @@ function attachEventListeners() {
       return;
     }
 
-    // Chip de data (modo "por data")
-    const dateChip = e.target.closest('.chip[data-date]');
-    if (dateChip) {
-      activeDate = dateChip.dataset.date;
+    // Dia do calendário (modo "por data")
+    const dateCell = e.target.closest('.cal-day[data-date]');
+    if (dateCell) {
+      activeDate = dateCell.dataset.date;
       rerenderTabBody();
       return;
     }
@@ -938,8 +958,7 @@ function updateKpisAndChips() {
   if (chips) {
     if (groupBy === 'date') {
       const byDate = activeTab === 'palpites' ? counts.openByDate : counts.finishedByDate;
-      chips.innerHTML = datesFor(activeTab)
-        .map(k => renderDateChip(k, byDate[k]?.done ?? 0, byDate[k]?.total ?? 0)).join('');
+      chips.innerHTML = renderDatePicker(byDate, activeTab);
     } else {
       const byGroup = activeTab === 'palpites' ? counts.openByGroup : counts.finishedByGroup;
       chips.innerHTML =
