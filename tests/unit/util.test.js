@@ -245,11 +245,16 @@ describe('formatBrShort', () => {
   });
 });
 
-describe('formatTime', () => {
-  it('formats ISO time as HH:MM', () => {
-    const result = formatTime('2026-06-11T15:30:00-03:00');
-    // Time zone handling may vary, just check format
-    expect(result).toMatch(/^\d{2}:\d{2}$/);
+describe('formatTime (renderiza em BRT, TZ de produção)', () => {
+  it('converte kickoff UTC para o relógio de Brasília', () => {
+    // match_date é gravado em UTC (jogo de abertura: 11/jun 19h UTC).
+    // Usuário no Brasil deve ver 16:00 (UTC-3). Antes este teste só checava
+    // o formato /\d{2}:\d{2}/ e mascarava o fuso — agora afirma o valor.
+    expect(formatTime('2026-06-11T19:00:00+00:00')).toBe('16:00');
+  });
+
+  it('preserva o horário quando o input já vem em BRT', () => {
+    expect(formatTime('2026-06-11T15:30:00-03:00')).toBe('15:30');
   });
 });
 
