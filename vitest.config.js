@@ -16,6 +16,7 @@ export default defineConfig({
       // Supabase) são cobertos por E2E, não aqui — incluí-los aqui só diluiria
       // a métrica e daria falsa sensação de cobertura.
       include: [
+        'src/js/bracket.js',
         'src/js/scoring.js',
         'src/js/thirds-assign.js',
         'src/js/util.js',
@@ -24,6 +25,7 @@ export default defineConfig({
       // cobertura cair abaixo do piso atual. Sobem conforme adicionamos testes;
       // NUNCA descem sem justificativa. (medido em 2026-06-05)
       thresholds: {
+        'src/js/bracket.js': { statements: 97, branches: 78, functions: 100, lines: 97 },
         'src/js/scoring.js': { statements: 100, branches: 100, functions: 100, lines: 100 },
         'src/js/thirds-assign.js': { statements: 100, branches: 100, functions: 100, lines: 100 },
         'src/js/util.js': { statements: 55, branches: 92, functions: 50, lines: 55 },
