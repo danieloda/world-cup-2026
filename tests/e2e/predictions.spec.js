@@ -35,11 +35,26 @@ test.describe('Predictions Page', () => {
     await expect(page.locator('.match, .empty').first()).toBeVisible({ timeout: 10000 });
   });
 
-  test('can navigate to knockout predictions page', async ({ page }) => {
+  test('knockout bracket renders without leaking broken values', async ({ page }) => {
     await page.goto('/palpites-mata.html');
 
-    // Page should load (may show "no matches yet" if tournament hasn't reached KO)
-    await expect(page.locator('body')).toContainText(/(Palpites|Mata|Oitavas|32-avos)/i);
+    // Espera o render assíncrono (auth + fetch + resolução do bracket). Tolera a
+    // fase de grupos (sem mata-mata ainda) via .empty.
+    await expect(page.locator('.bracket-match, .empty').first())
+      .toBeVisible({ timeout: 15000 }).catch(() => {});
+
+    const cardCount = await page.locator('.bracket-match').count();
+    if (cardCount === 0) return; // ainda em fase de grupos — nada a afirmar aqui
+
+    // INVARIANTE (independe da fase): quando há bracket, nenhum nome de time pode
+    // vir como valor quebrado. O smoke antigo (toContainText /Palpites|Mata/)
+    // passava com o bracket inteiro quebrado / campeão sumido — isto não.
+    const names = await page.locator('.bracket-match .team-name').allInnerTexts();
+    expect(names.length).toBeGreaterThan(0);
+    for (const name of names) {
+      expect(name.trim()).not.toBe('');
+      expect(name).not.toMatch(/undefined|NaN|null|\[object/i);
+    }
   });
 
   test('can view champion/top scorer page', async ({ page }) => {

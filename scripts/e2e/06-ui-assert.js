@@ -157,17 +157,24 @@ check(`historico: card da final mostra placar correto`, scoreOk,
   `final ${finalM.team_home} ${finalM.actual_home}-${finalM.actual_away} ${finalM.team_away} | dom='${finalScore ?? '(card não achado)'}'`);
 await shot('historico');
 
-// ===== E) palpites-mata (smoke + sem slot cru) =====
+// ===== E) palpites-mata (render + nenhum slot cru vazando) =====
 console.log(`\n${C.b}palpites-mata.html${C.x}`);
 await page.goto(`${BASE}/palpites-mata.html`);
 await page.waitForSelector('.bracket-match', { timeout: 15000 });
-const rawSlot = await page.$$eval('.bracket-match', els => {
-  const re = /(^|\b)(W\d|L\d|[123][A-L](\/|\b))/;
-  let bad = 0;
-  for (const el of els) { const t = el.querySelectorAll('.team-name'); for (const n of t){ if(/^([0-9]|W\d|L\d)/.test((n.getAttribute('data-team')||'').trim())) bad++; } }
-  return bad;
-});
-check(`palpites-mata: chaveamento renderiza (bracket-match presente)`, true, 'render ok');
+const bracketCount = await page.$$eval('.bracket-match', els => els.length).catch(() => 0);
+check(`palpites-mata: chaveamento renderiza (${bracketCount} confrontos)`, bracketCount > 0, 'esperado >0');
+
+// Com o torneio completo (todos os resultados lançados + palpites feitos), TODO
+// time do bracket tem de estar resolvido — nenhum data-team pode ser código de
+// slot cru (W73, 1A, 3A/B/C/D). Vazamento aqui = bug de propagação grupos→mata
+// (a classe do M85, campeão sumindo). Antes este check era `true` fixo: o
+// rawSlot era computado e descartado, então o bracket nunca era de fato afirmado.
+const rawSlot = await page.$$eval('.bracket-match .team-name', els =>
+  els.map(n => (n.getAttribute('data-team') || '').trim())
+     .filter(t => /^([0-9]|W\d|L\d)/.test(t) || t.includes('/'))
+);
+check(`palpites-mata: nenhum slot cru nos times resolvidos`, rawSlot.length === 0,
+  rawSlot.length ? `vazaram: ${[...new Set(rawSlot)].slice(0, 8).join(', ')}` : 'todos resolvidos');
 await shot('palpites-mata');
 
 await browser.close();
