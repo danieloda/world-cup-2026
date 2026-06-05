@@ -295,16 +295,6 @@ export function formatTime(iso) {
   return d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 }
 
-export function formatRelative(iso) {
-  const diff = new Date(iso) - new Date();
-  const days = Math.floor(diff / 86400000);
-  const hours = Math.floor(diff / 3600000);
-  if (days >= 1) return `Em ${days} dia${days > 1 ? 's' : ''}`;
-  if (hours >= 1) return `Em ${hours}h`;
-  if (diff > 0)   return 'Em breve';
-  return 'Iniciado';
-}
-
 // ===== Match helpers =====
 export function stageLabel(s) {
   return {

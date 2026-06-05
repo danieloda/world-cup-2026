@@ -693,7 +693,7 @@ function renderPlayerSelect(matchId, players, homeTeam, awayTeam) {
 }
 
 function setPenWinner(matchId, side) {
-  const m = cache.matches.find(x => x.id == matchId);
+  const m = cache.matches.find(x => x.id === Number(matchId));
   if (!m) return;
   m.pen_winner = side === '' ? null : side;
   // Re-render this row only
@@ -703,7 +703,7 @@ function setPenWinner(matchId, side) {
 function rerenderResultRow(matchId) {
   const row = document.querySelector(`.result-row[data-match-id="${matchId}"]`);
   if (!row) return;
-  const m = cache.matches.find(x => x.id == matchId);
+  const m = cache.matches.find(x => x.id === Number(matchId));
   if (!m) return;
 
   // Preserva foco e caret position
