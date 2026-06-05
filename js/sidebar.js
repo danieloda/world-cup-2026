@@ -3,6 +3,7 @@
 
 import { signOut } from './auth.js';
 import { supabase } from './supabase.js';
+import { loadLockAlerts } from './lock-alerts.js';
 import { avatarHtml, getInitials, showToast } from './util.js';
 
 // Agrupamento de navegação por seção
@@ -49,11 +50,16 @@ const COLLAPSED_KEY = 'bolao-sidebar-collapsed';
  */
 const MIN_LOADER_MS = 400;
 
-export async function renderShell({ active, profile, stats, stageLabel }) {
+export async function renderShell({ active, profile, stats, stageLabel, lockAlerts }) {
   const elapsed = performance.now();
   if (elapsed < MIN_LOADER_MS) {
     await new Promise(r => setTimeout(r, MIN_LOADER_MS - elapsed));
   }
+
+  // Badge de pendência por item de palpite. O Início já calcula e passa
+  // (lockAlerts); as demais páginas deixam a sidebar buscar sozinha.
+  const alerts = lockAlerts ?? await loadLockAlerts(profile?.id).catch(() => null);
+  const navBadges = buildNavBadges(alerts);
 
   const app = document.getElementById('app');
   if (!app) throw new Error('Elemento #app não encontrado.');
@@ -82,7 +88,7 @@ export async function renderShell({ active, profile, stats, stageLabel }) {
       </div>
 
       <nav class="sb-nav">
-        ${sections.map(section => renderSection(section, active)).join('')}
+        ${sections.map(section => renderSection(section, active, navBadges)).join('')}
       </nav>
 
       <div class="sb-progress">
@@ -158,26 +164,50 @@ export async function renderShell({ active, profile, stats, stageLabel }) {
   return document.getElementById('pageBody');
 }
 
-function renderSection(section, activeId) {
+function renderSection(section, activeId, badges = {}) {
   return `
     <div class="sb-section-group">
       <div class="sb-section-label">${escapeHtml(section.label)}</div>
-      ${section.items.map(item => renderNavItem(item, activeId)).join('')}
+      ${section.items.map(item => renderNavItem(item, activeId, badges)).join('')}
     </div>
   `;
 }
 
-function renderNavItem(item, activeId) {
+function renderNavItem(item, activeId, badges = {}) {
   const isActive = item.id === activeId;
   const cls = ['sb-link'];
   if (item.admin) cls.push('admin');
   if (isActive) cls.push('active');
+  const badge = badges[item.id];
+  const badgeHtml = badge
+    ? `<span class="sb-badge ${badge.urgent ? 'urgent' : ''}" title="${badge.count} palpite${badge.count > 1 ? 's' : ''} perto de bloquear">${badge.count}</span>`
+    : '';
   return `
     <a class="${cls.join(' ')}" href="${item.href}" title="${escapeHtml(item.label)}">
       ${item.icon()}
       <span class="sb-link-label">${escapeHtml(item.label)}</span>
+      ${badgeHtml}
     </a>
   `;
+}
+
+// Mapeia os alertas de bloqueio para badges por item de navegação:
+// jogos de grupo → "Grupos & Classificação"; mata-mata → "Mata-mata".
+// urgent = há algo travando em <48h naquele item.
+function buildNavBadges(alerts) {
+  if (!alerts || alerts.total === 0) return {};
+  const H48_MS = 48 * 3600000;
+  const buckets = { 'palpites-g': [], 'palpites-k': [] };
+  for (const m of alerts.matches) {
+    const id = m.stage && m.stage !== 'group' ? 'palpites-k' : 'palpites-g';
+    buckets[id].push(m);
+  }
+  const badges = {};
+  for (const [id, list] of Object.entries(buckets)) {
+    if (!list.length) continue;
+    badges[id] = { count: list.length, urgent: list.some(m => m.diff <= H48_MS) };
+  }
+  return badges;
 }
 
 // ============================================================

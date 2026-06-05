@@ -1,6 +1,7 @@
 import { requireAuth } from '../auth.js';
 import { renderShell } from '../sidebar.js';
 import { supabase } from '../supabase.js';
+import { loadLockAlerts } from '../lock-alerts.js';
 import {
   flag, escapeHtml, greeting, firstName, daysToKickoffLabel,
   formatBrDate, formatTime, lockCountdownLabel, stageLabel, isLive,
@@ -8,7 +9,7 @@ import {
 } from '../util.js';
 
 // Estado da página
-let profile, stats, todayMatches, upcomingMatches, myStanding;
+let profile, stats, todayMatches, upcomingMatches, myStanding, lockAlerts;
 let myPosition = null;   // posição no ranking (1-based); null antes de haver jogos
 let totalPlayers = 0;    // jogadores no ranking (denominador da posição)
 
@@ -42,6 +43,8 @@ async function matchesUpcoming(limit) {
 // ============================================================
 function renderInicio() {
   return `
+    ${renderLockBanner()}
+
     <section class="hero">
       <div class="hero-kicker">${greeting()}, ${escapeHtml(firstName(profile.full_name))}</div>
       <h1 class="hero-title">${todayMatches.length > 0 ? 'Jogos de hoje' : daysToKickoffLabel()}</h1>
@@ -61,6 +64,65 @@ function renderInicio() {
 
     ${renderQuickLinks()}
   `;
+}
+
+// Banner de alerta: jogos pendentes (sem palpite) perto do bloqueio.
+// Vermelho + pulso quando há algo travando em <48h; âmbar quando só <1 semana.
+// Some por completo quando não há nada pendente na janela.
+function renderLockBanner() {
+  const a = lockAlerts;
+  if (!a || a.total === 0) return '';
+
+  const urgent = a.urgent > 0;
+  const theme = urgent ? 'urgent' : 'soon';
+  const n = a.total;
+  const headline = urgent
+    ? `${a.urgent} ${a.urgent === 1 ? 'jogo trava' : 'jogos travam'} em menos de 48h`
+    : `${n} ${n === 1 ? 'jogo trava' : 'jogos travam'} esta semana`;
+
+  // Barra que esvazia: quanto resta da janela (48h se urgente, 1 semana se não)
+  // até o PRÓXIMO prazo. Quase vazia = aperto.
+  const windowMs = urgent ? 48 * 3600000 : 7 * 24 * 3600000;
+  const nearest = a.matches[0];
+  const remainPct = nearest ? Math.max(4, Math.min(100, (nearest.diff / windowMs) * 100)) : 100;
+
+  const chips = a.matches.slice(0, 3).map(m => `
+    <div class="la-game">
+      <span class="la-game-teams">
+        <span class="flag">${flag(m.team_home)}</span>
+        <span class="la-vs">×</span>
+        <span class="flag">${flag(m.team_away)}</span>
+      </span>
+      <span class="la-game-clock">${lockCountdownLabel(m.match_date)}</span>
+    </div>
+  `).join('');
+  const more = n > 3 ? `<span class="la-more">+${n - 3} jogo${n - 3 > 1 ? 's' : ''}</span>` : '';
+
+  const href = nearest?.stage === 'group' || !nearest?.stage
+    ? 'palpites-grupos.html' : 'palpites-mata.html';
+
+  return `
+    <a class="lock-alert ${theme}" href="${href}">
+      <span class="la-rail" aria-hidden="true"></span>
+      <div class="la-icon" aria-hidden="true">${iconClockAlert()}</div>
+      <div class="la-body">
+        <div class="la-head">
+          <span class="la-tag">${urgent ? 'Prazo apertando' : 'Fica de olho'}</span>
+          <h3 class="la-headline">${headline}</h3>
+        </div>
+        <p class="la-sub">Você ainda não palpitou — depois do bloqueio não dá mais.</p>
+        <div class="la-meter" aria-hidden="true"><span style="width:${remainPct}%"></span></div>
+        <div class="la-games">${chips}${more}</div>
+      </div>
+      <span class="la-cta">Palpitar agora <span class="la-arrow" aria-hidden="true">→</span></span>
+    </a>
+  `;
+}
+
+function iconClockAlert() {
+  return `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/></svg>`;
 }
 
 function renderKpis() {
@@ -211,16 +273,18 @@ try {
   if (!auth) throw new Error('not authed (no session)');
   profile = auth.profile;
 
-  const [statsRes, todayRes, upcomingRes, leaderRes] = await Promise.all([
+  const [statsRes, todayRes, upcomingRes, leaderRes, alertsRes] = await Promise.all([
     supabase.from('v_pool_stats').select('*').single(),
     matchesToday(),
     matchesUpcoming(5),
     supabase.from('v_leaderboard').select('*').order('total_pts', { ascending: false }),
+    loadLockAlerts(profile.id),
   ]);
 
   stats = statsRes.data ?? { finished_matches: 0, total_matches: 104, pct_played: 0, paid_users: 0, total_pot: 0 };
   todayMatches = todayRes.data ?? [];
   upcomingMatches = upcomingRes.data ?? [];
+  lockAlerts = alertsRes;
 
   // Posição derivada do ranking completo (mesma ordenação da página Ranking).
   const leaderboard = leaderRes.data ?? [];
@@ -232,7 +296,7 @@ try {
     myPosition = ahead + 1;
   }
 
-  const pageBody = await renderShell({ active: 'inicio', profile, stats });
+  const pageBody = await renderShell({ active: 'inicio', profile, stats, lockAlerts });
   pageBody.innerHTML = renderInicio();
   pageBody.classList.add('fade-up');
 } catch (err) {
