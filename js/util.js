@@ -61,8 +61,15 @@ export const FLAGS = {
  * @param {string} team - Nome do país
  * @returns {string} HTML span com classe flag-icons
  */
+// Nome-base de um time reserva: "Ghana B" → "Ghana". Seleções B (squads
+// reservas em amistosos/FIFA Series) usam a bandeira e o nome do país.
+function baseTeam(name) {
+  return String(name ?? '').replace(/\s+B$/, '');
+}
+
 export function flag(team) {
-  const code = FLAGS[decodeHtmlEntities(team)];
+  const decoded = decodeHtmlEntities(team);
+  const code = FLAGS[decoded] || FLAGS[baseTeam(decoded)];
   if (!code) return '<span class="fi fi-xx"></span>'; // fallback
   return `<span class="fi fi-${code}"></span>`;
 }
@@ -156,7 +163,11 @@ const TEAM_PT = {
 export function teamPt(name) {
   if (!name) return name;
   const decoded = decodeHtmlEntities(name);
-  return TEAM_PT[decoded] || decoded;
+  if (TEAM_PT[decoded]) return TEAM_PT[decoded];
+  // time reserva "X B": traduz o país e mantém o " B" (ex.: "Ghana B" → "Gana B")
+  const base = baseTeam(decoded);
+  if (base !== decoded && TEAM_PT[base]) return `${TEAM_PT[base]} B`;
+  return decoded;
 }
 
 // ===== Cidades-sede =====
@@ -618,6 +629,25 @@ export async function loadQualifiers() {
     console.warn('[loadQualifiers] failed:', err);
     return null;
   }
+}
+
+// ============================================================
+// Odds → probabilidade implícita (alimenta a barra 1X2 do Raio-X)
+// ============================================================
+// Converte odds decimais (casa/empate/fora) em probabilidades que somam 100%.
+// A chance bruta de cada resultado é 1/odd; a soma das três passa de 100% pela
+// margem da casa (overround/"vig"). Normaliza dividindo pela soma pra remover a
+// margem. Retorna { pHome, pDraw, pAway } em % + o favorito, ou null se as odds
+// não forem válidas (precisam ser > 1).
+export function oddsToProbs(o) {
+  const oh = Number(o?.odd_home), od = Number(o?.odd_draw), oa = Number(o?.odd_away);
+  if (!(oh > 1) || !(od > 1) || !(oa > 1)) return null;
+  const ih = 1 / oh, id = 1 / od, ia = 1 / oa;
+  const sum = ih + id + ia;
+  const pHome = (ih / sum) * 100, pDraw = (id / sum) * 100, pAway = (ia / sum) * 100;
+  const favored = (pHome >= pDraw && pHome >= pAway) ? 'home'
+                : (pAway >= pDraw && pAway >= pHome) ? 'away' : 'draw';
+  return { pHome, pDraw, pAway, favored };
 }
 
 // ============================================================

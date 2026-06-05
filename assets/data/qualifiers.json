@@ -2546,7 +2546,8 @@
     },
     "Iraq": {
       "format": "table",
-      "confederation": "AFC"
+      "confederation": "AFC",
+      "playoff": "INTERCONT"
     },
     "Norway": {
       "format": "table",
@@ -2574,7 +2575,8 @@
     },
     "DR Congo": {
       "format": "table",
-      "confederation": "CAF"
+      "confederation": "CAF",
+      "playoff": "INTERCONT"
     },
     "Uzbekistan": {
       "format": "table",

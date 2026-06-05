@@ -9,7 +9,7 @@ import {
 import { fifaRank } from '../fifa-rank.js';
 import { matchPoints, scoreBreakdown, stageMultiplier, scorerBonus } from '../scoring.js';
 import {
-  renderRaioXModalButton, openRaioXModal,
+  renderRaioXModalButton, openRaioXModal, attachRaioXTabs,
 } from '../raiox.js';
 
 // ============================================================
@@ -82,6 +82,7 @@ try {
   pageBody.classList.add('fade-up');
 
   attachEventListeners();
+  attachRaioXTabs();
 } catch (err) {
   console.error('[palpites-mata] FATAL:', err);
   document.body.innerHTML = `

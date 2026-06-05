@@ -238,8 +238,15 @@ async function main() {
   for (const team of wcTeams) {
     if (HOSTS.has(team)) { teamIndex[team] = { format: 'host' }; continue; }
     const conf = Object.keys(confTeams).find(c => confTeams[c].has(team));
-    if (conf) { teamIndex[team] = { format: 'table', confederation: conf }; continue; }
     const br = Object.keys(bracketTeams).find(k => bracketTeams[k].has(team));
+    if (conf) {
+      // Jogou a fase de tabela da confederação. Se TAMBÉM aparece num bracket de
+      // repescagem (ex.: Intercontinental), guarda como `playoff` — senão o
+      // mata-mata da repescagem ficava órfão (formato era único, table-first).
+      teamIndex[team] = { format: 'table', confederation: conf };
+      if (br) teamIndex[team].playoff = br;
+      continue;
+    }
     if (br) { teamIndex[team] = { format: 'bracket', bracket: br }; continue; }
     unmapped.push(team);
     teamIndex[team] = { format: 'unknown' };

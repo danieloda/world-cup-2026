@@ -5,14 +5,14 @@ import {
   flag, escapeHtml, formatBrDate, formatTime,
   isLocked, isLive, lockCountdownLabel, showToast, loadRecentMatches,
   loadQualifiers, teamPt, groundShort, renderDateCalendar, predictionDeadline,
-  localDateKey,
+  localDateKey, oddsToProbs,
 } from '../util.js';
 import { matchPoints, scoreBreakdown } from '../scoring.js';
 import {
   renderGroupCard, computeThirds, countThirdsComplete, renderThirdsTable,
 } from '../standings-view.js';
 import {
-  renderRaioXToggle, renderRaioXPanel, attachRaioXInline,
+  renderRaioXToggle, renderRaioXPanel, attachRaioXInline, attachRaioXTabs,
 } from '../raiox.js';
 
 const GP = matchPoints('group'); // { ag:1, ave:4, dg:1, exact:7 }
@@ -24,7 +24,7 @@ let profile, stats;
 let matches = [];                    // 72 group-stage matches, ordered by date
 let predsByMatch = new Map();        // match_id -> prediction row
 let goalsByMatch = new Map();        // match_id -> [{player, goals}]
-let oddsByMatch = new Map();         // match_id -> { odd_home, odd_draw, odd_away, bookmaker_name }
+let oddsByMatch = new Map();         // match_id -> { odd_home, odd_draw, odd_away, bookmaker_name } — alimenta a barra 1X2 (prob. implícita); não mais exibida crua no card
 let h2hByMatch = new Map();          // match_id -> { fixtures: [...], summary: {...}, api_team_home }
 let predictionsByMatch = new Map();  // match_id -> previsão normalizada (ver raiox.js / renderPredictionsBlock)
 let recentByTeam = new Map();        // team name -> [{ date, opponent, home, score, competition }] (forma recente)
@@ -42,9 +42,26 @@ function raioxData(m) {
   return {
     recentByTeam,
     h2h: h2hByMatch.get(m.id) ?? null,
-    predictions: predictionsByMatch.get(m.id) ?? null,
+    predictions: buildForecast(m),
     qualifiers,
   };
+}
+
+// "Previsão" do Raio-X = barra 1X2 + radar de força. A BARRA agora vem das ODDS
+// (probabilidade implícita de-margined, ver oddsToProbs); o RADAR continua vindo
+// do /predictions da API-Football (form/ataque/defesa). Une os dois num objeto
+// no shape que renderPredictionsBlock espera. Sem odds, a barra cai pro % da API
+// (raro: as odds cobrem todos os jogos de grupo). Retorna null se não há nenhum.
+function buildForecast(m) {
+  const apiPred = predictionsByMatch.get(m.id) ?? null;   // { pHome,…, radar, comparison, source }
+  const probs = oddsToProbs(oddsByMatch.get(m.id));       // das odds, ou null
+  if (!probs && !apiPred) return null;
+  const bar = probs
+    ? { pHome: probs.pHome, pDraw: probs.pDraw, pAway: probs.pAway, favored: probs.favored,
+        source: oddsByMatch.get(m.id)?.bookmaker_name || 'Betano' }
+    : { pHome: apiPred.pHome, pDraw: apiPred.pDraw, pAway: apiPred.pAway, favored: apiPred.favored,
+        source: apiPred.source || 'API-Football' };
+  return { ...bar, radar: apiPred?.radar ?? null, comparison: apiPred?.comparison ?? null };
 }
 
 // ============================================================
@@ -68,8 +85,8 @@ try {
   pageBody.innerHTML = renderPage();
   pageBody.classList.add('fade-up');
   attachEventListeners();
-  attachOddsTooltip();
   attachRaioXInline();
+  attachRaioXTabs();
 } catch (err) {
   console.error('[palpites-grupos] FATAL:', err);
   document.body.innerHTML = `
@@ -208,7 +225,7 @@ function renderPalpitesTab(counts) {
     </div>
 
     <div class="tooltip-hint raiox-hint">
-      🔍 Toque em <b>Raio-X</b> em cada jogo para ver a <b>forma recente</b> das seleções e o histórico de <b>confrontos diretos</b> entre elas.
+      🔍 Toque em <b>Raio-X</b> em cada jogo para ver o <b>favorito do mercado</b>, a <b>forma recente</b>, os <b>confrontos diretos</b> e a campanha nas <b>eliminatórias</b>.
     </div>
 
     <div id="matchesList">
@@ -331,85 +348,6 @@ function renderPalpitesList() {
   return renderGroupedByDate(filtered, renderPalpiteRow);
 }
 
-// Atributos que alimentam o popover informativo de odds (montado em JS no hover).
-function oddAttrs(o, oddValue, outcome) {
-  return `data-odd="${Number(oddValue).toFixed(2)}"`
-    + ` data-outcome="${escapeHtml(outcome)}"`
-    + ` data-bm="${escapeHtml(o.bookmaker_name || 'Betano')}"`;
-}
-function renderOddSide(m, side) {
-  const o = oddsByMatch.get(m.id);
-  if (!o) return '';
-  const odd = side === 'home' ? o.odd_home : o.odd_away;
-  const team = teamPt(side === 'home' ? m.team_home : m.team_away);
-  return `<span class="odd odd-${side}" tabindex="0" ${oddAttrs(o, odd, `Vitória de ${team}`)}>${Number(odd).toFixed(2)}</span>`;
-}
-function renderOddDraw(m) {
-  const o = oddsByMatch.get(m.id);
-  if (!o) return '';
-  return `<span class="odd odd-draw" tabindex="0" ${oddAttrs(o, o.odd_draw, 'Empate')}>X ${Number(o.odd_draw).toFixed(2)}</span>`;
-}
-
-// Popover informativo que explica o que a odd significa. Flutua no <body>
-// (position: fixed) pra não ser cortado pelo overflow do .main. Listeners
-// delegados sobrevivem aos re-renders da lista. Idempotente.
-function attachOddsTooltip() {
-  if (document.getElementById('oddsTooltip')) return;
-  const tip = document.createElement('div');
-  tip.id = 'oddsTooltip';
-  tip.className = 'odds-tt';
-  document.body.appendChild(tip);
-
-  const show = (el) => {
-    const odd = Number(el.dataset.odd);
-    if (!odd) return;
-    const prob = Math.round((1 / odd) * 100);
-    const ret = odd.toFixed(2).replace('.', ',');
-    tip.innerHTML = `
-      <div class="odds-tt-tag">Apenas informativo</div>
-      <div class="odds-tt-outcome">${escapeHtml(el.dataset.outcome || '')}</div>
-      <div class="odds-tt-value">${odd.toFixed(2)}<small>odd</small></div>
-      <p class="odds-tt-desc">Cotação da <b>${escapeHtml(el.dataset.bm || 'Betano')}</b> para este resultado. A odd é o quanto o mercado paga por cada R$&nbsp;1 — quanto <b>menor</b> a odd, mais provável o mercado considera o resultado.</p>
-      <div class="odds-tt-rows">
-        <div><span>Chance implícita</span><b>~${prob}%</b></div>
-        <div><span>Retorno por R$ 1</span><b>R$ ${ret}</b></div>
-      </div>
-      <div class="odds-tt-foot">Não afeta sua pontuação e não é recomendação de aposta.</div>`;
-    tip.classList.add('show');
-    positionOddsTip(el, tip);
-  };
-  const hide = () => tip.classList.remove('show');
-
-  document.addEventListener('mouseover', (e) => {
-    const el = e.target.closest('.odd');
-    if (el) show(el);
-  });
-  document.addEventListener('mouseout', (e) => {
-    if (e.target.closest('.odd')) hide();
-  });
-  document.addEventListener('focusin', (e) => {
-    const el = e.target.closest('.odd');
-    if (el) show(el);
-  });
-  document.addEventListener('focusout', (e) => {
-    if (e.target.closest('.odd')) hide();
-  });
-  window.addEventListener('scroll', hide, true);
-}
-
-function positionOddsTip(trigger, tip) {
-  const r = trigger.getBoundingClientRect();
-  const t = tip.getBoundingClientRect();
-  const margin = 8;
-  let left = r.left + r.width / 2 - t.width / 2;
-  let top = r.bottom + margin;
-  if (left < margin) left = margin;
-  if (left + t.width > window.innerWidth - margin) left = window.innerWidth - t.width - margin;
-  if (top + t.height > window.innerHeight - margin) top = r.top - t.height - margin;
-  tip.style.left = left + 'px';
-  tip.style.top = top + 'px';
-}
-
 function renderPalpiteRow(m) {
   const pred = predsByMatch.get(m.id);
   const locked = isLocked(m);
@@ -435,7 +373,6 @@ function renderPalpiteRow(m) {
       </div>
       <div class="team home">
         <span class="flag">${flag(m.team_home)}</span>
-        ${renderOddSide(m, 'home')}
         <span class="team-name" data-team="${escapeHtml(m.team_home)}">${escapeHtml(teamPt(m.team_home))}</span>
       </div>
       <div class="score-cell">
@@ -450,11 +387,9 @@ function renderPalpiteRow(m) {
                  aria-label="Gols ${escapeHtml(teamPt(m.team_away))}"
                  value="${awayVal}" ${locked ? 'disabled' : ''}>
         </div>
-        ${renderOddDraw(m)}
       </div>
       <div class="team right away">
         <span class="team-name" data-team="${escapeHtml(m.team_away)}">${escapeHtml(teamPt(m.team_away))}</span>
-        ${renderOddSide(m, 'away')}
         <span class="flag">${flag(m.team_away)}</span>
       </div>
       <div class="match-tail">

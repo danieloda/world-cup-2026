@@ -50,6 +50,26 @@ function compPt(name) {
   for (const [k, v] of Object.entries(COMP_PT)) if (name.includes(k)) return v;
   return name;
 }
+
+// Rótulo CURTO e discreto da competição pra forma recente. Os dados já vêm quase
+// todos em PT (Amistoso, Eliminatórias…); aqui só encurto os longos e traduzo o
+// que sobrou em inglês. Fallback: compPt + corte defensivo.
+const COMP_RECENT = {
+  'Eliminatórias': 'Elim. da Copa',
+  'World Cup - Qualification': 'Elim. da Copa',
+  'Copa Africana': 'Copa Africana',
+  'Nations League': 'Liga das Nações',
+  'UEFA Nations League': 'Liga das Nações',
+  'Arab Cup': 'Copa Árabe',
+  'FIFA Series': 'FIFA Series',
+  'EAFF E-1 Football Championship': 'EAFF E-1',
+  'Copa Ouro': 'Copa Ouro',
+};
+function compRecent(name) {
+  if (!name) return '';
+  const s = COMP_RECENT[name] || compPt(name);
+  return s.length > 16 ? s.slice(0, 15) + '…' : s;
+}
 function fmtH2HDate(iso) {
   if (!iso) return '';
   const [y, m, d] = iso.split('-');
@@ -111,17 +131,20 @@ function renderPredictionsRadar(pred, homeTeam, awayTeam) {
     </div>`;
 }
 
-// Previsão — só renderiza quando há RADAR (decisão do produto 2026-06-03: a
-// feature é o radar de força; sem ele a previsão não aparece — nem a barra 1X2).
-// O servidor (scripts/lib/normalize-prediction.js) já nem grava previsão sem
-// radar, então este early-return é a guarda defensiva no front.
-// Layout: barra 1X2 (vitória/empate/vitória) no topo + radar de força embaixo.
-// Verde = casa, vermelho = visitante, amarelo = empate (mesmo vocabulário visual
-// da balança de confronto direto, .ctx-balance).
-function renderPredictionsBlock(homeTeam, awayTeam, pred) {
-  if (!pred?.radar?.axes?.length) return '';
+// Previsão — duas metades independentes:
+//   • barra 1X2  → probabilidade implícita das ODDS (de-margined; ver oddsToProbs
+//                  em util.js e buildForecast em palpites-grupos.js). Aparece em
+//                  todo jogo com odds — o favorito é o do MERCADO.
+//   • radar      → comparação de força (form/ataque/defesa) do /predictions da
+//                  API-Football. Aparece só quando a API trouxe last_5.
+// Renderiza se houver QUALQUER uma das duas. Verde = casa, vermelho = visitante,
+// amarelo = empate (mesmo vocabulário visual da balança, .ctx-balance).
+export function renderPredictionsBlock(homeTeam, awayTeam, pred, { label = true } = {}) {
+  const pH = pct(pred?.pHome), pD = pct(pred?.pDraw), pA = pct(pred?.pAway);
+  const hasBar = (pH + pD + pA) > 0;
+  const hasRadar = !!pred?.radar?.axes?.length;
+  if (!hasBar && !hasRadar) return '';
 
-  const pH = pct(pred.pHome), pD = pct(pred.pDraw), pA = pct(pred.pAway);
   const homePt = teamPt(homeTeam);
   const awayPt = teamPt(awayTeam);
   const favored = pred.favored;  // 'home' | 'draw' | 'away'
@@ -131,9 +154,7 @@ function renderPredictionsBlock(homeTeam, awayTeam, pred) {
   const seg = (p, cls) => p > 0
     ? `<span class="rx-1x2-seg ${cls}" style="flex:${p}">${Math.round(p)}%</span>` : '';
 
-  return `
-    <div class="ctx-section-label">Previsão <span class="ctx-section-sub">${escapeHtml(pred.source || 'API-Football')}</span></div>
-    <div class="rx-pred">
+  const bar = hasBar ? `
       <div class="rx-1x2-head">
         <span class="rx-1x2-team home"><span class="flag">${flag(homeTeam)}</span>${escapeHtml(homePt)}</span>
         <span class="rx-1x2-draw">empate</span>
@@ -142,12 +163,17 @@ function renderPredictionsBlock(homeTeam, awayTeam, pred) {
       <div class="rx-1x2-bar" role="img" aria-label="${Math.round(pH)}% vitória ${escapeHtml(homePt)}, ${Math.round(pD)}% empate, ${Math.round(pA)}% vitória ${escapeHtml(awayPt)}">
         ${seg(pH, 'home')}${seg(pD, 'draw')}${seg(pA, 'away')}
       </div>
-      <div class="rx-1x2-verdict ${verdictCls}">Favorito da API: <b>${escapeHtml(verdictName)}</b></div>
-      ${renderPredictionsRadar(pred, homeTeam, awayTeam)}
+      <div class="rx-1x2-verdict ${verdictCls}">Favorito: <b>${escapeHtml(verdictName)}</b></div>` : '';
+
+  return `
+    ${label ? `<div class="ctx-section-label">Previsão <span class="ctx-section-sub">${escapeHtml(pred.source || 'mercado')}</span></div>` : ''}
+    <div class="rx-pred">
+      ${bar}
+      ${hasRadar ? renderPredictionsRadar(pred, homeTeam, awayTeam) : ''}
     </div>
   `;
 }
-function renderRecentBlock(team, recentByTeam) {
+export function renderRecentBlock(team, recentByTeam) {
   const rec = recentByTeam.get(team);
   if (!rec || !rec.length) {
     return `
@@ -173,14 +199,18 @@ function renderRecentBlock(team, recentByTeam) {
       divider = `<li class="rx-year"><span>${year}</span></li>`;
       lastYear = year;
     }
+    const comp = compRecent(r.competition);
     return `${divider}
       <li>
         <span class="rx-r ${res.c}">${res.l}</span>
         <span class="rx-when">${escapeHtml(fmtRecentDate(r.date))}</span>
-        <span class="rx-opp">
-          <span class="rx-loc ${r.home ? 'home' : 'away'}" title="${r.home ? 'Em casa' : 'Fora'}">${r.home ? 'C' : 'F'}</span>
-          <span class="flag">${flag(r.opponent)}</span>
-          <span class="rx-opp-name">${escapeHtml(teamPt(r.opponent))}</span>
+        <span class="rx-opp-wrap">
+          <span class="rx-opp">
+            <span class="rx-loc ${r.home ? 'home' : 'away'}" title="${r.home ? 'Em casa' : 'Fora'}">${r.home ? 'C' : 'F'}</span>
+            <span class="flag">${flag(r.opponent)}</span>
+            <span class="rx-opp-name">${escapeHtml(teamPt(r.opponent))}</span>
+          </span>
+          ${comp ? `<span class="rx-comp">${escapeHtml(comp)}</span>` : ''}
         </span>
         <span class="rx-score">${escapeHtml(r.score)}</span>
       </li>`;
@@ -204,13 +234,13 @@ function renderRecentBlock(team, recentByTeam) {
 
 // homeTeam é o lado "casa" do confronto do bolão; o summary do h2h é sempre
 // na ótica desse lado (home_wins == vitórias do homeTeam).
-function renderH2HBlock(homeTeam, awayTeam, h2h) {
+export function renderH2HBlock(homeTeam, awayTeam, h2h) {
   const homePt = teamPt(homeTeam);
   const awayPt = teamPt(awayTeam);
 
-  // Sem confrontos registrados → não mostra NADA (igual às odds: sem dado, sem
-  // seção). O gating em renderRaioXContent já evita chegar aqui vazio; isto é
-  // a guarda defensiva pra qualquer outro caller.
+  // Sem confrontos registrados → não mostra NADA (sem dado, sem seção). O gating
+  // em rxSections já evita chegar aqui vazio; isto é a guarda defensiva pra
+  // qualquer outro caller.
   if (!h2h || !h2h.fixtures?.length) return '';
 
   const s = h2h.summary || { home_wins: 0, draws: 0, away_wins: 0, total: 0 };
@@ -268,14 +298,25 @@ function roundPt(r) {
   return r;
 }
 
-// Status da linha: 'q' classificado direto, 'p' repescagem, '' eliminado.
-// A API marca repescagem com variante entre parênteses ("(Promotion)"); a 4ª
-// fase reconstruída da AFC usa o texto "Play-offs".
-function qualStatus(desc) {
-  if (!desc) return '';
-  const d = String(desc).toLowerCase();
-  if (d.includes('(') || d.includes('play')) return 'p';
-  return 'q';
+// Status AUTORITATIVO de uma linha: 'q' classificado direto, 'p' repescagem,
+// '' não classificou (eliminado). Antes era um heurístico só de descrição que
+// dava falso-positivo — campeão de grupo da CAF ("(Promotion: )") vinha como
+// "repescagem". Agora a base é o time estar na Copa (qualifiers.teams):
+//   - campo `playoff` (repescagem intercontinental confirmada)             → 'p'
+//   - descrição de playoff inequívoca: AFC "Play-offs"/"Fifth stage", ou o
+//     vice de grupo da UEFA "(Promotion)" SEM os dois-pontos do direto       → 'p'
+//   - time da Copa sem sinal de playoff = classificou direto                 → 'q'
+//   - linha de contexto (não está na Copa) = não classificou                → ''
+function qualStatusFor(qualifiers, team, desc) {
+  const rec = qualifiers?.teams?.[team];
+  const d = String(desc || '').toLowerCase();
+  const playoff = !!rec?.playoff
+    || d.includes('play')
+    || d.includes('fifth stage')
+    || /\(promotion\)\s*$/.test(d);   // "...(promotion)" sem ": " (vice UEFA)
+  if (playoff) return 'p';
+  if (rec && rec.format !== 'unknown') return 'q'; // está na Copa, sem playoff
+  return '';
 }
 
 function qualHas(qualifiers, team) {
@@ -304,9 +345,9 @@ function groupNamePt(name) {
 
 // Converte uma linha de eliminatória no formato normalizado de standings-view
 // (mesmo markup das tabelas de grupos). `focus` = Map<team, 'home'|'away'|'focus'>.
-function qualRows(group, focus) {
+function qualRows(group, focus, qualifiers) {
   return group.rows.map(r => {
-    const st = qualStatus(r.description);
+    const st = qualStatusFor(qualifiers, r.team, r.description);
     return {
       pos: r.rank, team: r.team,
       j: r.played, v: r.win, e: r.draw, d: r.lose, sg: r.gd, pts: r.points,
@@ -317,38 +358,61 @@ function qualRows(group, focus) {
 }
 
 // Card de um grupo (mesmo .group-card dos grupos), com a tabela canônica.
-function renderQualGroupCard(group, focus) {
+function renderQualGroupCard(group, focus, qualifiers) {
   const focusRow = group.rows.find(r => focus.has(r.team));
-  const headTag = focusRow ? qualTag(qualStatus(focusRow.description)) : '';
+  const headTag = focusRow ? qualTag(qualStatusFor(qualifiers, focusRow.team, focusRow.description)) : '';
   return `
     <div class="group-card">
       <div class="group-head">
         <div class="group-name sm">${escapeHtml(groupNamePt(group.name))}</div>
         ${headTag}
       </div>
-      ${renderStandingTable(qualRows(group, focus))}
+      ${renderStandingTable(qualRows(group, focus, qualifiers))}
     </div>`;
 }
 
 // Mostra apenas o(s) grupo(s) do(s) time(s) em foco (não a confederação inteira).
-function renderConfederation(conf, focus) {
+function renderConfederation(conf, focus, qualifiers) {
   const focusTeams = new Set(focus.keys());
   const hasFocus = g => g.rows.some(r => focusTeams.has(r.team));
   const focusGroups = conf.groups.filter(hasFocus);
   const groups = focusGroups.length ? focusGroups : conf.groups;
-  return `<div class="groups-grid">${groups.map(g => renderQualGroupCard(g, focus)).join('')}</div>`;
+  return `<div class="groups-grid">${groups.map(g => renderQualGroupCard(g, focus, qualifiers)).join('')}</div>`;
 }
 
-function campaignSummaryLine(conf, team) {
+function campaignSummaryLine(conf, team, qualifiers) {
   const hit = findTeamRow(conf, team);
   if (!hit) return '';
   const { group, row } = hit;
-  return `<div class="rx-qsum"><b>${row.rank}º</b> · ${escapeHtml(groupNamePt(group.name))} · ${row.points} pts · ${row.played}J <span class="rx-qwld">${row.win}V ${row.draw}E ${row.lose}D</span> · SG ${row.gd > 0 ? '+' : ''}${row.gd} ${qualTag(qualStatus(row.description))}</div>`;
+  return `<div class="rx-qsum"><b>${row.rank}º</b> · ${escapeHtml(groupNamePt(group.name))} · ${row.points} pts · ${row.played}J <span class="rx-qwld">${row.win}V ${row.draw}E ${row.lose}D</span> · SG ${row.gd > 0 ? '+' : ''}${row.gd} ${qualTag(qualStatusFor(qualifiers, team, row.description))}</div>`;
+}
+
+// Mantém só os confrontos no CAMINHO do time em foco. A repescagem
+// intercontinental dá 2 vagas = 2 caminhos independentes, cada um com sua final;
+// sem filtrar, o Raio-X de um time mostrava a final do OUTRO caminho também.
+// Caminha de trás pra frente (final → semis): parte do time em foco e vai
+// conectando quem ele (e seus adversários) enfrentou. Guarda: se o foco não
+// aparece em nenhum confronto, devolve tudo.
+function bracketFocusRounds(rounds, focusTeam) {
+  if (!focusTeam) return rounds;
+  const connected = new Set([focusTeam]);
+  const kept = rounds.map(() => []);
+  for (let i = rounds.length - 1; i >= 0; i--) {
+    for (const t of rounds[i].ties) {
+      if (connected.has(t.home) || connected.has(t.away)) {
+        kept[i].push(t);
+        if (t.home) connected.add(t.home);
+        if (t.away) connected.add(t.away);
+      }
+    }
+  }
+  if (!kept.some(ties => ties.length)) return rounds;
+  return rounds.map((rd, i) => ({ ...rd, ties: kept[i] })).filter(rd => rd.ties.length);
 }
 
 // Mata-mata → chave (rounds empilhados, com o time em foco destacado).
 function renderQualBracket(br, focusTeam) {
-  const rounds = br.rounds.map(rd => {
+  const rounds = bracketFocusRounds(br.rounds, focusTeam).map(rd => {
     const ties = rd.ties.map(t => {
       const hw = t.homeWinner === true || (t.homeGoals != null && t.awayGoals != null && t.homeGoals > t.awayGoals);
       const aw = t.awayWinner === true || (t.homeGoals != null && t.awayGoals != null && t.homeGoals < t.awayGoals);
@@ -365,6 +429,20 @@ function renderQualBracket(br, focusTeam) {
   return `<div class="rx-bracket">${rounds}</div>`;
 }
 
+// Bloco da repescagem (mata-mata) de um time, quando ele jogou tabela E um
+// bracket de repescagem (ex.: vencedores da Intercontinental). Mostra só o
+// CAMINHO do time (a final dele + a semi que a alimentou) — junto da tabela.
+function renderPlayoffBlock(team, qualifiers) {
+  const rec = qualifiers?.teams?.[team];
+  const br = rec?.playoff && qualifiers.brackets?.[rec.playoff];
+  if (!br) return '';
+  return `
+    <div class="rx-qplayoff">
+      <div class="rx-qplayoff-h">${escapeHtml(br.namePt)}</div>
+      ${renderQualBracket(br, team)}
+    </div>`;
+}
+
 // Bloco de uma seleção (cabeçalho + corpo conforme o formato).
 function renderCampaignBlock(team, qualifiers, role) {
   const rec = qualifiers.teams[team];
@@ -376,8 +454,10 @@ function renderCampaignBlock(team, qualifiers, role) {
   } else if (rec.format === 'table') {
     const conf = qualifiers.confederations[rec.confederation];
     sub = conf.namePt;
-    sumLine = campaignSummaryLine(conf, team);
-    body = renderConfederation(conf, new Map([[team, 'focus']]));
+    sumLine = campaignSummaryLine(conf, team, qualifiers);
+    // tabela da confederação + (se houve) o mata-mata da repescagem
+    body = renderConfederation(conf, new Map([[team, 'focus']]), qualifiers)
+         + renderPlayoffBlock(team, qualifiers);
   } else if (rec.format === 'bracket') {
     const br = qualifiers.brackets[rec.bracket];
     sub = br.namePt;
@@ -403,7 +483,7 @@ function qualLegend(homeTeam, awayTeam) {
   </div>`;
 }
 
-function renderQualifiersBlock(homeTeam, awayTeam, qualifiers) {
+export function renderQualifiersBlock(homeTeam, awayTeam, qualifiers, { label = true } = {}) {
   const okH = qualHas(qualifiers, homeTeam);
   const okA = qualHas(qualifiers, awayTeam);
   if (!okH && !okA) return '';
@@ -416,15 +496,17 @@ function renderQualifiersBlock(homeTeam, awayTeam, qualifiers) {
     const conf = qualifiers.confederations[recH.confederation];
     const focus = new Map([[homeTeam, 'home'], [awayTeam, 'away']]);
     return `
-      <div class="ctx-section-label">Eliminatórias <span class="ctx-section-sub">${escapeHtml(conf.namePt)}</span></div>
+      ${label ? `<div class="ctx-section-label">Eliminatórias <span class="ctx-section-sub">${escapeHtml(conf.namePt)}</span></div>` : ''}
       <div class="rx-qual">
         ${qualLegend(homeTeam, awayTeam)}
-        ${renderConfederation(conf, focus)}
+        ${renderConfederation(conf, focus, qualifiers)}
+        ${renderPlayoffBlock(homeTeam, qualifiers)}
+        ${renderPlayoffBlock(awayTeam, qualifiers)}
       </div>`;
   }
 
   return `
-    <div class="ctx-section-label">Eliminatórias <span class="ctx-section-sub">campanha classificatória</span></div>
+    ${label ? `<div class="ctx-section-label">Eliminatórias <span class="ctx-section-sub">campanha classificatória</span></div>` : ''}
     <div class="rx-qual rx-qual-split">
       ${okH ? renderCampaignBlock(homeTeam, qualifiers, 'home') : ''}
       ${okA ? renderCampaignBlock(awayTeam, qualifiers, 'away') : ''}
@@ -437,41 +519,175 @@ function renderQualifiersBlock(homeTeam, awayTeam, qualifiers) {
 export function hasRaioX(homeTeam, awayTeam, data) {
   if (!homeTeam || !awayTeam) return false;
   const { recentByTeam, h2h, predictions, qualifiers } = data;
-  // Cada seção só conta se TEM dado real (igual às odds): previsão presente,
-  // H2H com confrontos de verdade, forma recente, ou campanha de eliminatórias.
+  // Cada seção só conta se TEM dado real: previsão presente (barra das odds ou
+  // radar), H2H com confrontos de verdade, forma recente, ou eliminatórias.
   const hasH2H = !!h2h?.fixtures?.length;
   const hasQual = qualHas(qualifiers, homeTeam) || qualHas(qualifiers, awayTeam);
   return !!predictions || hasH2H || hasQual
     || recentByTeam.has(homeTeam) || recentByTeam.has(awayTeam);
 }
 
-// Conteúdo interno (seções). Reutilizado pelo painel inline e pelo modal.
-// Cada seção é independente: só entra se tiver dado real (sem placeholders /
-// "nenhum confronto"). Forma recente é o piso comum; previsão e H2H entram só
-// quando a API trouxe algo pra aquela partida.
-export function renderRaioXContent(homeTeam, awayTeam, data) {
+// ============================================================
+// Faixa-resumo (o "de relance") + abas (o detalhe por seção)
+// ============================================================
+// V/E/D dos últimos 5 jogos de um time (pro card de forma).
+function rxLast5(team, recentByTeam) {
+  const rec = recentByTeam?.get?.(team);
+  if (!rec || !rec.length) return null;
+  return rec.slice(0, 5).map(r => recentResult(r.score).c); // 'v' | 'e' | 'd'
+}
+// Posição/condição de classificação de um time (pro card de eliminatórias).
+function rxQualPos(qualifiers, team) {
+  const rec = qualifiers?.teams?.[team];
+  if (!rec || rec.format === 'unknown') return null;
+  if (rec.format === 'host') return 'Sede';
+  if (rec.format === 'bracket') return 'Mata-mata';
+  const conf = qualifiers.confederations?.[rec.confederation];
+  const hit = conf && findTeamRow(conf, team);
+  return hit ? `${hit.row.rank}º` : null;
+}
+
+const RX_WDL_L = { v: 'V', e: 'E', d: 'D' };
+function rxWdlChips(arr) {
+  if (!arr) return `<span class="rxx-wdl-none">—</span>`;
+  return `<span class="rxx-wdl">${arr.map(c => `<i class="${c}">${RX_WDL_L[c]}</i>`).join('')}</span>`;
+}
+function rxTwoRows(home, away, hv, av) {
+  return `<div class="rxx-stat-forms">
+    <div class="rxx-form-row"><span class="flag">${flag(home)}</span>${hv}</div>
+    <div class="rxx-form-row"><span class="flag">${flag(away)}</span>${av}</div>
+  </div>`;
+}
+
+// Cada card aponta (data-rxx-go) pra sua aba — clicar nele abre o detalhe.
+function rxStatFav(home, away, pred) {
+  if (!pred || (pct(pred.pHome) + pct(pred.pDraw) + pct(pred.pAway)) === 0) return '';
+  const f = pred.favored;
+  const name = f === 'home' ? teamPt(home) : f === 'away' ? teamPt(away) : 'Empate';
+  const p = f === 'home' ? pct(pred.pHome) : f === 'away' ? pct(pred.pAway) : pct(pred.pDraw);
+  const fl = f === 'draw' ? '' : `<span class="flag">${flag(f === 'home' ? home : away)}</span>`;
+  return `<div class="rxx-stat" data-rxx-go="pred" role="button" tabindex="0">
+    <div class="rxx-stat-l">Favorito</div>
+    <div class="rxx-stat-v rxx-fav ${f}">${fl}<span class="rxx-fav-n">${escapeHtml(name)}</span><span class="pct">${Math.round(p)}%</span></div>
+  </div>`;
+}
+function rxStatForm(home, away, recentByTeam) {
+  const h = rxLast5(home, recentByTeam), a = rxLast5(away, recentByTeam);
+  if (!h && !a) return '';
+  return `<div class="rxx-stat" data-rxx-go="form" role="button" tabindex="0">
+    <div class="rxx-stat-l">Forma · últimos 5</div>
+    ${rxTwoRows(home, away, rxWdlChips(h), rxWdlChips(a))}
+  </div>`;
+}
+function rxStatH2H(home, away, h2h) {
+  if (!h2h?.fixtures?.length) return '';
+  const s = h2h.summary || { home_wins: 0, draws: 0, away_wins: 0, total: 0 };
+  return `<div class="rxx-stat" data-rxx-go="h2h" role="button" tabindex="0">
+    <div class="rxx-stat-l">Confronto · ${s.total}</div>
+    <div class="rxx-stat-v rxx-h2h"><span class="flag">${flag(home)}</span><b class="v">${s.home_wins}</b><i>·</i><b class="e">${s.draws}</b><i>·</i><b class="a">${s.away_wins}</b><span class="flag">${flag(away)}</span></div>
+  </div>`;
+}
+function rxStatQual(home, away, qualifiers) {
+  const ph = rxQualPos(qualifiers, home), pa = rxQualPos(qualifiers, away);
+  if (!ph && !pa) return '';
+  const cell = v => `<span class="rxx-qpos">${v ? escapeHtml(v) : '—'}</span>`;
+  return `<div class="rxx-stat" data-rxx-go="qual" role="button" tabindex="0">
+    <div class="rxx-stat-l">Eliminatórias</div>
+    ${rxTwoRows(home, away, cell(ph), cell(pa))}
+  </div>`;
+}
+function rxSummary(home, away, data) {
+  const cards = [
+    rxStatFav(home, away, data.predictions),
+    rxStatForm(home, away, data.recentByTeam),
+    rxStatH2H(home, away, data.h2h),
+    rxStatQual(home, away, data.qualifiers),
+  ].filter(Boolean);
+  return cards.length ? `<div class="rxx-summary">${cards.join('')}</div>` : '';
+}
+
+// Seções (abas) — só as que têm dado; label interno desligado (a aba já nomeia).
+const RX_TAB_ABBR = { qual: 'Elim.' }; // rótulo curto em telas estreitas
+function rxSections(home, away, data) {
   const { recentByTeam, h2h, predictions, qualifiers } = data;
-  const hasRecent = recentByTeam.has(homeTeam) || recentByTeam.has(awayTeam);
-  const hasH2H = !!h2h?.fixtures?.length;
-  const hasQual = qualHas(qualifiers, homeTeam) || qualHas(qualifiers, awayTeam);
+  const out = [];
+  if (predictions)
+    out.push({ key: 'pred', label: 'Previsão', html: renderPredictionsBlock(home, away, predictions, { label: false }) });
+  if (recentByTeam.has(home) || recentByTeam.has(away))
+    out.push({ key: 'form', label: 'Forma', html: `<div class="rx-recent">${renderRecentBlock(home, recentByTeam)}${renderRecentBlock(away, recentByTeam)}</div>` });
+  if (h2h?.fixtures?.length)
+    out.push({ key: 'h2h', label: 'Confronto', html: renderH2HBlock(home, away, h2h) });
+  if (qualHas(qualifiers, home) || qualHas(qualifiers, away))
+    out.push({ key: 'qual', label: 'Eliminatórias', html: renderQualifiersBlock(home, away, qualifiers, { label: false }) });
+  return out.filter(s => s.html);
+}
 
-  return `
-    <div class="ctx-inner">
-      ${predictions ? renderPredictionsBlock(homeTeam, awayTeam, predictions) : ''}
-      ${hasRecent ? `
-      <div class="ctx-section-label">Forma recente <span class="ctx-section-sub">últimos jogos</span></div>
-      <div class="rx-recent">
-        ${renderRecentBlock(homeTeam, recentByTeam)}
-        ${renderRecentBlock(awayTeam, recentByTeam)}
-      </div>` : ''}
+// Conteúdo do Raio-X: faixa-resumo (de relance) + abas com o detalhe pesado.
+// Reutilizado pelo painel inline (grupos) e pelo modal (mata-mata). O container
+// .rxx tem max-width: contém o painel inline largo do desktop e iguala o modal.
+export function renderRaioXContent(homeTeam, awayTeam, data) {
+  const summary = rxSummary(homeTeam, awayTeam, data);
+  const secs = rxSections(homeTeam, awayTeam, data);
 
-      ${hasH2H ? `
-      <div class="ctx-section-label">Confronto direto</div>
-      ${renderH2HBlock(homeTeam, awayTeam, h2h)}` : ''}
+  let tabsBlock = '';
+  if (secs.length) {
+    const single = secs.length === 1;
+    const tabs = secs.map((s, i) => {
+      const abbr = RX_TAB_ABBR[s.key];
+      const lbl = abbr
+        ? `<span class="rxx-tab-full">${s.label}</span><span class="rxx-tab-abbr">${abbr}</span>`
+        : s.label;
+      return `<button type="button" class="rxx-tab" role="tab" data-rxx-tab="${s.key}" aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}">${lbl}</button>`;
+    }).join('');
+    const panels = secs.map((s, i) =>
+      `<div class="rxx-panel" data-rxx-key="${s.key}" role="tabpanel"${i === 0 ? '' : ' hidden'}>${s.html}</div>`).join('');
+    tabsBlock = `<div class="rxx-tabs${single ? ' is-single' : ''}" role="tablist">${tabs}</div><div class="rxx-panels">${panels}</div>`;
+  }
 
-      ${hasQual ? renderQualifiersBlock(homeTeam, awayTeam, qualifiers) : ''}
-    </div>
-  `;
+  // Fonte dos dados: tudo vem da API-Football; a barra 1X2 usa odds (Betano)
+  // quando há forecast de odds (predictions.source carrega o bookmaker).
+  const src = ['API-Football'];
+  const ps = data.predictions?.source;
+  if (ps && ps !== 'API-Football') src.unshift(`odds ${ps}`);
+  const footer = `<div class="rxx-source">Fonte: ${escapeHtml(src.join(' · '))}</div>`;
+
+  return `<div class="ctx-inner"><div class="rxx">${summary}${tabsBlock}${footer}</div></div>`;
+}
+
+// Troca de aba — 1 listener global delegado, escopo por container .rxx. Atende
+// também clique/teclado nos cards do resumo (data-rxx-go) como atalho pra abrir
+// a aba correspondente. Idempotente.
+let tabsAttached = false;
+export function attachRaioXTabs() {
+  if (tabsAttached) return;
+  tabsAttached = true;
+  const activate = (root, key) => {
+    if (!root || !key) return;
+    let found = false;
+    root.querySelectorAll('.rxx-tab').forEach(t => {
+      const on = t.dataset.rxxTab === key;
+      if (on) found = true;
+      t.setAttribute('aria-selected', String(on));
+      t.tabIndex = on ? 0 : -1;
+    });
+    if (!found) return;
+    root.querySelectorAll('.rxx-panel').forEach(p => {
+      p.toggleAttribute('hidden', p.dataset.rxxKey !== key);
+    });
+  };
+  document.addEventListener('click', (e) => {
+    const tab = e.target.closest('.rxx-tab[data-rxx-tab]');
+    if (tab) return activate(tab.closest('.rxx'), tab.dataset.rxxTab);
+    const card = e.target.closest('.rxx-stat[data-rxx-go]');
+    if (card) activate(card.closest('.rxx'), card.dataset.rxxGo);
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const card = e.target.closest('.rxx-stat[data-rxx-go]');
+    if (!card) return;
+    e.preventDefault();
+    activate(card.closest('.rxx'), card.dataset.rxxGo);
+  });
 }
 
 // ----- Variante INLINE (fase de grupos): botão + painel expansível -----

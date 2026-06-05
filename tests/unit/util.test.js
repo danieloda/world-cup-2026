@@ -17,6 +17,7 @@ import {
   isLive,
   isLocked,
   lockCountdownLabel,
+  oddsToProbs,
 } from '../../js/util.js';
 
 describe('flag', () => {
@@ -478,5 +479,58 @@ describe('lockCountdownLabel (conta até o bloqueio, não até o jogo)', () => {
   it('"Bloqueado" após o prazo', () => {
     vi.setSystemTime(new Date('2026-06-15T03:00:00Z')); // já passou 23h59 BRT da véspera
     expect(lockCountdownLabel(m.match_date)).toBe('Bloqueado');
+  });
+});
+
+describe('oddsToProbs', () => {
+  // 1/odd de cada resultado, normalizado pela soma (remove a margem da casa).
+  it('converte odds em probabilidades que somam ~100%', () => {
+    const p = oddsToProbs({ odd_home: 1.90, odd_draw: 3.40, odd_away: 4.20 });
+    expect(Math.round(p.pHome + p.pDraw + p.pAway)).toBe(100);
+    // 1/1.9=.5263, 1/3.4=.2941, 1/4.2=.2381 → soma 1.0585 → 49.7/27.8/22.5
+    expect(p.pHome).toBeCloseTo(49.7, 0);
+    expect(p.pDraw).toBeCloseTo(27.8, 0);
+    expect(p.pAway).toBeCloseTo(22.5, 0);
+    expect(p.favored).toBe('home');
+  });
+
+  it('marca empate como favorito quando a odd do empate é a menor', () => {
+    const p = oddsToProbs({ odd_home: 3.50, odd_draw: 2.10, odd_away: 3.60 });
+    expect(p.favored).toBe('draw');
+  });
+
+  it('marca visitante como favorito quando a odd de fora é a menor', () => {
+    const p = oddsToProbs({ odd_home: 4.00, odd_draw: 3.50, odd_away: 1.85 });
+    expect(p.favored).toBe('away');
+  });
+
+  it('retorna null para odds inválidas (<= 1, zero, ausentes, NaN)', () => {
+    expect(oddsToProbs({ odd_home: 1.0, odd_draw: 3.4, odd_away: 4.2 })).toBeNull();
+    expect(oddsToProbs({ odd_home: 0, odd_draw: 3.4, odd_away: 4.2 })).toBeNull();
+    expect(oddsToProbs({ odd_home: 1.9, odd_draw: 3.4 })).toBeNull();
+    expect(oddsToProbs({ odd_home: 'x', odd_draw: 3.4, odd_away: 4.2 })).toBeNull();
+    expect(oddsToProbs(null)).toBeNull();
+    expect(oddsToProbs(undefined)).toBeNull();
+  });
+
+  it('odds equilibradas → probabilidades equilibradas', () => {
+    const p = oddsToProbs({ odd_home: 3.0, odd_draw: 3.0, odd_away: 3.0 });
+    expect(p.pHome).toBeCloseTo(33.33, 1);
+    expect(p.pDraw).toBeCloseTo(33.33, 1);
+    expect(p.pAway).toBeCloseTo(33.33, 1);
+  });
+});
+
+describe('seleções B (reserva) — bandeira e nome do país', () => {
+  it('flag("Ghana B") usa a bandeira de Gana', () => {
+    expect(flag('Ghana B')).toBe('<span class="fi fi-gh"></span>');
+  });
+  it('teamPt("Ghana B") traduz o país e mantém o B', () => {
+    expect(teamPt('Ghana B')).toBe('Gana B');
+  });
+  it('não afeta times normais', () => {
+    expect(flag('Ghana')).toBe('<span class="fi fi-gh"></span>');
+    expect(teamPt('Ghana')).toBe('Gana');
+    expect(flag('Unknown')).toBe('<span class="fi fi-xx"></span>');
   });
 });
