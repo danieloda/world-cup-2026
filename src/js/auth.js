@@ -67,12 +67,11 @@ export async function signUp(email, password, fullName) {
     },
   });
   if (error) return { ok: false, error: humanizeAuthError(error) };
-  // Se identities vazio = email já cadastrado (Supabase não revela por segurança)
-  const alreadyExists = data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0;
-  if (alreadyExists) {
-    return { ok: false, error: 'Este email já está cadastrado. Tente entrar.' };
-  }
-  // session null = precisa confirmar email
+  // Anti-enumeração (M2): NÃO revelamos se o email já existe. Tanto um cadastro
+  // novo quanto um email já registrado (Supabase devolve identities:[]) retornam
+  // a MESMA resposta genérica de "confirme seu email". O Supabase envia o email
+  // apropriado em cada caso (confirmação para novo; aviso para recadastro), então
+  // o atacante não consegue distinguir email cadastrado de não-cadastrado pela UI.
   return { ok: true, needsConfirmation: !data.session };
 }
 

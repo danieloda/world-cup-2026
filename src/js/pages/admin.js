@@ -822,19 +822,11 @@ async function clearResult(matchId) {
   const id = parseInt(matchId, 10);
   if (!confirm('Limpar resultado e remover todos os marcadores deste jogo?\nPontos dos usuários serão recalculados.')) return;
 
-  // Limpa match
-  const { error: e1 } = await supabase
-    .from('matches')
-    .update({ actual_home: null, actual_away: null, pen_winner: null, finished: false, finished_at: null })
-    .eq('id', id);
+  // Limpa tudo numa transação atômica (migration 036): zera o placar, anula os
+  // pontos e remove os marcadores de uma vez. Antes eram 3 requests separados —
+  // falha no meio deixava estado inconsistente.
+  const { error: e1 } = await supabase.rpc('admin_clear_result', { p_match_id: id });
   if (e1) { showToast('Erro: ' + e1.message, 'error', 3500); return; }
-
-  // Limpa player_goals deste match
-  const { error: e2 } = await supabase.from('player_goals').delete().eq('match_id', id);
-  if (e2) { showToast('Erro ao limpar gols: ' + e2.message, 'error', 3500); return; }
-
-  // Limpa pontos das predictions
-  await supabase.from('predictions').update({ points_earned: null }).eq('match_id', id);
 
   // Update local cache
   const m = cache.matches.find(x => x.id === id);

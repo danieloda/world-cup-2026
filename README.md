@@ -128,36 +128,48 @@ npm run test:all       # Run all tests
 
 ## Scoring System
 
-| Result | Base Points |
-|--------|-------------|
-| Exact score | 5 pts |
-| Winner + goal diff | 3 pts |
-| Winner only | 2 pts |
-| One side correct | 1 pt |
-| Miss | 0 pts |
+**Additive model** (migration 022 — *not* "best tier"). Each correct component of a
+prediction adds up:
 
-### Stage Multipliers
+| Component | Awarded when | Points |
+|-----------|--------------|--------|
+| **AG** (goals/side) | each side whose goal count is exactly right (0, 1 or 2 sides) | `+ag` per side |
+| **AVE** (result) | correct winner/draw (knockout draw decided by `pen_winner`) | `+ave` |
+| **DG** (goal diff) | correct goal difference (includes 0-diff draws) | `+dg` |
 
-| Stage | Multiplier |
-|-------|------------|
-| Groups | 1.0x |
-| Round of 32 | 1.5x |
-| Round of 16 | 2.0x |
-| Quarterfinals | 3.0x |
-| Semifinals | 4.0x |
-| 3rd Place | 2.0x |
-| Final | 5.0x |
+Exact score = `2·ag + ave + dg`. Weights per stage:
+
+| Stage | AG | AVE | DG | Exact |
+|-------|----|-----|----|-------|
+| Groups | 1 | 4 | 1 | 7 |
+| Round of 32 | 1 | 6 | 1 | 9 |
+| Round of 16 | 3 | 12 | 1 | 19 |
+| Quarterfinals | 5 | 20 | 2 | 32 |
+| Semifinals | 8 | 32 | 2 | 50 |
+| 3rd Place | 4 | 16 | 1 | 25 |
+| Final | 12 | 48 | 4 | 76 |
 
 ### Bonuses
 
-- **Champion pick**: +50 pts if correct
-- **Top scorer pick**: +2 pts × stage_mult per goal
+- **Champion pick**: +40 pts if correct (decided only at the final)
+- **Top scorer pick**: +2 pts × stage multiplier per goal — the multiplier
+  (`1.0 / 1.5 / 2.0 / 3.0 / 4.0 / 2.0 / 5.0` for group→final) applies **only** here.
+- **Qualified team** (BPE/BP): points per knockout slot you call right, per phase
+  (migration 021/022).
+
+Source of truth: `supabase/migrations/022_additive_scoring.sql`, mirrored in
+`src/js/scoring.js` and `scripts/e2e/lib/scoring.js` (keep the three in sync).
 
 ## Security
 
-- Row Level Security (RLS) on all tables
-- Predictions auto-lock at match kickoff
-- Admin privileges enforced at database level
+- Row Level Security (RLS) on all tables — the only real trust boundary
+- Predictions lock at **23h59 (BRT) the day before** each match (not at kickoff);
+  rivals' predictions only become visible at kickoff
+- Admin privileges enforced at the database level (RLS), never just in JS
+- Every write to predictions/picks/results is logged to an append-only
+  `prediction_audit` trail (migration 035)
+- No secrets in git (`config.js` is gitignored; only the publishable/anon key
+  reaches the browser)
 - No secrets in git (config.js is gitignored)
 
 ## License
