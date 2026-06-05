@@ -221,13 +221,22 @@ function updateGlobalKpis() {
 async function loadUsers() {
   // Progresso agregado no SERVIDOR (1 linha por usuário) — evita o teto de ~1000
   // linhas do PostgREST que truncava a contagem com muitos palpites (104 × N).
-  const [usersRes, progRes] = await Promise.all([
-    supabase.from('profiles').select('*').order('created_at'),
+  // Lista de usuários (com e-mail) via RPC admin-gated admin_list_profiles()
+  // (migration 038): depois do lockdown de coluna, `select email from profiles`
+  // não é mais permitido a authenticated. Fallback pro select direto enquanto a
+  // 038 não estiver aplicada (RPC ainda não existe).
+  const [usersRpc, progRes] = await Promise.all([
+    supabase.rpc('admin_list_profiles'),
     supabase.rpc('admin_pred_progress'),
   ]);
-  if (usersRes.error) throw usersRes.error;
+  let users = usersRpc.data;
+  if (usersRpc.error) {
+    const fb = await supabase.from('profiles').select('*').order('created_at');
+    if (fb.error) throw usersRpc.error;
+    users = fb.data;
+  }
   if (progRes.error) throw progRes.error;
-  cache.users = usersRes.data;
+  cache.users = users;
   cache.pred_progress = new Map((progRes.data ?? []).map(r => [r.user_id, r]));
 
   // settings (for fee)
@@ -914,7 +923,7 @@ async function renderSettingsTab() {
   const s = cache.settings;
   const split = s.prize_split || { first: 70, second: 20, third: 10 };
   const dl = s.deadline_champion_scorer ? new Date(s.deadline_champion_scorer) : new Date('2026-06-11T02:59:00Z');
-  const dlLocal = toLocalDatetimeStr(dl);
+  const dlLocal = toBrtDatetimeStr(dl);
 
   return `
     <div class="setting-form">
@@ -930,7 +939,7 @@ async function renderSettingsTab() {
       </div>
       <div class="field">
         <label>Deadline campeão & artilheiro
-          <small>Após esta data/hora, as escolhas travam (formato local)</small>
+          <small>Após esta data/hora (horário de Brasília), as escolhas travam</small>
         </label>
         <input id="setDeadline" type="datetime-local" value="${dlLocal}">
       </div>
@@ -965,7 +974,9 @@ async function saveSettings() {
   }
   if (!dlLocal) { showToast('Deadline obrigatório', 'error'); return; }
 
-  const deadlineIso = new Date(dlLocal).toISOString();
+  // Interpreta o input como horário de Brasília (não como fuso do navegador), pra
+  // o deadline ser o mesmo instante independentemente de onde o admin esteja (L5).
+  const deadlineIso = fromBrtDatetimeStr(dlLocal).toISOString();
 
   // A coluna settings.value é jsonb e o supabase-js já serializa: passamos valores
   // NATIVOS (não JSON.stringify, senão duplo-codifica e vira '"2026-..."' com aspas,
@@ -1014,10 +1025,24 @@ function formatBrDateShort(d) {
   return `${String(d.getDate()).padStart(2, '0')}/${['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'][d.getMonth()]}`;
 }
 
-function toLocalDatetimeStr(d) {
-  // YYYY-MM-DDTHH:MM em local time (formato input[type=datetime-local])
+// Horário de Brasília (UTC-3 fixo, sem horário de verão — igual a util.js).
+const ADMIN_BRT_OFFSET_MS = 3 * 3600000;
+
+// Date (instante) → "YYYY-MM-DDTHH:MM" no relógio de Brasília (não no fuso do
+// navegador do admin). Antes usava o fuso local → admin fora do BRT gravava o
+// deadline no instante errado (L5).
+function toBrtDatetimeStr(d) {
+  const brt = new Date(d.getTime() - ADMIN_BRT_OFFSET_MS); // campos UTC = relógio BRT
   const pad = n => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  return `${brt.getUTCFullYear()}-${pad(brt.getUTCMonth() + 1)}-${pad(brt.getUTCDate())}T${pad(brt.getUTCHours())}:${pad(brt.getUTCMinutes())}`;
+}
+
+// "YYYY-MM-DDTHH:MM" (interpretado como horário de Brasília) → Date (instante UTC).
+function fromBrtDatetimeStr(s) {
+  const [datePart, timePart] = s.split('T');
+  const [y, mo, da] = datePart.split('-').map(Number);
+  const [h, mi] = timePart.split(':').map(Number);
+  return new Date(Date.UTC(y, mo - 1, da, h, mi, 0) + ADMIN_BRT_OFFSET_MS);
 }
 
 function groupMatchesByDate(matches) {

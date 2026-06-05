@@ -29,15 +29,19 @@ export async function getUser() {
 export async function getProfile() {
   const user = await getUser();
   if (!user) return null;
+  // Não selecionamos `email` da tabela (PII — ver M1/migration 038): o e-mail do
+  // próprio usuário vem do JWT/sessão, não de um SELECT em profiles. Assim o
+  // código continua funcionando mesmo após o lockdown de coluna da 038.
   const { data, error } = await supabase
     .from('profiles')
-    .select('*')
+    .select('id, full_name, avatar_url, is_admin, paid, paid_at, created_at')
     .eq('id', user.id)
     .maybeSingle();
   if (error) {
     console.warn('getProfile error:', error);
     return null;
   }
+  if (data) data.email = user.email; // e-mail próprio, da sessão
   return data;
 }
 
@@ -167,12 +171,14 @@ async function createMyProfile(user) {
       is_admin: false,
       paid: false,
     })
-    .select()
+    // Não devolvemos `email` no SELECT pós-insert (ver getProfile / M1).
+    .select('id, full_name, avatar_url, is_admin, paid, paid_at, created_at')
     .single();
   if (error) {
     console.error('createMyProfile:', error);
     return null;
   }
+  if (data) data.email = user.email; // e-mail próprio, da sessão
   return data;
 }
 

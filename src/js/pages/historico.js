@@ -69,7 +69,7 @@ async function loadData() {
   // somem palpites dos cards quando o bolão fica grande. Ver fetchAllPages.
   const predsPromise = fetchAllPages(() =>
     supabase.from('predictions')
-      .select('*, profiles(full_name, email, paid, avatar_url)')
+      .select('*, profiles(full_name, paid, avatar_url)')
       .in('match_id', matchIds).order('id'));
 
   // Artilheiros: o RLS só revela a escolha alheia após o deadline (10/jun). Como nenhum
