@@ -18,7 +18,9 @@
     "sync:h2h-pairs": "node scripts/data/fetch-h2h-pairs.js",
     "sync:odds": "node scripts/data/fetch-odds.js",
     "sync:predictions": "node scripts/data/fetch-predictions.js",
-    "sync:qualifiers": "node scripts/data/fetch-qualifiers.js"
+    "sync:qualifiers": "node scripts/data/fetch-qualifiers.js",
+    "integrity:snapshot": "node scripts/integrity/snapshot.js",
+    "integrity:verify": "node scripts/integrity/verify.js"
   },
   "devDependencies": {
     "@playwright/test": "^1.52.0",

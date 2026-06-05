@@ -1,0 +1,67 @@
+name: Integrity Snapshot
+
+# Carimba (snapshot + hash encadeado) os palpites já travados, diariamente.
+# Defensibilidade do bolão (achado H3): prova de imutabilidade pós-trava sem
+# confiar no operador do banco. O commit de volta = timestamp do histórico do
+# GitHub; o Telegram = timestamp de terceiro.
+#
+# Pré-requisitos (Settings → Secrets and variables → Actions):
+#   Variables:  SUPABASE_URL
+#   Secrets:    SUPABASE_SERVICE_ROLE_KEY
+#               TELEGRAM_TOKEN, TELEGRAM_CHAT_ID   (opcionais — posta o hash)
+
+on:
+  schedule:
+    # 06:10 UTC = 03:10 BRT — logo após a virada de dia (deadlines são 23h59 BRT).
+    - cron: '10 6 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: integrity-snapshot
+  cancel-in-progress: false
+
+permissions:
+  contents: write          # commitar o snapshot + manifest de volta
+
+jobs:
+  snapshot:
+    name: Snapshot & chain
+    runs-on: ubuntu-latest
+    if: ${{ vars.SUPABASE_URL != '' }}
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate snapshot
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: node scripts/integrity/snapshot.js
+
+      - name: Verify chain (sanity)
+        run: node scripts/integrity/verify.js
+
+      - name: Commit snapshot if changed
+        run: |
+          if [ -z "$(git status --porcelain integrity/)" ]; then
+            echo "Sem mudança no snapshot — nada a commitar."
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add integrity/
+          git commit -m "chore(integrity): snapshot automático dos palpites travados [skip ci]"
+          git push

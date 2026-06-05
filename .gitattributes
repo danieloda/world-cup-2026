@@ -1,0 +1,4 @@
+# Snapshots de integridade: bytes EXATOS importam (o SHA-256 é calculado sobre
+# eles). Desliga conversão de fim de linha pra o hash bater em qualquer plataforma.
+integrity/manifest.json    -text
+integrity/snapshots/**     -text

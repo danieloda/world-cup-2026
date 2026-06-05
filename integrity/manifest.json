@@ -1,0 +1,5 @@
+{
+  "version": 1,
+  "description": "Cadeia de integridade dos palpites do bolão SBC 2026. Cada entrada referencia um snapshot canônico em snapshots/ e o encadeia por SHA-256 (chain_hash = SHA256(prev_chain_hash || content_hash)). Verifique com: npm run integrity:verify",
+  "entries": []
+}
