@@ -7,7 +7,7 @@
  *
  * Pré-requisitos:
  *   - matches.api_fixture_id populado (scripts/fetch-odds.js já faz isso)
- *   - assets/data/fixtures.json atualizado (tem os ids dos times)
+ *   - src/assets/data/fixtures.json atualizado (tem os ids dos times)
  *   - migration 027 aplicada
  *
  * Custo: ~72 calls (fase de grupos). Idempotente — só re-busca quando
@@ -27,13 +27,13 @@ import { config } from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-config({ path: join(__dirname, '..', '.env') });
+config({ path: join(__dirname, '..', '..', '.env') });
 
 const API_KEY = process.env.API_FOOTBALL_KEY;
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const API_BASE = 'https://v3.football.api-sports.io';
-const FIXTURES_PATH = join(__dirname, '..', 'assets', 'data', 'fixtures.json');
+const FIXTURES_PATH = join(__dirname, '..', '..', 'src', 'assets', 'data', 'fixtures.json');
 
 const argv = process.argv.slice(2);
 const FORCE = argv.includes('--force');

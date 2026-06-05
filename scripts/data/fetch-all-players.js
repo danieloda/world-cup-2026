@@ -2,7 +2,7 @@
 /**
  * Fetch all 48 World Cup 2026 team squads from API-Football
  * Usage: node scripts/fetch-all-players.js
- * Output: assets/data/squads.json
+ * Output: src/assets/data/squads.json
  */
 
 import { writeFileSync, mkdirSync } from 'fs';
@@ -11,11 +11,11 @@ import { fileURLToPath } from 'url';
 import { config } from 'dotenv';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-config({ path: join(__dirname, '..', '.env') });
+config({ path: join(__dirname, '..', '..', '.env') });
 
 const API_KEY = process.env.API_FOOTBALL_KEY || process.env['API-FOOTBALL-KEY'];
 const BASE_URL = 'https://v3.football.api-sports.io';
-const OUTPUT_PATH = join(__dirname, '..', 'assets', 'data', 'squads.json');
+const OUTPUT_PATH = join(__dirname, '..', '..', 'src', 'assets', 'data', 'squads.json');
 
 const POSITION_MAP = {
   'Goalkeeper': 'GOL',

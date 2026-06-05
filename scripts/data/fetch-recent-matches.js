@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Fetch last 10 matches of each team from API-Football.
- * Output: assets/data/recent.json
+ * Output: src/assets/data/recent.json
  *
  * Formato (compatível com a UI atual):
  *   { "TeamName": [ [date, opponent, isHome, score, competition], ... ] }
@@ -19,7 +19,7 @@ import { fileURLToPath } from 'url';
 import { config } from 'dotenv';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-config({ path: join(__dirname, '..', '.env') });
+config({ path: join(__dirname, '..', '..', '.env') });
 
 const args = Object.fromEntries(
   process.argv.slice(2).map((a) => {
@@ -30,8 +30,8 @@ const args = Object.fromEntries(
 
 const API_KEY = process.env.API_FOOTBALL_KEY || process.env['API-FOOTBALL-KEY'];
 const BASE_URL = 'https://v3.football.api-sports.io';
-const OUTPUT_PATH = join(__dirname, '..', 'assets', 'data', 'recent.json');
-const FIXTURES_PATH = join(__dirname, '..', 'assets', 'data', 'fixtures.json');
+const OUTPUT_PATH = join(__dirname, '..', '..', 'src', 'assets', 'data', 'recent.json');
+const FIXTURES_PATH = join(__dirname, '..', '..', 'src', 'assets', 'data', 'fixtures.json');
 
 const ONLY_TEAM = args.team || null;
 const DRY_RUN = args['dry-run'] === true;

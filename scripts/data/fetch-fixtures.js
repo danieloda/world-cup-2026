@@ -2,7 +2,7 @@
 /**
  * Fetch all World Cup 2026 fixtures from API-Football
  * Usage: node scripts/fetch-fixtures.js
- * Output: assets/data/fixtures.json
+ * Output: src/assets/data/fixtures.json
  */
 
 import { writeFileSync, mkdirSync } from 'fs';
@@ -11,11 +11,11 @@ import { fileURLToPath } from 'url';
 import { config } from 'dotenv';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-config({ path: join(__dirname, '..', '.env') });
+config({ path: join(__dirname, '..', '..', '.env') });
 
 const API_KEY = process.env.API_FOOTBALL_KEY || process.env['API-FOOTBALL-KEY'];
 const BASE_URL = 'https://v3.football.api-sports.io';
-const OUTPUT_PATH = join(__dirname, '..', 'assets', 'data', 'fixtures.json');
+const OUTPUT_PATH = join(__dirname, '..', '..', 'src', 'assets', 'data', 'fixtures.json');
 
 async function fetchFixtures() {
   const res = await fetch(`${BASE_URL}/fixtures?league=1&season=2026`, {

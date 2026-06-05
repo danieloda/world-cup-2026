@@ -13,7 +13,7 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const SQUADS_PATH = join(__dirname, '..', 'assets', 'data', 'squads.json');
+const SQUADS_PATH = join(__dirname, '..', '..', 'src', 'assets', 'data', 'squads.json');
 
 // ESPN team name → squads.json key (which is API style)
 const TEAM_MAP = {

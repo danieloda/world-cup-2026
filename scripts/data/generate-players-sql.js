@@ -10,8 +10,8 @@ import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const squadsPath = join(__dirname, '..', 'assets', 'data', 'squads.json');
-const outputPath = join(__dirname, '..', 'supabase', 'seed', 'players_full.sql');
+const squadsPath = join(__dirname, '..', '..', 'src', 'assets', 'data', 'squads.json');
+const outputPath = join(__dirname, '..', '..', 'supabase', 'seed', 'players_full.sql');
 
 // Map API-Football team names to our database team names
 const TEAM_NAME_MAP = {

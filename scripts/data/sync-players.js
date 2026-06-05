@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Sincroniza public.players com o assets/data/squads.json (snapshot da API):
+ * Sincroniza public.players com o src/assets/data/squads.json (snapshot da API):
  *
  *   1. ADDS:    players na API mas não no DB → INSERT
  *   2. UPDATES: players nos dois → UPDATE shirt_number/position se mudou
@@ -26,7 +26,7 @@ import { dirname, join } from 'path';
 import { createInterface } from 'readline';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-config({ path: join(__dirname, '..', '.env') });
+config({ path: join(__dirname, '..', '..', '.env') });
 
 const args = Object.fromEntries(process.argv.slice(2).map((a) => {
   const m = a.match(/^--([^=]+)=(.*)$/); return m ? [m[1], m[2]] : [a.replace(/^--/, ''), true];
@@ -36,7 +36,7 @@ const NO_DELETE = args['no-delete'] === true;
 const FORCE = args.force === true;
 
 const admin = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
-const SQUADS_PATH = join(__dirname, '..', 'assets', 'data', 'squads.json');
+const SQUADS_PATH = join(__dirname, '..', '..', 'src', 'assets', 'data', 'squads.json');
 
 const C = { reset: '\x1b[0m', red: '\x1b[31m', green: '\x1b[32m', yellow: '\x1b[33m', blue: '\x1b[34m', dim: '\x1b[2m', bold: '\x1b[1m' };
 const log = (c, m) => console.log(`${C[c] || ''}${m}${C.reset}`);

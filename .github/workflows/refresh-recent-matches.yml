@@ -1,6 +1,6 @@
 name: Refresh Recent Matches
 
-# Atualiza assets/data/recent.json com as ULTIMAS 10 partidas de cada seleção
+# Atualiza src/assets/data/recent.json com as ULTIMAS 10 partidas de cada seleção
 # (via API-Football) e commita o arquivo de volta no main — o Netlify redeploya
 # no push, então as tooltips de "últimos jogos" ficam sempre frescas.
 #
@@ -64,13 +64,13 @@ jobs:
 
       - name: Commit & push if changed
         run: |
-          if git diff --quiet -- assets/data/recent.json; then
+          if git diff --quiet -- src/assets/data/recent.json; then
             echo "Sem mudanças em recent.json — nada a commitar."
             exit 0
           fi
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add assets/data/recent.json
+          git add src/assets/data/recent.json
           # NÃO usar [skip ci]: o Netlify também honra [skip ci]/[skip netlify] e
           # PULA o deploy — prod ficaria travado no recent.json antigo. Push via
           # GITHUB_TOKEN já não dispara o CI do GitHub, então não há loop de CI.

@@ -25,7 +25,7 @@ import { config } from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-config({ path: join(__dirname, '..', '.env') });
+config({ path: join(__dirname, '..', '..', '.env') });
 
 const API_KEY = process.env.API_FOOTBALL_KEY;
 const SUPABASE_URL = process.env.SUPABASE_URL;

@@ -32,7 +32,7 @@ import { dirname, join } from 'path';
 import { createInterface } from 'readline';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-config({ path: join(__dirname, '..', '.env') });
+config({ path: join(__dirname, '..', '..', '.env') });
 
 const args = Object.fromEntries(
   process.argv.slice(2).map((a) => {

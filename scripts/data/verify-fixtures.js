@@ -19,7 +19,7 @@ import { dirname, join } from 'path';
 import { spawnSync } from 'child_process';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-config({ path: join(__dirname, '..', '.env') });
+config({ path: join(__dirname, '..', '..', '.env') });
 
 const args = process.argv.slice(2);
 const REFRESH = args.includes('--refresh');
@@ -30,7 +30,7 @@ const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
 const supabase = createClient(SUPABASE_URL, ANON_KEY);
-const FIXTURES_PATH = join(__dirname, '..', 'assets', 'data', 'fixtures.json');
+const FIXTURES_PATH = join(__dirname, '..', '..', 'src', 'assets', 'data', 'fixtures.json');
 
 const C = { reset: '\x1b[0m', red: '\x1b[31m', green: '\x1b[32m', yellow: '\x1b[33m', blue: '\x1b[34m', bold: '\x1b[1m', dim: '\x1b[2m' };
 const log = (c, m) => console.log(`${C[c] || ''}${m}${C.reset}`);

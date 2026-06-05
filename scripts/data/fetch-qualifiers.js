@@ -2,7 +2,7 @@
 /**
  * Fetch World Cup 2026 QUALIFYING standings/brackets from API-Football.
  * Usage: node scripts/fetch-qualifiers.js
- * Output: assets/data/qualifiers.json
+ * Output: src/assets/data/qualifiers.json
  *
  * Alimenta a seção "Eliminatórias" do Raio-X: a campanha classificatória de
  * cada seleção, para comparar como mandante e visitante chegaram à Copa.
@@ -27,11 +27,11 @@ import { fileURLToPath } from 'url';
 import { config } from 'dotenv';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-config({ path: join(__dirname, '..', '.env') });
+config({ path: join(__dirname, '..', '..', '.env') });
 
 const API_KEY = process.env.API_FOOTBALL_KEY || process.env['API-FOOTBALL-KEY'];
 const BASE_URL = 'https://v3.football.api-sports.io';
-const OUTPUT_PATH = join(__dirname, '..', 'assets', 'data', 'qualifiers.json');
+const OUTPUT_PATH = join(__dirname, '..', '..', 'src', 'assets', 'data', 'qualifiers.json');
 
 // Confederações com tabela limpa via /standings. `season` varia por liga.
 const TABLE_QUALIFIERS = [
