@@ -102,4 +102,23 @@ describe('paths dos scripts (join(__dirname, ...))', () => {
     }
     expect(missing, `dados de produção ausentes:\n${missing.join('\n')}`).toEqual([]);
   });
+
+  it('paths de script em spawn/exec/fork (string literal) apontam p/ arquivo real', () => {
+    // Caminho cwd-relativo dentro de spawnSync('node', ['scripts/x.js']) escapa
+    // do extractDirnameJoins. Foi assim que verify-fixtures.js ficou chamando o
+    // path antigo scripts/fetch-fixtures.js (em vez de scripts/data/...) após o
+    // refactor — falha só em runtime. Aqui validamos contra a raiz do repo.
+    const SPAWN_RE = /(?:spawnSync|spawn|execSync|execFileSync|execFile|exec|fork)\s*\([^;]*?['"]((?:scripts|src|supabase)\/[^'"]+\.(?:m?js|cjs|json|sql))['"]/g;
+    const broken = [];
+    for (const file of scriptFiles) {
+      const content = readFileSync(file, 'utf8');
+      let m;
+      while ((m = SPAWN_RE.exec(content)) !== null) {
+        if (!existsSync(join(REPO, m[1]))) {
+          broken.push(`${relative(REPO, file)} → ${m[1]} (não existe)`);
+        }
+      }
+    }
+    expect(broken, `spawn/exec apontando p/ script inexistente:\n${broken.join('\n')}`).toEqual([]);
+  });
 });

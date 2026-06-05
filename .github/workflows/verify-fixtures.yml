@@ -1,0 +1,56 @@
+name: Verify Fixtures
+
+# Confere semanalmente se matches.match_date / team_home / team_away no DB
+# continuam batendo com a API-Football. Pega "data/hora errada de jogo" ANTES
+# que o usuário veja — a classe de bug que mais escapou. O script sai com
+# código 1 em qualquer discrepância → a action falha e o GitHub notifica.
+#
+# Pré-requisitos (Settings → Secrets and variables → Actions):
+#   Secrets:
+#     - API_FOOTBALL_KEY        (p/ o --refresh re-buscar da API)
+#     - SUPABASE_PUBLISHABLE_KEY
+#     - ADMIN_EMAIL
+#     - ADMIN_PASSWORD
+#   Variables:
+#     - SUPABASE_URL
+
+on:
+  schedule:
+    # 07:00 UTC = 04:00 BRT, toda segunda-feira
+    - cron: '0 7 * * 1'
+  workflow_dispatch:        # botão "Run workflow" — rode on-demand quando quiser
+
+concurrency:
+  group: verify-fixtures
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: DB vs API-Football
+    runs-on: ubuntu-latest
+    # Só roda se houver credenciais (evita falhar em forks)
+    if: ${{ vars.SUPABASE_URL != '' }}
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          # Node 22 LTS — @supabase/supabase-js exige WebSocket nativo (não em Node 20)
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify fixtures (re-fetch + compara DB)
+        env:
+          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+        run: node scripts/data/verify-fixtures.js --refresh

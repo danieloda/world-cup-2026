@@ -113,7 +113,7 @@ function summarizeApi(fixtures) {
 async function main() {
   if (REFRESH) {
     log('blue', '🔄 Refresh: rodando fetch-fixtures.js...');
-    const res = spawnSync('node', ['scripts/fetch-fixtures.js'], { stdio: 'inherit' });
+    const res = spawnSync('node', [join(__dirname, 'fetch-fixtures.js')], { stdio: 'inherit' });
     if (res.status !== 0) {
       log('red', '   ✗ fetch-fixtures.js falhou');
       process.exit(1);
