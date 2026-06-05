@@ -133,22 +133,19 @@ const SAMPLES = {
   },
   group: {
     severity: 'info',
-    title: '📋 Palpites de grupo — 01/06',
+    title: '🚨 Palpites travando — não deixe pra última hora!',
     body:
-`⏰ Cada jogo trava 23h59 da véspera.
-1º jogo trava 10/06 às 23h59 (faltam 9 dias)
+`Lembrete: cada jogo trava às 23h59 da véspera.
 
-📋 PROGRESSO (72 jogos de grupo):
-🔴 João Mendes — 0/72
-🟡 Carla Dias — 45/72
-🟡 Diego Reis — 60/72
-✅ Ana Silva — 72/72
-✅ Bruno Costa — 72/72
-✅ Ewerton Lima — 72/72
-✅ Fábio Souza — 72/72
-✅ Gabi Nunes — 72/72
+🚨 TRAVA HOJE ÀS 23H59 — ainda sem palpite:
+• João Mendes — França x Brasil, México x Japão
+• Maria Souza — França x Brasil
 
-8/11 fecharam todos os palpites.`,
+⚠️ TRAVA AMANHÃ ÀS 23H59 — ainda sem palpite:
+• Carla Dias — Argentina x Croácia
+• Pedro Lima — Argentina x Croácia, Portugal x Marrocos
+
+Ainda dá tempo — é só abrir e palpitar. 👇`,
     context: { cta_url: SITE_URL, cta_label: 'Fazer meus palpites' },
   },
   cs: {

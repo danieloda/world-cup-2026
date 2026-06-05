@@ -46,7 +46,7 @@ async function login() {
 // Cada teste roda a função cron real (que dispara o alerta de verdade).
 const RPCS = {
   payments:  { name: 'cron_alert_daily_payments',     desc: '💰 Pagamentos' },
-  group:     { name: 'cron_alert_group_completeness', desc: '📋 Completude de grupo' },
+  group:     { name: 'cron_alert_group_completeness', desc: '⏰ Lembrete jogos travando (🚨 hoje / ⚠️ amanhã; só se há pendentes)' },
   cs:        { name: 'cron_alert_cs_completeness',     desc: '🏆 Campeão & Artilheiro' },
   countdown: { name: 'cron_alert_deadline_countdown',  desc: '⏳ Contagem regressiva (só ≤3 dias do prazo)' },
   lock:      { name: 'cron_alert_lock_tonight',        desc: '🌙 Trava de hoje (só se há jogos)' },
