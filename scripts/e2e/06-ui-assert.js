@@ -15,7 +15,7 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { mkdirSync } from 'fs';
 import { makeAdminClient } from './lib/admin-client.js';
-import { fifaRank } from '../../js/fifa-rank.js';
+import { fifaRank } from '../../src/js/fifa-rank.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 config({ path: join(__dirname, '..', '..', '.env') });

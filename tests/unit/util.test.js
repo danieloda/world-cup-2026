@@ -18,7 +18,7 @@ import {
   isLocked,
   lockCountdownLabel,
   oddsToProbs,
-} from '../../js/util.js';
+} from '../../src/js/util.js';
 
 describe('flag', () => {
   // flag() retorna HTML da lib flag-icons (<span class="fi fi-xx">), não emoji.

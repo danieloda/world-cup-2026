@@ -5,8 +5,8 @@
   # Build command - generates js/config.js a partir de env vars
   command = "npm run build:config"
 
-  # Diretório a deployar (root pq é site estático puro)
-  publish = "."
+  # Diretório a deployar (web root estático)
+  publish = "src"
 
 # ============================================================
 # ENV VARS — configurar no Netlify UI (Site Settings → Env)

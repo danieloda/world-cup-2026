@@ -6,7 +6,7 @@
 !.env.example
 
 # Config do frontend (contém publishable key — gitignored por higiene)
-js/config.js
+src/js/config.js
 
 # Test outputs
 test-results/

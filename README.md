@@ -52,7 +52,7 @@ npm run dev
    - `SUPABASE_URL`
    - `SUPABASE_PUBLISHABLE_KEY`
 4. Add build command: `npm run build:config`
-5. Set publish directory: `/`
+5. Set publish directory: `src`
 6. Deploy
 
 ### Option B: Vercel
@@ -60,7 +60,7 @@ npm run dev
 1. Import from GitHub
 2. Set environment variables
 3. Build command: `npm run build:config`
-4. Output directory: `.`
+4. Output directory: `src`
 5. Deploy
 
 ### Option C: Any Static Host
@@ -86,34 +86,44 @@ npm run test:all       # Run all tests
 ## Project Structure
 
 ```
-├── index.html              # World Cup simulator
-├── login.html              # Authentication
-├── inicio.html             # Dashboard
-├── palpites-grupos.html    # Group stage: predictions + standings + best thirds + results (tabbed)
-├── palpites-mata.html      # Knockout predictions
-├── campeao-artilheiro.html # Champion & top scorer picks
-├── grupos.html             # Redirect → palpites-grupos.html#classificacao (legacy deep-link)
-├── terceiros.html          # Redirect → palpites-grupos.html#terceiros (legacy deep-link)
-├── ranking.html            # Leaderboard
-├── admin.html              # Admin panel
-├── js/
-│   ├── config.js           # Generated (gitignored)
-│   ├── config.example.js   # Template
-│   ├── supabase.js         # Supabase client
-│   ├── auth.js             # Authentication helpers
-│   ├── util.js             # Shared utilities
-│   ├── scoring.js          # Scoring logic (JS port)
-│   └── pages/              # Page-specific modules
-├── css/
-│   └── app.css             # Main stylesheet
+├── src/                        # Web root (Netlify publish dir)
+│   ├── index.html              # World Cup simulator
+│   ├── login.html              # Authentication
+│   ├── inicio.html             # Dashboard
+│   ├── palpites-grupos.html    # Group stage: predictions + standings + best thirds + results (tabbed)
+│   ├── palpites-mata.html      # Knockout predictions
+│   ├── campeao-artilheiro.html # Champion & top scorer picks
+│   ├── grupos.html             # Redirect → palpites-grupos.html#classificacao (legacy deep-link)
+│   ├── terceiros.html          # Redirect → palpites-grupos.html#terceiros (legacy deep-link)
+│   ├── ranking.html            # Leaderboard
+│   ├── admin.html              # Admin panel
+│   ├── js/
+│   │   ├── config.js           # Generated (gitignored)
+│   │   ├── config.example.js   # Template
+│   │   ├── supabase.js         # Supabase client
+│   │   ├── auth.js             # Authentication helpers
+│   │   ├── util.js             # Shared utilities
+│   │   ├── scoring.js          # Scoring logic (JS port)
+│   │   └── pages/              # Page-specific modules
+│   ├── css/
+│   │   └── app.css             # Main stylesheet
+│   └── assets/                 # Images, icons, avatars, JSON data
 ├── supabase/
-│   ├── migrations/         # Database schema
-│   └── seed/               # Initial data
+│   ├── migrations/             # Database schema
+│   └── seed/                   # Initial data
 ├── tests/
-│   ├── unit/               # Vitest unit tests
-│   └── e2e/                # Playwright E2E tests
-└── scripts/
-    └── build-config.js     # Config generator
+│   ├── unit/                   # Vitest unit tests
+│   └── e2e/                    # Playwright E2E tests
+├── scripts/
+│   ├── build-config.js         # Config generator
+│   ├── data/                   # API ingestion / sync (fetch-*, sync-*)
+│   ├── alerts/                 # Telegram alert tooling
+│   ├── maintenance/            # Reset / seed ops
+│   ├── lib/                    # Shared script helpers
+│   ├── dev/                    # Dev utilities
+│   └── e2e/                    # Manual E2E harness
+└── docs/
+    └── design/                 # Logo / brand explorations (not deployed)
 ```
 
 ## Scoring System

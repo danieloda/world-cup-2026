@@ -22,7 +22,7 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { mkdirSync } from 'fs';
 import { makeAdminClient } from './lib/admin-client.js';
-import { scorerBonus, stageMultiplier } from '../../js/scoring.js';
+import { scorerBonus, stageMultiplier } from '../../src/js/scoring.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 config({ path: join(__dirname, '..', '..', '.env') });

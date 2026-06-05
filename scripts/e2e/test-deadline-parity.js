@@ -21,7 +21,7 @@ import { config } from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { makeAdminClient } from './lib/admin-client.js';
-import { predictionDeadline } from '../../js/util.js';
+import { predictionDeadline } from '../../src/js/util.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 config({ path: join(__dirname, '..', '..', '.env') });

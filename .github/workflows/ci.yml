@@ -106,5 +106,5 @@ jobs:
         run: |
           echo "✅ Build successful"
           echo "Files ready for deployment:"
-          ls -la *.html
-          ls -la js/config.js
+          ls -la src/*.html
+          ls -la src/js/config.js

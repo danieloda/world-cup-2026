@@ -28,7 +28,7 @@ import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { config } from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
-import { normalizePrediction } from './lib/normalize-prediction.js';
+import { normalizePrediction } from '../lib/normalize-prediction.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 config({ path: join(__dirname, '..', '.env') });

@@ -6,19 +6,19 @@
   "scripts": {
     "build:config": "node scripts/build-config.js",
     "setup": "npm install && npm run build:config",
-    "dev": "npx serve -l 3000",
+    "dev": "npx serve src -l 3000",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:all": "npm run test && npm run test:e2e",
-    "sync:squads": "node scripts/sync-squads.js",
-    "sync:h2h": "node scripts/fetch-h2h.js",
-    "sync:h2h-pairs": "node scripts/fetch-h2h-pairs.js",
-    "sync:odds": "node scripts/fetch-odds.js",
-    "sync:predictions": "node scripts/fetch-predictions.js",
-    "sync:qualifiers": "node scripts/fetch-qualifiers.js"
+    "sync:squads": "node scripts/data/sync-squads.js",
+    "sync:h2h": "node scripts/data/fetch-h2h.js",
+    "sync:h2h-pairs": "node scripts/data/fetch-h2h-pairs.js",
+    "sync:odds": "node scripts/data/fetch-odds.js",
+    "sync:predictions": "node scripts/data/fetch-predictions.js",
+    "sync:qualifiers": "node scripts/data/fetch-qualifiers.js"
   },
   "devDependencies": {
     "@playwright/test": "^1.52.0",

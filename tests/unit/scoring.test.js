@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { matchPoints, scorePrediction, scoreBreakdown, championBonus, scorerBonus, stageMultiplier } from '../../js/scoring.js';
+import { matchPoints, scorePrediction, scoreBreakdown, championBonus, scorerBonus, stageMultiplier } from '../../src/js/scoring.js';
 
 // Modelo ADITIVO (022_additive_scoring.sql): cada acerto SOMA.
 //   +ag por LADO certo · +ave vencedor/empate · +dg saldo de gols.

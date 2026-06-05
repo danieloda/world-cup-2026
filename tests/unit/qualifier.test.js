@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { qualifierBonus } from '../../js/scoring.js';
+import { qualifierBonus } from '../../src/js/scoring.js';
 
 // Mirror of public.qualifier_bonus_pts (022_additive_scoring.sql).
 // BPE: r32 1 · r16 2 · qf 3 · sf 5 · third 3 · final 8.

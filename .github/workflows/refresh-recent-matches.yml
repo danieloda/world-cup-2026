@@ -57,9 +57,9 @@ jobs:
           TEAM: ${{ github.event.inputs.team }}
         run: |
           if [ -n "$TEAM" ]; then
-            node scripts/fetch-recent-matches.js --team="$TEAM"
+            node scripts/data/fetch-recent-matches.js --team="$TEAM"
           else
-            node scripts/fetch-recent-matches.js
+            node scripts/data/fetch-recent-matches.js
           fi
 
       - name: Commit & push if changed

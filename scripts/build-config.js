@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Build script to generate js/config.js from environment variables.
+ * Build script to generate src/js/config.js from environment variables.
  *
  * Usage:
  *   node scripts/build-config.js
@@ -58,9 +58,9 @@ export const APP_CONFIG = {
 };
 `;
 
-const configPath = join(rootDir, 'js', 'config.js');
+const configPath = join(rootDir, 'src', 'js', 'config.js');
 writeFileSync(configPath, configContent, 'utf8');
 
-console.log('✅ Generated js/config.js');
+console.log('✅ Generated src/js/config.js');
 console.log(`   SUPABASE_URL: ${SUPABASE_URL}`);
 console.log(`   SUPABASE_PUBLISHABLE_KEY: ${SUPABASE_PUBLISHABLE_KEY.slice(0, 20)}...`);

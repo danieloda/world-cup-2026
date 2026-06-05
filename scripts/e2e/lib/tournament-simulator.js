@@ -9,7 +9,7 @@
 // Output: { matches: [com actual_home/away/pen_winner + scorers], topScorer }
 
 import { mulberry32, hashSeed } from './prng.js';
-import { fifaRank } from '../../../js/fifa-rank.js';
+import { fifaRank } from '../../../src/js/fifa-rank.js';
 
 const REALISTIC_SCORES = [
   [0, 0], [1, 0], [0, 1], [1, 1], [2, 0], [0, 2],
