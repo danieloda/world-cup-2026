@@ -411,26 +411,104 @@ function renderClassificado() {
 // ---- 10) Desempate ----
 function renderDesempate() {
   return section('desempate', `
+    <p class="rules-p">
+      No fim, dois jogadores podem terminar com a <strong>mesma pontuação</strong>. Quando isso acontece, o
+      sistema desempata <strong>na ordem abaixo</strong> — só passa para o próximo critério se o anterior
+      continuar empatado. É tudo automático: ninguém decide no "par ou ímpar".
+    </p>
+
     <div class="rules-two">
       <div class="rules-half">
-        <div class="rules-half-title">Classificação dos grupos</div>
-        <p class="rules-p">Quando seleções empatam em pontos, quem avança é decidido por:</p>
+        <div class="rules-half-title">🏆 Classificação dos grupos (seleções)</div>
+        <p class="rules-p">Para decidir quais <strong>seleções</strong> avançam quando empatam em pontos no grupo:</p>
         <ol class="rules-ord">
-          <li>Pontos</li>
+          <li>Pontos no grupo</li>
           <li>Saldo de gols</li>
           <li>Gols marcados</li>
           <li>Ranking da FIFA (melhor posição passa)</li>
         </ol>
       </div>
       <div class="rules-half">
-        <div class="rules-half-title">Ranking do bolão</div>
-        <p class="rules-p">Quando dois participantes empatam em pontos, fica na frente quem tiver:</p>
+        <div class="rules-half-title">👥 Ranking do bolão (participantes)</div>
+        <p class="rules-p">Para decidir a ordem entre <strong>você e os outros jogadores</strong>:</p>
         <ol class="rules-ord">
           <li>Mais pontos no total</li>
-          <li>Mais placares exatos</li>
-          <li>Mais acertos de vencedor + diferença de gols</li>
+          <li>Mais placares exatos (cravados)</li>
+          <li>Mais acertos de vencedor + saldo</li>
+          <li>Empatou em tudo? <strong>Rateio</strong> — dividem a posição e o prêmio</li>
         </ol>
       </div>
+    </div>
+
+    <p class="rules-p" style="margin-top:20px;">
+      <strong>O desempate entre participantes, passo a passo</strong> — com exemplos:
+    </p>
+
+    <div class="rules-tiers">
+      <div class="rules-tier">
+        <div class="rules-tier-pts"><span class="pts">1</span></div>
+        <div class="rules-tier-body">
+          <div class="rules-tier-name">Mais pontos no total</div>
+          <div class="rules-tier-desc">
+            O total soma <strong>tudo</strong>: pontos dos jogos + Campeão + Artilheiro + Classificados.
+            Quem tiver mais pontos fica na frente — <strong>a grande maioria dos empates termina aqui</strong>.
+          </div>
+          <div class="rules-tier-ex"><b>Exemplo:</b> Ana terminou com <strong>152</strong> e Bruno com <strong>148</strong> → Ana fica na frente.</div>
+        </div>
+      </div>
+
+      <div class="rules-tier">
+        <div class="rules-tier-pts"><span class="pts">2</span></div>
+        <div class="rules-tier-body">
+          <div class="rules-tier-name">Mais placares exatos (cravados)</div>
+          <div class="rules-tier-desc">
+            Empataram no total? Passa à frente quem <strong>cravou mais placares</strong> — acertou em cheio o
+            resultado (palpitou 2 × 1 e o jogo terminou 2 × 1). Cravar é o acerto mais difícil, então premia quem foi mais preciso.
+          </div>
+          <div class="rules-tier-ex"><b>Exemplo:</b> Ana e Bruno empatam com <strong>150 pts</strong>. Ana cravou <strong>11</strong> placares e Bruno <strong>9</strong> → Ana fica na frente.</div>
+        </div>
+      </div>
+
+      <div class="rules-tier">
+        <div class="rules-tier-pts"><span class="pts">3</span></div>
+        <div class="rules-tier-body">
+          <div class="rules-tier-name">Mais acertos de vencedor + saldo</div>
+          <div class="rules-tier-desc">
+            Ainda empatados? Conta quem, entre os palpites que <em>não</em> foram cravados, acertou ao mesmo
+            tempo <strong>quem venceu e o saldo de gols</strong> — o "quase cravou" (palpitou 2 × 0 e deu 3 × 1:
+            acertou o vencedor e o saldo de 2 gols).
+          </div>
+          <div class="rules-tier-ex"><b>Exemplo:</b> Ana e Bruno empatam em <strong>150 pts</strong> e <strong>9 exatos</strong>. Ana fez vencedor + saldo em <strong>20</strong> jogos e Bruno em <strong>17</strong> → Ana fica na frente.</div>
+        </div>
+      </div>
+
+      <div class="rules-tier">
+        <div class="rules-tier-pts"><span class="pts">4</span></div>
+        <div class="rules-tier-body">
+          <div class="rules-tier-name">Rateio do prêmio — regra SBC 2022</div>
+          <div class="rules-tier-desc">
+            Se mesmo assim continuarem <strong>idênticos</strong> (mesmos pontos, mesmos exatos e mesmos vencedor + saldo),
+            não há como separá-los: os dois ficam na <strong>mesma posição</strong> (ex.: dois "2º lugar") e, quando a
+            posição é premiada, os prêmios das casas que eles ocupam são <strong>somados e divididos por igual</strong> —
+            o <strong>rateio</strong>. Campanhas idênticas, prêmio idêntico.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rules-example">
+      <div class="rules-example-head">Exemplo de rateio</div>
+      <p>Suponha um bolso de <strong>R$ 2.000</strong>, dividido em <strong>70% / 20% / 10%</strong> →
+        1º = <strong>R$ 1.400</strong>, 2º = <strong>R$ 400</strong>, 3º = <strong>R$ 200</strong>.</p>
+      <p><strong>Dois empatam em 1º:</strong> ocupam as casas de 1º e 2º. Soma-se R$ 1.400 + R$ 400 = R$ 1.800
+        e divide por 2 → <strong>R$ 900 para cada um</strong>. O próximo colocado cai para 3º e leva os R$ 200.</p>
+      <p class="rules-example-result"><strong>Dois empatam em 2º:</strong> o 1º leva os R$ 1.400 cheios; os empatados
+        ocupam as casas de 2º e 3º → (R$ 400 + R$ 200) ÷ 2 = <strong>R$ 300 para cada um</strong>.</p>
+    </div>
+
+    <div class="rules-tip">
+      💡 No <a href="ranking.html">Ranking</a>, jogadores empatados aparecem com o <strong>mesmo número de
+      posição</strong> e um marcador de empate <strong>(=)</strong>, e o prêmio já mostra o valor do rateio.
     </div>
   `);
 }

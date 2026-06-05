@@ -240,6 +240,15 @@ function tryParse(s) { try { return JSON.parse(s); } catch { return s; } }
 function renderPage() {
   const totalPot = computeTotalPot();
   const split = settings.prize_split || { first: 70, second: 20, third: 10 };
+  const prizeByPos = [
+    Math.round(totalPot * split.first  / 100),
+    Math.round(totalPot * split.second / 100),
+    Math.round(totalPot * split.third  / 100),
+  ];
+  // Atribui a cada jogador a posição (compartilhada em caso de empate total) e o
+  // valor do prêmio já com o rateio aplicado. Muta o leaderboard adicionando
+  // pos / tied / tieSize / prizeShare — usado por pódio e tabela.
+  assignRanksAndPrizes(leaderboard, prizeByPos);
 
   return `
     <section class="hero">
@@ -256,7 +265,7 @@ function renderPage() {
 
     ${renderPot(totalPot, split)}
 
-    ${leaderboard.length === 0 ? renderEmpty() : renderPodium(totalPot, split)}
+    ${leaderboard.length === 0 ? renderEmpty() : renderPodium()}
 
     ${leaderboard.length > 0 ? `
       <div class="section-head"><h3>Tabela completa</h3></div>
@@ -266,8 +275,12 @@ function renderPage() {
             <tr>
               <th class="left col-pos">#</th>
               <th class="left col-player">Jogador</th>
-              <th class="col-stat" title="Pontos dos palpites de jogos (soma de lado + resultado + saldo)">Jogos</th>
-              <th class="col-stat" title="Placares cravados">Exatos</th>
+              <th class="col-stat col-tiebreak" title="Placares cravados — 1º critério de desempate depois dos pontos">Exatos</th>
+              <th class="col-stat col-tiebreak" title="Acertou o vencedor E o saldo de gols, sem cravar — 2º critério de desempate">V+S</th>
+              <th class="col-stat col-soft" title="Acertou só quem venceu (errou o saldo de gols)">Venc.</th>
+              <th class="col-stat col-soft" title="Errou o vencedor, mas acertou os gols de um dos times">Parc.</th>
+              <th class="col-stat col-soft" title="Palpites de jogos finalizados que não pontuaram">Erros</th>
+              <th class="col-stat" title="Pontos dos palpites de jogos (lado + resultado + saldo)">Jogos</th>
               <th class="left col-pick">Campeão</th>
               <th class="left col-pick">Artilheiro</th>
               <th class="col-stat" title="Bônus por acertar times classificados (BPE/BP)">Classif.</th>
@@ -279,6 +292,11 @@ function renderPage() {
           </tbody>
         </table>
       </div>
+      <p class="hist-note rank-legend">
+        <b>Exatos</b> cravou o placar · <b>V+S</b> vencedor + saldo · <b>Venc.</b> só o vencedor · <b>Parc.</b> gols de um time · <b>Erros</b> não pontuou.
+        Empate em <b>Pts</b> é desempatado por <b>Exatos</b>, depois por <b>V+S</b>. Empatou nos três? Os jogadores dividem a mesma posição e o prêmio é rateado.
+        <a href="regras.html#desempate">Ver regras de desempate →</a>
+      </p>
     ` : ''}
 
     <div id="drillDown"></div>
@@ -379,14 +397,13 @@ function renderPot(totalPot, split) {
   `;
 }
 
-function renderPodium(totalPot, split) {
+function renderPodium() {
   const top3 = leaderboard.slice(0, 3);
   if (top3.length === 0) return '';
-  const prizes = [
-    Math.round(totalPot * split.first  / 100),
-    Math.round(totalPot * split.second / 100),
-    Math.round(totalPot * split.third  / 100),
-  ];
+
+  // A casa (1º/2º/3º) e o prêmio já vêm calculados por assignRanksAndPrizes —
+  // assim empates aparecem como mesma posição e o prêmio já é o do rateio.
+  const placeClass = (pos) => pos === 1 ? 'first' : pos === 2 ? 'second' : pos === 3 ? 'third' : '';
 
   // ordem visual: 2º · 1º · 3º
   const order = top3.length === 1 ? [0]
@@ -398,14 +415,14 @@ function renderPodium(totalPot, split) {
       ${order.map(idx => {
         const u = top3[idx];
         if (!u) return '<div></div>';
-        const place = idx + 1;
         return `
-          <div class="podium-card ${place === 1 ? 'first' : place === 2 ? 'second' : 'third'}" data-user-id="${u.user_id}">
-            <div class="podium-place">${place}º</div>
+          <div class="podium-card ${placeClass(u.pos)}" data-user-id="${u.user_id}">
+            <div class="podium-place">${u.pos}º</div>
             <div class="podium-av">${avatarHtml(u)}</div>
             <div class="podium-name">${escapeHtml(u.full_name)}</div>
             <div class="podium-pts">${u.total_pts} pts · ${u.exact_count} exatos</div>
-            <div class="podium-prize">${formatBRL(prizes[idx])}</div>
+            <div class="podium-prize">${formatBRL(Math.round(u.prizeShare))}</div>
+            ${u.tied ? `<div class="podium-split">empate · rateio entre ${u.tieSize}</div>` : ''}
           </div>
         `;
       }).join('')}
@@ -413,11 +430,15 @@ function renderPodium(totalPot, split) {
   `;
 }
 
-function renderRankRow(u, idx) {
-  const pos = idx + 1;
+function renderRankRow(u) {
+  const pos = u.pos;
   const isMe = u.user_id === profile.id;
   const posClass = pos <= 3 ? `pos pos-top pos-${pos}` : 'pos';
-  const rowClass = isMe ? 'me-row' : '';
+  const rowClass = `${isMe ? 'me-row' : ''}${u.tied ? ' tied-row' : ''}`.trim();
+  // Empate em TODOS os critérios → mesma posição, prêmio rateado (regra SBC 2022).
+  const tieTag = u.tied
+    ? `<span class="pos-tie" title="Empate em todos os critérios — mesma posição e prêmio dividido (rateio) entre ${u.tieSize}">=</span>`
+    : '';
 
   // Campeão: mostra a escolha + pontos. Quando a Final terminou e errou, mostra "0" apagado.
   const champPick = championPicksByUser.get(u.user_id);
@@ -463,7 +484,7 @@ function renderRankRow(u, idx) {
 
   return `
     <tr class="${rowClass}" data-user-id="${u.user_id}">
-      <td class="left"><span class="${posClass}">${pos}</span></td>
+      <td class="left"><span class="${posClass}">${pos}</span>${tieTag}</td>
       <td class="left">
         <div class="user-cell">
           <div class="av-mini">${avatarHtml(u)}</div>
@@ -472,8 +493,12 @@ function renderRankRow(u, idx) {
           </div>
         </div>
       </td>
+      <td class="tb">${u.exact_count}</td>
+      <td class="tb">${u.winner_sg_count ?? 0}</td>
+      <td class="soft">${u.winner_count ?? 0}</td>
+      <td class="soft">${u.side_count ?? 0}</td>
+      <td class="soft">${u.miss_count ?? 0}</td>
       <td>${u.match_pts}</td>
-      <td>${u.exact_count}</td>
       <td class="left pick-col">${champCell}</td>
       <td class="left pick-col">${scorerCell}</td>
       <td>${(u.qualifier_pts ?? 0) > 0
@@ -722,6 +747,51 @@ function attachEventListeners() {
       return;
     }
   });
+}
+
+// ============================================================
+// Posições com empate + rateio do prêmio (regra SBC 2022)
+// ============================================================
+// O v_leaderboard já vem ordenado por total_pts → exact_count → winner_sg_count
+// (os 3 critérios de desempate da página de Regras). Quando dois jogadores
+// empatam NOS TRÊS não há como separá-los: dividem a MESMA posição (ex.: dois
+// "2º") e, se essa posição premia, os prêmios das casas que eles ocupam são
+// somados e divididos por igual — o rateio.
+
+// Dois jogadores empatam de verdade quando são iguais nos 3 critérios.
+function tiedPair(a, b) {
+  return a.total_pts === b.total_pts
+      && a.exact_count === b.exact_count
+      && (a.winner_sg_count ?? 0) === (b.winner_sg_count ?? 0);
+}
+
+// Muta cada linha adicionando: pos (posição "competição padrão": 1,2,2,4…),
+// tied (compartilha posição), tieSize (quantos no bloco) e prizeShare (R$ já rateado).
+// prizeByPos = [prêmio 1º, prêmio 2º, prêmio 3º] em reais.
+function assignRanksAndPrizes(rows, prizeByPos) {
+  rows.forEach((u, i) => {
+    u.pos = (i > 0 && tiedPair(rows[i - 1], u)) ? rows[i - 1].pos : i + 1;
+  });
+
+  for (let i = 0; i < rows.length;) {
+    let j = i;
+    while (j + 1 < rows.length && rows[j + 1].pos === rows[i].pos) j++;
+    const size = j - i + 1;
+    // Soma os prêmios das casas realmente ocupadas pelo bloco (pos … pos+size-1).
+    let pool = 0;
+    for (let k = 0; k < size; k++) {
+      const slot = rows[i].pos + k; // casa 1-based
+      if (slot >= 1 && slot <= prizeByPos.length) pool += prizeByPos[slot - 1];
+    }
+    const share = pool / size;
+    for (let r = i; r <= j; r++) {
+      rows[r].tied = size > 1;
+      rows[r].tieSize = size;
+      rows[r].prizeShare = share;
+    }
+    i = j + 1;
+  }
+  return rows;
 }
 
 // ============================================================
