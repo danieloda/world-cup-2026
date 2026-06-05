@@ -40,6 +40,10 @@ venv/
 .idea/
 *.swp
 
+# Claude Code (config local/efêmera — settings.json compartilhada pode ser versionada)
+.claude/settings.local.json
+.claude/*.lock
+
 # ===== Node (GitHub template) =====
 # Logs
 logs
