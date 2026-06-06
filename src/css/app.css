@@ -1489,6 +1489,7 @@ body.raiox-modal-open { overflow: hidden; }
 
 /* ===== Palpites toolbar (chips + hover dos 3ºs) ===== */
 .palpites-toolbar {
+  position: relative;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -1497,6 +1498,36 @@ body.raiox-modal-open { overflow: hidden; }
   margin-bottom: 20px;
 }
 .palpites-toolbar .chips { margin-bottom: 0; flex: 1; }
+
+/* ===== Seletor de grupos: stepper + 12 bolinhas (substitui os 12 chips) ===== */
+.grp-stepper { display: flex; align-items: center; justify-content: center; gap: 14px; }
+.grp-cur { font-weight: 800; font-size: 17px; min-width: 116px; text-align: center; }
+.grp-cur b { color: var(--accent); }
+.grp-ct { color: var(--text-mute); font-size: 13px; font-weight: 600; }
+.grp-arrow {
+  width: 36px; height: 40px; border: 1px solid var(--line-strong);
+  background: var(--card-elev); border-radius: var(--radius-md);
+  color: var(--accent); font-size: 17px; cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-standard);
+}
+.grp-arrow:hover { background: var(--card-hover); }
+.grp-dots { display: flex; gap: 7px; justify-content: center; flex-wrap: wrap; margin-top: 12px; }
+.grp-dot {
+  width: 28px; height: 28px; border-radius: var(--radius-full);
+  border: 1px solid var(--line-strong); background: var(--card-elev);
+  color: var(--text-mute); font: 700 11px/1 var(--font);
+  display: grid; place-items: center; cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-standard);
+}
+.grp-dot:hover { background: var(--card-hover); }
+.grp-dot.done { background: var(--positive-dim); border-color: rgba(29,185,84,.4); color: var(--positive); }
+.grp-dot.cur  { background: var(--accent); border-color: var(--accent); color: #000; }
+/* stepper + bolinhas empilhados e centralizados no espaço (à esquerda dos 3ºs) */
+.grp-nav { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; }
+/* "Melhores 3ºs" fica à direita no fluxo do toolbar; em telas estreitas desce centralizado */
+@media (max-width: 560px) {
+  .palpites-toolbar .thirds-pop { width: 100%; display: flex; justify-content: center; margin-top: 14px; }
+}
 
 /* Popover (hover/clique) dos melhores 3ºs */
 .thirds-pop { position: relative; flex-shrink: 0; }

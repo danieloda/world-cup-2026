@@ -219,7 +219,7 @@ function renderPalpitesTab(counts) {
       <div class="chips" id="chips">
         ${groupBy === 'date'
           ? renderDatePicker(counts.openByDate, 'palpites')
-          : GROUPS.map(g => renderChip(g, 'Grupo ' + g, counts.openByGroup[g]?.done ?? 0, counts.openByGroup[g]?.total ?? 0)).join('')}
+          : renderGroupNav(counts.openByGroup)}
       </div>
       ${groupBy === 'group' ? renderThirdsPop('sim') : ''}
     </div>
@@ -547,7 +547,7 @@ function renderResultadosTab(counts) {
       <div class="chips" id="chips">
         ${groupBy === 'date'
           ? renderDatePicker(counts.finishedByDate, 'resultados')
-          : GROUPS.map(g => renderChip(g, 'Grupo ' + g, counts.finishedByGroup[g]?.done ?? 0, counts.finishedByGroup[g]?.total ?? 0)).join('')}
+          : renderGroupNav(counts.finishedByGroup)}
       </div>
       ${groupBy === 'group' ? renderThirdsPop('real') : ''}
     </div>
@@ -661,6 +661,32 @@ function renderChip(value, label, done, total) {
     <button class="${cls.join(' ')}" data-group="${value}">
       ${escapeHtml(label)} <span class="ct">${done}/${total}</span>
     </button>
+  `;
+}
+
+// Navegação de grupos: stepper (‹ Grupo X ›) centralizado + 12 bolinhas de
+// progresso (verde=completo / dourado=atual). Substitui os 12 chips (reduz a
+// sobrecarga de escolha). byGroup = { A: {done,total}, ... }.
+function renderGroupNav(byGroup) {
+  const cur = GROUPS.includes(activeGroup) ? activeGroup : GROUPS[0];
+  const c = byGroup[cur] || {};
+  const dots = GROUPS.map(g => {
+    const gc = byGroup[g] || {};
+    const done = gc.done ?? 0, total = gc.total ?? 0;
+    const cls = ['grp-dot'];
+    if (g === cur) cls.push('cur');
+    if (total > 0 && done === total) cls.push('done');
+    return `<button class="${cls.join(' ')}" type="button" data-group="${g}" aria-label="Grupo ${g}: ${done} de ${total} palpitados"${g === cur ? ' aria-current="true"' : ''}>${g}</button>`;
+  }).join('');
+  return `
+    <div class="grp-nav">
+      <div class="grp-stepper">
+        <button class="grp-arrow" type="button" data-grp-step="-1" aria-label="Grupo anterior">‹</button>
+        <div class="grp-cur">Grupo <b>${cur}</b> <span class="grp-ct">${c.done ?? 0}/${c.total ?? 0}</span></div>
+        <button class="grp-arrow" type="button" data-grp-step="1" aria-label="Próximo grupo">›</button>
+      </div>
+      <div class="grp-dots">${dots}</div>
+    </div>
   `;
 }
 
@@ -785,6 +811,21 @@ function attachEventListeners() {
       rerenderTabBody();
       return;
     }
+
+    // Stepper de grupos: setas (‹ ›) andam em ordem; bolinhas pulam direto.
+    const grpStep = e.target.closest('[data-grp-step]');
+    if (grpStep) {
+      const i = GROUPS.includes(activeGroup) ? GROUPS.indexOf(activeGroup) : 0;
+      activeGroup = GROUPS[(i + Number(grpStep.dataset.grpStep) + GROUPS.length) % GROUPS.length];
+      rerenderTabBody();
+      return;
+    }
+    const grpDot = e.target.closest('.grp-dot[data-group]');
+    if (grpDot) {
+      activeGroup = grpDot.dataset.group;
+      rerenderTabBody();
+      return;
+    }
   });
 
   // Inputs de placar (só na aba palpites)
@@ -892,8 +933,7 @@ function updateKpisAndChips() {
       chips.innerHTML = renderDatePicker(byDate, activeTab);
     } else {
       const byGroup = activeTab === 'palpites' ? counts.openByGroup : counts.finishedByGroup;
-      chips.innerHTML =
-        GROUPS.map(g => renderChip(g, 'Grupo ' + g, byGroup[g]?.done ?? 0, byGroup[g]?.total ?? 0)).join('');
+      chips.innerHTML = renderGroupNav(byGroup);
     }
   }
   // KPIs
