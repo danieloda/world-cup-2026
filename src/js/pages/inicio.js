@@ -218,9 +218,10 @@ function renderUpcomingSection() {
 }
 
 function renderMatchRow(m) {
-  // Card clicável → leva pra tela de palpite (grupo certo, ou mata-mata).
+  // Card clicável → leva pra tela de palpite e rola/pisca o jogo (#jogo-<id>);
+  // mata-mata abre a tela do mata.
   const href = m.group_name
-    ? `palpites-grupos.html#grupo-${m.group_name}`
+    ? `palpites-grupos.html#jogo-${m.id}`
     : 'palpites-mata.html';
   return `
     <a class="match next" href="${href}"

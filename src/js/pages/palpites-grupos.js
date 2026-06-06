@@ -87,6 +87,7 @@ try {
   attachEventListeners();
   attachRaioXInline();
   attachRaioXTabs();
+  focusHashMatch();  // se veio de um card do Início (#jogo-<id>), rola até o jogo e pisca
 } catch (err) {
   console.error('[palpites-grupos] FATAL:', err);
   document.body.innerHTML = `
@@ -177,9 +178,30 @@ function applyHashRoute() {
     case 'simulacao':     activeTab = 'palpites';   break;
     // 'palpites' ou vazio → mantém o default (aba Palpites)
   }
-  // Deep-link pra um grupo específico (ex.: cards de "próximos jogos" do Início → #grupo-A)
+  // Deep-link pra um grupo específico (ex.: #grupo-A)
   const gm = /^grupo-([A-L])$/.exec(h);
   if (gm) { activeTab = 'palpites'; groupBy = 'group'; activeGroup = gm[1]; }
+
+  // Deep-link pra um JOGO específico (cards de "próximos jogos" do Início → #jogo-<id>):
+  // abre a aba Palpites no grupo do jogo; o focusHashMatch() depois rola até ele e pisca.
+  const jm = /^jogo-(\d+)$/.exec(h);
+  if (jm) {
+    const mt = matches.find(x => x.id === Number(jm[1]));
+    if (mt && mt.group_name) { activeTab = 'palpites'; groupBy = 'group'; activeGroup = mt.group_name; }
+  }
+}
+
+// Rola até o jogo do hash (#jogo-<id>) e dá um flash rápido pra localizar o card.
+function focusHashMatch() {
+  const jm = /^jogo-(\d+)$/.exec((location.hash || '').replace('#', ''));
+  if (!jm) return;
+  const el = document.querySelector(`.match[data-match-id="${jm[1]}"]`);
+  if (!el) return;
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  el.classList.remove('flash');
+  void el.offsetWidth; // reinicia a animação se a classe já existia
+  el.classList.add('flash');
+  setTimeout(() => el.classList.remove('flash'), 1600);
 }
 
 function heroTitle() {

@@ -731,6 +731,17 @@ img { max-width: 100%; height: auto; }
 }
 @media (prefers-reduced-motion: reduce) { .match.next:hover { transform: none; } }
 
+/* Flash ao chegar de um card do Início (#jogo-<id>): pisca rápido pra localizar o jogo */
+@keyframes matchFlash {
+  0%, 100%      { box-shadow: 0 0 0 0 rgba(244, 196, 48, 0);    background: var(--card); }
+  10%, 35%, 60% { box-shadow: 0 0 0 3px rgba(244, 196, 48, .75); background: rgba(244, 196, 48, .10); }
+  22%, 48%      { box-shadow: 0 0 0 0 rgba(244, 196, 48, 0);    background: var(--card); }
+}
+.match.flash { animation: matchFlash 1.2s ease 1; }
+@media (prefers-reduced-motion: reduce) {
+  .match.flash { animation: none; box-shadow: 0 0 0 2px var(--accent); }
+}
+
 /* Botão Raio-X — linha própria no rodapé do card. Como o grid do .match tem
    colunas laterais SIMÉTRICAS, o placar fica no centro do card e o botão
    centralizado (justify-content: center) já cai no mesmo eixo do traço. */
