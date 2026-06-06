@@ -290,15 +290,12 @@ function renderMatchRow(m) {
         <span class="mm-ground">${escapeHtml(groundShort(m.ground))}</span>
         <span class="match-grp">${m.group_name ? 'Grupo ' + m.group_name : escapeHtml(stageLabel(m.stage))}</span>
       </div>
-      <div class="team home">
-        <span class="flag">${flag(m.team_home)}</span>
-        <span class="team-name">${escapeHtml(teamPt(m.team_home))}</span>
+      <div class="mn-fix">
+        <span class="team home"><span class="flag">${flag(m.team_home)}</span><span class="team-name">${escapeHtml(teamPt(m.team_home))}</span></span>
+        <span class="mn-x">×</span>
+        <span class="team away"><span class="flag">${flag(m.team_away)}</span><span class="team-name">${escapeHtml(teamPt(m.team_away))}</span></span>
       </div>
       <div class="match-cd">${lockCountdownLabel(m.match_date)}</div>
-      <div class="team away">
-        <span class="flag">${flag(m.team_away)}</span>
-        <span class="team-name">${escapeHtml(teamPt(m.team_away))}</span>
-      </div>
     </a>
   `;
 }

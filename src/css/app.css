@@ -713,11 +713,12 @@ img { max-width: 100%; height: auto; }
 /* ===== Card "próximo jogo" do Início (.match.next) — clicável =====
    Desktop: time › countdown ‹ time. Mobile: empilhado à esquerda (sem zigue-zague). */
 .match.next {
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: 1fr auto;
   grid-template-areas:
-    "meta meta meta"
-    "home cd   away";
+    "meta meta"
+    "fix  cd";
   gap: 8px 14px;
+  align-items: center;
   text-decoration: none; color: inherit;
   transition: transform var(--dur-fast) var(--ease-standard),
               box-shadow var(--dur-fast) var(--ease-standard),
@@ -733,17 +734,17 @@ img { max-width: 100%; height: auto; }
   background: var(--card-elev); border: 1px solid var(--line);
   border-radius: var(--radius-pill); padding: 4px 9px;
 }
-.match.next .team { font-size: 15px; }
-.match.next .team.home { grid-area: home; justify-content: flex-end; }
-.match.next .team.away { grid-area: away; justify-content: flex-start; }
-.match.next .match-cd { grid-area: cd; font-size: 12px; color: var(--text-mute); font-weight: 600; text-align: center; white-space: nowrap; }
+/* fixture alinhado à esquerda: a bandeira do mandante fica sempre no mesmo eixo */
+.match.next .mn-fix { grid-area: fix; display: flex; align-items: center; gap: 10px; min-width: 0; flex-wrap: wrap; }
+.match.next .team { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 600; }
+.match.next .mn-x { color: var(--text-mute); font-weight: 600; }
+.match.next .match-cd { grid-area: cd; justify-self: end; font-size: 12px; color: var(--text-mute); font-weight: 600; white-space: nowrap; }
 @media (max-width: 560px) {
   .match.next {
     grid-template-columns: 1fr;
-    grid-template-areas: "meta" "home" "away" "cd";
+    grid-template-areas: "meta" "fix" "cd";
   }
-  .match.next .team.home, .match.next .team.away { justify-content: flex-start; }
-  .match.next .match-cd { text-align: left; }
+  .match.next .match-cd { justify-self: start; }
 }
 @media (prefers-reduced-motion: reduce) { .match.next:hover { transform: none; } }
 
