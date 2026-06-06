@@ -58,12 +58,61 @@ function renderInicio() {
 
     ${renderKpis()}
 
+    ${renderNextMatch()}
+
     ${todayMatches.length > 0 ? renderTodaySection() : ''}
 
     ${renderUpcomingSection()}
 
     ${renderQuickLinks()}
   `;
+}
+
+// Bloco em destaque: o próximo jogo a ser disputado + countdown ao vivo até o
+// apito inicial + atalho pra palpitar (com scroll/flash via #jogo-<id>).
+// Fase-dependente: some quando não há jogos futuros (copa encerrada).
+function renderNextMatch() {
+  const m = upcomingMatches[0];
+  if (!m) return '';
+  const href = m.group_name ? `palpites-grupos.html#jogo-${m.id}` : 'palpites-mata.html';
+  const where = m.group_name ? 'Grupo ' + m.group_name : stageLabel(m.stage);
+  return `
+    <section class="next-hero">
+      <div class="nh-head">
+        <span class="nh-kicker">Próximo jogo</span>
+        <span class="nh-when">${escapeHtml(formatBrDate(new Date(m.match_date)))} · ${formatTime(m.match_date)} · ${escapeHtml(where)}</span>
+      </div>
+      <div class="nh-match">
+        <span class="nh-team"><span class="flag">${flag(m.team_home)}</span><span class="nh-name">${escapeHtml(teamPt(m.team_home))}</span></span>
+        <span class="nh-x">×</span>
+        <span class="nh-team"><span class="nh-name">${escapeHtml(teamPt(m.team_away))}</span><span class="flag">${flag(m.team_away)}</span></span>
+      </div>
+      <div class="countdown" data-deadline="${new Date(m.match_date).toISOString()}" aria-label="Tempo até o apito inicial">
+        <div class="cd-u"><b data-cd="d">--</b><span>dias</span></div>
+        <div class="cd-u"><b data-cd="h">--</b><span>hrs</span></div>
+        <div class="cd-u"><b data-cd="m">--</b><span>min</span></div>
+        <div class="cd-u"><b data-cd="s">--</b><span>seg</span></div>
+      </div>
+      <a class="btn btn-green nh-cta" href="${href}">Palpitar este jogo →</a>
+    </section>
+  `;
+}
+
+// Countdown ao vivo do bloco "próximo jogo" (atualiza a cada segundo).
+function startCountdown() {
+  const el = document.querySelector('.countdown[data-deadline]');
+  if (!el) return;
+  const target = new Date(el.dataset.deadline).getTime();
+  const set = (k, v) => { const n = el.querySelector(`[data-cd="${k}"]`); if (n) n.textContent = String(v).padStart(2, '0'); };
+  const tick = () => {
+    const s = Math.max(0, Math.floor((target - Date.now()) / 1000));
+    set('d', Math.floor(s / 86400));
+    set('h', Math.floor((s % 86400) / 3600));
+    set('m', Math.floor((s % 3600) / 60));
+    set('s', s % 60);
+  };
+  tick();
+  setInterval(tick, 1000);
 }
 
 // Banner de alerta: jogos pendentes (sem palpite) perto do bloqueio.
@@ -305,6 +354,7 @@ try {
   const pageBody = await renderShell({ active: 'inicio', profile, stats, lockAlerts });
   pageBody.innerHTML = renderInicio();
   pageBody.classList.add('fade-up');
+  startCountdown();  // ticker do bloco "próximo jogo"
 } catch (err) {
   console.error('[inicio] FATAL:', err);
   document.body.innerHTML = `

@@ -2019,6 +2019,36 @@ body.raiox-modal-open { overflow: hidden; }
 .empty-ic svg { width: 26px; height: 26px; }
 .empty-ic.green { background: var(--positive-dim); color: var(--positive); }
 
+/* ===== Bloco "Próximo jogo" + countdown (Início) ===== */
+.next-hero {
+  background: linear-gradient(165deg, var(--accent-dim), transparent 58%), var(--card);
+  border: 1px solid rgba(244, 196, 48, .25);
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+.nh-head { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+.nh-kicker {
+  font: 700 10px/1 var(--mono, ui-monospace, monospace); letter-spacing: .12em; text-transform: uppercase;
+  color: var(--accent); background: var(--accent-dim);
+  border: 1px solid rgba(244, 196, 48, .3); border-radius: var(--radius-pill); padding: 5px 10px;
+}
+.nh-when { font-size: 12px; color: var(--text-mute); }
+.nh-match { display: flex; align-items: center; justify-content: center; gap: 14px; font-size: 20px; font-weight: 800; margin-bottom: 16px; flex-wrap: wrap; }
+.nh-team { display: flex; align-items: center; gap: 10px; }
+.nh-match .flag { width: 30px; height: 22px; }
+.nh-x { color: var(--text-mute); font-weight: 600; font-size: 15px; }
+.countdown { display: flex; gap: 8px; justify-content: center; margin-bottom: 18px; }
+.cd-u { background: var(--card-elev); border: 1px solid var(--line); border-radius: var(--radius-md); padding: 8px 0; min-width: 56px; }
+.cd-u b { display: block; font-size: 24px; font-weight: 900; color: var(--accent); font-variant-numeric: tabular-nums; line-height: 1; }
+.cd-u span { font: 600 8px/1 var(--mono, ui-monospace, monospace); letter-spacing: .1em; text-transform: uppercase; color: var(--text-mute); }
+@media (max-width: 480px) {
+  .nh-match { font-size: 17px; gap: 10px; }
+  .cd-u { min-width: 48px; }
+  .cd-u b { font-size: 20px; }
+}
+
 /* ===== Login page ===== */
 .login-page {
   min-height: 100vh;
