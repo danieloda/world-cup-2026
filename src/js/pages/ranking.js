@@ -7,6 +7,7 @@ import {
 } from '../util.js';
 import { championBonus, scoreBreakdown, scorerBonus } from '../scoring.js';
 import { renderRankChart } from '../rank-chart.js';
+import { initTooltips } from '../tooltip.js';
 
 // ============================================================
 // Estado
@@ -53,6 +54,7 @@ try {
   if (chartPreviewMount) renderRankChart(chartPreviewMount, { progression: demoProgression(), meId: 'demo-me' });
 
   attachEventListeners();
+  initTooltips();  // tooltips dos termos de pontuação (cabeçalhos da tabela)
 } catch (err) {
   console.error('[ranking] FATAL:', err);
   document.body.innerHTML = `
@@ -274,15 +276,15 @@ function renderPage() {
             <tr>
               <th class="left col-pos">#</th>
               <th class="left col-player">Jogador</th>
-              <th class="col-stat col-tiebreak" title="Placares cravados — 1º critério de desempate depois dos pontos">Exatos</th>
-              <th class="col-stat col-tiebreak" title="Acertou o vencedor E o saldo de gols, sem cravar — 2º critério de desempate">V+S</th>
-              <th class="col-stat col-soft" title="Acertou só quem venceu (errou o saldo de gols)">Venc.</th>
-              <th class="col-stat col-soft" title="Errou o vencedor, mas acertou os gols de um dos times">Parc.</th>
-              <th class="col-stat col-soft" title="Palpites de jogos finalizados que não pontuaram">Erros</th>
-              <th class="col-stat" title="Pontos dos palpites de jogos (lado + resultado + saldo)">Jogos</th>
+              <th class="col-stat col-tiebreak" data-tip="Placares cravados — 1º critério de desempate depois dos pontos" tabindex="0">Exatos</th>
+              <th class="col-stat col-tiebreak" data-tip="Acertou o vencedor E o saldo de gols, sem cravar — 2º critério de desempate" tabindex="0">V+S</th>
+              <th class="col-stat col-soft" data-tip="Acertou só quem venceu (errou o saldo de gols)" tabindex="0">Venc.</th>
+              <th class="col-stat col-soft" data-tip="Errou o vencedor, mas acertou os gols de um dos times" tabindex="0">Parc.</th>
+              <th class="col-stat col-soft" data-tip="Palpites de jogos finalizados que não pontuaram" tabindex="0">Erros</th>
+              <th class="col-stat" data-tip="Pontos dos palpites de jogos (lado + resultado + saldo)" tabindex="0">Jogos</th>
               <th class="left col-pick">Campeão</th>
               <th class="left col-pick">Artilheiro</th>
-              <th class="col-stat" title="Bônus por acertar times classificados (BPE/BP)">Classif.</th>
+              <th class="col-stat" data-tip="Bônus por acertar times classificados (BPE/BP)" tabindex="0">Classif.</th>
               <th class="col-pts">Pts</th>
             </tr>
           </thead>

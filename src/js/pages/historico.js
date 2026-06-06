@@ -6,6 +6,7 @@ import {
   isLive, avatarHtml, localDateKey,
 } from '../util.js';
 import { scorerBonus, stageMultiplier, scoreBreakdown } from '../scoring.js';
+import { initTooltips } from '../tooltip.js';
 
 // ============================================================
 // Estado
@@ -613,78 +614,6 @@ function attachEventListeners() {
   initTooltips();
 }
 
-// ============================================================
-// Tooltip flutuante (popover de pontos / artilheiro)
-// ------------------------------------------------------------
-// Um único elemento reaproveitado, anexado ao <body> e posicionado via JS.
-// O conteúdo de cada gatilho vem do <template.tip-src> irmão. Delegação no
-// document → sobrevive aos re-renders das abas. Hover no desktop, toque no mobile.
-// ============================================================
-function initTooltips() {
-  let tipEl = null;
-  let current = null;   // gatilho atualmente exibido (p/ toggle no toque)
-
-  const ensure = () => {
-    if (!tipEl) {
-      tipEl = document.createElement('div');
-      tipEl.className = 'hist-tip';
-      tipEl.setAttribute('role', 'tooltip');
-      document.body.appendChild(tipEl);
-    }
-    return tipEl;
-  };
-
-  function show(trigger) {
-    const src = trigger.nextElementSibling;
-    if (!src || !src.classList.contains('tip-src')) return;
-    const el = ensure();
-    el.innerHTML = src.innerHTML;
-    el.classList.add('show');
-    current = trigger;
-    position(trigger, el);
-  }
-
-  function hide() {
-    if (tipEl) tipEl.classList.remove('show');
-    current = null;
-  }
-
-  function position(trigger, el) {
-    // mede com a tip já visível mas fora da tela
-    el.style.left = '-9999px';
-    el.style.top = '0';
-    const r = trigger.getBoundingClientRect();
-    const tw = el.offsetWidth, th = el.offsetHeight;
-    const gap = 9, pad = 8;
-    // centraliza no gatilho, prefere ACIMA; cai pra baixo se não couber
-    let left = r.left + r.width / 2 - tw / 2;
-    left = Math.max(pad, Math.min(left, window.innerWidth - tw - pad));
-    let top = r.top - th - gap;
-    let place = 'top';
-    if (top < pad) { top = r.bottom + gap; place = 'bottom'; }
-    el.dataset.place = place;
-    // seta apontando pro centro do gatilho (clampada à largura da tip)
-    const ax = Math.max(14, Math.min(r.left + r.width / 2 - left, tw - 14));
-    el.style.setProperty('--tip-arrow', `${ax}px`);
-    el.style.left = `${Math.round(left + window.scrollX)}px`;
-    el.style.top = `${Math.round(top + window.scrollY)}px`;
-  }
-
-  // Desktop: hover
-  document.addEventListener('mouseover', (e) => {
-    const t = e.target.closest('[data-tip]');
-    if (t) show(t);
-  });
-  document.addEventListener('mouseout', (e) => {
-    const t = e.target.closest('[data-tip]');
-    if (t && !(e.relatedTarget && t.contains(e.relatedTarget))) hide();
-  });
-  // Mobile: toque alterna; tocar fora fecha
-  document.addEventListener('click', (e) => {
-    const t = e.target.closest('[data-tip]');
-    if (t) { (current === t) ? hide() : show(t); }
-    else if (current) hide();
-  });
-  // Some ao rolar (captura também o scroll de containers internos)
-  document.addEventListener('scroll', hide, { passive: true, capture: true });
-}
+// Tooltip flutuante (pontos / artilheiro) agora vem do módulo compartilhado
+// ../tooltip.js — mesmo contrato: gatilho [data-tip] + <template class="tip-src">
+// irmão com o HTML. Ver initTooltips() lá.

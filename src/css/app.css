@@ -2592,6 +2592,11 @@ body.raiox-modal-open { overflow: hidden; }
 }
 .hist-tip[data-place="bottom"] { transform-origin: center top; transform: translateY(-4px) scale(.97); }
 .hist-tip.show { opacity: 1; transform: translateY(0) scale(1); }
+/* modo texto (explicação de termos): padding no balão + cor suave */
+.hist-tip.text-mode {
+  min-width: 0; padding: 9px 12px;
+  color: var(--text-dim); font-weight: 500;
+}
 /* fita de marca no topo */
 .hist-tip::before {
   content: "";
