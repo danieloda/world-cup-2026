@@ -1,5 +1,6 @@
 import { requireAuth } from '../auth.js';
 import { renderShell, iconChart, iconClipboard, iconTrophy } from '../sidebar.js';
+import { KPI } from '../kpi-icons.js';
 import { supabase } from '../supabase.js';
 import { loadLockAlerts } from '../lock-alerts.js';
 import {
@@ -174,14 +175,6 @@ function iconClockAlert() {
     <circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/></svg>`;
 }
 
-// Ícones dos KPIs (stroke = currentColor; o cap define a cor por variante)
-const KPI_IC = {
-  pos:   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 20v-6M12 20V8M18 20V4M3 20h18"/></svg>`,
-  pts:   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/></svg>`,
-  exact: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.5 13.5 17 22l-5-3-5 3 1.5-8.5"/></svg>`,
-  cup:   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>`,
-};
-
 function renderKpis() {
   const pointsDisplay = myStanding?.total_pts ?? 0;
   const exactsDisplay = myStanding?.exact_count ?? 0;
@@ -189,24 +182,24 @@ function renderKpis() {
   return `
     <div class="kpis">
       <div class="kpi green">
-        <div class="kpi-top"><span class="kpi-cap">${KPI_IC.pos}</span><span class="kpi-label">Sua posição</span></div>
+        <div class="kpi-top"><span class="kpi-cap">${KPI.position}</span><span class="kpi-label">Sua posição</span></div>
         <div class="kpi-num">${myPosition ? `${myPosition}º` : '—'}</div>
         <div class="kpi-sub">${myPosition
           ? `de ${totalPlayers} jogador${totalPlayers === 1 ? '' : 'es'}`
           : 'começa com os jogos'}</div>
       </div>
       <div class="kpi">
-        <div class="kpi-top"><span class="kpi-cap">${KPI_IC.pts}</span><span class="kpi-label">Seus pontos</span>${scorerPts ? `<span class="kpi-delta up">+${scorerPts} ↗</span>` : ''}</div>
+        <div class="kpi-top"><span class="kpi-cap">${KPI.points}</span><span class="kpi-label">Seus pontos</span>${scorerPts ? `<span class="kpi-delta up">+${scorerPts} ↗</span>` : ''}</div>
         <div class="kpi-num">${pointsDisplay}</div>
         <div class="kpi-sub">${scorerPts ? 'inclui o artilheiro' : 'sem jogos ainda'}</div>
       </div>
       <div class="kpi gold">
-        <div class="kpi-top"><span class="kpi-cap">${KPI_IC.exact}</span><span class="kpi-label">Placares exatos</span></div>
+        <div class="kpi-top"><span class="kpi-cap">${KPI.exact}</span><span class="kpi-label">Placares exatos</span></div>
         <div class="kpi-num">${exactsDisplay}</div>
         <div class="kpi-sub">seu maior acerto</div>
       </div>
       <div class="kpi">
-        <div class="kpi-top"><span class="kpi-cap">${KPI_IC.cup}</span><span class="kpi-label">Copa disputada</span></div>
+        <div class="kpi-top"><span class="kpi-cap">${KPI.cup}</span><span class="kpi-label">Copa disputada</span></div>
         <div class="kpi-num">${stats.pct_played ?? 0}<small>%</small></div>
         <div class="kpi-sub">${stats.finished_matches}/${stats.total_matches} jogos</div>
       </div>

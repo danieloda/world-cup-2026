@@ -587,6 +587,7 @@ img { max-width: 100%; height: auto; }
 .kpi-cap svg { width: 15px; height: 15px; }
 .kpi.green .kpi-cap { background: var(--accent-dim); color: var(--accent); }
 .kpi.gold  .kpi-cap { background: var(--positive-dim); color: var(--positive); }
+.kpi.red   .kpi-cap { background: var(--red-dim); color: var(--red); }
 .kpi-delta {
   margin-left: auto; display: inline-flex; align-items: center; gap: 3px;
   font: 800 11px/1 var(--font); padding: 3px 7px; border-radius: var(--radius-pill);

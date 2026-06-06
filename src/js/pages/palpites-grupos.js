@@ -1,5 +1,6 @@
 import { requireAuth } from '../auth.js';
 import { renderShell, refreshNavBadges } from '../sidebar.js';
+import { KPI } from '../kpi-icons.js';
 import { supabase } from '../supabase.js';
 import {
   flag, escapeHtml, formatBrDate, formatTime,
@@ -337,22 +338,22 @@ function renderKpisPalpites(counts) {
   return `
     <div class="kpis">
       <div class="kpi green">
-        <div class="kpi-label">Palpitados (em aberto)</div>
+        <div class="kpi-top"><span class="kpi-cap">${KPI.done}</span><span class="kpi-label">Palpitados (em aberto)</span></div>
         <div class="kpi-num">${doneOpen}<small>/${open}</small></div>
         <div class="progress-bar-inline"><span style="width:${pctDone}%"></span></div>
       </div>
       <div class="kpi red">
-        <div class="kpi-label">Faltando</div>
+        <div class="kpi-top"><span class="kpi-cap">${KPI.pending}</span><span class="kpi-label">Faltando</span></div>
         <div class="kpi-num">${open - doneOpen}</div>
         <div class="kpi-sub">${open - doneOpen === 0 ? 'tudo pronto ✓' : 'palpites pendentes'}</div>
       </div>
       <div class="kpi">
-        <div class="kpi-label">Total palpites</div>
+        <div class="kpi-top"><span class="kpi-cap">${KPI.total}</span><span class="kpi-label">Total palpites</span></div>
         <div class="kpi-num">${counts.totalDone}<small>/${matches.length}</small></div>
         <div class="kpi-sub">inclui jogos travados</div>
       </div>
       <div class="kpi gold">
-        <div class="kpi-label">Pontos ganhos</div>
+        <div class="kpi-top"><span class="kpi-cap">${KPI.points}</span><span class="kpi-label">Pontos ganhos</span></div>
         <div class="kpi-num">${counts.totalPoints}</div>
         <div class="kpi-sub">na fase de grupos</div>
       </div>
@@ -445,22 +446,22 @@ function renderKpisResultados(counts) {
   return `
     <div class="kpis">
       <div class="kpi gold">
-        <div class="kpi-label">Pontos ganhos</div>
+        <div class="kpi-top"><span class="kpi-cap">${KPI.points}</span><span class="kpi-label">Pontos ganhos</span></div>
         <div class="kpi-num">${counts.totalPoints}</div>
         <div class="kpi-sub">média ${avg} pts/jogo</div>
       </div>
       <div class="kpi green">
-        <div class="kpi-label">Placares exatos</div>
+        <div class="kpi-top"><span class="kpi-cap">${KPI.exact}</span><span class="kpi-label">Placares exatos</span></div>
         <div class="kpi-num">${exact}</div>
         <div class="kpi-sub">vale ${GP.exact} pts cada</div>
       </div>
       <div class="kpi">
-        <div class="kpi-label">Acertos parciais</div>
+        <div class="kpi-top"><span class="kpi-cap">${KPI.partial}</span><span class="kpi-label">Acertos parciais</span></div>
         <div class="kpi-num">${partial}</div>
         <div class="kpi-sub">vencedor/saldo/gols</div>
       </div>
       <div class="kpi red">
-        <div class="kpi-label">Erros</div>
+        <div class="kpi-top"><span class="kpi-cap">${KPI.miss}</span><span class="kpi-label">Erros</span></div>
         <div class="kpi-num">${miss}</div>
         <div class="kpi-sub">de ${total} palpites</div>
       </div>
