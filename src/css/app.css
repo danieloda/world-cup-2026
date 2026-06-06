@@ -570,8 +570,8 @@ img { max-width: 100%; height: auto; }
   letter-spacing: -.03em; line-height: 1;
 }
 .kpi-num small { font-size: 14px; color: var(--text-dim); font-weight: 600; }
-.kpi.green .kpi-num { color: var(--accent); }
-.kpi.gold  .kpi-num { color: var(--accent); }
+.kpi.green .kpi-num { color: var(--accent); }      /* foco/marca: sua posição */
+.kpi.gold  .kpi-num { color: var(--positive); }    /* sucesso: placares exatos (antes era amarelo idêntico ao .green) */
 .kpi.red   .kpi-num { color: var(--red); }
 .kpi-sub { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
 
@@ -973,7 +973,7 @@ body.raiox-modal-open { overflow: hidden; }
   font-variant-numeric: tabular-nums;
 }
 .h2h-sc b { font: 800 14px/1 var(--font); color: var(--text-dim); min-width: 9px; text-align: center; }
-.h2h-sc b.win { color: var(--accent-bright); }
+.h2h-sc b.win { color: var(--text); }   /* vencedor = branco (casa o nome em .h2h-t.win); antes amarelo colidia com empate/marca */
 .h2h-sc i { font-style: normal; color: var(--text-mute); font-size: 10px; }
 .h2h-comp {
   justify-self: end; text-align: right;
@@ -3289,9 +3289,9 @@ body.raiox-modal-open { overflow: hidden; }
   display: inline-block;
   width: 14px;
 }
-.group-table tbody tr.qualified td { color: #1DB954; }
+.group-table tbody tr.qualified td { color: var(--positive); }
 .group-table tbody tr.qualified td.pts { font-weight: 800; }
-.group-table tbody tr.qualified .position { color: #1DB954; font-weight: 800; }
+.group-table tbody tr.qualified .position { color: var(--positive); font-weight: 800; }
 .group-table tbody tr.third td { color: var(--medal-bronze); }
 .group-table tbody tr.third .position { color: var(--medal-bronze); font-weight: 700; }
 .group-table tbody tr.out td { color: var(--text-mute); }
@@ -3539,8 +3539,8 @@ input[type="number"].score-input {
 .bracket-match.result-mode .bm-team.winner .team-name { color: var(--accent); }
 .bracket-match.result-mode .bm-team.winner .result-score { color: var(--accent); }
 
-.bracket-match.result-mode.exact { border-color: var(--accent); background: rgba(45, 200, 110, 0.04); }
-.bracket-match.result-mode.partial { border-color: var(--positive); background: rgba(244, 196, 48, 0.04); }
+.bracket-match.result-mode.exact { border-color: var(--accent); background: rgba(244, 196, 48, 0.05); }    /* tint = borda (amarelo = exato) */
+.bracket-match.result-mode.partial { border-color: var(--positive); background: rgba(29, 185, 84, 0.05); }  /* tint = borda (verde = parcial) */
 .bracket-match.result-mode.miss { border-color: var(--red); background: rgba(241, 94, 108, 0.03); }
 .bracket-match.result-mode.no-pred { border-color: var(--line-strong); background: rgba(255, 255, 255, 0.02); }
 
@@ -3943,7 +3943,7 @@ input[type="number"].score-input {
   flex-shrink: 0;
 }
 .pos-badge.pos-ata { background: rgba(241, 94, 108, .2); color: #f15e6c; }
-.pos-badge.pos-mei { background: rgba(29, 185, 84, .2); color: #1DB954; }
+.pos-badge.pos-mei { background: rgba(29, 185, 84, .2); color: var(--positive); }
 .pos-badge.pos-def { background: rgba(59, 130, 246, .2); color: #3b82f6; }
 .pos-badge.pos-gol { background: rgba(244, 196, 48, .2); color: #f4c430; }
 .pos-badge.pos-unk { background: rgba(255,255,255,.1); color: var(--text-mute); }
@@ -5181,7 +5181,7 @@ input[type="number"].score-input {
 .account-menu::before {
   content: '';
   position: absolute; inset: 0 0 auto 0; height: 3px;
-  background: linear-gradient(90deg, var(--accent), var(--positive));
+  background: linear-gradient(90deg, var(--accent), var(--accent-bright));   /* marca pura (antes misturava verde de sucesso) */
 }
 .topbar-account.open .account-menu {
   opacity: 1; visibility: visible; transform: none;
@@ -5260,7 +5260,7 @@ input[type="number"].score-input {
 .modal::before {
   content: '';
   position: absolute; inset: 0 0 auto 0; height: 3px;
-  background: linear-gradient(90deg, var(--accent), var(--positive));
+  background: linear-gradient(90deg, var(--accent), var(--accent-bright));   /* marca pura (antes misturava verde de sucesso) */
 }
 .modal-overlay.show .modal { transform: none; }
 .modal-head {
@@ -5662,4 +5662,85 @@ input[type="number"].score-input {
   letter-spacing: .04em;
   color: var(--text-mute);
   text-align: right;
+}
+
+/* ============================================================
+   REFINEMENT PASS — Tier 1 (fundação: tokens + a11y + contraste)
+   Aditivo + 2 correções globais. Sem trocar paleta/marca/tema/tipo.
+   ============================================================ */
+
+/* 1.1 — escalas de token (aditivas; ancoradas nos valores de maior uso) */
+:root {
+  --space-0: 2px;   --space-1: 4px;   --space-1h: 6px;  --space-2: 8px;
+  --space-2h: 10px; --space-3: 12px;  --space-3h: 14px; --space-4: 16px;
+  --space-5: 24px;  --space-6: 32px;  --space-7: 48px;
+
+  --radius-xs: 3px; --radius-sm: 6px; --radius-md: 8px; --radius-lg: 12px;
+  --radius-xl: 16px; --radius-pill: 999px; --radius-full: 50%;
+
+  --elev-1: 0 1px 2px rgba(0,0,0,.4);
+  --elev-2: 0 8px 24px -12px rgba(0,0,0,.7);
+  --elev-3: 0 16px 40px rgba(0,0,0,.6);
+  --elev-4: 0 30px 80px -20px rgba(0,0,0,.85);
+  --shadow-glow: 0 16px 40px -18px var(--glow-accent);
+  --ring-accent: 0 0 0 3px var(--accent-dim);
+  --shadow-material: inset 0 1px 0 var(--glass-hi), 0 1px 2px rgba(0,0,0,.35);
+
+  --dur-fast: .12s; --dur-base: .2s; --dur-slow: .35s;
+  --ease-standard: cubic-bezier(.4,0,.2,1);
+  --ease-emphasized: cubic-bezier(.22,1,.36,1);
+
+  --fs-2xs: 10px; --fs-xs: 11px; --fs-sm: 12px; --fs-base: 13px;
+  --fs-md: 14px;  --fs-lg: 16px; --fs-xl: 18px; --fs-2xl: 22px; --fs-3xl: 28px;
+  --fw-medium: 600; --fw-bold: 700; --fw-heavy: 800; --fw-black: 900;
+  --lh-tight: 1.1; --lh-snug: 1.3; --lh-normal: 1.5;
+  --tracking-tight: -.02em; --tracking-wide: .08em; --tracking-caps: .15em;
+
+  --z-base: 0; --z-raised: 10; --z-sticky: 100; --z-sidebar: 200;
+  --z-dropdown: 300; --z-overlay: 400; --z-modal: 500; --z-toast: 600;
+
+  --blur-sm: 6px; --blur-md: 14px; --blur-lg: 20px;
+  --line-faint: rgba(255,255,255,.05);
+  --overlay-02: rgba(255,255,255,.02);
+  --overlay-04: rgba(255,255,255,.04);
+  --overlay-06: rgba(255,255,255,.06);
+}
+
+/* 1.2 — anel de foco de teclado GLOBAL (corrige WCAG 2.4.7 em todo o app).
+   :where() mantém especificidade 0 — não briga com regras existentes. */
+:where(
+  a, button, [role="button"], [role="menuitem"], [tabindex], input, select, textarea, summary,
+  .kpi, .card.hov, .admin-tab, .chip, .pill, .cal-cell,
+  .toggle button, .view-toggle button, .cs-row, .cs-country-item,
+  .podium-card, .group-card, .lock-alert, .see-all, .account-item,
+  .rxx-tab, .modal-close, .rank-table tbody tr[tabindex], .result-row[tabindex]
+):focus-visible {
+  outline: 2px solid var(--accent-bright);
+  outline-offset: 2px;
+  border-radius: inherit;
+}
+/* .sb-link tem overflow/clip — anel via box-shadow em vez de outline */
+.sb-link:focus-visible { outline: none; box-shadow: inset 0 0 0 2px var(--accent-bright); }
+.account-item.danger:focus-visible { outline-color: var(--red); }
+
+/* 1.3 — inputs: troca anel de :focus por :focus-visible (para de acender no clique) */
+.score-input:focus:not(:focus-visible),
+.mini-input:focus:not(:focus-visible) { outline: none; }
+
+/* 1.4 — CONTRASTE WCAG AA: --text-mute #8a8a8a sobre #282828 = 4.27:1 (reprova).
+   #959595 → 4.92:1 em card-hover e passa em todas as superfícies. */
+:root { --text-mute: #959595; }
+
+/* 1.5 — prefers-reduced-motion: reforço */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+}
+
+/* ============================================================
+   REFINEMENT PASS — Tier 2 (alvos de toque ≥44px no mobile)
+   ============================================================ */
+@media (max-width: 560px) {
+  .cal-cell, .cal-day, .score-input, .mini-input,
+  .login-pw-toggle, .menu-toggle, .cs-row, .toggle button,
+  .account-item, .modal-close { min-height: 44px; }
 }
