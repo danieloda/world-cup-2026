@@ -161,3 +161,98 @@ describe('invariantes do bracket (palpites completos aleatórios)', () => {
     });
   }
 });
+
+// ---- C) Invariantes sobre estados PARCIAIS (greedy fallback + real-first) ------
+// O bloco B só testa palpites COMPLETOS (todo grupo decidível → existe
+// emparelhamento perfeito dos 3ºs). Mas na vida real a pessoa preenche aos
+// poucos: grupos incompletos, mistura de resultado real + palpite. Aí o
+// thirds-assign cai no fallback greedy e a cascata KO resolve só em parte.
+// Invariante: resolução parcial NUNCA pode produzir lixo — todo slot resolvido
+// é um time REAL (nunca um slot tipo "3A/B/C" ou "W101" vazando como time) e
+// nenhum time aparece duas vezes. O campeão pode ficar irresolvido (ok).
+
+// Palpites incompletos: pula ~40% dos jogos → grupos meio-preenchidos.
+function randomPartialPreds(rng, fillProb = 0.6) {
+  const preds = new Map();
+  for (const m of TOPOLOGY) {
+    if (rng() > fillProb) continue;  // deixa buracos de propósito
+    const h = Math.floor(rng() * 5);
+    const a = Math.floor(rng() * 5);
+    const pen = (KO_STAGES.has(m.stage) && h === a) ? (rng() < 0.5 ? 'home' : 'away') : null;
+    preds.set(m.id, { pred_home: h, pred_away: a, pred_pen_winner: pen });
+  }
+  return preds;
+}
+
+// Topologia com um subconjunto aleatório de jogos já FINALIZADOS (resultado real).
+function randomMixedMatches(rng, finishProb = 0.5) {
+  return TOPOLOGY.map((m) => {
+    if (rng() < finishProb) {
+      const h = Math.floor(rng() * 4), a = Math.floor(rng() * 4);
+      const pen = (KO_STAGES.has(m.stage) && h === a) ? (rng() < 0.5 ? 'home' : 'away') : null;
+      return { ...m, finished: true, actual_home: h, actual_away: a, pen_winner: pen };
+    }
+    return { ...m, finished: false, actual_home: null, actual_away: null, pen_winner: null };
+  });
+}
+
+function assertNoGarbage(res, label) {
+  // 1) todo slot resolvido é um time REAL (nunca um slot vazando como time)
+  for (const [slot, v] of res) {
+    expect(isResolvedTeam(v.team), `${label}: slot ${slot} resolveu p/ não-time "${v.team}"`).toBe(true);
+  }
+  // 2) sem time repetido entre os entrantes RESOLVIDOS do R32
+  const r32 = koTopo.filter((m) => m.stage === 'r32');
+  const entrants = [];
+  for (const m of r32) {
+    for (const s of [m.slot_home, m.slot_away]) {
+      const t = res.get(s)?.team ?? (isResolvedTeam(s) ? s : null);
+      if (t) entrants.push(t);
+    }
+  }
+  expect(new Set(entrants).size, `${label}: time repetido entre entrantes resolvidos do R32`).toBe(entrants.length);
+  // 3) sem time repetido entre os slots compostos de 3º já atribuídos
+  const thirds = compositeThirdSlots.map((s) => res.get(s)?.team).filter(Boolean);
+  expect(new Set(thirds).size, `${label}: time repetido entre slots de 3º`).toBe(thirds.length);
+}
+
+describe('invariantes do bracket — estados PARCIAIS (greedy fallback)', () => {
+  const N = 120;
+  for (let i = 0; i < N; i++) {
+    const seed = `partial-${i}`;
+    it(`seed ${seed}: palpites incompletos não produzem lixo`, () => {
+      const preds = randomPartialPreds(makeRng(seed));
+      let res;
+      expect(() => {
+        res = computeSlotResolution({ allMatches: TOPOLOGY, matches: koTopo, predsByMatch: preds, mode: 'pred-only' });
+      }, `seed ${seed} lançou exceção`).not.toThrow();
+      assertNoGarbage(res, seed);
+    });
+  }
+
+  it('é determinístico em estado parcial (mesma entrada, mesma saída)', () => {
+    const preds = randomPartialPreds(makeRng('partial-determinism'));
+    const a = computeSlotResolution({ allMatches: TOPOLOGY, matches: koTopo, predsByMatch: preds, mode: 'pred-only' });
+    const b = computeSlotResolution({ allMatches: TOPOLOGY, matches: koTopo, predsByMatch: preds, mode: 'pred-only' });
+    expect([...a.entries()].map(([s, v]) => [s, v.team]))
+      .toEqual([...b.entries()].map(([s, v]) => [s, v.team]));
+  });
+});
+
+describe('invariantes do bracket — REAL-FIRST misto (resultado + palpite)', () => {
+  const N = 80;
+  for (let i = 0; i < N; i++) {
+    const seed = `mixed-${i}`;
+    it(`seed ${seed}: cascata real+palpite nunca produz lixo`, () => {
+      const rng = makeRng(seed);
+      const allMatches = randomMixedMatches(rng);
+      const matches = allMatches.filter((m) => KO_STAGES.has(m.stage));
+      const preds = randomPartialPreds(rng);
+      let res;
+      expect(() => {
+        res = computeSlotResolution({ allMatches, matches, predsByMatch: preds, mode: 'real-first' });
+      }, `seed ${seed} lançou exceção`).not.toThrow();
+      assertNoGarbage(res, seed);
+    });
+  }
+});
