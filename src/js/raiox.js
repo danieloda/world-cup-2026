@@ -42,6 +42,7 @@ function recentResult(score) {
 function fmtRecentDate(iso) {
   if (!iso) return '';
   const [, m, d] = iso.split('-');
+  if (!m || !d) return '';  // data malformada (não-ISO) → vazio, não "undefined/undefined"
   return `${d}/${m}`;
 }
 function compPt(name) {
@@ -73,6 +74,7 @@ function compRecent(name) {
 function fmtH2HDate(iso) {
   if (!iso) return '';
   const [y, m, d] = iso.split('-');
+  if (!y || !m || !d) return '';  // data malformada → vazio, não "undefined/undefined/"
   return `${d}/${m}/${y.slice(2)}`;
 }
 // "45%" | "40.0%" | 45 -> 45 (número). NaN vira 0.
@@ -174,7 +176,9 @@ export function renderPredictionsBlock(homeTeam, awayTeam, pred, { label = true 
   `;
 }
 export function renderRecentBlock(team, recentByTeam) {
-  const rec = recentByTeam.get(team);
+  // Guarda defensiva: se o load de "jogos recentes" falhou (recentByTeam ausente),
+  // mostra o estado vazio em vez de estourar e derrubar o painel inteiro.
+  const rec = recentByTeam?.get?.(team);
   if (!rec || !rec.length) {
     return `
       <div class="rx-recent-col is-empty">
