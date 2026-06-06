@@ -576,6 +576,22 @@ img { max-width: 100%; height: auto; }
 .kpi.gold  .kpi-num { color: var(--positive); }    /* sucesso: placares exatos (antes era amarelo idêntico ao .green) */
 .kpi.red   .kpi-num { color: var(--red); }
 .kpi-sub { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+/* Cluster do topo do KPI: ícone + label (+ chip de delta opcional) */
+.kpi-top { display: flex; align-items: center; gap: 8px; margin-bottom: 11px; }
+.kpi-top .kpi-label { margin: 0; }
+.kpi-cap {
+  width: 29px; height: 29px; border-radius: 9px; flex: 0 0 auto;
+  display: grid; place-items: center;
+  background: rgba(255, 255, 255, .06); color: var(--text-mute);
+}
+.kpi-cap svg { width: 15px; height: 15px; }
+.kpi.green .kpi-cap { background: var(--accent-dim); color: var(--accent); }
+.kpi.gold  .kpi-cap { background: var(--positive-dim); color: var(--positive); }
+.kpi-delta {
+  margin-left: auto; display: inline-flex; align-items: center; gap: 3px;
+  font: 800 11px/1 var(--font); padding: 3px 7px; border-radius: var(--radius-pill);
+}
+.kpi-delta.up { background: var(--positive-dim); color: var(--positive); }
 
 /* ===== Match row ===== */
 .match {
@@ -2030,7 +2046,7 @@ body.raiox-modal-open { overflow: hidden; }
 }
 .nh-head { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
 .nh-kicker {
-  font: 700 10px/1 var(--mono, ui-monospace, monospace); letter-spacing: .12em; text-transform: uppercase;
+  font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
   color: var(--accent); background: var(--accent-dim);
   border: 1px solid rgba(244, 196, 48, .3); border-radius: var(--radius-pill); padding: 5px 10px;
 }
@@ -2042,7 +2058,7 @@ body.raiox-modal-open { overflow: hidden; }
 .countdown { display: flex; gap: 8px; justify-content: center; margin-bottom: 18px; }
 .cd-u { background: var(--card-elev); border: 1px solid var(--line); border-radius: var(--radius-md); padding: 8px 0; min-width: 56px; }
 .cd-u b { display: block; font-size: 24px; font-weight: 900; color: var(--accent); font-variant-numeric: tabular-nums; line-height: 1; }
-.cd-u span { font: 600 8px/1 var(--mono, ui-monospace, monospace); letter-spacing: .1em; text-transform: uppercase; color: var(--text-mute); }
+.cd-u span { font-size: 8px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--text-mute); }
 @media (max-width: 480px) {
   .nh-match { font-size: 17px; gap: 10px; }
   .cd-u { min-width: 48px; }
