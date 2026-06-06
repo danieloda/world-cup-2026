@@ -3,7 +3,7 @@ import { renderShell } from '../sidebar.js';
 import { supabase } from '../supabase.js';
 import {
   flag, flagEmoji, escapeHtml, teamPt, groundShort, formatTime, formatBrDate,
-  stageLabel, roundLabelPt, showToast, localDateKey,
+  stageLabel, roundLabelPt, showToast, localDateKey, brParts,
 } from '../util.js';
 
 // ============================================================
@@ -1041,12 +1041,13 @@ function unwrap(v) {
 
 function shortDate(iso) {
   if (!iso) return '—';
-  const d = new Date(iso);
-  return `${String(d.getDate()).padStart(2, '0')}/${['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'][d.getMonth()]}`;
+  const { day, month } = brParts(iso);
+  return `${String(day).padStart(2, '0')}/${['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'][month - 1]}`;
 }
 
 function formatBrDateShort(d) {
-  return `${String(d.getDate()).padStart(2, '0')}/${['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'][d.getMonth()]}`;
+  const { day, month } = brParts(d);
+  return `${String(day).padStart(2, '0')}/${['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'][month - 1]}`;
 }
 
 // Horário de Brasília (UTC-3 fixo, sem horário de verão — igual a util.js).

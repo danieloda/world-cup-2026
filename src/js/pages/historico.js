@@ -3,7 +3,7 @@ import { renderShell } from '../sidebar.js';
 import { supabase, fetchAllPages } from '../supabase.js';
 import {
   flag, escapeHtml, teamPt, formatBrShort, formatTime, stageLabel,
-  isLive, avatarHtml,
+  isLive, avatarHtml, localDateKey,
 } from '../util.js';
 import { scorerBonus, stageMultiplier, scoreBreakdown } from '../scoring.js';
 
@@ -112,10 +112,9 @@ function inStage(m, stage) {
   return stage === 'group' ? m.stage === 'group' : m.stage !== 'group';
 }
 function dayKey(m) {
-  // Data LOCAL (mesmo fuso da exibição em formatBrShort/formatBrDate), pra que a
-  // aba de dia e a data do card nunca divirjam num jogo perto da meia-noite.
-  const d = new Date(m.match_date);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  // Chave de dia no fuso de Brasília (mesmo de formatBrShort/formatBrDate), pra
+  // que a aba de dia e a data do card nunca divirjam num jogo perto da meia-noite.
+  return localDateKey(m.match_date);
 }
 
 function stageMatches() {

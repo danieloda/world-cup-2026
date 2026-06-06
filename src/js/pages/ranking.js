@@ -3,7 +3,7 @@ import { renderShell } from '../sidebar.js';
 import { supabase, fetchAllPages } from '../supabase.js';
 import {
   flag, escapeHtml, teamPt, formatBrShort, formatTime, showToast,
-  avatarHtml, getInitials,
+  avatarHtml, getInitials, localDateKey,
 } from '../util.js';
 import { championBonus, scoreBreakdown, scorerBonus } from '../scoring.js';
 import { renderRankChart } from '../rank-chart.js';
@@ -160,8 +160,7 @@ async function loadData() {
 //   • campeão (no jogo da final)
 // A última coordenada de cada série == total_pts do v_leaderboard.
 function dayKey(iso) {
-  const d = new Date(iso);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  return localDateKey(iso);  // chave de dia no fuso de Brasília (SSOT)
 }
 
 function matchDelta(userId, m) {
@@ -209,8 +208,8 @@ function buildProgression() {
   // ----- Por dia: agrupa por data do jogo -----
   const days = [...new Set(finishedMatches.map(m => dayKey(m.match_date)))].sort();
   const dayLabels = days.map(k => {
-    const d = new Date(k + 'T12:00:00');
-    return `${d.getDate()}/${d.getMonth() + 1}`;
+    const [, mo, d] = k.split('-');  // k é yyyy-mm-dd (BRT) — sem Date, sem fuso
+    return `${+d}/${+mo}`;
   });
   const matchesByDay = new Map(days.map(k => [k, finishedMatches.filter(m => dayKey(m.match_date) === k)]));
   const lastDayIdx = days.length - 1;

@@ -5,7 +5,7 @@ import {
   flag, escapeHtml, formatBrDate, formatTime,
   isLocked, isLive, lockCountdownLabel, showToast, loadRecentMatches,
   loadQualifiers, teamPt, groundShort, renderDateCalendar, predictionDeadline,
-  localDateKey, oddsToProbs,
+  localDateKey, oddsToProbs, brParts,
 } from '../util.js';
 import { matchPoints, scoreBreakdown } from '../scoring.js';
 import {
@@ -912,5 +912,6 @@ function updateKpisAndChips() {
 
 function formatBrDateShort(d) {
   const MEZES = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
-  return `${String(d.getDate()).padStart(2,'0')}/${MEZES[d.getMonth()]}`;
+  const { day, month } = brParts(d);
+  return `${String(day).padStart(2,'0')}/${MEZES[month - 1]}`;
 }

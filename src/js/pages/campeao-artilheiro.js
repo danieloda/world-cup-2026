@@ -2,7 +2,7 @@ import { requireAuth } from '../auth.js';
 import { renderShell } from '../sidebar.js';
 import { supabase } from '../supabase.js';
 import {
-  flag, escapeHtml, teamPt, showToast,
+  flag, escapeHtml, teamPt, showToast, brParts,
 } from '../util.js';
 import { matchPoints, championBonus } from '../scoring.js';
 
@@ -732,12 +732,12 @@ function rerenderPlayerList() {
 // ============================================================
 function formatDeadline(d) {
   if (!(d instanceof Date) || isNaN(d.getTime())) return 'o prazo';
-  const dia = String(d.getDate()).padStart(2, '0');
+  const { day, month, hour, minute } = brParts(d);  // relógio de Brasília (SSOT)
   const meses = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
-  const mes = meses[d.getMonth()];
-  const h = String(d.getHours()).padStart(2, '0');
-  const m = String(d.getMinutes()).padStart(2, '0');
-  return `${dia}/${mes} · ${h}h${m}`;
+  const dia = String(day).padStart(2, '0');
+  const h = String(hour).padStart(2, '0');
+  const m = String(minute).padStart(2, '0');
+  return `${dia}/${meses[month - 1]} · ${h}h${m}`;
 }
 
 function startCountdown() {

@@ -4,7 +4,7 @@ import { supabase } from '../supabase.js';
 import {
   flag, escapeHtml, formatTime, formatBrDate, isLocked, lockCountdownLabel, showToast,
   loadRecentMatches, loadQualifiers, teamPt, renderDateCalendar, predictionDeadline,
-  localDateKey,
+  localDateKey, brParts,
 } from '../util.js';
 import { isRealTeam, resolveSlotToTeam, computeSlotResolution } from '../bracket.js';
 import { matchPoints, scoreBreakdown, stageMultiplier, scorerBonus } from '../scoring.js';
@@ -393,8 +393,8 @@ function renderResultBracketMatch(m) {
   const pred = predsByMatch.get(m.id);
   const pts = pred?.points_earned ?? 0;
 
-  const dt = new Date(m.match_date);
-  const dateLabel = `${String(dt.getDate()).padStart(2,'0')}/${MEZES[dt.getMonth()]}`;
+  const { day: _d, month: _mo } = brParts(m.match_date);
+  const dateLabel = `${String(_d).padStart(2,'0')}/${MEZES[_mo - 1]}`;
   const timeLabel = formatTime(m.match_date);
 
   const isFinal = m.stage === 'final';
@@ -619,8 +619,8 @@ function renderBracketMatch(m) {
   const showPen = !locked && homeIsDraw;
   const penWinner = pred?.pred_pen_winner;
 
-  const dt = new Date(m.match_date);
-  const dateLabel = `${String(dt.getDate()).padStart(2,'0')}/${MEZES[dt.getMonth()]}`;
+  const { day: _d, month: _mo } = brParts(m.match_date);
+  const dateLabel = `${String(_d).padStart(2,'0')}/${MEZES[_mo - 1]}`;
   const timeLabel = formatTime(m.match_date);
 
   const isFinal = m.stage === 'final';

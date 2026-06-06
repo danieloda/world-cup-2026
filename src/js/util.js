@@ -295,8 +295,13 @@ const _brFmt = new Intl.DateTimeFormat('en-CA', {
   year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit',
 });
 
-/** Campos civis (ano/mês/dia/hora/min/dia-da-semana) de um instante, no fuso de Brasília. */
-function brParts(dateLike) {
+/**
+ * Campos civis (ano/mês/dia/hora/min/dia-da-semana) de um instante, no fuso de
+ * Brasília. PRIMITIVA ÚNICA de fuso para exibição — qualquer página que precise
+ * montar um rótulo de data/hora deve usar isto (e NUNCA new Date(...).getDate()
+ * etc., que devolve o fuso do navegador). Mês é 1-indexed; dow é 0=domingo.
+ */
+export function brParts(dateLike) {
   const d = dateLike instanceof Date ? dateLike : new Date(dateLike);
   const p = {};
   for (const { type, value } of _brFmt.formatToParts(d)) p[type] = value;
