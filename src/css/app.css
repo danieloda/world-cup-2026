@@ -645,6 +645,55 @@ img { max-width: 100%; height: auto; }
   letter-spacing: .08em; text-transform: uppercase;
 }
 
+/* ===== Card de palpite reformulado (.match.bet) =====
+   Meta no topo (hora · estádio + chip do grupo); no desktop vira placar
+   centralizado (time › input – input ‹ time); no mobile cada time na sua
+   linha com o input ao lado. Escopado em .match.bet p/ NÃO afetar o .match
+   base (também usado nas linhas de jogo do Início). */
+.match.bet {
+  grid-template-columns: 1fr auto auto auto 1fr;
+  grid-template-areas:
+    "meta meta  meta meta  meta"
+    "home hin   sep  ain   away"
+    "foot foot  foot foot  foot"
+    "raiox raiox raiox raiox raiox";
+  gap: 10px 14px;
+}
+.match.bet .match-meta {
+  grid-area: meta; display: flex; align-items: center; gap: 8px;
+  font-size: 12px; color: var(--text-mute);
+}
+.match.bet .match-meta strong { color: var(--text); font-weight: 800; font-size: 14px; }
+.match.bet .mm-sep { color: var(--line-strong); }
+.match.bet .match-grp {
+  margin-left: auto;
+  font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--text-mute);
+  background: var(--card-elev); border: 1px solid var(--line);
+  border-radius: var(--radius-pill); padding: 4px 9px;
+}
+.match.bet .team { font-size: 15px; }
+.match.bet .team.home { grid-area: home; justify-content: flex-end; }
+.match.bet .team.away { grid-area: away; justify-content: flex-start; }
+.match.bet .score-input[data-side="home"] { grid-area: hin; }
+.match.bet .score-sep { grid-area: sep; }
+.match.bet .score-input[data-side="away"] { grid-area: ain; }
+.match.bet .lock-note { grid-area: foot; text-align: center; margin: 0; }
+.match.bet .match-raiox { grid-area: raiox; }
+@media (max-width: 560px) {
+  .match.bet {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "meta meta"
+      "home hin"
+      "away ain"
+      "foot foot"
+      "raiox raiox";
+  }
+  .match.bet .score-sep { display: none; }
+  .match.bet .team.home, .match.bet .team.away { justify-content: flex-start; }
+  .match.bet .score-input { justify-self: end; }
+}
+
 /* Botão Raio-X — linha própria no rodapé do card. Como o grid do .match tem
    colunas laterais SIMÉTRICAS, o placar fica no centro do card e o botão
    centralizado (justify-content: center) já cai no mesmo eixo do traço. */

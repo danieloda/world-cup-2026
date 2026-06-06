@@ -366,37 +366,32 @@ function renderPalpiteRow(m) {
     : '';
 
   return `
-    <div class="match ${locked ? 'locked' : ''}" data-match-id="${m.id}">
-      <div class="match-when">
+    <div class="match bet ${locked ? 'locked' : ''}" data-match-id="${m.id}">
+      <div class="match-meta">
         <strong>${formatTime(m.match_date)}</strong>
-        ${escapeHtml(groundShort(m.ground))}
+        <span class="mm-sep">·</span>
+        <span class="mm-ground">${escapeHtml(groundShort(m.ground))}</span>
+        ${status}
+        <span class="match-grp">Grupo ${m.group_name}</span>
       </div>
       <div class="team home">
         <span class="flag">${flag(m.team_home)}</span>
         <span class="team-name" data-team="${escapeHtml(m.team_home)}">${escapeHtml(teamPt(m.team_home))}</span>
       </div>
-      <div class="score-cell">
-        <div class="score-inputs">
-          <input class="score-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2"
-                 data-match="${m.id}" data-side="home"
-                 aria-label="Gols ${escapeHtml(teamPt(m.team_home))}"
-                 value="${homeVal}" ${locked ? 'disabled' : ''}>
-          <span class="score-sep">–</span>
-          <input class="score-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2"
-                 data-match="${m.id}" data-side="away"
-                 aria-label="Gols ${escapeHtml(teamPt(m.team_away))}"
-                 value="${awayVal}" ${locked ? 'disabled' : ''}>
-        </div>
-      </div>
-      <div class="team right away">
-        <span class="team-name" data-team="${escapeHtml(m.team_away)}">${escapeHtml(teamPt(m.team_away))}</span>
+      <input class="score-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2"
+             data-match="${m.id}" data-side="home"
+             aria-label="Gols ${escapeHtml(teamPt(m.team_home))}"
+             value="${homeVal}" ${locked ? 'disabled' : ''}>
+      <span class="score-sep">–</span>
+      <input class="score-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2"
+             data-match="${m.id}" data-side="away"
+             aria-label="Gols ${escapeHtml(teamPt(m.team_away))}"
+             value="${awayVal}" ${locked ? 'disabled' : ''}>
+      <div class="team away">
         <span class="flag">${flag(m.team_away)}</span>
+        <span class="team-name" data-team="${escapeHtml(m.team_away)}">${escapeHtml(teamPt(m.team_away))}</span>
       </div>
-      <div class="match-tail">
-        ${status}
-        ${lockNote}
-        <div class="match-group">Grupo ${m.group_name}</div>
-      </div>
+      ${lockNote}
       ${renderRaioXToggle(m.id, m.team_home, m.team_away, raioxData(m))}
     </div>
     ${renderRaioXPanel(m.id, m.team_home, m.team_away, raioxData(m))}
