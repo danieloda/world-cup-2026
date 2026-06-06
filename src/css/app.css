@@ -5744,3 +5744,21 @@ input[type="number"].score-input {
   .login-pw-toggle, .menu-toggle, .cs-row, .toggle button,
   .account-item, .modal-close { min-height: 44px; }
 }
+
+/* ============================================================
+   REFINEMENT PASS — Tier 3 (responsivo: leaderboard no mobile)
+   A tabela do ranking tem 12 colunas (~1060px) e rolava na horizontal,
+   escondendo a coluna de PONTOS. No mobile, colapsa pro essencial
+   (#, Jogador, Pts); o detalhe por jogador continua no drill-down
+   (expandir a linha). Sem mexer em lógica nem no desktop.
+   ============================================================ */
+@media (max-width: 600px) {
+  /* esconde as colunas 3..11 (Exatos…Classif.), mantém #, Jogador e Pts */
+  .rank-table thead th:nth-child(n+3):nth-child(-n+11),
+  .rank-table tbody td:nth-child(n+3):nth-child(-n+11) { display: none; }
+  .rank-table { min-width: 0; }               /* remove o min-width:1060px que forçava o scroll */
+  .rank-table thead th.col-pts { width: 70px; }
+  .rank-table tbody td.pts { width: 70px; }
+  .rank-table-wrap { overflow-x: visible; }   /* não precisa mais rolar lateralmente */
+  .rank-legend { display: none; }             /* descrevia colunas agora ocultas; detalhe no drill-down */
+}
