@@ -54,7 +54,7 @@ function check(name, pass, detail) {
 
 let alice = null, bob = null;       // { id }
 let aliceClient = null, bobClient = null;
-let origMatchDate = null, origDeadline = null;
+let origMatchDate = null, origDeadline = null, origFinished = null;
 
 async function mkUser(email) {
   const { data, error } = await admin.auth.admin.createUser({
@@ -73,8 +73,9 @@ async function setup() {
   const b = await mkUser(BOB_EMAIL); bob = { id: b.id }; bobClient = b.client;
   log('green', `   ✓ Alice ${alice.id.slice(0, 8)}... | Bob ${bob.id.slice(0, 8)}...`);
 
-  const { data: m } = await admin.from('matches').select('match_date').eq('id', TEST_MATCH).single();
+  const { data: m } = await admin.from('matches').select('match_date, finished').eq('id', TEST_MATCH).single();
   origMatchDate = m.match_date;
+  origFinished = m.finished;  // o banco local pode ter o match já finalizado de rodadas anteriores
   const { data: s } = await admin.from('settings').select('value').eq('key', 'deadline_champion_scorer').single();
   origDeadline = typeof s.value === 'string' ? s.value.replace(/^"|"$/g, '') : s.value;
 }
@@ -83,6 +84,7 @@ async function teardown() {
   log('blue', '\n[teardown] Restaurando + limpando...');
   try {
     if (origMatchDate) await admin.from('matches').update({ match_date: origMatchDate }).eq('id', TEST_MATCH);
+    if (origFinished !== null) await admin.from('matches').update({ finished: origFinished }).eq('id', TEST_MATCH);
     if (origDeadline) await admin.from('settings').upsert({ key: 'deadline_champion_scorer', value: JSON.stringify(origDeadline) });
   } catch (e) { log('red', `   ⚠ restore: ${e.message}`); }
   for (const u of [alice, bob]) {
@@ -171,11 +173,14 @@ async function main() {
   check('recompute_qualifier_points → negado (H2)', !!r11b.error, r11b.error ? '' : 'PASSOU (vulnerável!)');
 
   log('blue', '\n[12] Alice tenta escrever em settings / matches sem ser admin:');
+  // Estado conhecido: garante match NÃO-finalizado antes do ataque (o banco local
+  // pode tê-lo finalizado em rodadas anteriores). Sem isso, o check vira falso-positivo.
+  await admin.from('matches').update({ finished: false }).eq('id', TEST_MATCH);
   const r12a = await aliceClient.from('settings').upsert({ key: 'fee_amount', value: 0 });
   await aliceClient.from('matches').update({ finished: true }).eq('id', TEST_MATCH);
   const { data: m1 } = await admin.from('matches').select('finished').eq('id', TEST_MATCH).single();
   check('Escrita em settings (não-admin) → bloqueada', !!r12a.error, r12a.error ? '' : 'PASSOU (vulnerável!)');
-  check('Marcar match finished (não-admin) → sem efeito', m1?.finished === false, `finished=${m1?.finished}`);
+  check('Marcar match finished (não-admin) → sem efeito', m1?.finished === false, `finished=${m1?.finished} (ataque não foi bloqueado!)`);
 
   log('blue', '\n[13] Trilha de auditoria registra escrita em palpite (H3):');
   await admin.from('predictions').update({ pred_home: 5 }).eq('user_id', bob.id).eq('match_id', TEST_MATCH);

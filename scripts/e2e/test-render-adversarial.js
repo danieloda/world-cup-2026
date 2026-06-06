@@ -113,7 +113,11 @@ async function main() {
 
   log('blue', '\n[setup] Criando usuário descartável (paid, sem dados)...');
   const user = await adminCreateUser(admin, EMAIL, PASSWORD, 'Render Tester');
-  await adminCreateProfile(admin, user, 'Render Tester', { paid: true });
+  // avatar_url setado: requireAuth tem gate de avatar obrigatório → sem ele a
+  // sessão é redirecionada p/ complete-profile.html e nenhuma página renderiza.
+  await adminCreateProfile(admin, user, 'Render Tester', {
+    paid: true, avatar_url: 'https://example.com/avatar.png',
+  });
   alice = { id: user.id };
   log('green', `   ✓ ${EMAIL} (${alice.id.slice(0, 8)}…)`);
 
