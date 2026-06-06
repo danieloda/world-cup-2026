@@ -18,17 +18,19 @@
    ============================================================ */
 
 :root {
-  --bg-page: #000;
-  --bg-sidebar: #000;
-  --bg-main: #121212;
-  --card: #181818;
-  --card-hover: #282828;
-  --card-elev: #1f1f1f;
-  --line: rgba(255, 255, 255, .08);
-  --line-strong: rgba(255, 255, 255, .15);
+  /* Paleta híbrida (2026-06): superfícies neutras levantadas + bordas definidas
+     da paleta nova, mantendo marca/semântica/Figtree. */
+  --bg-page: #0c0c0c;
+  --bg-sidebar: #0c0c0c;
+  --bg-main: #161616;
+  --card: #202022;
+  --card-hover: #2b2b2d;
+  --card-elev: #262628;
+  --line: rgba(255, 255, 255, .10);
+  --line-strong: #3c3c40;
   --text: #fff;
   --text-dim: #b3b3b3;
-  --text-mute: #8a8a8a;
+  --text-mute: #a3a3a3;
   /* Cores semânticas do tema:
        --accent   = amarelo (cor de marca, destaques, botão primário)
        --positive = verde   (sucesso: acertos, pontos, classificado) */
@@ -5727,9 +5729,9 @@ input[type="number"].score-input {
 .score-input:focus:not(:focus-visible),
 .mini-input:focus:not(:focus-visible) { outline: none; }
 
-/* 1.4 — CONTRASTE WCAG AA: --text-mute #8a8a8a sobre #282828 = 4.27:1 (reprova).
-   #959595 → 4.92:1 em card-hover e passa em todas as superfícies. */
-:root { --text-mute: #959595; }
+/* 1.4 — CONTRASTE WCAG AA do texto muted (já definido na paleta híbrida como
+   #a3a3a3 → ~6:1 em card; mantido aqui como guarda explícita). */
+:root { --text-mute: #a3a3a3; }
 
 /* 1.5 — prefers-reduced-motion: reforço */
 @media (prefers-reduced-motion: reduce) {
