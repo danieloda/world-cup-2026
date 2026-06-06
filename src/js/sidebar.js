@@ -478,12 +478,12 @@ function iconClock() {
 }
 
 // Ranking — barras crescentes
-function iconChart() {
+export function iconChart() {
   return svg('<line x1="6" y1="20" x2="6" y2="14"/><line x1="12" y1="20" x2="12" y2="8"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="3" y1="20" x2="21" y2="20"/>');
 }
 
 // Palpites Grupos — clipboard com check
-function iconClipboard() {
+export function iconClipboard() {
   return svg('<rect x="5" y="4" width="14" height="18" rx="2"/><path d="M9 4h6v3H9z"/><polyline points="9 14 11 16 15 12"/>');
 }
 
@@ -498,7 +498,7 @@ function iconBook() {
 }
 
 // Campeão & Artilheiro — troféu (filled bowl)
-function iconTrophy() {
+export function iconTrophy() {
   return svg('<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 4h3v2a3 3 0 0 1-3 3M7 4H4v2a3 3 0 0 0 3 3"/>');
 }
 

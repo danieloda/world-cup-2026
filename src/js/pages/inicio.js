@@ -1,5 +1,5 @@
 import { requireAuth } from '../auth.js';
-import { renderShell } from '../sidebar.js';
+import { renderShell, iconChart, iconClipboard, iconTrophy } from '../sidebar.js';
 import { supabase } from '../supabase.js';
 import { loadLockAlerts } from '../lock-alerts.js';
 import {
@@ -247,17 +247,17 @@ function renderQuickLinks() {
     </div>
     <div class="kpis">
       <a class="kpi card hov" href="palpites-grupos.html" style="text-decoration:none;">
-        <div class="kpi-label">📊 Palpites</div>
+        <div class="kpi-label"><span class="kpi-ic">${iconClipboard()}</span>Palpites</div>
         <div class="kpi-num" style="font-size:18px; font-weight:700;">Fazer palpites</div>
         <div class="kpi-sub">Grupos e mata-mata</div>
       </a>
       <a class="kpi card hov" href="ranking.html" style="text-decoration:none;">
-        <div class="kpi-label">🏆 Ranking</div>
+        <div class="kpi-label"><span class="kpi-ic">${iconChart()}</span>Ranking</div>
         <div class="kpi-num" style="font-size:18px; font-weight:700;">Ver classificação</div>
         <div class="kpi-sub">${stats.paid_users || 0} jogadores</div>
       </a>
       <a class="kpi card hov" href="campeao-artilheiro.html" style="text-decoration:none;">
-        <div class="kpi-label">⭐ Campeão & Artilheiro</div>
+        <div class="kpi-label"><span class="kpi-ic">${iconTrophy()}</span>Campeão &amp; Artilheiro</div>
         <div class="kpi-num" style="font-size:18px; font-weight:700;">Escolher</div>
         <div class="kpi-sub">Até 10/jun 23:59</div>
       </a>
