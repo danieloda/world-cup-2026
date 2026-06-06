@@ -218,25 +218,29 @@ function renderUpcomingSection() {
 }
 
 function renderMatchRow(m) {
+  // Card clicável → leva pra tela de palpite (grupo certo, ou mata-mata).
+  const href = m.group_name
+    ? `palpites-grupos.html#grupo-${m.group_name}`
+    : 'palpites-mata.html';
   return `
-    <div class="match">
-      <div class="match-when">
+    <a class="match next" href="${href}"
+       aria-label="Palpitar ${escapeHtml(teamPt(m.team_home))} x ${escapeHtml(teamPt(m.team_away))}">
+      <div class="match-meta">
         <strong>${formatTime(m.match_date)}</strong>
-        ${escapeHtml(groundShort(m.ground))}
+        <span class="mm-sep">·</span>
+        <span class="mm-ground">${escapeHtml(groundShort(m.ground))}</span>
+        <span class="match-grp">${m.group_name ? 'Grupo ' + m.group_name : escapeHtml(stageLabel(m.stage))}</span>
       </div>
       <div class="team home">
-        <span class="flag">${flag(m.team_home)}</span> ${escapeHtml(teamPt(m.team_home))}
+        <span class="flag">${flag(m.team_home)}</span>
+        <span class="team-name">${escapeHtml(teamPt(m.team_home))}</span>
       </div>
-      <div class="score-cell">
-        <span style="color:var(--text-mute); font-size:13px; font-weight:600;">
-          ${lockCountdownLabel(m.match_date)}
-        </span>
+      <div class="match-cd">${lockCountdownLabel(m.match_date)}</div>
+      <div class="team away">
+        <span class="flag">${flag(m.team_away)}</span>
+        <span class="team-name">${escapeHtml(teamPt(m.team_away))}</span>
       </div>
-      <div class="team right away">
-        ${escapeHtml(teamPt(m.team_away))} <span class="flag">${flag(m.team_away)}</span>
-      </div>
-      <div class="match-tail">${m.group_name ? 'Grupo ' + m.group_name : stageLabel(m.stage)}</div>
-    </div>
+    </a>
   `;
 }
 

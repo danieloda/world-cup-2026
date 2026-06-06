@@ -166,7 +166,8 @@ function renderPage() {
 // Deep-link via hash. Usado pelos redirects das antigas grupos.html / terceiros.html
 // e por URLs compartilháveis. Define activeTab antes do primeiro render.
 function applyHashRoute() {
-  switch ((location.hash || '').replace('#', '')) {
+  const h = (location.hash || '').replace('#', '');
+  switch (h) {
     // Antigas sub-abas/páginas oficiais agora vivem todas na aba Resultados (por grupo).
     case 'classificacao':
     case 'terceiros':
@@ -176,6 +177,9 @@ function applyHashRoute() {
     case 'simulacao':     activeTab = 'palpites';   break;
     // 'palpites' ou vazio → mantém o default (aba Palpites)
   }
+  // Deep-link pra um grupo específico (ex.: cards de "próximos jogos" do Início → #grupo-A)
+  const gm = /^grupo-([A-L])$/.exec(h);
+  if (gm) { activeTab = 'palpites'; groupBy = 'group'; activeGroup = gm[1]; }
 }
 
 function heroTitle() {
