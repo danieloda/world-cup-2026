@@ -282,17 +282,46 @@ export function daysToKickoffLabel() {
 const DIAS = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
 const MESES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
 
-export function formatBrDate(d) {
-  return `${DIAS[d.getDay()]} · ${d.getDate()}/${MESES[d.getMonth()]}`;
+// Fuso oficial de EXIBIÇÃO do bolão: tudo (hora e dia do jogo) é mostrado no
+// relógio de Brasília, INDEPENDENTE do fuso do dispositivo do usuário — um
+// brasileiro viajando vê o mesmo horário de quem está no Brasil. NÃO confiar no
+// fuso do navegador (getHours/getDate/toLocale* sem timeZone): foi o bug em que
+// usuário fora do BRT via data/hora deslocada (DB certo, frontend errado).
+// predictionDeadline já era TZ-independente (offset fixo); as funções abaixo
+// agora também. Coberto por tests/unit/date-tz-invariance.test.js (fuzzer).
+const BR_TZ = 'America/Sao_Paulo';
+const _brFmt = new Intl.DateTimeFormat('en-CA', {
+  timeZone: BR_TZ, hour12: false,
+  year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit',
+});
+
+/** Campos civis (ano/mês/dia/hora/min/dia-da-semana) de um instante, no fuso de Brasília. */
+function brParts(dateLike) {
+  const d = dateLike instanceof Date ? dateLike : new Date(dateLike);
+  const p = {};
+  for (const { type, value } of _brFmt.formatToParts(d)) p[type] = value;
+  const year = +p.year, month = +p.month, day = +p.day;
+  let hour = +p.hour; if (hour === 24) hour = 0;  // alguns ICUs emitem '24' à meia-noite
+  const minute = +p.minute;
+  const dow = new Date(Date.UTC(year, month - 1, day)).getUTCDay();  // dia da semana civil, TZ-indep
+  return { year, month, day, hour, minute, dow };
 }
 
-export function formatBrShort(d) {
-  return `${d.getDate()}/${MESES[d.getMonth()]}`;
+const _pad2 = (n) => String(n).padStart(2, '0');
+
+export function formatBrDate(dateLike) {
+  const { dow, day, month } = brParts(dateLike);
+  return `${DIAS[dow]} · ${day}/${MESES[month - 1]}`;
+}
+
+export function formatBrShort(dateLike) {
+  const { day, month } = brParts(dateLike);
+  return `${day}/${MESES[month - 1]}`;
 }
 
 export function formatTime(iso) {
-  const d = new Date(iso);
-  return d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  const { hour, minute } = brParts(iso);
+  return `${_pad2(hour)}:${_pad2(minute)}`;
 }
 
 // ===== Match helpers =====
@@ -324,16 +353,16 @@ function calDateKey(y, mo, d) {
 }
 
 /**
- * Chave de data (yyyy-mm-dd) no fuso do NAVEGADOR — consistente com formatTime,
- * que exibe o horário local. Usar isto para agrupar jogos por dia.
+ * Chave de data (yyyy-mm-dd) no fuso de BRASÍLIA — consistente com formatTime,
+ * que exibe o horário de Brasília. Usar isto para agrupar jogos por dia.
  *
- * ⚠️ NÃO usar `new Date(iso).toISOString().slice(0,10)`: toISOString() devolve
- * UTC, então jogos noturnos (ex.: 20:00 -06:00 = 02:00 UTC do dia seguinte)
- * caem no dia errado e somem da contagem do dia correto.
+ * ⚠️ NÃO usar `new Date(iso).toISOString().slice(0,10)` (devolve UTC) NEM
+ * getFullYear/getMonth/getDate (devolve o fuso do navegador): jogos noturnos
+ * caíam no dia errado para quem não estava no BRT. Ver date-tz-invariance.test.js.
  */
 export function localDateKey(dateLike) {
-  const d = dateLike instanceof Date ? dateLike : new Date(dateLike);
-  return calDateKey(d.getFullYear(), d.getMonth(), d.getDate());
+  const { year, month, day } = brParts(dateLike);
+  return calDateKey(year, month - 1, day);  // calDateKey espera mês 0-indexed
 }
 
 /** Chave do dia de hoje (yyyy-mm-dd) no fuso do navegador. */
