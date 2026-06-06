@@ -219,19 +219,45 @@ function wireAccountMenu(profile) {
   const menu = document.getElementById('accountMenu');
   if (!accountEl || !userBtn || !menu) return;
 
-  const open = () => { accountEl.classList.add('open'); userBtn.setAttribute('aria-expanded', 'true'); };
-  const close = () => { accountEl.classList.remove('open'); userBtn.setAttribute('aria-expanded', 'false'); };
+  const items = () => [...menu.querySelectorAll('[data-account-action]')];
+  const open = ({ focusFirst = false } = {}) => {
+    accountEl.classList.add('open'); userBtn.setAttribute('aria-expanded', 'true');
+    if (focusFirst) {
+      // foca o 1º item só depois da transição de abertura (focar durante a transição falha)
+      const focus = () => items()[0]?.focus();
+      menu.addEventListener('transitionend', focus, { once: true });
+      setTimeout(focus, 200);   // fallback: prefers-reduced-motion / sem transição
+    }
+  };
+  const close = ({ restore = false } = {}) => {
+    if (!accountEl.classList.contains('open')) return;
+    accountEl.classList.remove('open'); userBtn.setAttribute('aria-expanded', 'false');
+    if (restore) userBtn.focus();
+  };
 
   userBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     accountEl.classList.contains('open') ? close() : open();
   });
+  userBtn.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown') { e.preventDefault(); accountEl.classList.contains('open') ? items()[0]?.focus() : open({ focusFirst: true }); }
+  });
   // Clique fora fecha
   document.addEventListener('click', (e) => {
     if (!e.target.closest('#topbarAccount')) close();
   });
+  // Teclado dentro do menu: setas/Home/End/Escape (WAI-ARIA menu pattern)
+  menu.addEventListener('keydown', (e) => {
+    const list = items();
+    const i = list.indexOf(document.activeElement);
+    if (e.key === 'ArrowDown') { e.preventDefault(); list[(i + 1) % list.length]?.focus(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); list[(i - 1 + list.length) % list.length]?.focus(); }
+    else if (e.key === 'Home') { e.preventDefault(); list[0]?.focus(); }
+    else if (e.key === 'End') { e.preventDefault(); list[list.length - 1]?.focus(); }
+    else if (e.key === 'Escape') { e.preventDefault(); close({ restore: true }); }
+  });
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !document.getElementById('accountModal')?.classList.contains('show')) close();
+    if (e.key === 'Escape' && !document.getElementById('accountModal')?.classList.contains('show')) close({ restore: true });
   });
 
   menu.querySelectorAll('[data-account-action]').forEach(btn => {
@@ -256,6 +282,7 @@ function applyProfileToTopbar(profile) {
 }
 
 // ----- Modal genérico -----
+let accountModalLastFocus = null;
 function ensureModalRoot() {
   let root = document.getElementById('accountModal');
   if (root) return root;
@@ -274,20 +301,45 @@ function ensureModalRoot() {
   root.addEventListener('click', (e) => {
     if (e.target === root || e.target.closest('.modal-close') || e.target.closest('[data-close]')) closeModal();
   });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+  document.addEventListener('keydown', (e) => {
+    if (!root.classList.contains('show')) return;
+    if (e.key === 'Escape') { closeModal(); return; }
+    if (e.key === 'Tab') {
+      const list = [...root.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')]
+        .filter(el => el.offsetParent !== null);
+      if (!list.length) return;
+      const first = list[0], last = list[list.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  });
   return root;
 }
 
 function openModal(title, bodyHtml) {
   const root = ensureModalRoot();
+  accountModalLastFocus = document.activeElement;   // restaura ao fechar
   root.querySelector('#accountModalTitle').textContent = title;
   root.querySelector('#accountModalBody').innerHTML = bodyHtml;
-  requestAnimationFrame(() => root.classList.add('show'));
+  requestAnimationFrame(() => {
+    root.classList.add('show');
+    void root.offsetHeight;   // recalc de estilo antes de focar (sai de visibility:hidden)
+    // foca após .show: input se houver, senão o X
+    const body = root.querySelector('#accountModalBody');
+    const focusEl = body.querySelector('input, select, textarea') || root.querySelector('.modal-close');
+    focusEl?.focus();
+    if (focusEl?.tagName === 'INPUT' && focusEl.type === 'text') focusEl.select();
+  });
   return root;
 }
 
 function closeModal() {
-  document.getElementById('accountModal')?.classList.remove('show');
+  const root = document.getElementById('accountModal');
+  if (root) root.classList.remove('show');
+  // o modal é sempre aberto pelo menu da conta → devolve o foco pro botão da conta
+  const back = document.getElementById('topbarUser') || accountModalLastFocus;
+  accountModalLastFocus = null;
+  back?.focus?.();
 }
 
 function showModalErr(el, msg) { el.textContent = msg; el.hidden = false; }
@@ -309,7 +361,7 @@ function openNameModal(profile) {
   const input = document.getElementById('accNameInput');
   const save = document.getElementById('accNameSave');
   const err = document.getElementById('accModalErr');
-  input.focus(); input.select();
+  // foco/seleção inicial do input são feitos por openModal (rAF, após .show)
 
   const submit = async () => {
     const name = input.value.trim();
@@ -342,7 +394,7 @@ function openPhotoModal(profile) {
   openModal('Alterar foto', `
     <div class="avatar-upload">
       <div class="avatar-preview" id="accAvPrev">${prevInner}</div>
-      <label class="btn btn-dark" for="accAvFile">Escolher imagem</label>
+      <label class="btn btn-dark" for="accAvFile" id="accAvLabel" tabindex="0" role="button">Escolher imagem</label>
       <input id="accAvFile" type="file" accept="image/png,image/jpeg,image/webp" hidden>
       <p class="avatar-hint">PNG, JPG ou WEBP · máx 2MB</p>
     </div>
@@ -353,6 +405,9 @@ function openPhotoModal(profile) {
     </div>
   `);
   const fileInput = document.getElementById('accAvFile');
+  document.getElementById('accAvLabel')?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
+  });
   const prev = document.getElementById('accAvPrev');
   const save = document.getElementById('accPhotoSave');
   const err = document.getElementById('accModalErr');

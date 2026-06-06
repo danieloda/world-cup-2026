@@ -415,7 +415,7 @@ function renderPodium() {
         const u = top3[idx];
         if (!u) return '<div></div>';
         return `
-          <div class="podium-card ${placeClass(u.pos)}" data-user-id="${u.user_id}">
+          <div class="podium-card ${placeClass(u.pos)}" data-user-id="${u.user_id}" role="button" tabindex="0" aria-label="Ver perfil de ${escapeHtml(u.full_name)}">
             <div class="podium-place">${u.pos}º</div>
             <div class="podium-av">${avatarHtml(u)}</div>
             <div class="podium-name">${escapeHtml(u.full_name)}</div>
@@ -482,7 +482,7 @@ function renderRankRow(u) {
     : '<span style="color:var(--text-mute); font-style:italic;">—</span>';
 
   return `
-    <tr class="${rowClass}" data-user-id="${u.user_id}">
+    <tr class="${rowClass}" data-user-id="${u.user_id}" tabindex="0" role="button" aria-expanded="false" aria-label="Ver perfil de ${escapeHtml(u.full_name)}">
       <td class="left"><span class="${posClass}">${pos}</span>${tieTag}</td>
       <td class="left">
         <div class="user-cell">
@@ -528,7 +528,9 @@ async function expandUser(userId) {
 
   // Marca linha como expanded
   document.querySelectorAll('#rankBody tr').forEach(tr => {
-    tr.classList.toggle('expanded', tr.dataset.userId === userId);
+    const on = tr.dataset.userId === userId;
+    tr.classList.toggle('expanded', on);
+    if (tr.hasAttribute('aria-expanded')) tr.setAttribute('aria-expanded', String(on));
   });
 
   // Scroll suave
@@ -718,7 +720,10 @@ function renderPredRow(p) {
 function closeDrill() {
   expandedUserId = null;
   document.getElementById('drillDown').innerHTML = '';
-  document.querySelectorAll('#rankBody tr').forEach(tr => tr.classList.remove('expanded'));
+  document.querySelectorAll('#rankBody tr').forEach(tr => {
+    tr.classList.remove('expanded');
+    if (tr.hasAttribute('aria-expanded')) tr.setAttribute('aria-expanded', 'false');
+  });
 }
 
 // ============================================================
@@ -745,6 +750,17 @@ function attachEventListeners() {
       closeDrill();
       return;
     }
+  });
+  // Teclado: Enter/Espaço abre/fecha o drill-down na linha/pódio focado
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const row = e.target.closest('#rankBody tr[data-user-id]');
+    const podium = e.target.closest('.podium-card[data-user-id]');
+    if (!row && !podium) return;
+    e.preventDefault();
+    const uid = (row || podium).dataset.userId;
+    if (row && uid === expandedUserId) closeDrill();
+    else expandUser(uid);
   });
 }
 

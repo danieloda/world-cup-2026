@@ -338,7 +338,7 @@ function renderChampionSelection(locked) {
       <div class="cs-list" id="teamList">
         ${filtered.map(t => `
           <div class="cs-row ${championPick?.team === t ? 'selected' : ''} ${locked ? 'disabled' : ''}"
-               data-action="pick-team" data-team="${escapeHtml(t)}">
+               role="button" tabindex="${locked ? -1 : 0}" data-action="pick-team" data-team="${escapeHtml(t)}">
             <span class="flag">${flag(t)}</span>
             <span class="nm">${escapeHtml(teamPt(t))}</span>
             ${championPick?.team === t ? '<span class="check">✓</span>' : ''}
@@ -508,7 +508,7 @@ function renderCountryStep(locked) {
     <div class="cs-list cs-country-grid" id="countryList">
       ${filtered.map(t => `
         <div class="cs-country-item ${locked ? 'disabled' : ''}"
-             data-action="select-country" data-country="${escapeHtml(t)}">
+             role="button" tabindex="${locked ? -1 : 0}" data-action="select-country" data-country="${escapeHtml(t)}">
           <span class="flag">${flag(t)}</span>
           <span class="nm">${escapeHtml(teamPt(t))}</span>
         </div>
@@ -547,7 +547,7 @@ function renderPlayerStep(locked) {
         ? '<div class="cs-loading"><div class="cs-spinner"></div> Carregando jogadores…</div>'
         : filtered.map(p => `
           <div class="cs-row ${scorerPick?.player_id === p.id ? 'selected' : ''} ${locked ? 'disabled' : ''}"
-               data-action="pick-player" data-player="${p.id}">
+               role="button" tabindex="${locked ? -1 : 0}" data-action="pick-player" data-player="${p.id}">
             <span class="pos-badge pos-${p.position?.toLowerCase() || 'unk'}">${escapeHtml(p.position || '?')}</span>
             <span class="nm">${escapeHtml(p.full_name)}</span>
             <span class="meta">${p.shirt_number ? '#' + p.shirt_number : ''}</span>
@@ -578,6 +578,15 @@ function attachEventListeners() {
     } else if (action === 'pick-player') {
       await pickScorer(parseInt(row.dataset.player, 10));
     }
+  });
+
+  // Teclado: Enter/Espaço seleciona o item focado (reusa o handler de clique)
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const row = e.target.closest('.cs-row[data-action], .cs-country-item[data-action]');
+    if (!row || row.classList.contains('disabled')) return;
+    e.preventDefault();
+    row.click();
   });
 
   // Busca (filtra listas)
@@ -683,7 +692,7 @@ function rerenderTeamList() {
   if (!list) return;
   list.innerHTML = filtered.map(t => `
     <div class="cs-row ${championPick?.team === t ? 'selected' : ''} ${locked ? 'disabled' : ''}"
-         data-action="pick-team" data-team="${escapeHtml(t)}">
+         role="button" tabindex="${locked ? -1 : 0}" data-action="pick-team" data-team="${escapeHtml(t)}">
       <span class="flag">${flag(t)}</span>
       <span class="nm">${escapeHtml(teamPt(t))}</span>
       ${championPick?.team === t ? '<span class="check">✓</span>' : ''}
@@ -700,7 +709,7 @@ function rerenderCountryList() {
   if (!list) return;
   list.innerHTML = filtered.map(t => `
     <div class="cs-country-item ${locked ? 'disabled' : ''}"
-         data-action="select-country" data-country="${escapeHtml(t)}">
+         role="button" tabindex="${locked ? -1 : 0}" data-action="select-country" data-country="${escapeHtml(t)}">
       <span class="flag">${flag(t)}</span>
       <span class="nm">${escapeHtml(teamPt(t))}</span>
     </div>
@@ -718,7 +727,7 @@ function rerenderPlayerList() {
   if (!list) return;
   list.innerHTML = filtered.map(p => `
     <div class="cs-row ${scorerPick?.player_id === p.id ? 'selected' : ''} ${locked ? 'disabled' : ''}"
-         data-action="pick-player" data-player="${p.id}">
+         role="button" tabindex="${locked ? -1 : 0}" data-action="pick-player" data-player="${p.id}">
       <span class="pos-badge pos-${p.position?.toLowerCase() || 'unk'}">${escapeHtml(p.position || '?')}</span>
       <span class="nm">${escapeHtml(p.full_name)}</span>
       <span class="meta">${p.shirt_number ? '#' + p.shirt_number : ''}</span>

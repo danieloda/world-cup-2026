@@ -117,11 +117,13 @@ function renderPredictionsRadar(pred, homeTeam, awayTeam) {
     return `<text class="rx-radar-axis" x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="${anchor}">${escapeHtml(ax)}</text>`;
   }).join('');
 
+  const axisDesc = axes.map((ax, i) =>
+    `${ax}: ${teamPt(homeTeam)} ${Math.round(clamp(home[i]))}, ${teamPt(awayTeam)} ${Math.round(clamp(away[i]))}`).join('; ');
   return `
     <div class="rx-cmp-label-head">Comparação de força</div>
     <div class="rx-radar">
       <svg viewBox="0 0 240 212" class="rx-radar-svg" role="img"
-           aria-label="Radar de força: ${escapeHtml(teamPt(homeTeam))} contra ${escapeHtml(teamPt(awayTeam))}">
+           aria-label="Comparação de força — ${escapeHtml(axisDesc)}">
         <g class="rx-radar-grid">${rings}${spokes}</g>
         ${labels}
         <g class="rx-radar-plot">${area(away, 'away')}${area(home, 'home')}</g>
@@ -634,15 +636,18 @@ export function renderRaioXContent(homeTeam, awayTeam, data) {
   let tabsBlock = '';
   if (secs.length) {
     const single = secs.length === 1;
+    // uid único por instância — há vários Raio-X na mesma página (1 por jogo),
+    // então ids de tab/painel não podem colidir (aria-controls/labelledby válidos).
+    const uid = (renderRaioXContent._n = (renderRaioXContent._n || 0) + 1);
     const tabs = secs.map((s, i) => {
       const abbr = RX_TAB_ABBR[s.key];
       const lbl = abbr
         ? `<span class="rxx-tab-full">${s.label}</span><span class="rxx-tab-abbr">${abbr}</span>`
         : s.label;
-      return `<button type="button" class="rxx-tab" role="tab" data-rxx-tab="${s.key}" aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}">${lbl}</button>`;
+      return `<button type="button" class="rxx-tab" role="tab" id="rxx-tab-${uid}-${s.key}" aria-controls="rxx-panel-${uid}-${s.key}" data-rxx-tab="${s.key}" aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}">${lbl}</button>`;
     }).join('');
     const panels = secs.map((s, i) =>
-      `<div class="rxx-panel" data-rxx-key="${s.key}" role="tabpanel"${i === 0 ? '' : ' hidden'}>${s.html}</div>`).join('');
+      `<div class="rxx-panel" id="rxx-panel-${uid}-${s.key}" data-rxx-key="${s.key}" role="tabpanel" aria-labelledby="rxx-tab-${uid}-${s.key}" tabindex="0"${i === 0 ? '' : ' hidden'}>${s.html}</div>`).join('');
     tabsBlock = `<div class="rxx-tabs${single ? ' is-single' : ''}" role="tablist">${tabs}</div><div class="rxx-panels">${panels}</div>`;
   }
 
@@ -684,7 +689,25 @@ export function attachRaioXTabs() {
     if (card) activate(card.closest('.rxx'), card.dataset.rxxGo);
   });
   document.addEventListener('keydown', (e) => {
+    // Navegação por seta/Home/End no tablist (WAI-ARIA tabs pattern).
+    const tab = e.target.closest('.rxx-tab[data-rxx-tab]');
+    if (tab && ['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) {
+      const tabs = [...tab.closest('.rxx-tabs').querySelectorAll('.rxx-tab')];
+      const i = tabs.indexOf(tab);
+      let j = i;
+      if (e.key === 'ArrowLeft')  j = (i - 1 + tabs.length) % tabs.length;
+      if (e.key === 'ArrowRight') j = (i + 1) % tabs.length;
+      if (e.key === 'Home') j = 0;
+      if (e.key === 'End')  j = tabs.length - 1;
+      e.preventDefault();
+      const next = tabs[j];
+      activate(next.closest('.rxx'), next.dataset.rxxTab);
+      next.focus();
+      return;
+    }
     if (e.key !== 'Enter' && e.key !== ' ') return;
+    // Enter/Espaço em aba ou card de resumo.
+    if (tab) { e.preventDefault(); return activate(tab.closest('.rxx'), tab.dataset.rxxTab); }
     const card = e.target.closest('.rxx-stat[data-rxx-go]');
     if (!card) return;
     e.preventDefault();
@@ -740,6 +763,7 @@ export function renderRaioXModalButton(matchId, homeTeam, awayTeam, data) {
   </button>`;
 }
 
+let raioxLastFocus = null;
 function ensureModal() {
   let modal = document.getElementById('raioxModal');
   if (modal) return modal;
@@ -761,22 +785,34 @@ function ensureModal() {
     if (e.target.closest('[data-raiox-close]')) closeRaioXModal();
   });
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !modal.hidden) closeRaioXModal();
+    if (modal.hidden) return;
+    if (e.key === 'Escape') { closeRaioXModal(); return; }
+    if (e.key === 'Tab') {
+      const list = [...modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')]
+        .filter(el => el.offsetParent !== null);
+      if (!list.length) return;
+      const first = list[0], last = list[list.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
   });
   return modal;
 }
 
 export function openRaioXModal({ homeTeam, awayTeam, titleHtml, data }) {
   const modal = ensureModal();
+  raioxLastFocus = document.activeElement;   // pra restaurar o foco ao fechar
   modal.querySelector('.raiox-modal-title').innerHTML = titleHtml
     || `${escapeHtml(teamPt(homeTeam))} <span class="rx-vs">×</span> ${escapeHtml(teamPt(awayTeam))}`;
   modal.querySelector('.raiox-modal-body').innerHTML = renderRaioXContent(homeTeam, awayTeam, data);
   modal.hidden = false;
   document.body.classList.add('raiox-modal-open');
+  modal.querySelector('.raiox-modal-x')?.focus();   // move o foco pra dentro do diálogo
 }
 
 export function closeRaioXModal() {
   const modal = document.getElementById('raioxModal');
   if (modal) modal.hidden = true;
   document.body.classList.remove('raiox-modal-open');
+  if (raioxLastFocus && typeof raioxLastFocus.focus === 'function') { raioxLastFocus.focus(); raioxLastFocus = null; }
 }

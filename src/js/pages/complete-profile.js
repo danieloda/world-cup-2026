@@ -14,6 +14,11 @@ if (profile.avatar_url) {
 
 const form = document.getElementById('profileForm');
 const fileInput = document.getElementById('avatarFile');
+// O <input type=file> é hidden; o <label> precisa ser operável por teclado.
+const avatarLabel = document.getElementById('avatarLabel');
+avatarLabel?.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
+});
 const previewImg = document.getElementById('previewImg');
 const previewInitials = document.getElementById('previewInitials');
 const submitBtn = document.getElementById('submitBtn');
