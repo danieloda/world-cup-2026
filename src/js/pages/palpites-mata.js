@@ -1,5 +1,5 @@
 import { requireAuth } from '../auth.js';
-import { renderShell } from '../sidebar.js';
+import { renderShell, refreshNavBadges } from '../sidebar.js';
 import { supabase } from '../supabase.js';
 import {
   flag, escapeHtml, formatTime, formatBrDate, isLocked, lockCountdownLabel, showToast,
@@ -940,6 +940,7 @@ async function doSave(matchId) {
   showToast(`Salvo ${teamPt(homeName)} ${h}–${a} ${teamPt(awayName)}`, 'success', 1500);
   updateKpis();
   rerenderAllBracketRows();
+  refreshNavBadges(profile.id);  // baixa o badge de pendência na hora (sem F5)
 }
 
 /**

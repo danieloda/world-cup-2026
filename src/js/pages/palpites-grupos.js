@@ -1,5 +1,5 @@
 import { requireAuth } from '../auth.js';
-import { renderShell } from '../sidebar.js';
+import { renderShell, refreshNavBadges } from '../sidebar.js';
 import { supabase } from '../supabase.js';
 import {
   flag, escapeHtml, formatBrDate, formatTime,
@@ -924,6 +924,7 @@ async function doSave(matchId) {
   showToast(`Salvo ${getTeamLabel(matchId)}`, 'success', 1200);
   updateKpisAndChips();
   refreshProjection();
+  refreshNavBadges(profile.id);  // baixa o badge de pendência na hora (sem F5)
 }
 
 // Atualiza a tabela projetada do grupo e o popover de 3ºs após salvar um palpite

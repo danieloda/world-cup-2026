@@ -183,7 +183,7 @@ function renderNavItem(item, activeId, badges = {}) {
     ? `<span class="sb-badge ${badge.urgent ? 'urgent' : ''}" title="${badge.count} palpite${badge.count > 1 ? 's' : ''} perto de bloquear">${badge.count}</span>`
     : '';
   return `
-    <a class="${cls.join(' ')}" href="${item.href}" title="${escapeHtml(item.label)}">
+    <a class="${cls.join(' ')}" href="${item.href}" data-nav="${item.id}" title="${escapeHtml(item.label)}">
       ${item.icon()}
       <span class="sb-link-label">${escapeHtml(item.label)}</span>
       ${badgeHtml}
@@ -208,6 +208,25 @@ function buildNavBadges(alerts) {
     badges[id] = { count: list.length, urgent: list.some(m => m.diff <= H48_MS) };
   }
   return badges;
+}
+
+// Atualiza os badges de pendência da sidebar SEM recarregar a página (ex.: logo
+// depois de salvar um palpite). Re-busca os alertas e ajusta o DOM dos nav items.
+export async function refreshNavBadges(userId) {
+  const alerts = await loadLockAlerts(userId).catch(() => null);
+  const badges = buildNavBadges(alerts);
+  document.querySelectorAll('.sb-link[data-nav]').forEach((link) => {
+    const badge = badges[link.dataset.nav];
+    let el = link.querySelector('.sb-badge');
+    if (badge) {
+      if (!el) { el = document.createElement('span'); el.className = 'sb-badge'; link.appendChild(el); }
+      el.classList.toggle('urgent', !!badge.urgent);
+      el.textContent = badge.count;
+      el.title = `${badge.count} palpite${badge.count > 1 ? 's' : ''} perto de bloquear`;
+    } else if (el) {
+      el.remove();
+    }
+  });
 }
 
 // ============================================================
