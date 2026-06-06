@@ -505,6 +505,13 @@
   ],
   "Canada": [
     [
+      "2026-06-05",
+      "Rep. Of Ireland",
+      true,
+      "1-1",
+      "Amistoso"
+    ],
+    [
       "2026-06-02",
       "Uzbekistan",
       true,
@@ -565,13 +572,6 @@
       "Wales",
       false,
       "1-0",
-      "Amistoso"
-    ],
-    [
-      "2025-09-05",
-      "Romania",
-      false,
-      "3-0",
       "Amistoso"
     ]
   ],
@@ -1297,6 +1297,13 @@
   ],
   "Haiti": [
     [
+      "2026-06-06",
+      "Peru",
+      true,
+      "1-2",
+      "Amistoso"
+    ],
+    [
       "2026-06-03",
       "New Zealand",
       true,
@@ -1358,13 +1365,6 @@
       true,
       "0-0",
       "Eliminatórias"
-    ],
-    [
-      "2025-06-22",
-      "USA",
-      false,
-      "1-2",
-      "Copa Ouro"
     ]
   ],
   "Iran": [
@@ -2161,6 +2161,13 @@
   ],
   "Paraguay": [
     [
+      "2026-06-05",
+      "Nicaragua",
+      true,
+      "4-0",
+      "Amistoso"
+    ],
+    [
       "2026-03-31",
       "Morocco",
       false,
@@ -2221,13 +2228,6 @@
       "Brazil",
       false,
       "0-1",
-      "Eliminatórias"
-    ],
-    [
-      "2025-06-05",
-      "Uruguay",
-      true,
-      "2-0",
       "Eliminatórias"
     ]
   ],
@@ -2377,6 +2377,13 @@
   ],
   "Saudi Arabia": [
     [
+      "2026-06-05",
+      "Puerto Rico",
+      false,
+      "3-0",
+      "Amistoso"
+    ],
+    [
       "2026-05-31",
       "Ecuador",
       false,
@@ -2438,13 +2445,6 @@
       true,
       "2-1",
       "Arab Cup"
-    ],
-    [
-      "2025-11-18",
-      "Algeria",
-      true,
-      "0-2",
-      "Amistoso"
     ]
   ],
   "Scotland": [
