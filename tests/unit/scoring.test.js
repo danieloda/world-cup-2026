@@ -4,6 +4,11 @@ import { matchPoints, scorePrediction, scoreBreakdown, championBonus, scorerBonu
 // Modelo ADITIVO (022_additive_scoring.sql): cada acerto SOMA.
 //   +ag por LADO certo · +ave vencedor/empate · +dg saldo de gols.
 //   placar exato = 2*ag + ave + dg.
+//
+// Os VALORES por fase aqui são literais (= a spec). A garantia de que batem com
+// o servidor (v_leaderboard/points_earned) NÃO está aqui — está em
+// scoring-parity.test.js, que parseia as funções SQL. Sem ela, função e teste
+// poderiam derivar juntos sem ninguém notar.
 
 describe('matchPoints (tabela por fase)', () => {
   it('grupos = 1/4/1 → exato 7', () => {
@@ -113,6 +118,14 @@ describe('scorePrediction — mata-mata com pênaltis', () => {
   });
   it('grupos não tem pênalti: empate é empate (1-1 vs 1-1) = 7', () => {
     expect(scorePrediction(1, 1, null, 1, 1, null, 'group')).toBe(7);
+  });
+
+  it('aceita o encoding REAL do DB (home/away), não só o atalho h/a', () => {
+    // Em produção pred_pen_winner/pen_winner são 'home'/'away' (não 'h'/'a').
+    // determineWinner compara por igualdade, então o resultado deve ser idêntico
+    // ao dos casos h/a acima — este caso garante fidelidade ao dado de produção.
+    expect(scorePrediction(2, 2, 'home', 1, 1, 'home', 'r16')).toBe(13); // vencedor por pênalti certo
+    expect(scorePrediction(2, 2, 'home', 1, 1, 'away', 'r16')).toBe(1);  // pênalti errado, só dg1
   });
 });
 

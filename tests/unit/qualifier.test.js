@@ -4,6 +4,8 @@ import { qualifierBonus } from '../../src/js/scoring.js';
 // Mirror of public.qualifier_bonus_pts (022_additive_scoring.sql).
 // BPE: r32 1 · r16 2 · qf 3 · sf 5 · third 3 · final 8.
 // BP = round(BPE/2), EXCETO r32 onde BP = 0 (32 vagas → "está na fase" é quase de graça).
+// Os valores aqui são literais (= a spec). A paridade com o SQL (que estes
+// "espelham") é garantida por scoring-parity.test.js, não por este arquivo.
 
 describe('qualifierBonus — BPE (posição exata)', () => {
   it('valor por fase', () => {

@@ -8,6 +8,13 @@ export default defineConfig({
     // TZ de produção (usuários no Brasil). Trava o relógio dos testes em BRT
     // para que dev (macOS) e CI (Ubuntu/UTC) rodem IDÊNTICOS — bug de data não
     // pode depender da TZ da máquina. Node relê process.env.TZ a cada Date.
+    //
+    // ⚠️ ACOPLAMENTO: esta TZ fixa torna os testes de data determinísticos, MAS
+    // sozinha esconde 100% dos bugs de fuso (foi cúmplice do bug de datas de
+    // jun/2026). Ela só é segura porque tests/unit/date-tz-invariance.test.js
+    // VARIA o fuso em subprocessos. NÃO remova/skipe aquele teste sem substituir
+    // a cobertura de fuso — senão toda a superfície de data volta a ser testada
+    // só no valor "seguro" da variável que quebra. Ver env-guard.test.js.
     env: { TZ: 'America/Sao_Paulo' },
     coverage: {
       provider: 'v8',
