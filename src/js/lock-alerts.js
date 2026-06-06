@@ -19,6 +19,36 @@ function emptyAlerts() {
 }
 
 /**
+ * NÚCLEO PURO da regra de alerta (sem I/O) — testável isoladamente.
+ * Dado os jogos pendentes, o conjunto já palpitado e o instante `now`, classifica
+ * quem está perto de travar: inclui só não-palpitado, prazo ainda aberto (diff>0)
+ * e < 1 semana; urgente = trava em <48h. Ordena pelo prazo mais próximo.
+ * @param {Array} matches       jogos { match_id, match_date, ... }
+ * @param {Set}   predictedSet  match_ids já palpitados pelo usuário
+ * @param {number} now          Date.now() (ms) — injetado p/ ser determinístico
+ */
+export function classifyLockAlerts(matches, predictedSet, now) {
+  const pending = [];
+  for (const m of matches ?? []) {
+    if (predictedSet?.has?.(m.match_id)) continue;
+    const deadline = predictionDeadline(m.match_date).getTime();
+    const diff = deadline - now;
+    if (diff <= 0) continue;       // já travou: não há ação possível
+    if (diff > WEEK_MS) continue;  // ainda distante
+    pending.push({ ...m, deadline, diff });
+  }
+  pending.sort((a, b) => a.diff - b.diff);
+  const urgent = pending.filter(p => p.diff <= H48_MS).length;
+  return {
+    urgent,
+    soon: pending.length - urgent,
+    total: pending.length,
+    matches: pending,
+    nextDeadline: pending[0]?.deadline ?? null,
+  };
+}
+
+/**
  * Carrega os jogos pendentes (sem palpite) que estão perto do bloqueio.
  * @param {string} userId  profile.id do usuário logado
  * @returns {Promise<{urgent:number, soon:number, total:number,
@@ -43,26 +73,5 @@ export async function loadLockAlerts(userId) {
   if (matchesRes.error || predsRes.error) return emptyAlerts();
 
   const predicted = new Set((predsRes.data ?? []).map(p => p.match_id));
-  const now = Date.now();
-
-  const pending = [];
-  for (const m of matchesRes.data ?? []) {
-    if (predicted.has(m.match_id)) continue;
-    const deadline = predictionDeadline(m.match_date).getTime();
-    const diff = deadline - now;
-    if (diff <= 0) continue;       // já travou: não há ação possível, não alerta
-    if (diff > WEEK_MS) continue;  // ainda distante
-    pending.push({ ...m, deadline, diff });
-  }
-
-  pending.sort((a, b) => a.diff - b.diff);
-  const urgent = pending.filter(p => p.diff <= H48_MS).length;
-
-  return {
-    urgent,
-    soon: pending.length - urgent,
-    total: pending.length,
-    matches: pending,
-    nextDeadline: pending[0]?.deadline ?? null,
-  };
+  return classifyLockAlerts(matchesRes.data ?? [], predicted, Date.now());
 }
