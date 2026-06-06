@@ -1,6 +1,7 @@
 // Auth helpers: sessão, login, logout, route guard, profile.
 
 import { supabase } from './supabase.js';
+import { installErrorReporter } from './error-reporter.js';
 
 /**
  * Retorna a sessão atual (ou null).
@@ -138,6 +139,8 @@ export async function requireAuth(options = {}) {
       return redirectAndHalt('login.html?error=profile');
     }
   }
+  // Observabilidade: captura erros não tratados desta sessão (migration 047).
+  installErrorReporter(session.user.id);
   if (options.adminOnly && !profile.is_admin) return redirectAndHalt('inicio.html');
   // Gate de avatar obrigatório (admins isentos — já têm avatar local)
   if (!options.skipAvatarGate && !profile.avatar_url && !profile.is_admin) {

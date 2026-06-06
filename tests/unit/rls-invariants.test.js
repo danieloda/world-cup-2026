@@ -106,6 +106,13 @@ describe('invariantes de RLS (anti-regressão das migrations)', () => {
     expect(grant, 'email NÃO pode estar no grant de coluna').not.toMatch(/\bemail\b/);
   });
 
+  it('client_errors: INSERT só do próprio, SELECT só admin (047)', () => {
+    const ins = latestPolicy('client_errors_insert_self');
+    expect(ins).toMatch(/user_id = auth\.uid\(\)/);
+    const sel = latestPolicy('client_errors_select_admin');
+    expect(sel).toMatch(/is_admin\(\)/);
+  });
+
   it('funções SECURITY DEFINER continuam revogadas de authenticated (H1/H2)', () => {
     const fns = [
       'recompute_prediction_points', 'recompute_qualifier_points',
