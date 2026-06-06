@@ -1083,8 +1083,8 @@ body.raiox-modal-open { overflow: hidden; }
   letter-spacing: .04em; text-transform: uppercase; dominant-baseline: middle;
 }
 .rx-radar-area { stroke-width: 2; stroke-linejoin: round; }
-.rx-radar-area.home { fill: rgba(29,185,84,.16);  stroke: var(--positive); }
-.rx-radar-area.away { fill: rgba(241,94,108,.16); stroke: var(--red); }
+.rx-radar-area.home { fill: rgba(29,185,84,.18);  stroke: var(--positive); stroke-width: 2.5; filter: drop-shadow(0 0 3px rgba(29,185,84,.45)); }
+.rx-radar-area.away { fill: rgba(241,94,108,.07); stroke: var(--red); stroke-dasharray: 5 3; }
 .rx-radar-dot { stroke: #0c0c0c; stroke-width: 1; }
 .rx-radar-dot.home { fill: var(--positive); }
 .rx-radar-dot.away { fill: var(--red); }
@@ -5762,3 +5762,20 @@ input[type="number"].score-input {
   .rank-table-wrap { overflow-x: visible; }   /* não precisa mais rolar lateralmente */
   .rank-legend { display: none; }             /* descrevia colunas agora ocultas; detalhe no drill-down */
 }
+
+/* ============================================================
+   REFINEMENT PASS — Tier 4 (acabamento: profundidade + foco visual)
+   ============================================================ */
+/* 4.1 — KPI focal: "Sua posição" (.kpi.green) vira o card-herói (tint de marca + anel sutil) */
+.kpi.green {
+  background: linear-gradient(165deg, var(--accent-dim), transparent 62%), var(--card);
+  box-shadow: var(--shadow-material), inset 0 0 0 1px rgba(244,196,48,.16);
+}
+/* 4.2 — cards interativos: lift + elevação no hover (contrato único, "vivo") */
+.card.hov {
+  transition: transform var(--dur-fast) var(--ease-standard),
+              box-shadow var(--dur-fast) var(--ease-standard),
+              background var(--dur-fast) var(--ease-standard);
+}
+.card.hov:hover { transform: translateY(-2px); box-shadow: var(--shadow-material), var(--elev-2); }
+@media (prefers-reduced-motion: reduce) { .card.hov:hover { transform: none; } }
