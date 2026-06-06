@@ -64,9 +64,9 @@
         "number": null
       },
       {
-        "name": "K. De Bruyne",
+        "name": "Kevin De Bruyne",
         "position": "MEI",
-        "number": null
+        "number": 7
       },
       {
         "name": "A. Onana",
@@ -109,9 +109,9 @@
         "number": null
       },
       {
-        "name": "R. Lukaku",
+        "name": "Romelu Lukaku",
         "position": "ATA",
-        "number": null
+        "number": 10
       },
       {
         "name": "D. Lukebakio",
@@ -233,9 +233,9 @@
         "number": null
       },
       {
-        "name": "B. Barcola",
+        "name": "Bradley Barcola",
         "position": "ATA",
-        "number": null
+        "number": 9
       },
       {
         "name": "R. Cherki",
@@ -243,9 +243,9 @@
         "number": null
       },
       {
-        "name": "O. Dembélé",
+        "name": "Ousmane Dembélé",
         "position": "ATA",
-        "number": null
+        "number": 11
       },
       {
         "name": "D. Doué",
@@ -259,7 +259,7 @@
       },
       {
         "id": 278,
-        "name": "K. Mbappé",
+        "name": "Kylian Mbappé",
         "age": 27,
         "number": 10,
         "position": "ATA",
@@ -451,7 +451,7 @@
       },
       {
         "id": 726,
-        "name": "A. Kramarić",
+        "name": "Andrej Kramarić",
         "age": 34,
         "number": 9,
         "position": "ATA",
@@ -809,9 +809,9 @@
       },
       {
         "id": 762,
-        "name": "V. Júnior",
+        "name": "Vinícius Júnior",
         "age": 25,
-        "number": 10,
+        "number": 7,
         "position": "ATA",
         "photo": "https://media.api-sports.io/football/players/762.png"
       }
@@ -940,7 +940,7 @@
       },
       {
         "id": 756,
-        "name": "F. Valverde",
+        "name": "Federico Valverde",
         "age": 27,
         "number": 15,
         "position": "MEI",
@@ -1017,9 +1017,9 @@
       },
       {
         "id": 51617,
-        "name": "D. Núñez",
+        "name": "Darwin Núñez",
         "age": 26,
-        "number": 9,
+        "number": 19,
         "position": "ATA",
         "photo": "https://media.api-sports.io/football/players/51617.png"
       }
@@ -1174,7 +1174,7 @@
       },
       {
         "id": 517,
-        "name": "J. Rodríguez",
+        "name": "James Rodríguez",
         "age": 34,
         "number": 10,
         "position": "MEI",
@@ -1195,7 +1195,7 @@
       },
       {
         "id": 2489,
-        "name": "L. Díaz",
+        "name": "Luis Díaz",
         "age": 28,
         "number": 7,
         "position": "ATA",
@@ -1359,16 +1359,16 @@
       },
       {
         "id": 386828,
-        "name": "L. Yamal",
+        "name": "Lamine Yamal",
         "age": 18,
         "number": 19,
         "position": "ATA",
         "photo": "https://media.api-sports.io/football/players/386828.png"
       },
       {
-        "name": "N. Williams",
+        "name": "Nico Williams",
         "position": "ATA",
-        "number": null
+        "number": 17
       },
       {
         "id": 1323,
@@ -1550,7 +1550,7 @@
       },
       {
         "id": 129718,
-        "name": "J. Bellingham",
+        "name": "Jude Bellingham",
         "age": 22,
         "number": 10,
         "position": "MEI",
@@ -1562,7 +1562,7 @@
         "number": null
       },
       {
-        "name": "H. Kane",
+        "name": "Harry Kane",
         "position": "ATA",
         "number": 9
       },
@@ -1577,9 +1577,9 @@
         "number": null
       },
       {
-        "name": "B. Saka",
+        "name": "Bukayo Saka",
         "position": "ATA",
-        "number": null
+        "number": 7
       },
       {
         "id": 909,
@@ -1846,9 +1846,9 @@
         "number": null
       },
       {
-        "name": "T. Kubo",
-        "position": "MEI",
-        "number": null
+        "name": "Takefusa Kubo",
+        "position": "ATA",
+        "number": 11
       },
       {
         "name": "Y. Suzuki",
@@ -2131,9 +2131,9 @@
         "number": null
       },
       {
-        "name": "B. Embolo",
+        "name": "Breel Embolo",
         "position": "ATA",
-        "number": null
+        "number": 7
       },
       {
         "name": "N. Okafor",
@@ -2290,9 +2290,9 @@
         "number": null
       },
       {
-        "name": "S. Giménez",
+        "name": "Santiago Giménez",
         "position": "ATA",
-        "number": null
+        "number": 9
       }
     ]
   },
@@ -2470,7 +2470,7 @@
       },
       {
         "id": 186,
-        "name": "S. Heung-Min",
+        "name": "Son Heung-min",
         "age": 33,
         "number": 7,
         "position": "ATA",
@@ -3123,9 +3123,9 @@
         "number": null
       },
       {
-        "name": "F. Wirtz",
+        "name": "Florian Wirtz",
         "position": "MEI",
-        "number": null
+        "number": 17
       },
       {
         "name": "J. Leweling",
@@ -3143,9 +3143,9 @@
         "number": null
       },
       {
-        "name": "K. Havertz",
+        "name": "Kai Havertz",
         "position": "ATA",
-        "number": null
+        "number": 7
       },
       {
         "name": "L. Karl",
@@ -3153,9 +3153,9 @@
         "number": null
       },
       {
-        "name": "J. Musiala",
-        "position": "ATA",
-        "number": null
+        "name": "Jamal Musiala",
+        "position": "MEI",
+        "number": 10
       },
       {
         "name": "L. Sané",
@@ -3269,19 +3269,19 @@
         "number": null
       },
       {
-        "name": "L. Messi",
+        "name": "Lionel Messi",
         "position": "ATA",
-        "number": null
+        "number": 10
       },
       {
-        "name": "L. Martínez",
+        "name": "Lautaro Martínez",
         "position": "ATA",
-        "number": null
+        "number": 22
       },
       {
-        "name": "J. Álvarez",
+        "name": "Julián Álvarez",
         "position": "ATA",
-        "number": null
+        "number": 9
       },
       {
         "name": "N. González",
@@ -3620,9 +3620,9 @@
         "number": null
       },
       {
-        "name": "A. Hakimi",
+        "name": "Achraf Hakimi",
         "position": "DEF",
-        "number": null
+        "number": 2
       },
       {
         "name": "Z. El Ouahdi",
@@ -3878,7 +3878,7 @@
       },
       {
         "id": 306,
-        "name": "M. Salah",
+        "name": "Mohamed Salah",
         "age": 33,
         "number": 10,
         "position": "ATA",
@@ -4427,9 +4427,9 @@
         "number": null
       },
       {
-        "name": "E. Haaland",
+        "name": "Erling Haaland",
         "position": "ATA",
-        "number": null
+        "number": 9
       },
       {
         "name": "A. Sørloth",
@@ -4815,14 +4815,14 @@
         "number": null
       },
       {
-        "name": "M. Depay",
+        "name": "Memphis Depay",
         "position": "ATA",
-        "number": null
+        "number": 10
       },
       {
-        "name": "C. Gakpo",
+        "name": "Cody Gakpo",
         "position": "ATA",
-        "number": null
+        "number": 11
       },
       {
         "name": "J. Kluivert",
@@ -7160,9 +7160,9 @@
         "number": null
       },
       {
-        "name": "C. Pulisic",
+        "name": "Christian Pulisic",
         "position": "ATA",
-        "number": null
+        "number": 10
       },
       {
         "id": 161921,
@@ -7174,9 +7174,9 @@
       },
       {
         "id": 138835,
-        "name": "F. Balogun",
+        "name": "Folarin Balogun",
         "age": 24,
-        "number": 20,
+        "number": 9,
         "position": "ATA",
         "photo": "https://media.api-sports.io/football/players/138835.png"
       },

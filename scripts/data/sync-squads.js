@@ -132,17 +132,19 @@ async function syncTeam({ apiTeamId, apiName }) {
       inserted++;
       continue;
     }
+    // NÃO sobrescreve full_name: nomes no DB são curados (ex: "Kylian Mbappé"),
+    // enquanto a API manda iniciais ("K. Mbappé"). Deixar o nome do DB evita
+    // reverter as estrelas e recriar duplicatas (ver migration 050). Só
+    // sincronizamos position/shirt_number/api_player_id.
     const needsUpdate =
       existing.position !== p.position ||
       existing.shirt_number !== p.shirt_number ||
-      existing.api_player_id !== p.api_player_id ||
-      existing.full_name !== p.full_name;
+      existing.api_player_id !== p.api_player_id;
     if (needsUpdate) {
       if (!DRY_RUN) {
         const { error: updErr } = await admin
           .from('players')
           .update({
-            full_name: p.full_name,
             position: p.position,
             shirt_number: p.shirt_number,
             api_player_id: p.api_player_id,
