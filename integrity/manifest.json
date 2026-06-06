@@ -1,5 +1,20 @@
 {
   "version": 1,
   "description": "Cadeia de integridade dos palpites do bolão SBC 2026. Cada entrada referencia um snapshot canônico em snapshots/ e o encadeia por SHA-256 (chain_hash = SHA256(prev_chain_hash || content_hash)). Verifique com: npm run integrity:verify",
-  "entries": []
+  "entries": [
+    {
+      "seq": 1,
+      "file": "snapshots/0001_2026-06-06T08-45-35-055Z.json",
+      "taken_at": "2026-06-06T08:45:35.055Z",
+      "content_hash": "fd10006aa01114630f75d2abbf199a2a8937cd71581b0619280006bf348e475b",
+      "prev_chain_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "chain_hash": "7f1a33639fc7c0ce142a9ae0134db103ddcc472357caccc21d8fa01c785374ec",
+      "counts": {
+        "locked_matches": 0,
+        "predictions": 0,
+        "champion_picks": 0,
+        "scorer_picks": 0
+      }
+    }
+  ]
 }
