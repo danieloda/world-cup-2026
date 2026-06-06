@@ -39,3 +39,18 @@ describe('wiring: client_errors → alerta no Telegram', () => {
     expect(body).toMatch(/jsonb_build_object\('sig'/);
   });
 });
+
+describe('wiring: digest diário de erros do cliente', () => {
+  it('existe a função de digest chamando send_alert', () => {
+    const i = allSql.indexOf('create or replace function public.cron_alert_client_errors_digest');
+    expect(i).toBeGreaterThan(-1);
+    const body = allSql.slice(i, allSql.indexOf('$$;', i));
+    expect(body).toMatch(/send_alert/);
+    expect(body).toMatch(/'client_errors_digest'/);
+    expect(body).toMatch(/24 hours/);
+  });
+
+  it('está agendado no pg_cron', () => {
+    expect(allSql).toMatch(/cron\.schedule\(\s*'alerts_client_errors_digest'/);
+  });
+});
