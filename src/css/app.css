@@ -2010,6 +2010,14 @@ body.raiox-modal-open { overflow: hidden; }
   margin-bottom: 8px;
 }
 .empty p { color: var(--text-dim); margin-bottom: 20px; max-width: 440px; margin-inline: auto; }
+/* Ícone opcional no topo do empty state (cluster com tint da marca) */
+.empty-ic {
+  width: 56px; height: 56px; border-radius: 16px;
+  display: grid; place-items: center; margin: 0 auto 16px;
+  background: var(--accent-dim); color: var(--accent);
+}
+.empty-ic svg { width: 26px; height: 26px; }
+.empty-ic.green { background: var(--positive-dim); color: var(--positive); }
 
 /* ===== Login page ===== */
 .login-page {

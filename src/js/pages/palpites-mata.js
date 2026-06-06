@@ -296,7 +296,9 @@ function renderDateView(counts, cardRenderer) {
         <div class="sub">${dayMatches.length} jogo${dayMatches.length > 1 ? 's' : ''}</div>
       </div>
       <div class="bracket-date-list">${dayMatches.map(cardRenderer).join('')}</div>`
-    : `<div class="empty"><h3>Sem jogos nesta data</h3><p>Escolha outra data acima.</p></div>`;
+    : `<div class="empty">
+        <div class="empty-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+        <h3>Sem jogos nesta data</h3><p>Escolha outra data acima.</p></div>`;
 
   return `
     <div class="palpites-toolbar">

@@ -368,7 +368,13 @@ function renderPalpitesList() {
     : (activeGroup === 'all' ? open : open.filter(m => m.group_name === activeGroup));
 
   if (filtered.length === 0) {
-    return `<div class="empty"><h3>Sem jogos abertos</h3><p>Nenhum jogo aberto para o filtro selecionado.</p></div>`;
+    return `
+      <div class="empty">
+        <div class="empty-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+        <h3>Sem jogos abertos</h3>
+        <p>Os palpites abrem conforme as rodadas chegam. Enquanto isso, confira o que já rolou.</p>
+        <button class="btn btn-ghost" type="button" onclick="document.querySelector('[data-tab=resultados]')?.click()">Ver resultados oficiais →</button>
+      </div>`;
   }
 
   return renderGroupedByDate(filtered, renderPalpiteRow);
@@ -471,6 +477,7 @@ function renderResultadosList() {
     const what = groupBy === 'date' ? 'nesta data' : `no Grupo ${activeGroup}`;
     return `
       <div class="empty">
+        <div class="empty-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 20v-6M12 20V8M18 20V4M3 20h18"/></svg></div>
         <h3>Nenhum resultado ${what} ainda</h3>
         <p>Os resultados aparecem aqui conforme o admin lança os placares dos jogos.</p>
         <a class="btn btn-ghost" href="palpites-grupos.html" onclick="document.querySelector('[data-tab=palpites]').click(); return false;">Ver palpites pendentes →</a>
