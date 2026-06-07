@@ -18,6 +18,8 @@ scripts/e2e/screenshots/
 scripts/e2e/errors.json
 scripts/e2e/user-tokens.json
 scripts/e2e/expected-tournament.json
+scripts/e2e/sim-roster.json
+scripts/e2e/playout.sql
 scripts/e2e/audit-report.json
 scripts/e2e/render-adversarial-errors.json
 scripts/e2e/.tmp/
