@@ -193,12 +193,20 @@ if (gIdx >= 0) {
     stageMultiplier('group') === 1, `mult=${stageMultiplier('group')}`);
   const gScorerChip = gCard.locator('.hb-scorer').first();
   if (await gScorerChip.count()) {
-    await gScorerChip.hover();
-    await page.waitForSelector('.hist-tip.show', { timeout: 4000 }).catch(() => {});
-    const gTip = await page.locator('.hist-tip.show').innerText().catch(() => '');
+    // Lê o CONTEÚDO do popover direto do <template class="tip-src"> (irmão do chip,
+    // a fonte que o tooltip.js renderiza). Determinístico — sem depender de hover,
+    // que é flaky em headless (o auto-scroll dispara scroll→hide). Mesmo invariante:
+    // grupo (mult ×1) soma +2 e NÃO tem linha de "Peso". O hover em si já é coberto
+    // pelo popover da FINAL acima.
+    const gTip = await gCard.evaluate((card) => {
+      const chip = card.querySelector('.hb-scorer[data-tip]');
+      // o <template class="tip-src"> do artilheiro é o IRMÃO IMEDIATO do chip
+      // (o .hb-row tem outro tip-src, do palpite, antes — não confundir).
+      const tpl = chip?.nextElementSibling;
+      return (tpl && tpl.classList.contains('tip-src')) ? tpl.innerHTML.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() : '';
+    });
     check('grupo: popover do artilheiro soma +2 e NÃO mostra linha de "Peso"',
-      /\+2/.test(gTip) && !/Peso/.test(gTip), `tip="${gTip.replace(/\n/g, ' ⏎ ')}"`);
-    await page.mouse.move(5, 5);
+      /\+2/.test(gTip) && !/Peso/.test(gTip), `tip="${gTip.slice(0, 70)}"`);
   }
   await gCard.screenshot({ path: join(shotsDir, 'hist-scorer-group.png') }).catch(() => {});
 }

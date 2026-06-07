@@ -40,17 +40,20 @@ Os cálculos no PostgreSQL, independentes da implementação JS. Não deixam res
 - **Specs estáveis:** `tests/e2e/auth.spec.js` + `predictions.spec.js` (21 testes).
   Rodar: `TEST_USER_EMAIL=sim-001@bolao.test TEST_USER_PASSWORD='SimUser2026!' npx playwright test --workers=1`
 - **Render adversarial:** `npm run test:render` — nenhuma página vaza `undefined/NaN/...` (90 checks).
-- **Harness de UI** (`scripts/e2e/test-*.js`): sessão, admin, avatar, re-scoring, odds, etc.
-  ⚠️ Vários assumem o **golden-path** (§ abaixo) ou estado finalizado — ver achados no AUDIT.
+- **Harness de UI — standalone** (rodam após `bootstrap-local.sh`, estabelecem o próprio
+  estado): `test-odds`, `test-fifa-tie-dom`, `test-temporal-states`, `test-ui-pages`,
+  `test-signup-flow`, `test-session`, `test-render-adversarial`, etc. **Todos verdes.**
+- **Harness de UI — golden-path** (exigem os usuários + oráculo do harness): `test-historico-scorer`,
+  `test-rank-chart`, `test-admin-ui-penalty`. Rodar **após `node scripts/e2e/seed-harness-state.js`**
+  (monta o estado do harness via DB em ~30s). **Todos verdes.**
 
 ### Nível 5 — Golden-path E2E (harness completo) · ~10min
-Fluxo ponta-a-ponta pela UI real, com oráculo determinístico:
-```
-00-setup-local → 01-generate-tournament → 03-palpitar (10 users via UI)
-→ 04-admin-results (time-warp + 104 resultados via UI) → 05-audit (matemática vs v_leaderboard)
-→ 06-ui-assert (DOM)
-```
-Valida o caminho de **escrita pela UI** + admin + auditoria. Lento; rode antes de releases grandes.
+Duas formas de montar o estado do harness (10 usuários + oráculo wc2026-e2e-v1 + playout):
+- **Rápido (DB):** `node scripts/e2e/seed-harness-state.js` (~30s). Pré-requisito dos 3
+  testes de asserção do golden-path acima. Reseta antes se os matches já estiverem jogados.
+- **Completo (UI real):** `00-setup-local → 01-generate → 03-palpitar (UI) → 04-admin-results
+  (time-warp + 104 resultados via UI) → 05-audit → 06-ui-assert`. Valida o **caminho de escrita
+  pela UI**; lento (~10min); rode antes de releases grandes.
 
 ### Nível 6 — Carga / Concorrência (Node) · ~30s · **NOVO**
 - `test-load-concurrency.js` — **estouro de deadline**: ~60 usuários concorrentes no mesmo

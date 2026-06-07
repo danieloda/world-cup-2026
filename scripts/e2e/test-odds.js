@@ -53,16 +53,27 @@ try {
   await page.goto(`${BASE}/login.html`);
   await page.fill('#email', process.env.ADMIN_EMAIL); await page.fill('#password', process.env.ADMIN_PASSWORD);
   await page.click('#submitBtn'); await page.waitForURL(/\/inicio(\.html)?$/, {timeout:15000});
-  await page.goto(`${BASE}/palpites-grupos.html`);
+  // #jogo-<id> abre a aba Palpites no grupo do jogo e rola até ele (deep-link).
+  await page.goto(`${BASE}/palpites-grupos.html#jogo-${MID}`);
   await page.waitForSelector(`.match[data-match-id="${MID}"]`, {timeout:15000});
-  const oddText = await page.evaluate((id)=>{
-    const row = document.querySelector(`.match[data-match-id="${id}"]`);
-    return row ? [...row.querySelectorAll('.odd')].map(e=>e.textContent.trim()) : null;
+  // As odds não são mais um badge na linha — viraram a BARRA 1X2 (probabilidade
+  // implícita de-margined das odds, ver oddsToProbs) dentro do Raio-X. Abre e lê.
+  await page.click(`.match[data-match-id="${MID}"] .ctx-toggle`);
+  await page.waitForTimeout(400);
+  const fc = await page.evaluate((id)=>{
+    const panel = document.querySelector(`#ctx-${id}`);
+    if (!panel) return null;
+    return {
+      segs: [...panel.querySelectorAll('.rx-1x2-seg')].map(e=>e.textContent.trim()),
+      fav: panel.querySelector('.rx-1x2-verdict')?.textContent?.trim() || '',
+    };
   }, MID);
   await browser.close();
-  const joined = (oddText||[]).join(' ');
-  check('badge de odds aparece na linha do jogo', !!oddText && joined.includes('1.85') && joined.includes('4.20'),
-    `odds no DOM: ${joined||'(nenhuma)'}`);
+  // odds 1.85/3.40/4.20 → casa favorita; a barra mostra 3 segmentos em %.
+  const segs = fc?.segs || [];
+  check('odds renderizam no Raio-X (barra 1X2, casa favorita)',
+    segs.length === 3 && segs.every(s=>s.includes('%')) && /Favorito/i.test(fc?.fav||''),
+    `barra=${segs.join(' ')} · ${fc?.fav||'(sem barra)'}`);
 } finally {
   await admin.from('matches').update(snap).eq('id', MID);
   try { await admin.rpc('recompute_prediction_points', { p_match_id: MID }); } catch {}

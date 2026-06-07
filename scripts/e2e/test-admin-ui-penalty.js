@@ -26,9 +26,16 @@ const champBonus = async (uid) => (await admin.rpc('champion_bonus_for', { p_use
 async function updateFinalViaUI(page, home, away, pen) {
   const rowSel = `.result-row[data-match-id="104"]`;
   await openAdminResults(page);
-  await page.click('[data-action="results-subtab"][data-sub="launched"]').catch(()=>{});
-  await page.waitForTimeout(500);
-  await page.waitForSelector(rowSel, { timeout: 10000 });
+  // Garante que a aba Resultados renderizou (o 1º click pode correr o handler de
+  // tab → fica na aba Usuários, sem sub-abas). Re-clica se necessário.
+  const launchedBtn = '[data-action="results-subtab"][data-sub="launched"]';
+  await page.waitForSelector(launchedBtn, { timeout: 8000 }).catch(async () => {
+    await page.click('.admin-tab[data-tab="results"]');
+    await page.waitForSelector(launchedBtn, { timeout: 10000 });
+  });
+  // Sub-aba "Lançados": com tudo finalizado, a "Lançar" (default) fica vazia.
+  await page.click(launchedBtn);
+  await page.waitForSelector(rowSel, { timeout: 15000 });
   await page.$eval(rowSel, el=>el.scrollIntoView({block:'center'}));
   await page.fill(`#rh_104`, String(home));
   await page.fill(`#ra_104`, String(away));
@@ -81,8 +88,13 @@ const tour = JSON.parse(readFileSync(join(__dirname,'expected-tournament.json'),
 const m1 = tour.matches.find(m=>m.id===MID);
 const rowSel = `.result-row[data-match-id="${MID}"]`;
 await openAdminResults(page);
-await page.click('[data-action="results-subtab"][data-sub="launched"]').catch(()=>{});
-await page.waitForSelector(rowSel, {timeout:10000, state:'attached'});
+const launchedSub = '[data-action="results-subtab"][data-sub="launched"]';
+await page.waitForSelector(launchedSub, { timeout: 8000 }).catch(async () => {
+  await page.click('.admin-tab[data-tab="results"]');
+  await page.waitForSelector(launchedSub, { timeout: 10000 });
+});
+await page.click(launchedSub);
+await page.waitForSelector(rowSel, {timeout:15000, state:'attached'});
 await page.locator(rowSel).scrollIntoViewIfNeeded();
 await page.click(`${rowSel} [data-action="clear-result"]`);
 await page.waitForTimeout(1500);

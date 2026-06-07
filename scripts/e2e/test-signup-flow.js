@@ -125,10 +125,14 @@ async function main() {
     // ===== 6. Upload avatar =====
     log('blue', '[6] Upload do avatar...');
     await page.setInputFiles('#avatarFile', AVATAR_PATH);
-    // NOTA: em headless, setInputFiles em input hidden nem sempre dispara o change
-    // nativo. Usuário real (click no label → picker) dispara normalmente.
-    await page.dispatchEvent('#avatarFile', 'change');
-    await page.waitForSelector('#submitBtn:not([disabled])', { timeout: 5000 });
+    // Espera o change nativo + o FileReader (lê o avatar como data URL) habilitarem
+    // o submit. Em headless o change pode não disparar sozinho num input hidden —
+    // só então forçamos via dispatch (mesmo padrão do test-avatar-upload, que passa).
+    await page.waitForTimeout(800);
+    if (await page.evaluate(() => document.getElementById('submitBtn')?.disabled)) {
+      await page.dispatchEvent('#avatarFile', 'change');
+    }
+    await page.waitForSelector('#submitBtn:not([disabled])', { timeout: 8000 });
     await page.click('#submitBtn');
 
     // ===== 7. Redirect pra inicio =====

@@ -170,23 +170,30 @@ async function main() {
     check('recent.json: cobre os times de grupo do DB', missing.length === 0,
       missing.length ? `faltam ${missing.length}: ${missing.slice(0, 5).join(', ')}` : `${dbTeams.length}/${dbTeams.length}`);
 
-    // 3b) tooltip no DOM. A aba "Palpites" só lista jogos ABERTOS (zero agora), então
-    // uso a aba "Resultados" → Classificação, que tem .team-name[data-team] dos times
-    // reais. attachTeamTooltips usa delegação no document, então o hover funciona mesmo
-    // após troca de aba.
-    await page.goto(`${BASE}/palpites-grupos.html#classificacao`);
-    await page.waitForSelector('.group-card .team-name[data-team]', { timeout: 15000 });
-    const teamSel = '.group-card .team-name[data-team]';
-    await page.hover(teamSel);
-    await page.waitForTimeout(500);
-    const tip = await page.evaluate(() => {
-      const el = document.getElementById('teamTooltip');
-      if (!el) return { exists: false };
-      const cs = getComputedStyle(el);
-      return { exists: true, visible: cs.display !== 'none' && cs.visibility !== 'hidden', text: (el.textContent || '').trim().slice(0, 50) };
-    });
-    check('tooltip de forma recente aparece ao passar o mouse', tip.exists && tip.visible && tip.text.length > 0,
-      `vis=${tip.visible} text="${tip.text}"`);
+    // 3b) Forma recente no DOM. O hover no nome do time foi REMOVIDO; a forma
+    // recente agora vive na aba "Forma" do Raio-X (ver palpites-grupos.js:80
+    // "antes ficava num hover…; agora vai pro painel Raio-X"). Abrimos um jogo
+    // (match 1, temporariamente aberto) e conferimos que o Raio-X a renderiza.
+    const snapM1 = (await admin.from('matches').select('match_date, finished, actual_home, actual_away, pen_winner, finished_at, status').eq('id', 1).single()).data;
+    try {
+      await admin.from('matches').update({ match_date: new Date(Date.now() + 10 * 864e5).toISOString(), finished: false, actual_home: null, actual_away: null, pen_winner: null, finished_at: null, status: 'scheduled' }).eq('id', 1);
+      await page.goto(`${BASE}/palpites-grupos.html`);
+      await page.waitForSelector('.match[data-match-id="1"]', { timeout: 15000 });
+      await page.click('.match[data-match-id="1"] .ctx-toggle');
+      await page.waitForTimeout(400);
+      const forma = await page.evaluate(() => {
+        const panel = document.querySelector('#ctx-1, .match[data-match-id="1"] .match-context');
+        if (!panel) return { ok: false, rows: 0 };
+        const tab = [...panel.querySelectorAll('.rxx-tab')].find((t) => /forma/i.test(t.textContent));
+        if (tab) tab.click();
+        const rows = panel.querySelectorAll('.rx-recent-list li, .rx-recent-col').length;
+        return { ok: rows > 0, rows };
+      });
+      check('forma recente renderiza no Raio-X (substituiu o hover no nome do time)', forma.ok, `linhas=${forma.rows}`);
+    } finally {
+      await admin.from('matches').update(snapM1).eq('id', 1);
+      try { await admin.rpc('recompute_prediction_points', { p_match_id: 1 }); } catch {}
+    }
 
   } finally {
     await browser.close().catch(() => {});

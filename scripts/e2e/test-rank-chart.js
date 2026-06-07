@@ -216,9 +216,12 @@ try {
   check('foco: "Ver todos" limpa o isolamento', await page.locator('#rankChart polyline.rc-line.dim').count() === 0);
 
   // (7) hover: linha-guia + tooltip de standings + confronto (modo por jogo)
+  await page.locator('#rankChart').scrollIntoViewIfNeeded();  // o handler lê e.clientX real → chart precisa estar no viewport
   const hit = page.locator('#rankChart .rc-hit').first();
   const box = await hit.boundingBox();
-  await page.mouse.move(box.x + box.width * 0.55, box.y + box.height * 0.5);
+  // move em 2 passos (com steps) p/ garantir que o mousemove dispare em headless
+  await page.mouse.move(box.x + box.width * 0.3, box.y + box.height * 0.5);
+  await page.mouse.move(box.x + box.width * 0.55, box.y + box.height * 0.5, { steps: 8 });
   await page.waitForFunction(() => {
     const t = document.querySelector('#rankChart .rc-tip');
     return t && !t.hidden && t.querySelector('.rc-tip-r');

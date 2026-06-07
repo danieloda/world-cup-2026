@@ -37,7 +37,10 @@ try {
   await page.click('#submitBtn'); await page.waitForURL(/\/inicio(\.html)?$/, {timeout:15000});
   await page.goto(`${BASE}/palpites-grupos.html`);
   await page.waitForSelector('.admin-tabs', {timeout:15000});
-  await page.click('[data-tab="resultados"]');  // sub-aba default = Classificação (real)
+  await page.click('[data-tab="resultados"]');
+  // A classificação (group-card) só renderiza na visão "Por grupo" (groupBy='group');
+  // o default é "Por data" (lista de resultados, sem tabela). Trocar o view-toggle.
+  await page.click('.view-toggle button[data-view="group"]');
   await page.waitForSelector('.group-card .group-table', {timeout:15000});
   const order = await page.evaluate(() => {
     const card = [...document.querySelectorAll('.group-card')].find(c => (c.querySelector('.group-name')?.textContent||'').includes('A'));

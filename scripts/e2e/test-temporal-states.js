@@ -51,8 +51,11 @@ const check = (name, pass, detail = '') => {
 
 // roda SQL no Postgres local via stdin (sem inferno de quoting no Windows)
 function psql(sql) {
-  return execFileSync('docker', ['exec', '-i', CID, 'psql', '-U', 'postgres', '-d', 'postgres', '-v', 'ON_ERROR_STOP=1'],
-    { input: sql, encoding: 'utf8' });
+  // -q + client_min_messages=warning: silencia o flood de NOTICEs do recompute de
+  // qualifier (temp tables "already exists" × 70 usuários) que estourava o buffer.
+  // maxBuffer 64MB: rede de segurança p/ saídas grandes (era o default de 1MB → ENOBUFS).
+  return execFileSync('docker', ['exec', '-i', CID, 'psql', '-U', 'postgres', '-d', 'postgres', '-q', '-v', 'ON_ERROR_STOP=1'],
+    { input: 'set client_min_messages = warning;\n' + sql, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
 }
 
 const ALERT_TRIGGERS = [
@@ -199,11 +202,13 @@ async function main() {
     await page.goto(`${BASE}/palpites-grupos.html`);
     await page.waitForSelector('.admin-tabs', { timeout: 15000 });
     await page.click('[data-tab="resultados"]');
-    // A aba Resultados renderiza UM grupo por vez (chips A..L) — itera os 12.
-    await page.waitForSelector('.chip[data-group]', { timeout: 15000 });
+    // A classificação renderiza na visão "Por grupo" (default é "Por data"); o
+    // seletor de grupo virou .grp-dot (antes .chip). Trocar a visão e iterar os 12.
+    await page.click('.view-toggle button[data-view="group"]');
+    await page.waitForSelector('.grp-dot[data-group]', { timeout: 15000 });
     let groupCount = 0;
     for (const g of ['A','B','C','D','E','F','G','H','I','J','K','L']) {
-      await page.click(`.chip[data-group="${g}"]`);
+      await page.click(`.grp-dot[data-group="${g}"]`);
       const ok = await page.waitForFunction(
         (gg) => (document.querySelector('.group-card .group-name')?.textContent || '').includes(`Grupo ${gg}`)
                 && !!document.querySelector('.group-card .group-table tbody tr'),

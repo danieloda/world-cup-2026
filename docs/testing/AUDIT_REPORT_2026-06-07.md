@@ -23,9 +23,13 @@ bugs de produto — cada feature subjacente foi confirmada funcionando por outro
 | Suites verdes (núcleo crítico) | **18/18** |
 | Asserções automatizadas verdes | **~800+** |
 | Bugs de PRODUTO encontrados | **0** |
-| Achados test-side (testes frágeis) | **7** (ver §4) |
+| Achados test-side (testes frágeis) | **8 — todos CORRIGIDOS** (ver §4) |
 | Paridade prod ↔ repo | ✅ confirmada (migration 052; players=1247 idêntico) |
 | Gap de ambiente fechado | Local 039 → **052** (13 migrations) |
+
+> **Atualização (mesmo dia):** os 8 testes de UI frágeis foram **todos corrigidos e estão
+> verdes** (ver §4). Suíte inteira passa agora — incluindo o golden-path via o novo
+> `seed-harness-state.js` (estado do harness em ~30s, sem a UI lenta).
 
 ---
 
@@ -83,25 +87,36 @@ mesmo `players=1247`, mesmas settings críticas.
 
 ---
 
-## 4. Achados (todos TEST-SIDE — nenhum bug de produto)
+## 4. Achados (todos TEST-SIDE — nenhum bug de produto) — **CORRIGIDOS**
 
-> Cada item abaixo é um **teste frágil**, não um defeito do app. A feature correspondente
-> foi confirmada funcionando por outra suite verde (coluna "Confirmado por").
+> Cada item era um **teste frágil**, não um defeito do app. **Todos foram corrigidos
+> nesta rodada** e estão verdes. A causa-raiz e a correção estão abaixo.
 
-| # | Teste | Sintoma | Causa-raiz | Confirmado por |
+| # | Teste | Causa-raiz | Correção aplicada | Status |
 |---|---|---|---|---|
-| A1 | `tiebreak.sql`, `qualifier-bonus.sql` | `null user_id` ao rodar do zero | Exigem **profile admin** pré-existente (setup implícito) | Passam 12/12 e 11/11 após `00-setup-local.js` |
-| A2 | `test-odds.js` | timeout em `.match[data-match-id=1]` | Move o jogo p/ data **fora da view padrão** (agrupada por data) + busca badge `.odd` que **migrou pro raio-x** | Probe: barra 1X2 48/29/23% + radar renderizam das odds seedadas |
-| A3 | `test-temporal-states.js` (FASE B) | timeout em `.chip[data-group]` | Standings só renderizam com jogos **finalizados**; o setup da fase parcial não estabelece esse estado antes de navegar | `tiebreak.sql` prova standings/slots; `render-adversarial` 90/90 |
-| A4 | `test-ui-pages.js` | timeout em `.group-card .team-name[data-team]` | `#classificacao` → aba Resultados, vazia sem jogos finalizados | idem A3 |
-| A5 | `test-signup-flow.js` | timeout no submit do avatar (passo 6) | **Quirk de headless**: `setInputFiles` em input hidden não dispara `change` nativo (documentado no próprio teste). Passos 1-5 (signup→confirma→login→gate) passam | `test-avatar-upload.js` ✓ (upload real funciona) |
-| A6 | `test-historico-scorer/rank-chart/fifa-tie-dom/admin-ui-penalty` | timeouts em seletores | Desenhados p/ rodar **após o golden-path** (01→06) com os 10 usuários do harness; frágeis standalone num rebuild limpo | `rescore-on-edit` 7/7, `admin-validation` 5/5, `tiebreak` C1-C3, leaderboard 1129 |
-| A7 | `test-load-concurrency.js` (1ª execução) | só ~6/60 escritas | **A RLS funcionou**: `WITH CHECK points_earned IS NULL` bloqueia editar palpite já pontuado (anti-burla). Teste rodava no estado pós-playout | Corrigido (limpa o jogo-alvo no setup) → **60/60 ✓** |
+| A1 | `tiebreak.sql`, `qualifier-bonus.sql` | Exigem **profile admin** pré-existente | `bootstrap-local.sh` cria o admin antes (`00-setup-local.js`) | ✅ 12/12 · 11/11 |
+| A2 | `test-odds.js` | Movia o jogo p/ data fora da view + buscava badge `.odd` que **migrou pro raio-x** | Deep-link `#jogo-1` + lê a **barra 1X2 do Raio-X** (não o `.odd`) | ✅ verde |
+| A3 | `test-temporal-states.js` (FASE B) | Classificação só na visão **"Por grupo"** (default é "Por data"); chips viraram **`.grp-dot`**. + buffer do `execFileSync` estourava (flood de NOTICE) | Clica o view-toggle; usa `.grp-dot`; `psql` com `-q`/`maxBuffer` | ✅ 13/13 |
+| A4 | `test-ui-pages.js` | `#classificacao` não troca a dimensão; hover-tooltip do nome do time **foi removido** (migrou pro Raio-X) | Clica view-toggle; verifica a **aba "Forma" do Raio-X** | ✅ 15/15 |
+| A5 | `test-signup-flow.js` | `setInputFiles` em input hidden não dispara `change` antes do FileReader | Espera 800ms + dispatch de fallback (padrão do `test-avatar-upload`) | ✅ end-to-end |
+| A6 | `test-rank-chart.js` | Hover do chart flaky em headless (`e.clientX` real) | `scrollIntoView` + `mouse.move` em 2 passos (`steps`) | ✅ 18/18 |
+| A7 | `test-historico-scorer.js` | Login como usuário do **harness** (inexistente no rebuild) + popover de hover flaky | Roda sobre `seed-harness-state.js`; lê o `<template class="tip-src">` direto | ✅ 12/12 |
+| A8 | `test-admin-ui-penalty.js` | Sub-aba "Lançados" + `finished_at` ambíguo (final fora do cap 60) + JSON do oráculo divergente | `seed-harness-state` ordena `finished_at` por id + escreve `expected-tournament.json` | ✅ 10/10 |
+| — | `test-load-concurrency.js` (NOVO) | 1ª execução: RLS bloqueou (anti-burla `points_earned`) no estado pontuado | Limpa o jogo-alvo no setup (state-independent) | ✅ 60/60 |
 
-### Tema comum
-Vários testes de UI do harness assumem o **estado incremental** do ambiente do autor e que o
-**golden-path (01→06) rodou antes**. Num rebuild **limpo com paridade de prod** eles quebram em
-passos de espera de DOM. Não é regressão do app — é **manutenção de teste**. Recomendação em §6.
+### Causa-raiz comum & a solução estrutural
+A maioria dos testes de UI assumia o **estado incremental** do ambiente do autor ou que o
+**golden-path (01→06) rodou antes**. Dois tipos de correção:
+1. **Standalone** (odds, fifa-tie, temporal, ui-pages, signup, load): tornados robustos em
+   rebuild limpo — cada um estabelece seu próprio estado e usa os seletores atuais.
+2. **Golden-path** (historico-scorer, rank-chart, admin-ui-penalty): dependem dos usuários +
+   oráculo do harness (cenários como "artilheiro marca na final"). Em vez do golden-path
+   lento via UI (~15 min), o novo **`scripts/e2e/seed-harness-state.js`** monta esse estado
+   **via DB em ~30s** (10 usuários do harness + oráculo wc2026-e2e-v1 + playout + JSON).
+
+> **Lição (reforça [[tests-mask-prod-reality]]):** testes acoplados ao estado de um ambiente
+> específico mascaram a realidade num rebuild limpo. Agora há 2 caminhos claros — bootstrap
+> (estado sintético) e seed-harness-state (estado do golden-path) — e os testes declaram qual exigem.
 
 ---
 
@@ -115,19 +130,18 @@ passos de espera de DOM. Não é regressão do app — é **manutenção de test
 | Desempate FIFA + resolução de chaveamento | 🟢 Baixo | tiebreak 12/12 (pts>SG>GF>FIFA, cascata, idempotência) |
 | Bônus de classificado (BPE/BP) | 🟢 Baixo | qualifier 11/11 |
 | Concorrência no estouro de deadline (~70) | 🟢 Baixo | 60 concorrentes, p50≈109ms, 0 corrupção |
-| Cadastro de novos usuários | 🟢 Baixo | signup passos 1-5 + avatar (teste dedicado) ✓ |
-| Cobertura de UI por testes automáticos verdes | 🟡 Médio | núcleo coberto; harness de UI precisa de manutenção (§4/§6) |
+| Cadastro de novos usuários | 🟢 Baixo | signup E2E completo ✓ (signup→confirma→login→avatar→inicio) |
+| Cobertura de UI por testes automáticos verdes | 🟢 Baixo | **harness de UI 100% verde** após manutenção (§4); 5 standalone + 3 golden-path |
 | Entrega de alertas Telegram (edge) | ⚪ Não testado | depende de secrets; fora do escopo local |
 
 ---
 
 ## 6. Recomendações
 
-1. **Manutenção do harness de UI (prioridade alta p/ próximas rodadas):** tornar
-   `test-odds`, `test-temporal-states`, `test-ui-pages`, `test-fifa-tie-dom`,
-   `test-admin-ui-penalty`, `test-historico-scorer`, `test-rank-chart` **robustos em rebuild
-   limpo** — cada um deve estabelecer seu próprio estado (finalizar grupos quando precisar de
-   standings) e usar os seletores atuais (raio-x no lugar de `.odd`; stepper/dots além de `.chip`).
+1. **Manutenção do harness de UI — ✅ FEITO nesta rodada.** Os 8 testes frágeis foram
+   corrigidos e estão verdes (§4). Os de golden-path rodam sobre `seed-harness-state.js`.
+   Para as próximas rodadas: rodar os standalone após `bootstrap-local.sh` e os de golden-path
+   após `seed-harness-state.js` (ver TEST_PLAN §"Como rodar tudo").
 2. **Pré-requisito explícito de admin** nos cenários SQL: o runbook já cria via
    `00-setup-local.js`; o `bootstrap-local.sh` faz isso automaticamente. Manter.
 3. **CI:** hoje roda só unit + coverage. Considerar um job que suba Supabase local e rode os
