@@ -8,7 +8,7 @@ import {
   localDateKey, brParts,
 } from '../util.js';
 import { isRealTeam, resolveSlotToTeam, computeSlotResolution } from '../bracket.js';
-import { matchPoints, scoreBreakdown, stageMultiplier, scorerBonus } from '../scoring.js';
+import { matchPoints, scoreBreakdown, stageMultiplier, scorerBonus, championBonus } from '../scoring.js';
 import {
   renderRaioXModalButton, openRaioXModal, attachRaioXTabs,
 } from '../raiox.js';
@@ -54,9 +54,12 @@ let goalsByMatch = new Map();        // match_id -> [{player, goals}]
 let slotResolution = new Map();      // slot string -> { team, source } (real-first: resultado real ou palpite)
 let predSlotResolution = new Map();  // slot string -> { team, source } (apenas palpites do user)
 let qualifierBySide = new Map();     // "matchId:side" -> { kind:'bpe'|'bp', pts, pred, actual } (do cache SQL)
+let thirdSlotIndex = new Map();      // slot "3A/B/C/D/F" -> 1..8 (numera as vagas de melhor-3º)
+let scorerPickId = null;             // player_id do artilheiro escolhido (bônus por gol)
+let championPickTeam = null;         // time escolhido como campeão (bônus na final)
+let realChampion = null;             // campeão real (vencedor da final, quando jogada)
 let recentByTeam = new Map();        // team -> forma recente (Raio-X)
 let qualifiers = null;               // assets/data/qualifiers.json — campanha de eliminatórias (Raio-X)
-let activeTab = 'palpites';          // 'palpites' | 'resultados'
 let viewMode = 'date';               // 'bracket' | 'date' — layout: chave ou lista por data (padrão: por data)
 let activeDate = null;               // ISO yyyy-mm-dd quando viewMode === 'date'
 const saveTimers = new Map();        // match_id -> setTimeout handle
@@ -99,12 +102,14 @@ try {
 // Data
 // ============================================================
 async function loadData() {
-  const [statsRes, matchesRes, predsRes, goalsRes, qualRes] = await Promise.all([
+  const [statsRes, matchesRes, predsRes, goalsRes, qualRes, scorerRes, champRes] = await Promise.all([
     supabase.from('v_pool_stats').select('*').single(),
     supabase.from('matches').select('*').order('match_date'),
     supabase.from('predictions').select('*').eq('user_id', profile.id),
     supabase.from('player_goals').select('*, players(full_name, team)'),
     supabase.from('user_qualifier_points').select('breakdown').eq('user_id', profile.id).maybeSingle(),
+    supabase.from('top_scorer_picks').select('player_id, players(full_name)').eq('user_id', profile.id).maybeSingle(),
+    supabase.from('champion_picks').select('team').eq('user_id', profile.id).maybeSingle(),
   ]);
 
   if (matchesRes.error) throw matchesRes.error;
@@ -131,6 +136,30 @@ async function loadData() {
   for (const it of items) {
     qualifierBySide.set(`${it.match_id}:${it.side}`, it);
   }
+
+  // Artilheiro escolhido pelo usuário (p/ o bônus por gol dele em cada jogo).
+  scorerPickId = scorerRes.data?.player_id ?? null;
+
+  // Campeão: pick do usuário + campeão real (vencedor da final, quando finalizada).
+  championPickTeam = champRes.data?.team ?? null;
+  const finalM = matches.find(m => m.stage === 'final');
+  realChampion = (finalM && finalM.finished)
+    ? (finalM.actual_home > finalM.actual_away ? finalM.team_home
+       : finalM.actual_away > finalM.actual_home ? finalM.team_away
+       : finalM.pen_winner === 'home' ? finalM.team_home
+       : finalM.pen_winner === 'away' ? finalM.team_away : null)
+    : null;
+
+  // Numera as vagas de melhor-3º (1..8) por ordem de jogo, pra cada uma ser
+  // distinguível ("3º①", "3º②"…) em vez de todas mostrarem só "3º".
+  thirdSlotIndex = new Map();
+  let ti = 0;
+  const r32 = matches.filter(m => m.stage === 'r32').sort((a, b) => a.id - b.id);
+  for (const m of r32) {
+    for (const s of [m.slot_home, m.slot_away]) {
+      if (s && /^3[A-Z/]+$/.test(s) && !thirdSlotIndex.has(s)) thirdSlotIndex.set(s, ++ti);
+    }
+  }
 }
 
 // ============================================================
@@ -139,11 +168,12 @@ async function loadData() {
 // Resolve o time real de um lado do confronto (via palpites do user). null se
 // ainda é um slot não resolvido. Usado pelo Raio-X (só aparece com 2 times reais).
 function resolveSide(m, side) {
-  const slotOriginal = side === 'home' ? m.slot_home : m.slot_away;
   const realTeam = side === 'home' ? m.team_home : m.team_away;
+  if (isRealTeam(realTeam)) return realTeam;   // time real já saiu (upstream resolvido)
+  const slotOriginal = side === 'home' ? m.slot_home : m.slot_away;
   const slot = slotOriginal || realTeam;
   if (isRealTeam(slot)) return slot;
-  return predSlotResolution.get(slot)?.team ?? null;
+  return predSlotResolution.get(slot)?.team ?? null;  // senão, seu palpite de vaga
 }
 
 // Dados que alimentam o Raio-X (módulo ../raiox.js). No render do botão o H2H
@@ -177,22 +207,33 @@ async function openRaioXForMata(homeTeam, awayTeam) {
 // A resolução do bracket (slots → times) vive em ../bracket.js (puro, testável).
 // Aqui só passamos o estado de módulo e consumimos o Map resultante.
 
+const ORDINAIS = ['Primeiro','Segundo','Terceiro','Quarto','Quinto','Sexto','Sétimo','Oitavo','Nono','Décimo','Décimo-primeiro','Décimo-segundo'];
+
 function teamDisplay(slot) {
   if (isRealTeam(slot)) return teamPt(slot);
-  // Slot human-readable
-  // "1A" → "1º Grupo A", "2B" → "2º Grupo B"
-  // "3A/B/C/D/F" → "3º A/B/C/D/F"
-  // "W73" → "Vencedor M73", "L101" → "Perdedor M101"
+  // Slot human-readable (tooltip detalhado)
   if (/^\d[A-L]$/.test(slot)) return `${slot[0]}º Grupo ${slot[1]}`;
-  if (/^3[A-Z/]+$/.test(slot)) return `3º ${slot.slice(1)}`;
-  if (/^W\d+$/.test(slot)) return `Venc. M${slot.slice(1)}`;
-  if (/^L\d+$/.test(slot)) return `Perd. M${slot.slice(1)}`;
+  if (/^3[A-Z/]+$/.test(slot)) {
+    const i = thirdSlotIndex.get(slot);
+    const groups = slot.slice(1);
+    return i ? `3º (${ORDINAIS[i - 1] ?? i + 'º'} Colocado) · grupos ${groups}` : `3º ${groups}`;
+  }
+  if (/^W\d+$/.test(slot)) return `Vencedor da M${slot.slice(1)}`;
+  if (/^L\d+$/.test(slot)) return `Perdedor da M${slot.slice(1)}`;
   return slot;
 }
 
-function totalPotentialPoints() {
-  // Pontos máximos teóricos por jogo: o placar exato de cada fase.
-  return matches.reduce((sum, m) => sum + stageExact(m.stage), 0);
+// Rótulo curto da vaga pra sublinha do card ("vaga: …").
+function slotLineLabel(slot) {
+  if (!slot) return '';
+  if (/^\d[A-L]$/.test(slot)) return `${slot[0]}º Grupo ${slot[1]}`;
+  if (/^3[A-Z/]+$/.test(slot)) {
+    const i = thirdSlotIndex.get(slot);
+    return i ? `3º (${ORDINAIS[i - 1] ?? i + 'º'} Colocado)` : '3º melhor';
+  }
+  if (/^W\d+$/.test(slot)) return `Venc. M${slot.slice(1)}`;
+  if (/^L\d+$/.test(slot)) return `Perd. M${slot.slice(1)}`;
+  return slot;
 }
 
 // Acertou o placar exato deste jogo?
@@ -213,11 +254,10 @@ function datesFor() {
   return [...new Set(matches.map(dateKey))].sort();
 }
 
-function defaultDate(tab) {
+function defaultDate() {
   const ks = datesFor();
-  const pick = tab === 'resultados'
-    ? ks.find(k => matches.some(m => dateKey(m) === k && m.finished))
-    : ks.find(k => matches.some(m => dateKey(m) === k && !m.finished));
+  // Primeira data com jogo ainda a palpitar; senão a primeira data.
+  const pick = ks.find(k => matches.some(m => dateKey(m) === k && !m.finished));
   return pick ?? ks[0] ?? null;
 }
 
@@ -237,21 +277,25 @@ function renderViewToggle() {
 function buildDateMeta(byDate) {
   const stagesByDate = {};
   const deadlineByDate = {};
+  const finByDate = {};     // yyyy-mm-dd -> nº de jogos já encerrados
   for (const m of matches) {
     const dk = dateKey(m);
     (stagesByDate[dk] ??= new Set()).add(m.stage);
     const dl = predictionDeadline(m.match_date).getTime();
     deadlineByDate[dk] = Math.min(deadlineByDate[dk] ?? Infinity, dl);
+    if (m.finished) finByDate[dk] = (finByDate[dk] ?? 0) + 1;
   }
   const meta = {};
   for (const dk of datesFor()) {
     const labels = [...(stagesByDate[dk] ?? [])].map(s => STAGE_LABELS[s] ?? s);
+    const total = byDate[dk]?.total ?? 0;
     meta[dk] = {
       info: labels[0] ?? '',
       title: labels.join(' · '),
       done: byDate[dk]?.done ?? 0,
-      total: byDate[dk]?.total ?? 0,
+      total,
       deadline: deadlineByDate[dk],
+      played: total > 0 && (finByDate[dk] ?? 0) >= total,   // dia todo encerrado
     };
   }
   return meta;
@@ -282,7 +326,7 @@ function renderBracketView(colRenderer) {
 
 function renderDateView(counts, cardRenderer) {
   const ks = datesFor();
-  if (!ks.includes(activeDate)) activeDate = defaultDate(activeTab);
+  if (!ks.includes(activeDate)) activeDate = defaultDate();
 
   const dayMatches = activeDate
     ? matches.filter(m => dateKey(m) === activeDate).sort((a, b) => new Date(a.match_date) - new Date(b.match_date))
@@ -317,31 +361,32 @@ function renderPage() {
   return `
     <section class="hero">
       <div class="hero-kicker">Palpitar placares · Mata-mata</div>
-      <h1 class="hero-title">${activeTab === 'palpites' ? 'Seus palpites' : 'Resultados oficiais'}</h1>
+      <h1 class="hero-title">Mata-mata</h1>
       <div class="hero-meta">
         <b>${matches.length} jogos</b><span class="sep"></span>
-        Quanto mais perto da final, mais pontos<span class="sep"></span>
+        Seu palpite e o resultado oficial no mesmo lugar<span class="sep"></span>
         <b>${counts.totalDone}</b> palpitados
       </div>
     </section>
 
-    <div class="admin-tabs">
-      <button class="admin-tab ${activeTab === 'palpites' ? 'active' : ''}" data-tab="palpites">
-        Palpites <span class="ct">${counts.totalRemaining}</span>
-      </button>
-      <button class="admin-tab ${activeTab === 'resultados' ? 'active' : ''}" data-tab="resultados">
-        Resultados oficiais <span class="ct">${counts.totalFinished}</span>
-      </button>
-    </div>
+    ${renderNote()}
 
-    <div id="tabBody">
-      ${activeTab === 'palpites' ? renderPalpitesTab(counts) : renderResultadosTab(counts)}
-    </div>
+    <div id="tabBody">${renderBody(counts)}</div>
   `;
 }
 
+// Corpo que re-renderiza (KPIs + toggle de visão + lista de cards unificados).
+function renderBody(counts) {
+  return `
+    ${renderKpis(counts)}
+    ${renderViewToggle()}
+    ${viewMode === 'date'
+      ? renderDateView(counts, renderCard)
+      : renderBracketView(renderStageColumn)}
+  `;
+}
 
-function renderPalpitesTab(counts) {
+function renderNote() {
   return `
     <div class="note">
       <span class="note-head">Como funcionam os palpites do mata-mata</span>
@@ -352,47 +397,23 @@ function renderPalpitesTab(counts) {
         <li>⚽ Acha que vai dar empate? <strong>Escolha quem passa nos pênaltis</strong> (conta o placar do tempo normal).</li>
       </ul>
       <span class="note-deadline">⏰ Cada palpite fecha às 23h59 da véspera do jogo (um dia antes).
-        <span class="sub">As vagas viram seleções de verdade quando os grupos terminam.</span></span>
+        <span class="sub">Quando o jogo encerra, o card mostra seu palpite ao lado do resultado oficial.</span></span>
       <a class="note-link" href="regras.html">Ver todas as regras →</a>
     </div>
-
-    ${renderKpis(counts)}
-
-    ${renderViewToggle()}
-
-    ${viewMode === 'date'
-      ? renderDateView(counts, renderBracketMatch)
-      : renderBracketView(renderStageColumn)}
   `;
 }
 
-function renderResultadosTab(counts) {
-  return `
-    ${renderKpisResultados(counts)}
-
-    ${renderViewToggle()}
-
-    ${viewMode === 'date'
-      ? renderDateView(counts, renderResultBracketMatch)
-      : renderBracketView(renderResultStageColumn)}
-  `;
+// ============================================================
+// Card unificado — despacha pelo estado do jogo.
+//   encerrado → duas faixas (seu palpite | oficial) + pontos
+//   aberto    → faixa única editável (time real se já saiu, senão seu bracket)
+// ============================================================
+function renderCard(m) {
+  return m.finished ? renderFinishedCard(m) : renderOpenCard(m);
 }
 
-function renderResultStageColumn(stage, grouped) {
-  const list = grouped[stage.id] || [];
-  return `
-    <div class="bracket-col">
-      <h4>
-        ${escapeHtml(stage.label)}
-        ${stageHeaderBadges(stage.id)}
-        <span class="count">${list.length} jogo${list.length !== 1 ? 's' : ''}</span>
-      </h4>
-      ${list.map(renderResultBracketMatch).join('')}
-    </div>
-  `;
-}
-
-function renderResultBracketMatch(m) {
+// ---- ENCERRADO: duas faixas lado a lado (seu palpite × oficial) ----
+function renderFinishedCard(m) {
   const pred = predsByMatch.get(m.id);
   const pts = pred?.points_earned ?? 0;
 
@@ -403,112 +424,159 @@ function renderResultBracketMatch(m) {
   const isFinal = m.stage === 'final';
   const isThird = m.stage === 'third';
 
-  let resultClass = '';
-  if (m.finished && pred) {
-    if (isExactPred(m, pred)) resultClass = 'exact';
-    else if (pts > 0) resultClass = 'partial';
-    else resultClass = 'miss';
-  } else if (m.finished && !pred) {
-    resultClass = 'no-pred';
-  }
+  const qualPts = matchQualPts(m);          // bônus por acertar quem classificou
+  const scorerPts = matchScorerPts(m);       // bônus por gol do seu artilheiro
+  const champPts = matchChampionPts(m);      // bônus de campeão (só na final)
+  const totalPts = pts + qualPts + scorerPts + champPts;
+  const hasBonus = qualPts > 0 || scorerPts > 0 || champPts > 0;
+  // Ganhou ALGO neste jogo? (placar previsto OU bônus de classificado/artilheiro,
+  // que independem de ter palpitado o placar — vêm dos palpites de grupo/artilheiro).
+  const hasAny = !!pred || hasBonus;
 
-  const classes = ['bracket-match', 'result-mode'];
+  // Classificado/artilheiro já contam como acerto parcial, mesmo sem palpite de placar.
+  const resultClass = !pred
+    ? (hasBonus ? 'partial' : 'no-pred')
+    : isExactPred(m, pred) ? 'exact'
+    : (pts > 0 || hasBonus) ? 'partial' : 'miss';
+
+  const classes = ['bracket-match', 'km-finished', resultClass, 'finished'];
   if (isFinal) classes.push('final-match');
   if (isThird) classes.push('third-place');
-  if (resultClass) classes.push(resultClass);
-  if (m.finished) classes.push('finished');
 
-  const pointsBadge = m.finished && pred
-    ? renderPointsBadge(pts, stageExact(m.stage), resultClass)
-    : (m.finished && !pred ? '<div class="bm-pts no-pred">sem palpite</div>' : '');
-
-  // Quebra aditiva (lado / resultado / saldo) — só em jogo finalizado com palpite
-  const breakdown = (m.finished && pred) ? renderBmBreak(m, pred) : '';
+  const pointsBadge = hasAny
+    ? renderPointsBadge(totalPts, null, resultClass)
+    : '<div class="bm-pts no-pred">sem palpite</div>';
+  const breakdown = hasAny ? renderBmBreak(m, pred, qualPts, scorerPts, champPts) : '';
 
   return `
     <div class="${classes.join(' ')}" data-match-id="${m.id}">
       <div class="bm-id">
         <span class="bm-id-main">${stageTagFor(m)}${isThird ? '🥉 3º Lugar' : isFinal ? '🏆 Final' : `M${m.id}`}</span>
-        <span class="when">${dateLabel} · ${timeLabel}</span>
+        <span class="when">${dateLabel} · ${timeLabel} · <span class="km-tag-done">encerrado</span></span>
       </div>
 
-      ${renderResultTeamRow(m, 'home')}
-      ${renderResultTeamRow(m, 'away')}
+      <div class="km-lanes">
+        <div class="km-cap km-area-predcap">Seu palpite</div>
+        <div class="km-cap km-cap-off km-area-offcap">Resultado oficial</div>
+        ${renderFinRow(m, 'pred', 'home')}
+        ${renderFinRow(m, 'official', 'home')}
+        ${renderFinRow(m, 'pred', 'away')}
+        ${renderFinRow(m, 'official', 'away')}
+      </div>
+      ${m.pen_winner ? `<div class="km-pen">⚽ Pênaltis: ${m.pen_winner === 'home' ? teamPt(m.team_home) : teamPt(m.team_away)}</div>` : ''}
 
-      ${m.pen_winner ? `
-        <div class="bm-pen-result">
-          <span>⚽ Pênaltis:</span> ${m.pen_winner === 'home' ? teamPt(m.team_home) : teamPt(m.team_away)}
+      <div class="km-foot">
+        <div class="km-cap">Pontuação</div>
+        <div class="km-foot-row">
+          ${breakdown}
+          ${pointsBadge}
         </div>
-      ` : ''}
-
-      ${pred ? `
-        <div class="bm-pred-compare">
-          <span class="label">Seu palpite:</span>
-          <span class="score">${pred.pred_home} – ${pred.pred_away}</span>
-          ${pred.pred_pen_winner ? `<span class="pen">(pen: ${pred.pred_pen_winner === 'home' ? 'casa' : 'fora'})</span>` : ''}
-        </div>
-      ` : ''}
-
-      ${breakdown}
-      ${pointsBadge}
+      </div>
     </div>
   `;
 }
 
-// Quebra aditiva do palpite num card de resultado do bracket
-function renderBmBreak(m, pred) {
-  const { parts } = scoreBreakdown(
-    pred.pred_home, pred.pred_away, pred.pred_pen_winner,
-    m.actual_home, m.actual_away, m.pen_winner, m.stage,
-  );
-  if (parts.length === 0) return '';
-  return `<div class="bm-break">${parts.map(p =>
-    `<span class="brk ${p.key}">${p.label} <b>+${p.pts}</b></span>`).join('')}</div>`;
-}
-
-function renderResultTeamRow(m, side) {
-  const team = side === 'home' ? m.team_home : m.team_away;
+// Uma linha do card encerrado. lens='pred' (seu palpite) | 'official' (real); side='home'|'away'.
+// Recebe uma classe de área do grid (km-area-*) p/ alinhar home-com-home e away-com-away
+// entre as duas faixas mesmo quando um lado tem o selo "classificado".
+function renderFinRow(m, lens, side) {
+  const realTeam = side === 'home' ? m.team_home : m.team_away;
   const slotOriginal = side === 'home' ? m.slot_home : m.slot_away;
-  const score = side === 'home' ? m.actual_home : m.actual_away;
-  const isWinner = m.finished && (
-    (side === 'home' && (m.actual_home > m.actual_away || (m.actual_home === m.actual_away && m.pen_winner === 'home'))) ||
-    (side === 'away' && (m.actual_away > m.actual_home || (m.actual_home === m.actual_away && m.pen_winner === 'away')))
-  );
+  const slot = slotOriginal || realTeam;
+  const predTeam = isRealTeam(slot) ? slot : (predSlotResolution.get(slot)?.team ?? null);
+  const pred = predsByMatch.get(m.id);
+  const area = `km-area-${lens === 'official' ? 'off' : 'pred'}${side}`;
 
-  const slotBadge = slotOriginal ? `<span class="slot-badge" title="${escapeHtml(teamDisplay(slotOriginal))}">${escapeHtml(formatSlotShort(slotOriginal))}</span>` : '';
+  // Vaga de origem (ex.: "2A"). Mesmo spot nas duas faixas → casa palpite × oficial.
+  const slotLine = slotOriginal
+    ? `<span class="km-slot-line" title="${escapeHtml(teamDisplay(slotOriginal))}">vaga: ${escapeHtml(slotLineLabel(slotOriginal))}</span>`
+    : '';
 
-  return `
-    <div class="bm-team ${isWinner ? 'winner' : ''}">
-      <span class="flag">${flag(team)}</span>
-      <div class="nm">
-        <div class="team-line">
-          <span class="team-name" data-team="${escapeHtml(team)}">${escapeHtml(teamPt(team))}</span>
-          ${slotBadge}
+  if (lens === 'official') {
+    const score = side === 'home' ? m.actual_home : m.actual_away;
+    const isWinner =
+      (side === 'home' && (m.actual_home > m.actual_away || (m.actual_home === m.actual_away && m.pen_winner === 'home'))) ||
+      (side === 'away' && (m.actual_away > m.actual_home || (m.actual_home === m.actual_away && m.pen_winner === 'away')));
+    const qual = renderQualBadge(m.id, side);
+    return `
+      <div class="km-row km-off ${area} ${isWinner ? 'winner' : ''}">
+        <span class="flag">${flag(realTeam)}</span>
+        <div class="km-nm">
+          <span class="km-name" data-team="${escapeHtml(realTeam || '')}">${escapeHtml(teamPt(realTeam))}</span>
+          ${slotLine}
+          ${qual}
         </div>
-        ${renderQualBadge(m.id, side)}
+        <span class="km-score">${score}</span>
+      </div>`;
+  }
+
+  // lens === 'pred' — time que VOCÊ imaginava na vaga + seu placar
+  const pscore = pred ? (side === 'home' ? pred.pred_home : pred.pred_away) : null;
+  const diverged = predTeam && isRealTeam(realTeam) && predTeam !== realTeam;
+  return `
+    <div class="km-row km-pred ${area} ${diverged ? 'diverged' : ''}">
+      <span class="flag">${predTeam ? flag(predTeam) : ''}</span>
+      <div class="km-nm">
+        <span class="km-name">${predTeam ? escapeHtml(teamPt(predTeam)) : '—'}</span>
+        ${slotLine}
       </div>
-      <span class="result-score">${m.finished ? score : '–'}</span>
-    </div>
-  `;
+      <span class="km-score">${pscore ?? '–'}</span>
+    </div>`;
+}
+
+// Soma o bônus de classificado (BPE/BP) dos dois lados do confronto.
+function matchQualPts(m) {
+  let sum = 0;
+  for (const side of ['home', 'away']) {
+    const q = qualifierBySide.get(`${m.id}:${side}`);
+    if (q) sum += q.pts || 0;
+  }
+  return sum;
+}
+
+// Bônus de artilheiro NESTE jogo: gols do jogador escolhido × multiplicador da fase.
+function matchScorerPts(m) {
+  if (!scorerPickId) return 0;
+  const goal = (goalsByMatch.get(m.id) ?? []).find(g => g.player_id === scorerPickId);
+  const n = goal?.goals ?? 0;
+  return n > 0 ? scorerBonus(n, m.stage) : 0;
+}
+
+// Bônus de campeão: cai SÓ no jogo da final, quando você acertou o campeão.
+function matchChampionPts(m) {
+  if (m.stage !== 'final' || !championPickTeam || !realChampion) return 0;
+  return championPickTeam === realChampion ? championBonus(true) : 0;
+}
+
+// Quebra aditiva da pontuação: chips do placar (lado/resultado/saldo) + chips de
+// "Classificado +N" e "Artilheiro +N" quando houver esses bônus no jogo.
+function renderBmBreak(m, pred, qualPts = 0, scorerPts = 0, champPts = 0) {
+  const chips = [];
+  if (pred) {
+    const { parts } = scoreBreakdown(
+      pred.pred_home, pred.pred_away, pred.pred_pen_winner,
+      m.actual_home, m.actual_away, m.pen_winner, m.stage,
+    );
+    chips.push(...parts.map(p => `<span class="brk ${p.key}">${p.label} <b>+${p.pts}</b></span>`));
+  }
+  if (qualPts > 0) chips.push(`<span class="brk qual">Classificado <b>+${qualPts}</b></span>`);
+  if (scorerPts > 0) chips.push(`<span class="brk scorer">⚽ Artilheiro <b>+${scorerPts}</b></span>`);
+  if (champPts > 0) chips.push(`<span class="brk champ">🏆 Campeão <b>+${champPts}</b></span>`);
+  if (chips.length === 0) return '';
+  return `<div class="bm-break">${chips.join('')}</div>`;
 }
 
 // Selo de bônus de classificado (lê o breakdown gravado pelo SQL).
 function renderQualBadge(matchId, side) {
   const q = qualifierBySide.get(`${matchId}:${side}`);
   if (!q) return '';
+  // Selo qualitativo (marca o acerto da vaga). Os pontos vivem na seção Pontuação.
   if (q.kind === 'bpe') {
-    return `<span class="qual-badge bpe" title="Acertou a seleção classificada nesta vaga">✓ classificado +${q.pts}</span>`;
+    return `<span class="qual-badge bpe" title="Você acertou quem se classificou nesta vaga (+${q.pts} na pontuação)">✓ classificado</span>`;
   }
-  return `<span class="qual-badge bp" title="Time certo na fase, vaga errada">~ time certo, vaga errada +${q.pts}</span>`;
+  return `<span class="qual-badge bp" title="Time certo na fase, vaga errada (+${q.pts} na pontuação)">~ vaga errada</span>`;
 }
 
-function formatSlotShort(slot) {
-  if (!slot) return '';
-  if (/^\d[A-L]$/.test(slot)) return slot;
-  if (/^3[A-Z/]+$/.test(slot)) return '3º';
-  if (/^[WL]\d+$/.test(slot)) return slot;
-  return slot;
-}
 
 /**
  * Selo de pontos do jogo: "+N pts" e, quando há máximo, "de M".
@@ -527,37 +595,11 @@ function renderPointsBadge(pts, max, extraClass = '') {
   return `<div class="${cls}">${pts > 0 ? '+' : ''}${pts} pts</div>`;
 }
 
-function renderKpisResultados(counts) {
-  const total = counts.totalFinishedWithPred;
-  const avg = total > 0 ? (counts.totalPoints / total).toFixed(1) : '0';
-  return `
-    <div class="kpis">
-      <div class="kpi gold">
-        <div class="kpi-top"><span class="kpi-cap">${KPI.points}</span><span class="kpi-label">Pontos ganhos</span></div>
-        <div class="kpi-num">${counts.totalPoints}</div>
-        <div class="kpi-sub">média ${avg} pts/jogo</div>
-      </div>
-      <div class="kpi green">
-        <div class="kpi-top"><span class="kpi-cap">${KPI.exact}</span><span class="kpi-label">Placares exatos</span></div>
-        <div class="kpi-num">${counts.exactCount}</div>
-        <div class="kpi-sub">vale mais a cada fase</div>
-      </div>
-      <div class="kpi">
-        <div class="kpi-top"><span class="kpi-cap">${KPI.partial}</span><span class="kpi-label">Acertos parciais</span></div>
-        <div class="kpi-num">${counts.partialCount}</div>
-        <div class="kpi-sub">de ${total}</div>
-      </div>
-      <div class="kpi red">
-        <div class="kpi-top"><span class="kpi-cap">${KPI.miss}</span><span class="kpi-label">Erros</span></div>
-        <div class="kpi-num">${counts.missCount}</div>
-        <div class="kpi-sub">0 pts ganhos</div>
-      </div>
-    </div>
-  `;
-}
-
+// KPIs unificados: progresso de palpites + desempenho (pontos/exatos) num strip só.
 function renderKpis(counts) {
   const pct = matches.length ? Math.round(counts.totalDone / matches.length * 100) : 0;
+  const fin = counts.totalFinishedWithPred;
+  const avg = fin > 0 ? (counts.totalPoints / fin).toFixed(1) : '0';
   return `
     <div class="kpis">
       <div class="kpi green">
@@ -565,20 +607,20 @@ function renderKpis(counts) {
         <div class="kpi-num">${counts.totalDone}<small>/${matches.length}</small></div>
         <div class="progress-bar-inline"><span style="width:${pct}%"></span></div>
       </div>
+      <div class="kpi gold">
+        <div class="kpi-top"><span class="kpi-cap">${KPI.points}</span><span class="kpi-label">Pontos ganhos</span></div>
+        <div class="kpi-num">${counts.totalPoints}</div>
+        <div class="kpi-sub">${fin > 0 ? `média ${avg} pts/jogo` : 'aguardando jogos'}</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-top"><span class="kpi-cap">${KPI.exact}</span><span class="kpi-label">Placares exatos</span></div>
+        <div class="kpi-num">${counts.exactCount}</div>
+        <div class="kpi-sub">de ${fin} encerrado${fin !== 1 ? 's' : ''}</div>
+      </div>
       <div class="kpi red">
         <div class="kpi-top"><span class="kpi-cap">${KPI.pending}</span><span class="kpi-label">Faltando</span></div>
         <div class="kpi-num">${counts.totalRemaining}</div>
         <div class="kpi-sub">${counts.totalRemaining === 0 ? 'tudo pronto ✓' : 'jogos pendentes'}</div>
-      </div>
-      <div class="kpi">
-        <div class="kpi-top"><span class="kpi-cap">${KPI.locked}</span><span class="kpi-label">Travados</span></div>
-        <div class="kpi-num">${counts.totalLocked}</div>
-        <div class="kpi-sub">jogos já iniciados</div>
-      </div>
-      <div class="kpi gold">
-        <div class="kpi-top"><span class="kpi-cap">${KPI.points}</span><span class="kpi-label">Pontos máx</span></div>
-        <div class="kpi-num">${totalPotentialPoints()}</div>
-        <div class="kpi-sub">se acertar tudo exato</div>
       </div>
     </div>
   `;
@@ -607,12 +649,14 @@ function renderStageColumn(stage, grouped) {
         ${stageHeaderBadges(stage.id)}
         <span class="count">${list.length} jogo${list.length !== 1 ? 's' : ''}</span>
       </h4>
-      ${list.map(renderBracketMatch).join('')}
+      ${list.map(renderCard).join('')}
     </div>
   `;
 }
 
-function renderBracketMatch(m) {
+// ---- ABERTO: faixa única editável. Mostra o time REAL quando já saiu (oitavas
+// após os grupos), senão o time que VOCÊ previu na vaga; sinaliza divergência. ----
+function renderOpenCard(m) {
   const pred = predsByMatch.get(m.id);
   const locked = isLocked(m);
   const homeVal = pred?.pred_home ?? '';
@@ -633,10 +677,6 @@ function renderBracketMatch(m) {
   if (isFinal) classes.push('final-match');
   if (isThird) classes.push('third-place');
 
-  const pointsBadge = pred?.points_earned != null
-    ? renderPointsBadge(pred.points_earned, stageExact(m.stage))
-    : '';
-
   // Raio-X só quando os dois lados já são times reais (slots resolvidos).
   const raioxBtn = renderRaioXModalButton(m.id, resolveSide(m, 'home'), resolveSide(m, 'away'), raioxData());
 
@@ -648,23 +688,20 @@ function renderBracketMatch(m) {
       </div>
       <div class="bm-lock">${locked ? 'Bloqueado' : lockCountdownLabel(m.match_date)}</div>
 
-      ${renderTeamRow(m, 'home', homeVal, locked)}
-      ${renderTeamRow(m, 'away', awayVal, locked)}
+      ${renderOpenTeamRow(m, 'home', homeVal, locked)}
+      ${renderOpenTeamRow(m, 'away', awayVal, locked)}
 
       ${showPen ? renderPenToggle(m, penWinner) : ''}
 
-      ${pointsBadge}
       ${raioxBtn ? `<div class="bm-raiox">${raioxBtn}</div>` : ''}
     </div>
   `;
 }
 
 function renderPenToggle(m, penWinner) {
-  // Pega os times resolvidos pra mostrar bandeira + nome (usa palpites do user)
-  const homeSlot = m.slot_home || m.team_home;
-  const awaySlot = m.slot_away || m.team_away;
-  const homeTeam = isRealTeam(homeSlot) ? homeSlot : predSlotResolution.get(homeSlot)?.team;
-  const awayTeam = isRealTeam(awaySlot) ? awaySlot : predSlotResolution.get(awaySlot)?.team;
+  // Bandeira + nome dos lados: time real se já saiu, senão o seu palpite de vaga.
+  const homeTeam = resolveSide(m, 'home');
+  const awayTeam = resolveSide(m, 'away');
 
   const homeLabel = homeTeam ? teamPt(homeTeam) : 'Casa';
   const awayLabel = awayTeam ? teamPt(awayTeam) : 'Fora';
@@ -689,36 +726,46 @@ function renderPenToggle(m, penWinner) {
   `;
 }
 
-function renderTeamRow(m, side, val, locked) {
-  // Para a aba Palpites, usa SEMPRE o slot original (slot_home/slot_away) e resolve
-  // através do predSlotResolution (baseado APENAS nos palpites do user).
-  // Assim o time mostrado é quem o USUÁRIO previu que avançaria, não o time real.
+function renderOpenTeamRow(m, side, val, locked) {
   const slotOriginal = side === 'home' ? m.slot_home : m.slot_away;
   const realTeam = side === 'home' ? m.team_home : m.team_away;
+  const realKnown = isRealTeam(realTeam);
 
-  // Se tem slot_home/away, usa ele; senão, é grupo (sem slot) e usa team_home/away direto
+  // Time que VOCÊ previu nessa vaga (lente de palpite).
   const slot = slotOriginal || realTeam;
   const isReal = isRealTeam(slot);
   const resolved = !isReal ? predSlotResolution.get(slot) : null;
-  const team = isReal ? slot : (resolved?.team ?? null);
-  const showFlag = !!team;
-  const source = resolved?.source;
-  const isPredSource = source === 'pred-group' || source === 'pred-ko';
+  const predTeam = isReal ? slot : (resolved?.team ?? null);
 
-  const slotBadge = slotOriginal ? `<span class="slot-badge" title="${escapeHtml(teamDisplay(slotOriginal))}">${escapeHtml(formatSlotShort(slotOriginal))}</span>` : '';
+  // Mostra o time REAL quando já saiu; senão o seu palpite de vaga.
+  const shown = realKnown ? realTeam : predTeam;
+  const showFlag = !!shown;
+  const source = resolved?.source;
+  const isPredSource = !realKnown && (source === 'pred-group' || source === 'pred-ko');
+  const diverged = realKnown && predTeam && predTeam !== realTeam;
+
+  // Vaga de origem como sublinha (consistente com o card encerrado).
+  const slotLine = slotOriginal
+    ? `<div class="bm-slot-line" title="${escapeHtml(teamDisplay(slotOriginal))}">vaga: ${escapeHtml(slotLineLabel(slotOriginal))}</div>`
+    : '';
 
   let nameHtml;
-  if (team) {
+  if (shown) {
     const sourceBadge = isPredSource
       ? '<span class="pred-source" title="Baseado nos seus palpites">P</span>'
+      : '';
+    // Chip de divergência: você botou outro time nessa vaga.
+    const divChip = diverged
+      ? `<div class="bm-diverge" title="Quem você previu nesta vaga">na sua simulação: <span class="dv-flag">${flag(predTeam)}</span> ${escapeHtml(teamPt(predTeam))}</div>`
       : '';
     nameHtml = `
       <div class="nm">
         <div class="team-line">
-          <span class="team-name" data-team="${escapeHtml(team)}">${escapeHtml(teamPt(team))}</span>
-          ${slotBadge}
+          <span class="team-name" data-team="${escapeHtml(shown)}">${escapeHtml(teamPt(shown))}</span>
           ${sourceBadge}
         </div>
+        ${slotLine}
+        ${divChip}
       </div>`;
   } else {
     nameHtml = `<div class="nm slot">${escapeHtml(teamDisplay(slot))}</div>`;
@@ -726,11 +773,11 @@ function renderTeamRow(m, side, val, locked) {
 
   return `
     <div class="bm-team">
-      ${showFlag ? `<span class="flag">${flag(team)}</span>` : '<span></span>'}
+      ${showFlag ? `<span class="flag">${flag(shown)}</span>` : '<span></span>'}
       ${nameHtml}
       <input class="mini-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2"
              data-match="${m.id}" data-side="${side}"
-             aria-label="Gols ${escapeHtml(team ? teamPt(team) : teamDisplay(slot))}"
+             aria-label="Gols ${escapeHtml(shown ? teamPt(shown) : teamDisplay(slot))}"
              value="${val}" ${locked ? 'disabled' : ''}>
     </div>
   `;
@@ -817,24 +864,13 @@ function attachEventListeners() {
       return;
     }
 
-    const tabBtn = e.target.closest('.admin-tab[data-tab]');
-    if (tabBtn) {
-      const t = tabBtn.dataset.tab;
-      if (t !== activeTab) {
-        activeTab = t;
-        const pageBody = document.getElementById('pageBody');
-        if (pageBody) pageBody.innerHTML = renderPage();
-      }
-      return;
-    }
-
     // Toggle de visão: chave ⇄ por data
     const viewBtn = e.target.closest('.view-toggle button[data-view]');
     if (viewBtn) {
       const v = viewBtn.dataset.view;
       if (v !== viewMode) {
         viewMode = v;
-        if (viewMode === 'date' && !activeDate) activeDate = defaultDate(activeTab);
+        if (viewMode === 'date' && !activeDate) activeDate = defaultDate();
         rerenderTabBody();
       }
       return;
@@ -965,7 +1001,7 @@ function rerenderAllBracketRows() {
     const card = document.querySelector(`.bracket-match[data-match-id="${m.id}"]`);
     if (!card) continue;
     const wrapper = document.createElement('div');
-    wrapper.innerHTML = renderBracketMatch(m);
+    wrapper.innerHTML = renderCard(m);
     card.replaceWith(wrapper.firstElementChild);
   }
 
@@ -999,7 +1035,7 @@ function rerenderMatchAndKeepFocus(matchId) {
   }
 
   const wrapper = document.createElement('div');
-  wrapper.innerHTML = renderBracketMatch(m);
+  wrapper.innerHTML = renderOpenCard(m);
   const newCard = wrapper.firstElementChild;
   card.replaceWith(newCard);
 
@@ -1029,13 +1065,9 @@ function updateKpis() {
   }
 }
 
-// Re-renderiza só o corpo da aba (usado por toggle de visão e chips de data).
+// Re-renderiza só o corpo (usado por toggle de visão e chips de data).
 function rerenderTabBody() {
   const counts = computeCounts();
   const tabBody = document.getElementById('tabBody');
-  if (tabBody) {
-    tabBody.innerHTML = activeTab === 'palpites'
-      ? renderPalpitesTab(counts)
-      : renderResultadosTab(counts);
-  }
+  if (tabBody) tabBody.innerHTML = renderBody(counts);
 }

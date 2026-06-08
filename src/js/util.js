@@ -350,7 +350,8 @@ const CAL_STATUSES = [
   { id: 'urgent',  label: 'Bloqueia em <48h' },
   { id: 'soon',    label: 'Bloqueia em <1 semana' },
   { id: 'pending', label: 'Pendente' },
-  { id: 'locked',  label: 'Bloqueado' },
+  { id: 'locked',  label: 'Não palpitado' },
+  { id: 'past',    label: 'Encerrado' },
 ];
 
 function calDateKey(y, mo, d) {
@@ -377,22 +378,25 @@ export function todayKey() {
 
 /**
  * Estado de palpite de um dia, para a cor do calendário:
- *  'done'    = todos os jogos do dia já palpitados
+ *  'past'    = dia já encerrado/jogado (histórico) — neutro, não fica verde
+ *  'done'    = todos os jogos do dia já palpitados (e ainda por jogar)
  *  'urgent'  = pendente e o bloqueio é em <48h (muito perto)
  *  'soon'    = pendente e o bloqueio é em <1 semana (perto)
  *  'pending' = pendente, bloqueio ainda distante
- *  'locked'  = pendente mas o prazo já passou (não dá mais pra palpitar)
+ *  'locked'  = prazo passou sem palpitar tudo (perdeu a janela)
  * @param done      jogos palpitados no dia
  * @param total     jogos do dia
  * @param deadline  instante de bloqueio do dia (Date|ms) — opcional
+ * @param played    true se os jogos do dia já foram disputados (encerrados)
  */
-export function dayPredictionStatus(done, total, deadline) {
+export function dayPredictionStatus(done, total, deadline, played = false) {
+  const ms = deadline == null ? null : (deadline instanceof Date ? deadline.getTime() : +deadline);
+  const passed = played || (ms != null && ms - Date.now() <= 0);
+  // Dia que já passou/jogou: histórico. Verde só pra dias FUTUROS já palpitados.
+  if (passed) return (total && done >= total) ? 'past' : 'locked';
   if (!total || done >= total) return 'done';
-  if (deadline == null) return 'pending';
-  const ms = deadline instanceof Date ? deadline.getTime() : +deadline;
-  const diff = ms - Date.now();
-  if (diff <= 0) return 'locked';
-  const hours = diff / 3600000;
+  if (ms == null) return 'pending';
+  const hours = (ms - Date.now()) / 3600000;
   if (hours <= 48) return 'urgent';
   if (hours <= 168) return 'soon';
   return 'pending';
@@ -416,7 +420,7 @@ export function renderDateCalendar({ dates, meta = {}, activeDate } = {}) {
   const last = new Date(sorted[sorted.length - 1] + 'T12:00:00');
   const todayKeyStr = todayKey();
 
-  const statusOf = (m) => dayPredictionStatus(m.done ?? 0, m.total ?? 0, m.deadline);
+  const statusOf = (m) => dayPredictionStatus(m.done ?? 0, m.total ?? 0, m.deadline, m.played);
 
   // Quais estados aparecem de fato (para a legenda enxugar o que não há).
   const present = new Set(dates.map(k => statusOf(meta[k] || {})));

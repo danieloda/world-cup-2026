@@ -1459,6 +1459,9 @@ body.raiox-modal-open { overflow: hidden; }
 .cal-day.st-urgent  { --st: var(--red);      --st-bg: var(--red-dim);      --st-line: rgba(241, 94, 108, .35); }
 .cal-day.st-pending { --st: var(--text-mute); }
 .cal-day.st-locked  { --st: var(--text-mute); opacity: .6; }
+/* dia já encerrado/jogado (histórico) — neutro cinza-azulado, nunca verde */
+.cal-day.st-past    { --st: #8a93a6; --st-bg: rgba(138, 147, 166, .10); --st-line: rgba(138, 147, 166, .28); opacity: .82; }
+.cal-day.st-past .cal-ct { background: rgba(138, 147, 166, .16); color: #aab2c2; }
 .cal-day:hover {
   background: var(--card-hover);
   border-color: var(--line-strong);
@@ -3718,34 +3721,270 @@ input[type="number"].score-input {
 }
 
 /* ============================================================
-   Bracket-match em modo "resultados" (read-only com placar real)
+   Card ENCERRADO — duas faixas (Seu palpite × Resultado oficial)
+   Mobile: empilhado (seu em cima). Desktop largo: lado a lado.
    ============================================================ */
-.bracket-match.result-mode {
-  /* Sem inputs — usa grid mais simples pros times */
+.km-finished { /* herda .bracket-match (bg/padding/raio) */ }
+
+/* Tint da borda pela qualidade do palpite (mesma semântica de cor do app). */
+.km-finished.exact   { border-color: var(--accent);   background: rgba(244, 196, 48, 0.05); }
+.km-finished.partial { border-color: var(--positive);  background: rgba(29, 185, 84, 0.05); }
+.km-finished.miss    { border-color: var(--red);        background: rgba(241, 94, 108, 0.03); }
+.km-finished.no-pred { border-color: var(--line-strong); background: rgba(255, 255, 255, 0.02); }
+
+.km-tag-done {
+  color: var(--positive);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .06em;
 }
-.bracket-match.result-mode .bm-team {
-  grid-template-columns: 22px 1fr auto;
+
+/* Grid por ÁREAS: home alinha com home e away com away entre as faixas, mesmo
+   quando um lado tem o selo "classificado" (linhas do grid esticam à mais alta). */
+.km-lanes {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "predcap"
+    "predhome"
+    "predaway"
+    "offcap"
+    "offhome"
+    "offaway";
+  align-items: start;
 }
-.bracket-match.result-mode .bm-team .result-score {
-  font-size: 18px;
+.km-area-predcap  { grid-area: predcap; }
+.km-area-offcap   { grid-area: offcap; }
+.km-area-predhome { grid-area: predhome; }
+.km-area-offhome  { grid-area: offhome; }
+.km-area-predaway { grid-area: predaway; }
+.km-area-offaway  { grid-area: offaway; }
+/* divisor antes da faixa oficial quando empilhada (mobile) */
+.km-area-offcap { border-top: 1px dashed var(--line); padding-top: 6px; margin-top: 4px; }
+
+.km-cap {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  margin-bottom: 3px;
+}
+.km-cap-off { color: var(--accent); }
+
+.km-row {
+  display: grid;
+  grid-template-columns: 26px 1fr auto;
+  align-items: start;   /* topo → 1ª linha (bandeira/nome/placar) alinha entre faixas */
+  column-gap: 11px;
+  padding: 5px 0;
+  font-size: 13px;
+  font-weight: 600;
+  min-width: 0;
+}
+.km-row .flag, .km-row .km-score { padding-top: 1px; }
+/* bandeira em caixa fixa e centralizada → nunca encosta/sobrepõe o nome */
+.km-row .flag {
+  width: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  line-height: 1;
+  flex: none;
+}
+.km-row .flag .fi, .km-row .flag .fis { border-radius: 2px; }
+.km-nm { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 1px; }
+/* vaga de origem como sublinha discreta sob o nome ("vaga: 3º (Primeiro Colocado)") */
+.km-slot-line {
+  font-size: 10px;
+  line-height: 1.3;
+  font-weight: 600;
+  color: var(--text-mute);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+/* selo de classificado compacto (não estica a coluna toda) */
+.km-nm .qual-badge {
+  margin-top: 2px;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 1px 7px;
+  border-radius: 999px;
+  letter-spacing: .01em;
+}
+.km-row .km-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 700;
+  font-size: 14px;
+  min-width: 0;
+  max-width: 100%;
+}
+.km-row .km-score {
+  font-family: var(--font);
+  font-variant-numeric: tabular-nums;
   font-weight: 900;
-  color: var(--text);
-  min-width: 32px;
+  font-size: 18px;
+  min-width: 20px;
   text-align: center;
-  font-family: ui-monospace, monospace;
+  color: var(--text);
 }
-.bracket-match.result-mode .bm-team.winner .team-name { color: var(--accent); }
-.bracket-match.result-mode .bm-team.winner .result-score { color: var(--accent); }
+/* faixa oficial: vencedor em destaque */
+.km-row.km-off.winner .km-name,
+.km-row.km-off.winner .km-score { color: var(--accent); }
+/* faixa do palpite: time que você botou que NÃO chegou (divergência) */
+.km-row.diverged .km-name { color: var(--red); text-decoration: line-through; opacity: .8; }
+.km-row.diverged .flag { opacity: .55; }
+.km-row.km-pred .km-name { color: var(--text-dim); }
+.km-row.km-pred .km-score { color: var(--text-dim); }
 
-.bracket-match.result-mode.exact { border-color: var(--accent); background: rgba(244, 196, 48, 0.05); }    /* tint = borda (amarelo = exato) */
-.bracket-match.result-mode.partial { border-color: var(--positive); background: rgba(29, 185, 84, 0.05); }  /* tint = borda (verde = parcial) */
-.bracket-match.result-mode.miss { border-color: var(--red); background: rgba(241, 94, 108, 0.03); }
-.bracket-match.result-mode.no-pred { border-color: var(--line-strong); background: rgba(255, 255, 255, 0.02); }
-
-.bracket-match.result-mode.finished:not(.exact):not(.partial):not(.miss):not(.no-pred) {
-  /* finalizado mas sem palpite calculado */
-  border-color: var(--line-strong);
+.km-pen {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 4px;
 }
+.km-pen { font-weight: 600; }
+
+.km-foot {
+  border-top: 1px dashed var(--line);
+  margin-top: 6px;
+  padding-top: 6px;
+}
+.km-foot-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.km-foot .bm-pts { margin: 0; }
+.km-foot .bm-break { margin: 0; flex: 1; min-width: 0; }
+
+/* Desktop / cards largos (visão "Por data"): faixas lado a lado (2 colunas do grid).
+   home alinha com home e away com away porque dividem a mesma linha do grid. */
+@media (min-width: 560px) {
+  .bracket-date-list .km-lanes {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "predcap  offcap"
+      "predhome offhome"
+      "predaway offaway";
+    column-gap: 14px;
+  }
+  /* divisor vertical entre as faixas; remove o de cima (empilhado) */
+  .bracket-date-list .km-area-offcap,
+  .bracket-date-list .km-area-offhome,
+  .bracket-date-list .km-area-offaway {
+    border-top: 0;
+    margin-top: 0;
+    border-left: 1px dashed var(--line);
+    padding-left: 14px;
+  }
+}
+
+/* ============================================================
+   Card de RESULTADO de grupo (encerrado) — você × oficial em colunas.
+   ============================================================ */
+.gr-card {
+  background: var(--card);
+  border-radius: 10px;
+  padding: 11px 14px;
+  margin-bottom: 10px;
+  border: 1px solid transparent;
+  border-left: 3px solid var(--line-strong);
+}
+.gr-card.exact   { border-left-color: var(--accent);  background: rgba(244, 196, 48, 0.04); }
+.gr-card.partial { border-left-color: var(--positive); background: rgba(29, 185, 84, 0.04); }
+.gr-card.miss    { border-left-color: var(--red); }
+.gr-card.no-pred { border-left-color: var(--text-mute); }
+
+.gr-grid { margin: 4px 0 2px; }
+.gr-colhead, .gr-row {
+  display: grid;
+  grid-template-columns: 26px 1fr 46px 50px;
+  column-gap: 10px;
+  align-items: center;
+}
+.gr-colhead { padding-bottom: 2px; }
+.gr-colhead .gr-ch {
+  font-size: 9px; font-weight: 800; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--text-mute); text-align: center;
+}
+.gr-row { padding: 6px 0; }
+.gr-row + .gr-row { border-top: 1px solid var(--line); }
+.gr-row .flag { width: 26px; display: inline-flex; justify-content: center; font-size: 16px; line-height: 1; }
+.gr-row .flag .fi, .gr-row .flag .fis { border-radius: 2px; }
+.gr-name {
+  font-weight: 700; font-size: 14px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
+}
+.gr-pred {
+  text-align: center;
+  font-family: var(--font); font-variant-numeric: tabular-nums;
+  font-weight: 800; font-size: 16px; color: var(--text-dim);
+}
+.gr-pred.hit { color: var(--accent); }   /* cravou os gols deste time */
+.gr-score {
+  text-align: center;
+  font-family: var(--font); font-variant-numeric: tabular-nums;
+  font-weight: 900; font-size: 20px; color: var(--text);
+}
+.gr-row.winner .gr-name, .gr-row.winner .gr-score { color: var(--accent); }
+
+.gr-card .km-foot { border-top: 1px dashed var(--line); margin-top: 6px; padding-top: 6px; }
+.gr-goals {
+  margin-top: 8px; padding-top: 8px;
+  border-top: 1px dashed var(--line);
+  font-size: 12px; color: var(--text-dim);
+}
+.gr-goals-cap {
+  font-size: 10px; font-weight: 800; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--text-mute); margin-right: 8px;
+}
+.gr-scorer { margin-right: 10px; font-weight: 600; }
+.gr-scorer b { color: var(--accent); font-weight: 800; }
+.gr-goals-sep { color: var(--text-mute); margin-right: 10px; }
+
+/* Toggle de lente (Projeção ⇄ Oficial) acima da classificação do grupo. */
+.stand-toggle-row {
+  display: flex;
+  justify-content: center;
+  margin: 28px 0 4px;
+}
+
+/* Vaga de origem como sublinha no card ABERTO (consistente com o encerrado). */
+.bm-slot-line {
+  font-size: 10px;
+  line-height: 1.3;
+  font-weight: 600;
+  color: var(--text-mute);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  margin-top: 1px;
+}
+
+/* Chip de divergência no card ABERTO (oitavas): "no seu bracket: X".
+   Quebra em 2 linhas em vez de cortar o nome (não aumenta o card). */
+.bm-diverge {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 3px 5px;
+  font-size: 11px;
+  line-height: 1.4;
+  font-weight: 600;
+  color: var(--text-mute);
+  margin-top: 3px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.bm-diverge .dv-flag { font-size: 12px; flex-shrink: 0; }
 
 .bm-pen-result {
   font-size: 12px;
@@ -3877,6 +4116,25 @@ input[type="number"].score-input {
 }
 .bm-break .brk b { color: var(--positive); font-weight: 800; }
 .bm-break .brk.winner b { color: var(--accent); }
+/* chip de classificado na Pontuação — verde sutil pra distinguir do placar */
+.bm-break .brk.qual {
+  background: var(--positive-dim);
+  color: var(--positive);
+}
+.bm-break .brk.qual::before { content: "✓ "; }
+.bm-break .brk.qual b { color: var(--positive); }
+/* chip de artilheiro — dourado (cor de marca) */
+.bm-break .brk.scorer {
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+.bm-break .brk.scorer b { color: var(--accent); }
+/* chip de campeão — ouro de medalha (maior peso do bolão) */
+.bm-break .brk.champ {
+  background: rgba(255, 215, 0, .14);
+  color: var(--medal-gold, #ffd700);
+}
+.bm-break .brk.champ b { color: var(--medal-gold, #ffd700); }
 .bm-pts .formula {
   color: var(--text-mute);
   font-weight: 700;

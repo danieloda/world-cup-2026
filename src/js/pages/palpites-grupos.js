@@ -8,7 +8,7 @@ import {
   loadQualifiers, teamPt, groundShort, renderDateCalendar, predictionDeadline,
   localDateKey, oddsToProbs, brParts,
 } from '../util.js';
-import { matchPoints, scoreBreakdown } from '../scoring.js';
+import { matchPoints, scoreBreakdown, scorerBonus } from '../scoring.js';
 import {
   renderGroupCard, computeThirds, countThirdsComplete, renderThirdsTable,
 } from '../standings-view.js';
@@ -30,10 +30,11 @@ let h2hByMatch = new Map();          // match_id -> { fixtures: [...], summary: 
 let predictionsByMatch = new Map();  // match_id -> previsão normalizada (ver raiox.js / renderPredictionsBlock)
 let recentByTeam = new Map();        // team name -> [{ date, opponent, home, score, competition }] (forma recente)
 let qualifiers = null;               // assets/data/qualifiers.json — campanha de eliminatórias (Raio-X)
-let activeTab = 'palpites';          // 'palpites' | 'resultados'
-let activeGroup = 'all';             // 'all' | 'A'..'L' (ambas as abas operam sempre por grupo)
+let scorerPickId = null;             // player_id do artilheiro escolhido (bônus por gol)
+let activeGroup = 'all';             // 'all' | 'A'..'L'
 let groupBy = 'date';                // 'group' | 'date' — dimensão do filtro/agrupamento (padrão: por data)
 let activeDate = null;               // ISO yyyy-mm-dd quando groupBy === 'date'
+let standMode = 'sim';               // 'sim' (projeção dos palpites) | 'real' (oficial) — lente da classificação/3ºs
 const saveTimers = new Map();        // match_id -> setTimeout handle
 const GROUPS = ['A','B','C','D','E','F','G','H','I','J','K','L'];
 
@@ -104,7 +105,7 @@ try {
 // Data
 // ============================================================
 async function loadData() {
-  const [statsRes, matchesRes, predsRes, goalsRes, oddsRes, h2hRes, forecastRes] = await Promise.all([
+  const [statsRes, matchesRes, predsRes, goalsRes, oddsRes, h2hRes, forecastRes, scorerRes] = await Promise.all([
     supabase.from('v_pool_stats').select('*').single(),
     supabase.from('matches').select('*').eq('stage', 'group').order('match_date'),
     supabase.from('predictions').select('*').eq('user_id', profile.id),
@@ -112,6 +113,7 @@ async function loadData() {
     supabase.from('match_odds').select('match_id, odd_home, odd_draw, odd_away, bookmaker_name'),
     supabase.from('match_h2h').select('match_id, fixtures, summary, api_team_home'),
     supabase.from('match_predictions').select('match_id, payload'),
+    supabase.from('top_scorer_picks').select('player_id').eq('user_id', profile.id).maybeSingle(),
   ]);
 
   if (matchesRes.error) throw matchesRes.error;
@@ -132,6 +134,17 @@ async function loadData() {
     if (!goalsByMatch.has(g.match_id)) goalsByMatch.set(g.match_id, []);
     goalsByMatch.get(g.match_id).push(g);
   }
+
+  scorerPickId = scorerRes.data?.player_id ?? null;
+}
+
+// Bônus de artilheiro NESTE jogo: gols do jogador escolhido × multiplicador da fase
+// (na fase de grupos o multiplicador é 1, então = 2 × gols).
+function matchScorerPts(m) {
+  if (!scorerPickId) return 0;
+  const goal = (goalsByMatch.get(m.id) ?? []).find(g => g.player_id === scorerPickId);
+  const n = goal?.goals ?? 0;
+  return n > 0 ? scorerBonus(n, m.stage) : 0;
 }
 
 // ============================================================
@@ -142,53 +155,36 @@ function renderPage() {
   return `
     <section class="hero">
       <div class="hero-kicker">Palpitar placares · Fase de grupos</div>
-      <h1 class="hero-title">${heroTitle()}</h1>
+      <h1 class="hero-title">Fase de grupos</h1>
       <div class="hero-meta">
         <b>${matches.length} jogos</b><span class="sep"></span>
-        <b>${counts.totalDone}</b> palpitados<span class="sep"></span>
-        <b>${counts.totalFinished}</b> finalizados
+        Seu palpite e o resultado oficial no mesmo lugar<span class="sep"></span>
+        <b>${counts.totalDone}</b> palpitados
       </div>
     </section>
 
-    <div class="admin-tabs">
-      <button class="admin-tab ${activeTab === 'palpites' ? 'active' : ''}" data-tab="palpites">
-        Palpites <span class="ct">${counts.totalRemaining}</span>
-      </button>
-      <button class="admin-tab ${activeTab === 'resultados' ? 'active' : ''}" data-tab="resultados">
-        Resultados oficiais <span class="ct">${counts.totalFinished}</span>
-      </button>
-    </div>
-
-    <div id="tabBody">
-      ${renderActiveTab(counts)}
-    </div>
+    <div id="tabBody">${renderBody(counts)}</div>
   `;
 }
 
 // Deep-link via hash. Usado pelos redirects das antigas grupos.html / terceiros.html
-// e por URLs compartilháveis. Define activeTab antes do primeiro render.
+// e por URLs compartilháveis. Define grupo/lente antes do primeiro render.
 function applyHashRoute() {
   const h = (location.hash || '').replace('#', '');
-  switch (h) {
-    // Antigas sub-abas/páginas oficiais agora vivem todas na aba Resultados (por grupo).
-    case 'classificacao':
-    case 'terceiros':
-    case 'jogos':
-    case 'resultados':    activeTab = 'resultados'; break;
-    // 'simulacao' foi fundida na aba Palpites (projeção + 3ºs no hover)
-    case 'simulacao':     activeTab = 'palpites';   break;
-    // 'palpites' ou vazio → mantém o default (aba Palpites)
+  // Sub-páginas oficiais antigas → abre por grupo na lente oficial.
+  if (['classificacao', 'terceiros', 'jogos', 'resultados'].includes(h)) {
+    groupBy = 'group'; standMode = 'real';
   }
   // Deep-link pra um grupo específico (ex.: #grupo-A)
   const gm = /^grupo-([A-L])$/.exec(h);
-  if (gm) { activeTab = 'palpites'; groupBy = 'group'; activeGroup = gm[1]; }
+  if (gm) { groupBy = 'group'; activeGroup = gm[1]; }
 
   // Deep-link pra um JOGO específico (cards de "próximos jogos" do Início → #jogo-<id>):
-  // abre a aba Palpites no grupo do jogo; o focusHashMatch() depois rola até ele e pisca.
+  // abre o grupo do jogo; o focusHashMatch() depois rola até ele e pisca.
   const jm = /^jogo-(\d+)$/.exec(h);
   if (jm) {
     const mt = matches.find(x => x.id === Number(jm[1]));
-    if (mt && mt.group_name) { activeTab = 'palpites'; groupBy = 'group'; activeGroup = mt.group_name; }
+    if (mt && mt.group_name) { groupBy = 'group'; activeGroup = mt.group_name; }
   }
 }
 
@@ -205,23 +201,16 @@ function focusHashMatch() {
   setTimeout(() => el.classList.remove('flash'), 1600);
 }
 
-function heroTitle() {
-  return activeTab === 'resultados' ? 'Resultados oficiais' : 'Seus palpites';
-}
-
-function renderActiveTab(counts) {
-  return activeTab === 'resultados' ? renderResultadosTab(counts) : renderPalpitesTab(counts);
-}
-
 // ============================================================
-// TAB: PALPITES (jogos abertos para palpitar)
+// Corpo unificado: nota + KPIs + toggle de visão + navegação + lista de cards
+// (aberto=inputs / encerrado=resultado) + classificação/3ºs com toggle de lente.
 // ============================================================
-function renderPalpitesTab(counts) {
+function renderBody(counts) {
   // Garante uma seleção válida conforme a dimensão ativa.
   if (groupBy === 'date') {
-    if (!datesFor('palpites').includes(activeDate)) activeDate = defaultDate('palpites');
+    if (!allDates().includes(activeDate)) activeDate = defaultDate();
   } else if (!GROUPS.includes(activeGroup)) {
-    activeGroup = defaultPalpitesGroup();
+    activeGroup = defaultGroup();
   }
 
   return `
@@ -234,21 +223,21 @@ function renderPalpitesTab(counts) {
         <li>🎯 Cravou o placar exato? Soma tudo: <strong>${GP.exact} pontos</strong></li>
       </ul>
       <span class="note-deadline">⏰ Cada palpite fecha às 23h59 da véspera do jogo (um dia antes).
-        <span class="sub">Até lá, é só digitar o placar — salva sozinho e pode mudar quantas vezes quiser.</span></span>
+        <span class="sub">Quando o jogo encerra, o card mostra seu palpite ao lado do resultado oficial.</span></span>
       <a class="note-link" href="regras.html">Ver todas as regras →</a>
     </div>
 
-    ${renderKpisPalpites(counts)}
+    ${renderKpis(counts)}
 
     ${renderViewToggle()}
 
     <div class="palpites-toolbar">
       <div class="chips" id="chips">
         ${groupBy === 'date'
-          ? renderDatePicker(counts.openByDate, 'palpites')
-          : renderGroupNav(counts.openByGroup)}
+          ? renderDatePicker(counts.allByDate)
+          : renderGroupNav(counts.allByGroup)}
       </div>
-      ${groupBy === 'group' ? renderThirdsPop('sim') : ''}
+      ${groupBy === 'group' ? renderThirdsPop(standMode) : ''}
     </div>
 
     <div class="tooltip-hint raiox-hint">
@@ -256,17 +245,17 @@ function renderPalpitesTab(counts) {
     </div>
 
     <div id="matchesList">
-      ${renderPalpitesList()}
+      ${renderMatchesList()}
     </div>
 
-    <div id="palpitesGroupTable">
-      ${groupBy === 'group' ? renderGroupTable('sim') : ''}
+    <div id="groupTableWrap">
+      ${groupBy === 'group' ? renderGroupTableSection() : ''}
     </div>
   `;
 }
 
 // Primeiro grupo (A..L) com pelo menos 1 jogo em aberto; senão o primeiro grupo.
-function defaultPalpitesGroup() {
+function defaultGroup() {
   return GROUPS.find(g => matches.some(m => m.group_name === g && !m.finished)) || GROUPS[0];
 }
 
@@ -307,6 +296,20 @@ function renderThirdsPopBody(mode = 'sim') {
 
 // Tabela de classificação do grupo selecionado. mode 'sim' = projeção dos palpites;
 // 'real' = oficial. Compartilhada por Palpites e Resultados.
+// Seção da classificação com o toggle de lente (Projeção ⇄ Oficial).
+function renderGroupTableSection() {
+  if (!GROUPS.includes(activeGroup)) return '';
+  return `
+    <div class="stand-toggle-row">
+      <div class="view-toggle stand-toggle" role="tablist" aria-label="Lente da classificação">
+        <button class="${standMode === 'sim' ? 'active' : ''}" data-stand="sim" type="button">Projeção</button>
+        <button class="${standMode === 'real' ? 'active' : ''}" data-stand="real" type="button">Oficial</button>
+      </div>
+    </div>
+    ${renderGroupTable(standMode)}
+  `;
+}
+
 function renderGroupTable(mode = 'sim') {
   if (!GROUPS.includes(activeGroup)) return '';
   const gm = matches.filter(m => m.group_name === activeGroup);
@@ -331,54 +334,54 @@ function renderGroupTable(mode = 'sim') {
   `;
 }
 
-function renderKpisPalpites(counts) {
-  const open = counts.totalOpen;
-  const doneOpen = counts.totalDoneOpen;
-  const pctDone = open ? Math.round(doneOpen / open * 100) : 100;
+// KPIs unificados: progresso de palpites + desempenho (pontos/exatos) num strip só.
+function renderKpis(counts) {
+  const pct = matches.length ? Math.round(counts.totalDone / matches.length * 100) : 0;
+  const fin = counts.totalFinishedWithPred;
+  const avg = fin > 0 ? (counts.totalPoints / fin).toFixed(1) : '0';
   return `
     <div class="kpis">
       <div class="kpi green">
-        <div class="kpi-top"><span class="kpi-cap">${KPI.done}</span><span class="kpi-label">Palpitados (em aberto)</span></div>
-        <div class="kpi-num">${doneOpen}<small>/${open}</small></div>
-        <div class="progress-bar-inline"><span style="width:${pctDone}%"></span></div>
-      </div>
-      <div class="kpi red">
-        <div class="kpi-top"><span class="kpi-cap">${KPI.pending}</span><span class="kpi-label">Faltando</span></div>
-        <div class="kpi-num">${open - doneOpen}</div>
-        <div class="kpi-sub">${open - doneOpen === 0 ? 'tudo pronto ✓' : 'palpites pendentes'}</div>
-      </div>
-      <div class="kpi">
-        <div class="kpi-top"><span class="kpi-cap">${KPI.total}</span><span class="kpi-label">Total palpites</span></div>
+        <div class="kpi-top"><span class="kpi-cap">${KPI.done}</span><span class="kpi-label">Palpitados</span></div>
         <div class="kpi-num">${counts.totalDone}<small>/${matches.length}</small></div>
-        <div class="kpi-sub">inclui jogos travados</div>
+        <div class="progress-bar-inline"><span style="width:${pct}%"></span></div>
       </div>
       <div class="kpi gold">
         <div class="kpi-top"><span class="kpi-cap">${KPI.points}</span><span class="kpi-label">Pontos ganhos</span></div>
         <div class="kpi-num">${counts.totalPoints}</div>
-        <div class="kpi-sub">na fase de grupos</div>
+        <div class="kpi-sub">${fin > 0 ? `média ${avg} pts/jogo` : 'aguardando jogos'}</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-top"><span class="kpi-cap">${KPI.exact}</span><span class="kpi-label">Placares exatos</span></div>
+        <div class="kpi-num">${counts.exactCount}</div>
+        <div class="kpi-sub">de ${fin} encerrado${fin !== 1 ? 's' : ''}</div>
+      </div>
+      <div class="kpi red">
+        <div class="kpi-top"><span class="kpi-cap">${KPI.pending}</span><span class="kpi-label">Faltando</span></div>
+        <div class="kpi-num">${counts.totalRemaining}</div>
+        <div class="kpi-sub">${counts.totalRemaining === 0 ? 'tudo pronto ✓' : 'jogos pendentes'}</div>
       </div>
     </div>
   `;
 }
 
-function renderPalpitesList() {
-  // Apenas jogos NÃO finalizados (e dentro do filtro)
-  const open = matches.filter(m => !m.finished);
-  const filtered = groupBy === 'date'
-    ? (activeDate ? open.filter(m => dateKey(m) === activeDate) : open)
-    : (activeGroup === 'all' ? open : open.filter(m => m.group_name === activeGroup));
+// Lista unificada: TODOS os jogos do filtro (aberto=inputs / encerrado=resultado).
+function renderMatchesList() {
+  const inScope = groupBy === 'date'
+    ? (activeDate ? matches.filter(m => dateKey(m) === activeDate) : matches)
+    : (activeGroup === 'all' ? matches : matches.filter(m => m.group_name === activeGroup));
 
-  if (filtered.length === 0) {
+  if (inScope.length === 0) {
     return `
       <div class="empty">
         <div class="empty-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
-        <h3>Sem jogos abertos</h3>
-        <p>Os palpites abrem conforme as rodadas chegam. Enquanto isso, confira o que já rolou.</p>
-        <button class="btn btn-ghost" type="button" onclick="document.querySelector('[data-tab=resultados]')?.click()">Ver resultados oficiais →</button>
+        <h3>Sem jogos ${groupBy === 'date' ? 'nesta data' : `no Grupo ${activeGroup}`}</h3>
+        <p>Escolha outra ${groupBy === 'date' ? 'data' : 'opção'} acima.</p>
       </div>`;
   }
 
-  return renderGroupedByDate(filtered, renderPalpiteRow);
+  const sorted = [...inScope].sort((a, b) => new Date(a.match_date) - new Date(b.match_date));
+  return renderGroupedByDate(sorted, m => (m.finished ? renderResultRow(m) : renderPalpiteRow(m)));
 }
 
 function renderPalpiteRow(m) {
@@ -431,167 +434,91 @@ function renderPalpiteRow(m) {
   `;
 }
 
-// Primeiro grupo (A..L) com pelo menos 1 jogo finalizado; senão o primeiro grupo.
-function defaultJogosGroup() {
-  return GROUPS.find(g => matches.some(m => m.group_name === g && m.finished)) || GROUPS[0];
-}
-
-function renderKpisResultados(counts) {
-  const exact   = counts.exactCount;
-  const partial = counts.partialCount;
-  const miss    = counts.missCount;
-  const total = counts.totalFinishedWithPred;
-  const avg = total > 0 ? (counts.totalPoints / total).toFixed(1) : '0';
-
-  return `
-    <div class="kpis">
-      <div class="kpi gold">
-        <div class="kpi-top"><span class="kpi-cap">${KPI.points}</span><span class="kpi-label">Pontos ganhos</span></div>
-        <div class="kpi-num">${counts.totalPoints}</div>
-        <div class="kpi-sub">média ${avg} pts/jogo</div>
-      </div>
-      <div class="kpi green">
-        <div class="kpi-top"><span class="kpi-cap">${KPI.exact}</span><span class="kpi-label">Placares exatos</span></div>
-        <div class="kpi-num">${exact}</div>
-        <div class="kpi-sub">vale ${GP.exact} pts cada</div>
-      </div>
-      <div class="kpi">
-        <div class="kpi-top"><span class="kpi-cap">${KPI.partial}</span><span class="kpi-label">Acertos parciais</span></div>
-        <div class="kpi-num">${partial}</div>
-        <div class="kpi-sub">vencedor/saldo/gols</div>
-      </div>
-      <div class="kpi red">
-        <div class="kpi-top"><span class="kpi-cap">${KPI.miss}</span><span class="kpi-label">Erros</span></div>
-        <div class="kpi-num">${miss}</div>
-        <div class="kpi-sub">de ${total} palpites</div>
-      </div>
-    </div>
-  `;
-}
-
-function renderResultadosList() {
-  const filtered = groupBy === 'date'
-    ? matches.filter(m => m.finished && activeDate && dateKey(m) === activeDate)
-    : matches.filter(m => m.finished && m.group_name === activeGroup);
-
-  if (filtered.length === 0) {
-    const what = groupBy === 'date' ? 'nesta data' : `no Grupo ${activeGroup}`;
-    return `
-      <div class="empty">
-        <div class="empty-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 20v-6M12 20V8M18 20V4M3 20h18"/></svg></div>
-        <h3>Nenhum resultado ${what} ainda</h3>
-        <p>Os resultados aparecem aqui conforme o admin lança os placares dos jogos.</p>
-        <a class="btn btn-ghost" href="palpites-grupos.html" onclick="document.querySelector('[data-tab=palpites]').click(); return false;">Ver palpites pendentes →</a>
-      </div>
-    `;
-  }
-
-  // Mais recentes primeiro
-  const sorted = [...filtered].sort((a, b) => new Date(b.match_date) - new Date(a.match_date));
-  return renderGroupedByDate(sorted, renderResultRow, /* descDate */ true);
-}
-
+// Card de RESULTADO de grupo (encerrado). Comparação você × oficial em colunas
+// alinhadas + Pontuação — mesma linguagem visual do card de mata-mata.
 function renderResultRow(m) {
   const pred = predsByMatch.get(m.id);
-  const pts = pred?.points_earned;
+  const placarPts = pred?.points_earned ?? 0;
+  const scorerPts = matchScorerPts(m);            // bônus por gol do seu artilheiro
+  const pts = placarPts + scorerPts;               // total do jogo
   const isExact = pred && pred.pred_home === m.actual_home && pred.pred_away === m.actual_away;
-  const cardClass = isExact ? 'exact' : pts > 0 ? 'partial' : pred ? 'miss' : 'no-pred';
-  const ptsLabel = isExact ? 'Exato!' : pts > 0 ? 'Parcial' : (pred ? 'Errou' : 'Sem palpite');
+  const resultClass = !pred && scorerPts === 0 ? 'no-pred'
+    : isExact ? 'exact'
+    : (placarPts > 0 || scorerPts > 0) ? 'partial' : 'miss';
 
-  // Quebra aditiva do seu palpite (só quando há palpite)
-  let breakRow = '';
+  // Quebra aditiva do palpite (lado / resultado / saldo) + chip de artilheiro.
+  const chipList = [];
   if (pred) {
     const { parts } = scoreBreakdown(
       pred.pred_home, pred.pred_away, pred.pred_pen_winner,
       m.actual_home, m.actual_away, m.pen_winner, m.stage,
     );
-    breakRow = `<div class="result-card-break">${
-      parts.length > 0
-        ? parts.map(p => `<span class="brk ${p.key}">${p.label} <b>+${p.pts}</b></span>`).join('')
-        : '<span class="brk miss">não pontuou</span>'
-    }</div>`;
+    chipList.push(...(parts.length > 0
+      ? parts.map(p => `<span class="brk ${p.key}">${p.label} <b>+${p.pts}</b></span>`)
+      : ['<span class="brk miss">não pontuou</span>']));
   }
+  if (scorerPts > 0) chipList.push(`<span class="brk scorer">⚽ Artilheiro <b>+${scorerPts}</b></span>`);
+  const chips = chipList.join('');
+
+  const pointsBadge = (pred || scorerPts > 0)
+    ? `<div class="bm-pts ${resultClass}">${pts > 0 ? '+' : ''}${pts} pts</div>`
+    : '<div class="bm-pts no-pred">sem palpite</div>';
 
   const goals = goalsByMatch.get(m.id) ?? [];
   const homeGoals = goals.filter(g => g.players.team === m.team_home);
   const awayGoals = goals.filter(g => g.players.team === m.team_away);
+  const goalsHtml = goals.length > 0
+    ? `<div class="gr-goals">
+         <span class="gr-goals-cap">⚽ Gols</span>
+         ${homeGoals.map(g => `<span class="gr-scorer">${escapeHtml(g.players.full_name)} <b>${g.goals}'</b></span>`).join('')}
+         ${homeGoals.length && awayGoals.length ? '<span class="gr-goals-sep">·</span>' : ''}
+         ${awayGoals.map(g => `<span class="gr-scorer">${escapeHtml(g.players.full_name)} <b>${g.goals}'</b></span>`).join('')}
+       </div>`
+    : '';
+
+  const dateLabel = `${formatBrDateShort(new Date(m.match_date))} · ${formatTime(m.match_date)}`;
 
   return `
-    <div class="result-card ${cardClass}">
-      <div class="result-card-head">
-        <div class="result-card-team">
-          <span class="flag">${flag(m.team_home)}</span>
-          <span class="team-name" data-team="${escapeHtml(m.team_home)}">${escapeHtml(teamPt(m.team_home))}</span>
-        </div>
-        <div class="result-card-score">${m.actual_home} — ${m.actual_away}</div>
-        <div class="result-card-team right">
-          <span class="team-name" data-team="${escapeHtml(m.team_away)}">${escapeHtml(teamPt(m.team_away))}</span>
-          <span class="flag">${flag(m.team_away)}</span>
+    <div class="gr-card ${resultClass}" data-match-id="${m.id}">
+      <div class="bm-id">
+        <span class="bm-id-main">Grupo ${m.group_name}</span>
+        <span class="when">${dateLabel} · <span class="km-tag-done">encerrado</span></span>
+      </div>
+
+      <div class="gr-grid">
+        <div class="gr-colhead"><span></span><span></span><span class="gr-ch">você</span><span class="gr-ch">oficial</span></div>
+        ${grTeamRow(m, 'home', pred)}
+        ${grTeamRow(m, 'away', pred)}
+      </div>
+
+      <div class="km-foot">
+        <div class="km-cap">Pontuação</div>
+        <div class="km-foot-row">
+          ${chips ? `<div class="bm-break">${chips}</div>` : '<span></span>'}
+          ${pointsBadge}
         </div>
       </div>
 
-      <div class="result-card-bottom">
-        <div class="result-card-info">
-          ${pred
-            ? `<span>Seu palpite:</span> <span class="pred-score">${pred.pred_home} – ${pred.pred_away}</span>`
-            : `<span style="color:var(--text-mute); font-style:italic;">Sem palpite</span>`}
-        </div>
-        <div class="result-card-points">
-          <span class="num">${pts != null ? (pts > 0 ? '+' + pts : pts) : '—'}</span>
-          <span class="label">${ptsLabel}</span>
-        </div>
-        <div class="result-card-meta">
-          ${formatBrDateShort(new Date(m.match_date))} · ${formatTime(m.match_date)}
-          <br><span class="stage">Grupo ${m.group_name}</span>
-        </div>
-      </div>
-
-      ${breakRow}
-
-      ${goals.length > 0 ? `
-        <div class="result-card-scorers">
-          <span class="label">⚽ Gols:</span>
-          ${homeGoals.map(g => `<span class="scorer">${escapeHtml(g.players.full_name)} <span class="num">${g.goals}'</span></span>`).join('')}
-          ${homeGoals.length && awayGoals.length ? '<span style="color:var(--text-mute); margin: 0 4px;">·</span>' : ''}
-          ${awayGoals.map(g => `<span class="scorer">${escapeHtml(g.players.full_name)} <span class="num">${g.goals}'</span></span>`).join('')}
-        </div>
-      ` : ''}
+      ${goalsHtml}
     </div>
   `;
 }
 
-// ============================================================
-// TAB: RESULTADOS (oficial) — espelha a aba Palpites, por grupo:
-// resultados do grupo → classificação oficial do grupo no fim → 3ºs no hover.
-// ============================================================
-function renderResultadosTab(counts) {
-  // Garante seleção válida conforme a dimensão ativa.
-  if (groupBy === 'date') {
-    if (!datesFor('resultados').includes(activeDate)) activeDate = defaultDate('resultados');
-  } else if (!GROUPS.includes(activeGroup)) {
-    activeGroup = defaultJogosGroup();
-  }
-
+// Uma linha do card de resultado: bandeira · nome · seu palpite · placar oficial.
+function grTeamRow(m, side, pred) {
+  const team = side === 'home' ? m.team_home : m.team_away;
+  const actual = side === 'home' ? m.actual_home : m.actual_away;
+  const ps = pred ? (side === 'home' ? pred.pred_home : pred.pred_away) : null;
+  const isWinner =
+    (side === 'home' && (m.actual_home > m.actual_away)) ||
+    (side === 'away' && (m.actual_away > m.actual_home));
+  const hit = ps != null && ps === actual;   // cravou os gols deste time
   return `
-    ${renderKpisResultados(counts)}
-
-    ${renderViewToggle()}
-
-    <div class="palpites-toolbar">
-      <div class="chips" id="chips">
-        ${groupBy === 'date'
-          ? renderDatePicker(counts.finishedByDate, 'resultados')
-          : renderGroupNav(counts.finishedByGroup)}
-      </div>
-      ${groupBy === 'group' ? renderThirdsPop('real') : ''}
-    </div>
-
-    <div id="matchesList">
-      ${renderResultadosList()}
-    </div>
-
-    <div id="resultadosGroupTable">
-      ${groupBy === 'group' ? renderGroupTable('real') : ''}
+    <div class="gr-row ${isWinner ? 'winner' : ''}">
+      <span class="flag">${flag(team)}</span>
+      <span class="gr-name" data-team="${escapeHtml(team)}">${escapeHtml(teamPt(team))}</span>
+      <span class="gr-pred ${hit ? 'hit' : ''}">${ps ?? '–'}</span>
+      <span class="gr-score">${actual}</span>
     </div>
   `;
 }
@@ -603,19 +530,15 @@ function dateKey(m) {
   return localDateKey(m.match_date);
 }
 
-// Datas distintas (yyyy-mm-dd) relevantes para a aba: abertas (palpites) ou
-// finalizadas (resultados). Resultados vêm com a data mais recente primeiro.
-function datesFor(tab) {
-  const rel = tab === 'resultados'
-    ? matches.filter(m => m.finished)
-    : matches.filter(m => !m.finished);
-  const keys = [...new Set(rel.map(dateKey))].sort();
-  if (tab === 'resultados') keys.reverse();
-  return keys;
+// Todas as datas distintas (yyyy-mm-dd) dos jogos, em ordem cronológica.
+function allDates() {
+  return [...new Set(matches.map(dateKey))].sort();
 }
 
-function defaultDate(tab) {
-  return datesFor(tab)[0] ?? null;
+// Data padrão: primeira com jogo ainda a palpitar; senão a primeira.
+function defaultDate() {
+  const ks = allDates();
+  return ks.find(k => matches.some(m => dateKey(m) === k && !m.finished)) ?? ks[0] ?? null;
 }
 
 function renderViewToggle() {
@@ -634,30 +557,34 @@ function renderViewToggle() {
 function buildDateMeta(byDate) {
   const groupsByDate = {};
   const deadlineByDate = {};
+  const finByDate = {};     // yyyy-mm-dd -> nº de jogos já encerrados
   for (const m of matches) {
     const dk = dateKey(m);
     (groupsByDate[dk] ??= new Set()).add(m.group_name);
     const dl = predictionDeadline(m.match_date).getTime();
     deadlineByDate[dk] = Math.min(deadlineByDate[dk] ?? Infinity, dl);
+    if (m.finished) finByDate[dk] = (finByDate[dk] ?? 0) + 1;
   }
   const meta = {};
   for (const dk of Object.keys(byDate)) {
     const gs = [...(groupsByDate[dk] ?? [])].filter(Boolean).sort();
+    const total = byDate[dk]?.total ?? 0;
     meta[dk] = {
       info: gs.length ? gs.join(' ') : '',
       title: gs.length ? `Grupo${gs.length > 1 ? 's' : ''} ${gs.join(', ')}` : '',
       done: byDate[dk]?.done ?? 0,
-      total: byDate[dk]?.total ?? 0,
+      total,
       deadline: deadlineByDate[dk],
+      played: total > 0 && (finByDate[dk] ?? 0) >= total,   // dia todo encerrado
     };
   }
   return meta;
 }
 
-// Calendário de datas para a aba ('palpites' | 'resultados').
-function renderDatePicker(byDate, tab) {
+// Calendário de datas (todas as datas; meta com palpitados/total por dia).
+function renderDatePicker(byDate) {
   return renderDateCalendar({
-    dates: datesFor(tab),
+    dates: allDates(),
     meta: buildDateMeta(byDate),
     activeDate,
   });
@@ -683,19 +610,6 @@ function renderGroupedByDate(list, rowRenderer, descDate = false) {
       ${l.map(rowRenderer).join('')}
     `;
   }).join('');
-}
-
-function renderChip(value, label, done, total) {
-  const isActive = activeGroup === value;
-  const complete = total > 0 && done === total;
-  const cls = ['chip'];
-  if (isActive) cls.push('active');
-  if (complete) cls.push('complete');
-  return `
-    <button class="${cls.join(' ')}" data-group="${value}">
-      ${escapeHtml(label)} <span class="ct">${done}/${total}</span>
-    </button>
-  `;
 }
 
 // Navegação de grupos: stepper (‹ Grupo X ›) centralizado + 12 bolinhas de
@@ -725,16 +639,13 @@ function renderGroupNav(byGroup) {
 }
 
 function computeCounts() {
-  const openByGroup = { all: { done: 0, total: 0 } };
-  const finishedByGroup = { all: { done: 0, total: 0 } };
-  for (const g of GROUPS) {
-    openByGroup[g] = { done: 0, total: 0 };
-    finishedByGroup[g] = { done: 0, total: 0 };
-  }
-  const openByDate = {};       // yyyy-mm-dd -> { done, total }
-  const finishedByDate = {};
+  // Contadores por grupo/data agora abrangem TODOS os jogos (palpitados/total),
+  // já que a lista é unificada (abertos + encerrados no mesmo fluxo).
+  const allByGroup = { all: { done: 0, total: 0 } };
+  for (const g of GROUPS) allByGroup[g] = { done: 0, total: 0 };
+  const allByDate = {};        // yyyy-mm-dd -> { done, total }
 
-  let totalDone = 0, totalDoneOpen = 0, totalOpen = 0, totalFinished = 0;
+  let totalDone = 0, totalFinished = 0;
   let totalPoints = 0, exactCount = 0, partialCount = 0, missCount = 0, totalFinishedWithPred = 0;
 
   for (const m of matches) {
@@ -745,40 +656,30 @@ function computeCounts() {
 
     if (hasPred) totalDone++;
     if (m.finished) totalFinished++;
-    else totalOpen++;
 
-    if (!m.finished) {
-      openByGroup.all.total++;
-      if (g) openByGroup[g].total++;
-      (openByDate[dk] ??= { done: 0, total: 0 }).total++;
-      if (hasPred) {
-        totalDoneOpen++;
-        openByGroup.all.done++;
-        if (g) openByGroup[g].done++;
-        openByDate[dk].done++;
-      }
-    } else {
-      finishedByGroup.all.total++;
-      if (g) finishedByGroup[g].total++;
-      (finishedByDate[dk] ??= { done: 0, total: 0 }).total++;
-      if (hasPred) {
-        finishedByGroup.all.done++;
-        if (g) finishedByGroup[g].done++;
-        finishedByDate[dk].done++;
-        totalFinishedWithPred++;
-        const pts = p.points_earned ?? 0;
-        totalPoints += pts;
-        if (p.pred_home === m.actual_home && p.pred_away === m.actual_away) exactCount++;
-        else if (pts > 0) partialCount++;
-        else missCount++;
-      }
+    allByGroup.all.total++;
+    if (g) allByGroup[g].total++;
+    (allByDate[dk] ??= { done: 0, total: 0 }).total++;
+    if (hasPred) {
+      allByGroup.all.done++;
+      if (g) allByGroup[g].done++;
+      allByDate[dk].done++;
+    }
+
+    if (m.finished && hasPred) {
+      totalFinishedWithPred++;
+      const pts = p.points_earned ?? 0;
+      totalPoints += pts;
+      if (p.pred_home === m.actual_home && p.pred_away === m.actual_away) exactCount++;
+      else if (pts > 0) partialCount++;
+      else missCount++;
     }
   }
 
   return {
-    openByGroup, finishedByGroup, openByDate, finishedByDate,
+    allByGroup, allByDate,
     totalDone, totalRemaining: matches.length - totalDone,
-    totalDoneOpen, totalOpen, totalFinished, totalFinishedWithPred,
+    totalFinished, totalFinishedWithPred,
     totalPoints, exactCount, partialCount, missCount,
   };
 }
@@ -787,30 +688,32 @@ function computeCounts() {
 // Eventos
 // ============================================================
 function attachEventListeners() {
-  // Tab switching (abas + botões que apontam para uma aba, ex. empty-state)
   document.addEventListener('click', (e) => {
-    const tabBtn = e.target.closest('[data-tab]');
-    if (tabBtn) {
-      const t = tabBtn.dataset.tab;
-      if (t !== activeTab) {
-        activeTab = t;
-        // Cada aba abre numa seleção válida da dimensão ativa.
-        if (groupBy === 'date') activeDate = defaultDate(t);
-        else activeGroup = t === 'palpites' ? defaultPalpitesGroup() : defaultJogosGroup();
-        rerenderAll();
-      }
-      return;
-    }
-
     // Toggle de visão: por grupo ⇄ por data
     const viewBtn = e.target.closest('.view-toggle button[data-view]');
     if (viewBtn) {
       const v = viewBtn.dataset.view;
       if (v !== groupBy) {
         groupBy = v;
-        if (groupBy === 'date') activeDate = defaultDate(activeTab);
-        else activeGroup = activeTab === 'palpites' ? defaultPalpitesGroup() : defaultJogosGroup();
+        if (groupBy === 'date') activeDate = defaultDate();
+        else activeGroup = defaultGroup();
         rerenderTabBody();
+      }
+      return;
+    }
+
+    // Toggle de lente da classificação/3ºs: Projeção ⇄ Oficial
+    const standBtn = e.target.closest('[data-stand]');
+    if (standBtn) {
+      const s = standBtn.dataset.stand;
+      if (s !== standMode) {
+        standMode = s;
+        const wrap = document.getElementById('groupTableWrap');
+        if (wrap) wrap.innerHTML = renderGroupTableSection();
+        const tp = document.getElementById('thirdsPopBody');
+        if (tp) tp.innerHTML = renderThirdsPopBody(standMode);
+        const trig = document.querySelector('.thirds-pop-trigger .hint');
+        if (trig) trig.textContent = standMode === 'real' ? 'oficial' : 'sua projeção';
       }
       return;
     }
@@ -928,13 +831,13 @@ async function doSave(matchId) {
   refreshNavBadges(profile.id);  // baixa o badge de pendência na hora (sem F5)
 }
 
-// Atualiza a tabela projetada do grupo e o popover de 3ºs após salvar um palpite
-// (ficam fora dos inputs, então re-renderizar não rouba o foco).
+// Atualiza a classificação do grupo e o popover de 3ºs após salvar um palpite
+// (ficam fora dos inputs, então re-renderizar não rouba o foco). Só faz sentido
+// quando a lente é projeção (oficial não muda com palpite).
 function refreshProjection() {
-  // Tabela projetada e 3ºs só existem no modo "por grupo".
-  if (groupBy !== 'group') return;
-  const gt = document.getElementById('palpitesGroupTable');
-  if (gt) gt.innerHTML = renderGroupTable('sim');
+  if (groupBy !== 'group' || standMode !== 'sim') return;
+  const wrap = document.getElementById('groupTableWrap');
+  if (wrap) wrap.innerHTML = renderGroupTableSection();
   const tp = document.getElementById('thirdsPopBody');
   if (tp) tp.innerHTML = renderThirdsPopBody('sim');
 }
@@ -945,37 +848,26 @@ function getTeamLabel(matchId) {
   return `${teamPt(m.team_home)} × ${teamPt(m.team_away)}`;
 }
 
-function rerenderAll() {
-  const pageBody = document.getElementById('pageBody');
-  pageBody.innerHTML = renderPage();
-}
-
 function rerenderTabBody() {
   const counts = computeCounts();
   const tabBody = document.getElementById('tabBody');
   if (!tabBody) return;
-  tabBody.innerHTML = renderActiveTab(counts);
+  tabBody.innerHTML = renderBody(counts);
 }
 
 function updateKpisAndChips() {
   // Re-render apenas KPIs e chips (não a lista — preserva foco no input)
   const counts = computeCounts();
-  // Chips
   const chips = document.getElementById('chips');
   if (chips) {
-    if (groupBy === 'date') {
-      const byDate = activeTab === 'palpites' ? counts.openByDate : counts.finishedByDate;
-      chips.innerHTML = renderDatePicker(byDate, activeTab);
-    } else {
-      const byGroup = activeTab === 'palpites' ? counts.openByGroup : counts.finishedByGroup;
-      chips.innerHTML = renderGroupNav(byGroup);
-    }
+    chips.innerHTML = groupBy === 'date'
+      ? renderDatePicker(counts.allByDate)
+      : renderGroupNav(counts.allByGroup);
   }
-  // KPIs
   const kpis = document.querySelector('.kpis');
   if (kpis) {
     const wrapper = document.createElement('div');
-    wrapper.innerHTML = activeTab === 'palpites' ? renderKpisPalpites(counts) : renderKpisResultados(counts);
+    wrapper.innerHTML = renderKpis(counts);
     kpis.replaceWith(wrapper.firstElementChild);
   }
 }

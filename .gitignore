@@ -146,3 +146,8 @@ scripts/e2e/_test-avatar.png
 # Local Netlify folder
 .netlify
 preview-eliminatorias.html
+
+# artefatos gerados de teste local
+scripts/e2e/playout-r32.sql
+scripts/e2e/playout-full.sql
+scripts/e2e/canonical-dates.json
