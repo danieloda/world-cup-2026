@@ -129,10 +129,13 @@ O prazo de palpite acompanha a nova data (trava 23h59 da véspera). Por enquanto
     severity: 'info',
     title: '🚨 Palpites travam HOJE às 23h59',
     body:
-`Ainda sem palpite (estes jogos fecham hoje à meia-noite):
+`Estes jogos fecham hoje à meia-noite:
+⚽ Brasil x Sérvia
+⚽ França x México
 
-• João Mendes — Brasil x Sérvia, França x México
-• Maria Souza — Brasil x Sérvia
+Quem ainda não palpitou:
+• João Mendes
+• Maria Souza
 
 👉 Dá tempo: abra e palpite antes das 23h59.`,
     context: cta('Fazer meus palpites'),
@@ -141,14 +144,19 @@ O prazo de palpite acompanha a nova data (trava 23h59 da véspera). Por enquanto
     severity: 'info',
     title: '⏳ Palpites travando nos próximos dias',
     body:
-`Cada jogo trava às 23h59 da véspera. Ainda sem palpite:
+`Cada jogo trava às 23h59 da véspera.
 
 📅 Trava 11/06 (amanhã):
-• João Mendes — Argentina x Portugal
-• Pedro Lima — Argentina x Portugal
+⚽ Argentina x Portugal
+⚽ Espanha x Marrocos
 
 📅 Trava 12/06:
-• João Mendes — Espanha x Marrocos
+⚽ França x Croácia
+
+Quem ainda não palpitou:
+• João Mendes
+• Maria Souza
+• Pedro Lima
 
 👉 Não deixe acumular — palpite com antecedência.`,
     context: cta('Fazer meus palpites'),
