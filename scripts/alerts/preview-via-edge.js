@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Dispara os NOVOS alertas (migration 042) DIRETO na Edge Function telegram-alert,
+// Dispara os alertas (revamp da migration 053) DIRETO na Edge Function telegram-alert,
 // que já tem o TELEGRAM_TOKEN/CHAT_ID nos secrets do Supabase e manda pro chat.
 //
 // Por que pela edge e não pela API do Telegram? O .env local NÃO tem TELEGRAM_TOKEN
@@ -44,6 +44,9 @@ const C = { reset: '\x1b[0m', green: '\x1b[32m', red: '\x1b[31m', yellow: '\x1b[
 // Links sempre diretos/explícitos (igual à migração 045: send_alert força
 // cta_label = cta_url). O rótulo é ignorado de propósito.
 const cta = () => ({ cta_url: SITE, cta_label: SITE });
+// Alertas de resultado/ranking apontam pro histórico (ver pontuações dos outros).
+const HIST = `${SITE}/historico.html`;
+const ctaHist = () => ({ cta_url: HIST, cta_label: HIST });
 
 const SAMPLES = {
   daily_payments: {
@@ -86,8 +89,10 @@ const SAMPLES = {
 
 🎯 3 de 11 cravaram o placar exato!
 
-Pontos recalculados e lacrados. 🔒`,
-    context: cta('Ver classificação'),
+Pontos recalculados e lacrados. 🔒
+
+👉 Para ver as pontuações dos outros participantes, acesse:`,
+    context: ctaHist(),
   },
   result_confirmed_ko: {
     severity: 'info',
@@ -98,20 +103,10 @@ Pontos recalculados e lacrados. 🔒`,
 🎯 1 de 11 cravaram o placar exato!
 🛡️ 7 acertaram quem avançou.
 
-Pontos recalculados e lacrados. 🔒`,
-    context: cta('Ver classificação'),
-  },
-  result_corrected: {
-    severity: 'info',
-    title: '🔧 Resultado corrigido: México x EUA',
-    body:
-`O resultado de México x EUA foi ajustado pelo admin.
+Pontos recalculados e lacrados. 🔒
 
-Antes: 1 x 0
-Agora: 2 x 0
-
-Todos os pontos foram recalculados automaticamente — transparência total. 🔒`,
-    context: cta('Ver classificação'),
+👉 Para ver as pontuações dos outros participantes, acesse:`,
+    context: ctaHist(),
   },
   match_void: {
     severity: 'info',
@@ -122,49 +117,41 @@ Todos os pontos foram recalculados automaticamente — transparência total. �
   match_postponed: {
     severity: 'info',
     title: '⏳ Jogo adiado: Gana x Coreia do Sul',
-    body: 'O jogo Gana x Coreia do Sul foi ADIADO. Quando a nova data sair, o prazo de palpite acompanha (trava 23h59 da véspera). Por enquanto nada muda na sua pontuação.',
+    body:
+`O jogo Gana x Coreia do Sul foi ADIADO.
+📅 Data anterior: 18/06 às 13h00
+📅 Nova data: 24/06 às 16h00
+
+O prazo de palpite acompanha a nova data (trava 23h59 da véspera). Por enquanto nada muda na sua pontuação.`,
     context: cta('Ver jogos'),
   },
-  champion_revealed: {
+  group_lock_24h: {
     severity: 'info',
-    title: '🏆 Argentina é campeã! E o bolão?',
+    title: '🚨 Palpites travam HOJE às 23h59',
     body:
-`🏆 Argentina é CAMPEÃ da Copa do Mundo 2026! (nos pênaltis)
+`Ainda sem palpite (estes jogos fecham hoje à meia-noite):
 
-🎯 4 de 11 cravaram o campeão (+40 pts):
-• Ana Silva
-• Bruno Costa
-• Carla Dias
-• Diego Reis
+• João Mendes — Brasil x Sérvia, França x México
+• Maria Souza — Brasil x Sérvia
 
-O pódio final do bolão sai já já. 🏅`,
-    context: cta('Ver classificação'),
+👉 Dá tempo: abra e palpite antes das 23h59.`,
+    context: cta('Fazer meus palpites'),
   },
-  ko_phase_opens: {
+  group_lock_3d: {
     severity: 'info',
-    title: '🆕 Oitavas de final — palpites abertos',
+    title: '⏳ Palpites travando nos próximos dias',
     body:
-`🆕 Oitavas de final definida! Os confrontos já têm times reais e os palpites estão ABERTOS.
+`Cada jogo trava às 23h59 da véspera. Ainda sem palpite:
 
-• 28/06 às 13h00 — Brasil x Uruguai
-• 28/06 às 16h00 — Argentina x Portugal
-• 29/06 às 13h00 — França x Croácia
-• 29/06 às 16h00 — Espanha x Marrocos
+📅 Trava 11/06 (amanhã):
+• João Mendes — Argentina x Portugal
+• Pedro Lima — Argentina x Portugal
 
-Cada jogo trava 23h59 da véspera. 👇`,
-    context: cta('Palpitar agora'),
-  },
-  final_opens: {
-    severity: 'info',
-    title: '🆕 FINAL — palpites abertos',
-    body:
-`🆕 FINAL definida! Os confrontos já têm times reais e os palpites estão ABERTOS.
-⭐ É o jogo de MAIOR peso do bolão — o placar exato da final vale até 76 pts!
+📅 Trava 12/06:
+• João Mendes — Espanha x Marrocos
 
-• 19/07 às 16h00 — Argentina x França
-
-Cada jogo trava 23h59 da véspera. 👇`,
-    context: cta('Palpitar agora'),
+👉 Não deixe acumular — palpite com antecedência.`,
+    context: cta('Fazer meus palpites'),
   },
   leader_change: {
     severity: 'info',
@@ -172,20 +159,11 @@ Cada jogo trava 23h59 da véspera. 👇`,
     body:
 `Bruno Costa assumiu a liderança com 142 pts, passando Ana Silva! 🔥
 
-Quem vai reagir?`,
-    context: cta('Ver classificação'),
-  },
-  round_movers: {
-    severity: 'info',
-    title: '🔥 Os destaques da rodada',
-    body:
-`🔥 QUEM MAIS PONTUOU (últimas 24h):
-🥇 Diego Reis — +28 pts
-🥈 Ana Silva — +24 pts
-🥉 Hugo Alves — +19 pts
+📊 Vantagem de 6 pts pro 2º lugar.
+📈 Ainda restam ~55% dos pontos de placar em jogo. Tudo pode virar!
 
-Bora pros próximos jogos! 👇`,
-    context: cta('Ver classificação'),
+👉 Para ver as pontuações dos outros participantes, acesse:`,
+    context: ctaHist(),
   },
   group_stage_done: {
     severity: 'info',
@@ -195,11 +173,13 @@ Bora pros próximos jogos! 👇`,
 
 🏆 LÍDER PROVISÓRIO (prêmio parcial):
 🥇 Ana Silva — 88 pts
-🥈 Bruno Costa — 81 pts
-🥉 Carla Dias — 74 pts
+🥈 Bruno Costa — 81 pts (-7)
+🥉 Carla Dias — 74 pts (-7)
 
-Mas calma: ~55% dos pontos ainda estão em jogo no mata-mata. Tudo pode virar! 🔥`,
-    context: cta('Ver classificação'),
+Mas calma: ainda restam ~55% dos pontos de placar no mata-mata. Tudo pode virar! 🔥
+
+👉 Para ver as pontuações dos outros participantes, acesse:`,
+    context: ctaHist(),
   },
   pool_settled: {
     severity: 'info',
@@ -207,28 +187,31 @@ Mas calma: ~55% dos pontos ainda estão em jogo no mata-mata. Tudo pode virar! �
     body:
 `🏁 É OFICIAL — o bolão da Copa 2026 chegou ao fim! Pódio final:
 🥇 Bruno Costa — 287 pts
-🥈 Ana Silva — 263 pts
-🥉 Diego Reis — 241 pts
+🥈 Ana Silva — 263 pts (-24)
+🥉 Diego Reis — 241 pts (-22)
 
 💰 PREMIAÇÃO (caixa R$ 1.100):
 🥇 Bruno Costa — R$ 770
 🥈 Ana Silva — R$ 220
 🥉 Diego Reis — R$ 110
 
-Obrigado a todos que jogaram! 🏆 Até a próxima Copa.`,
-    context: cta('Ver classificação final'),
-  },
-  inactive_paid: {
-    severity: 'info',
-    title: '⚽ 3 pago(s) ainda sem nenhum palpite',
-    body:
-`3 já pagaram mas ainda não fizeram NENHUM palpite — é ponto de graça ficando na mesa:
-• João Mendes
-• Maria Souza
-• Pedro Lima
+🎯 O campeão do bolão cravou 9 placar(es) exato(s) na Copa.
 
-Bora abrir e palpitar! 👇`,
-    context: cta('Fazer meus palpites'),
+Obrigado a todos que jogaram! 🏆 Até a próxima Copa.
+
+👉 Para ver a classificação final completa, acesse:`,
+    context: ctaHist(),
+  },
+  cron_job_failure: {
+    severity: 'warn',
+    title: '2 job(s) de cron falharam',
+    body:
+`2 execução(ões) de cron falharam na última hora:
+• alerts_daily_payments — ERROR: relation "public.foo" does not exist
+• alerts_daily_recap — ERROR: division by zero
+
+Veja cron.job_run_details no dashboard pra investigar.`,
+    context: {},
   },
   signup_late: {
     severity: 'info',
@@ -243,7 +226,7 @@ Bora abrir e palpitar! 👇`,
 
 const BANNER = {
   severity: 'info',
-  title: '🧪 PRÉVIA — novos alertas (migração 042)',
+  title: '🧪 PRÉVIA — alertas revisados (migração 053)',
   body: 'As próximas mensagens são EXEMPLOS com dados FICTÍCIOS, só pra revisão do admin. Pode ignorar — nada disso aconteceu de verdade. 👇',
   context: {},
 };

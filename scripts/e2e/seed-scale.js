@@ -256,7 +256,8 @@ async function main() {
   // Desliga só os triggers de ALERTA (postam ao edge/Telegram). Os de NEGÓCIO
   // (on_match_finished=scoring, trigger_resolve_slots, trg_s_qualifier_bonus)
   // ficam ligados e disparam em cascata na ordem cronológica.
-  const ALERT_TRG = ['trg_z_alert_champion_revealed', 'trg_z_alert_ko_phase_opens', 'trg_z_alert_match_status', 'trg_z_alert_orphan_predictions', 'trg_z_alert_result_confirmed', 'trg_z_alert_result_corrected', 'trg_z_alert_unresolved_slots'];
+  // result_corrected, champion_revealed e ko_phase_opens foram removidos na migration 053.
+  const ALERT_TRG = ['trg_z_alert_match_status', 'trg_z_alert_orphan_predictions', 'trg_z_alert_result_confirmed', 'trg_z_alert_unresolved_slots'];
   const playout = [
     '-- playout.sql — joga o torneio (oráculo) e pontua todos. Gerado por seed-scale.js.',
     '-- Aplicar: docker exec -i supabase_db_world-cup-2026 psql -U postgres -d postgres < scripts/e2e/playout.sql',

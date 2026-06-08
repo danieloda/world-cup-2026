@@ -6,7 +6,7 @@
 //      node scripts/test-alerts-daily.js --only=payments
 //      node scripts/test-alerts-daily.js --dry-run
 //
-// only: payments | group | cs | countdown | lock | recap | heartbeat | signup
+// only: payments | group | cs | countdown | recap | heartbeat | jobfail
 
 import { createClient } from '@supabase/supabase-js';
 import { config } from 'dotenv';
@@ -46,12 +46,12 @@ async function login() {
 // Cada teste roda a função cron real (que dispara o alerta de verdade).
 const RPCS = {
   payments:  { name: 'cron_alert_daily_payments',     desc: '💰 Pagamentos' },
-  group:     { name: 'cron_alert_group_completeness', desc: '⏰ Lembrete jogos travando (🚨 hoje / ⚠️ amanhã; só se há pendentes)' },
+  group:     { name: 'cron_alert_group_completeness', desc: '⏰ Lembrete jogos travando — 2 msgs: 🚨 ≤24h / ⏳ 1–3 dias (só se há pendentes)' },
   cs:        { name: 'cron_alert_cs_completeness',     desc: '🏆 Campeão & Artilheiro' },
   countdown: { name: 'cron_alert_deadline_countdown',  desc: '⏳ Contagem regressiva (só ≤3 dias do prazo)' },
-  lock:      { name: 'cron_alert_lock_tonight',        desc: '🌙 Trava de hoje (só se há jogos)' },
   recap:     { name: 'cron_alert_daily_recap',         desc: '📊 Recap (só se houve jogo nas 24h)' },
   heartbeat: { name: 'cron_heartbeat',                 desc: '❤️ Heartbeat (só se um cron parou)' },
+  jobfail:   { name: 'cron_check_job_failures',        desc: '⚠️ Falhas de pg_cron (só se algum job falhou na última hora)' },
 };
 
 async function runRpc(key) {
@@ -91,7 +91,7 @@ async function main() {
   }
   const allOk = Object.values(results).every((v) => v);
   console.log('');
-  if (allOk) log('ok', '✅ Todos dispararam. Lembre: countdown/lock/recap/heartbeat só mandam mensagem se a condição bater.');
+  if (allOk) log('ok', '✅ Todos dispararam. Lembre: countdown/recap/heartbeat/jobfail só mandam mensagem se a condição bater.');
   else { log('fail', '⚠️  Algumas falharam.'); process.exit(1); }
 }
 
