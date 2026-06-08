@@ -756,7 +756,7 @@ function renderOpenTeamRow(m, side, val, locked) {
       : '';
     // Chip de divergência: você botou outro time nessa vaga.
     const divChip = diverged
-      ? `<div class="bm-diverge" title="Quem você previu nesta vaga">na sua simulação: <span class="dv-flag">${flag(predTeam)}</span> ${escapeHtml(teamPt(predTeam))}</div>`
+      ? `<div class="bm-diverge" title="Quem você previu nesta vaga"><span class="dv-label">na sua simulação:</span> <span class="dv-team"><span class="dv-flag">${flag(predTeam)}</span>${escapeHtml(teamPt(predTeam))}</span></div>`
       : '';
     nameHtml = `
       <div class="nm">

@@ -3985,16 +3985,25 @@ input[type="number"].score-input {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 3px 5px;
+  gap: 2px 5px;
   font-size: 11px;
-  line-height: 1.4;
+  line-height: 1.35;
   font-weight: 600;
   color: var(--text-mute);
   margin-top: 3px;
   min-width: 0;
-  overflow-wrap: anywhere;
 }
-.bm-diverge .dv-flag { font-size: 12px; flex-shrink: 0; }
+.bm-diverge .dv-label { flex-shrink: 0; }
+/* bandeira + nome como uma unidade alinhada (evita desalinhar a bandeira) */
+.bm-diverge .dv-team { display: inline-flex; align-items: center; gap: 5px; min-width: 0; }
+.bm-diverge .dv-flag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 13px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.bm-diverge .dv-flag .fi, .bm-diverge .dv-flag .fis { border-radius: 2px; vertical-align: middle; }
 
 .bm-pen-result {
   font-size: 12px;
