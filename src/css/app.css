@@ -1459,9 +1459,9 @@ body.raiox-modal-open { overflow: hidden; }
 .cal-day.st-urgent  { --st: var(--red);      --st-bg: var(--red-dim);      --st-line: rgba(241, 94, 108, .35); }
 .cal-day.st-pending { --st: var(--text-mute); }
 .cal-day.st-locked  { --st: var(--text-mute); opacity: .6; }
-/* dia já encerrado/jogado (histórico) — neutro cinza-azulado, nunca verde */
-.cal-day.st-past    { --st: #8a93a6; --st-bg: rgba(138, 147, 166, .10); --st-line: rgba(138, 147, 166, .28); opacity: .82; }
-.cal-day.st-past .cal-ct { background: rgba(138, 147, 166, .16); color: #aab2c2; }
+/* dia já encerrado/jogado (histórico) — neutro do tema, nunca verde */
+.cal-day.st-past    { --st: var(--text-mute); --st-bg: rgba(255, 255, 255, .05); --st-line: var(--line); opacity: .9; }
+.cal-day.st-past .cal-ct { background: rgba(255, 255, 255, .07); color: var(--text-mute); }
 .cal-day:hover {
   background: var(--card-hover);
   border-color: var(--line-strong);
@@ -3591,7 +3591,8 @@ body.raiox-modal-open { overflow: hidden; }
 }
 .bm-id .when {
   color: var(--text-dim);
-  font-family: ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .02em;
 }
 /* Contagem regressiva até o bloqueio do palpite no card do bracket */
 .bm-lock {
@@ -3603,14 +3604,23 @@ body.raiox-modal-open { overflow: hidden; }
 .bracket-match.locked .bm-lock { color: var(--text-mute); }
 .bm-team {
   display: grid;
-  grid-template-columns: 22px 1fr 52px;
-  gap: 8px; align-items: center;
+  grid-template-columns: 26px 1fr 52px;
+  column-gap: 11px; align-items: center;
   padding: 7px 0;
   font-size: 13px;
   font-weight: 600;
 }
 .bm-team + .bm-team { border-top: 1px solid var(--line); }
-.bm-team .flag { font-size: 16px; }
+/* bandeira em caixa fixa e centralizada → não encosta no nome */
+.bm-team .flag {
+  width: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  line-height: 1;
+}
+.bm-team .flag .fi, .bm-team .flag .fis { border-radius: 2px; }
 .bm-team .nm {
   display: flex;
   flex-direction: column;
@@ -4131,10 +4141,10 @@ input[type="number"].score-input {
 .bm-break .brk.scorer b { color: var(--accent); }
 /* chip de campeão — ouro de medalha (maior peso do bolão) */
 .bm-break .brk.champ {
-  background: rgba(255, 215, 0, .14);
-  color: var(--medal-gold, #ffd700);
+  background: rgba(212, 167, 58, .16);   /* --medal-gold #d4a73a */
+  color: var(--medal-gold);
 }
-.bm-break .brk.champ b { color: var(--medal-gold, #ffd700); }
+.bm-break .brk.champ b { color: var(--medal-gold); }
 .bm-pts .formula {
   color: var(--text-mute);
   font-weight: 700;
