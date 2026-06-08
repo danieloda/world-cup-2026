@@ -213,6 +213,18 @@ Obrigado a todos que jogaram! 🏆 Até a próxima Copa.
 Veja cron.job_run_details no dashboard pra investigar.`,
     context: {},
   },
+  deadline_breach: {
+    severity: 'warn',
+    title: 'Palpite gravado APÓS o prazo (match #42)',
+    body: 'A linha de predictions 9281 foi alterada após o prazo do jogo Brasil x Sérvia, que ainda não terminou. A trava de prazo (RLS) deveria ter bloqueado — convém investigar.',
+    context: {},
+  },
+  scoring_anomaly: {
+    severity: 'critical',
+    title: 'Pontuação fora da faixa no match #97 (sf)',
+    body: '3 palpite(s) do match #97 (Argentina x França) ficaram com points_earned fora de [0, 50] (máximo da fase sf). Possível bug no score_prediction — verifique antes que contamine o leaderboard.',
+    context: {},
+  },
   signup_late: {
     severity: 'info',
     title: '✨ Novo participante: Pedro Lima',

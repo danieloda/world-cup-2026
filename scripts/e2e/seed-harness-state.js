@@ -80,7 +80,8 @@ log('g', `   ✓ 10 usuários do harness + ${preds.length} palpites`);
 
 // 3. playout do oráculo do harness (resultados + gols; triggers de negócio pontuam)
 // result_corrected, champion_revealed e ko_phase_opens foram removidos na migration 053.
-const ALERT = ['trg_z_alert_match_status', 'trg_z_alert_orphan_predictions', 'trg_z_alert_result_confirmed', 'trg_z_alert_unresolved_slots'];
+// scoring_anomaly adicionado na 054.
+const ALERT = ['trg_z_alert_match_status', 'trg_z_alert_orphan_predictions', 'trg_z_alert_result_confirmed', 'trg_z_alert_scoring_anomaly', 'trg_z_alert_unresolved_slots'];
 const ordered = oracle.matches.slice().sort((a, b) => new Date(matches.find((m) => m.id === a.id).match_date) - new Date(matches.find((m) => m.id === b.id).match_date));
 // finished_at por ID (espelha a ordem de ENTRADA do golden-path real, onde o admin
 // lança jogo a jogo): id maior = mais recente. O "launched" do admin ordena por
