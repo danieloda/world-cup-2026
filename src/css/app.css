@@ -1590,6 +1590,13 @@ body.raiox-modal-open { overflow: hidden; }
 .grp-dot.cur  { background: var(--accent); border-color: var(--accent); color: #000; }
 /* stepper + bolinhas empilhados e centralizados no espaço (à esquerda dos 3ºs) */
 .grp-nav { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; }
+/* Desktop: tira "Melhores 3ºs" do fluxo (absoluto à direita) p/ o seletor de
+   grupos centralizar na largura total — alinhado com o centro dos placares
+   (grid simétrico 1fr auto auto auto 1fr) em vez do espaço à esquerda do botão. */
+@media (min-width: 561px) {
+  .palpites-toolbar .chips { flex-basis: 100%; }
+  .palpites-toolbar .thirds-pop { position: absolute; top: 0; right: 0; }
+}
 /* "Melhores 3ºs" fica à direita no fluxo do toolbar; em telas estreitas desce centralizado */
 @media (max-width: 560px) {
   .palpites-toolbar .thirds-pop { width: 100%; display: flex; justify-content: center; margin-top: 14px; }
