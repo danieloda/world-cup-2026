@@ -3911,9 +3911,11 @@ input[type="number"].score-input {
   text-align: center;
   color: var(--text);
 }
-/* faixa oficial: vencedor em destaque */
-.km-row.km-off.winner .km-name,
-.km-row.km-off.winner .km-score { color: var(--accent); }
+/* faixa oficial: VERDE onde você pontuou a vaga (classificado), VERMELHO onde não.
+   (Aposentou o realce amarelo de "vencedor" — quem avança já é claro pelo placar /
+   pela linha de pênaltis.) */
+.km-row.km-off.scored .km-name { color: var(--positive); }
+.km-row.km-off.missed .km-name { color: var(--red); }
 /* faixa do palpite: time que você botou que NÃO chegou (divergência) */
 .km-row.diverged .km-name { color: var(--red); text-decoration: line-through; opacity: .8; }
 .km-row.diverged .flag { opacity: .55; }

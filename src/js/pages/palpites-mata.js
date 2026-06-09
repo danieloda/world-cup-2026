@@ -500,12 +500,14 @@ function renderFinRow(m, lens, side) {
 
   if (lens === 'official') {
     const score = side === 'home' ? m.actual_home : m.actual_away;
-    const isWinner =
-      (side === 'home' && (m.actual_home > m.actual_away || (m.actual_home === m.actual_away && m.pen_winner === 'home'))) ||
-      (side === 'away' && (m.actual_away > m.actual_home || (m.actual_home === m.actual_away && m.pen_winner === 'away')));
+    // Verde onde VOCÊ pontuou nessa vaga (acertou quem chega → bônus de classificado),
+    // vermelho onde não. Aposenta o realce amarelo de "vencedor": quem avança já é
+    // claro pelo placar e, no empate, pela linha "⚽ Pênaltis: …".
+    const q = qualifierBySide.get(`${m.id}:${side}`);
+    const hit = q && (q.pts ?? 0) > 0 ? 'scored' : 'missed';
     const qual = renderQualBadge(m.id, side);
     return `
-      <div class="km-row km-off ${area} ${isWinner ? 'winner' : ''}">
+      <div class="km-row km-off ${area} ${hit}">
         <span class="flag">${flag(realTeam)}</span>
         <div class="km-nm">
           <span class="km-name" data-team="${escapeHtml(realTeam || '')}">${escapeHtml(teamPt(realTeam))}</span>
