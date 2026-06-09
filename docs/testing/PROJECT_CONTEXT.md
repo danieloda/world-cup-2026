@@ -141,4 +141,7 @@ Lançar um resultado (`finished=true`) dispara, **em ordem**:
 | Desempate FIFA | `fifa_rank()` (015) | `src/js/fifa-rank.js` | `tiebreak.sql` B1/B2 |
 | Classificado | `qualifier_bonus_*` (021/022) | `src/js/*` | `qualifier.test.js`, `qualifier-bonus.sql` |
 | Raio-X | — | `src/js/raiox.js` | `raiox-render.test.js` |
-| Cards de palpite (grupos/mata) | — | `palpites-grupos.js`, `palpites-mata.js`, `util.js` | smoke e2e + `docs/features/palpites-cards.md` |
+| Cards de palpite (grupos/mata) | — | `src/js/card-results.js` (puro) + `palpites-grupos.js`, `palpites-mata.js` | `card-results.test.js` + smoke e2e + `docs/features/palpites-cards.md` |
+| Replay do ranking (gráficos) | — | `src/js/progression-core.js` (puro) + `progression.js`, `chart-utils.js` | `progression.test.js`, `chart-utils.test.js` |
+| Ranking (ordem + desempate) | `v_leaderboard` (039) | `src/js/prize.js` | `prize.test.js`, `leaderboard-parity.test.js` |
+| Snapshot de integridade | — | `scripts/integrity/{snapshot,verify}.js` | `integrity-guards.test.js`, `npm run test:integrity` |

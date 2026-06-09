@@ -67,7 +67,26 @@ check('v_leaderboard consultável', !lb.error, lb.error ? lb.error.message.slice
 // 3. Números esperados
 log('b', '\n[3] Dados de produção (sanidade)');
 const m = await count('matches'); check('matches = 104', m.n === 104, `n=${m.n}`);
-const p = await count('players'); check('players = 1247 (resync da migration 052)', p.n === 1247, `n=${p.n}`);
+// 1249 = 052 (1247) + overrides manuais de 2026-06-09 (Portugal com 27, 4º GOL
+// Ricardo Velho). Sentinela de drift: mudou o elenco de propósito? Atualize aqui.
+const p = await count('players'); check('players = 1249 (052 + overrides 2026-06-09)', p.n === 1249, `n=${p.n}`);
+{ // Sem jogador duplicado em NENHUMA listagem: api_player_id é único e nenhum
+  // país passa de 27 (26 da FIFA + 1 adição manual documentada).
+  const all = [];
+  for (let from = 0; ; from += 1000) {
+    const { data, error } = await db.from('players').select('id, team, api_player_id').order('id').range(from, from + 999);
+    if (error) { check('players legíveis p/ checagem de duplicata', false, error.message); break; }
+    all.push(...data);
+    if (data.length < 1000) break;
+  }
+  const apiIds = all.map(x => x.api_player_id).filter(x => x != null);
+  check('players sem api_player_id duplicado', new Set(apiIds).size === apiIds.length,
+    `${apiIds.length - new Set(apiIds).size} duplicado(s)`);
+  const byTeam = new Map();
+  for (const x of all) byTeam.set(x.team, (byTeam.get(x.team) ?? 0) + 1);
+  const weird = [...byTeam.entries()].filter(([, n]) => n < 26 || n > 27);
+  check('todo elenco com 26–27 jogadores', weird.length === 0, weird.map(([t, n]) => `${t}=${n}`).join(' ') || 'ok');
+}
 const pr = await count('profiles'); check('profiles (usuários reais)', (pr.n ?? 0) > 0, `n=${pr.n}`);
 const fr = await db.from('team_fifa_rank').select('*', { count: 'exact', head: true }); check('team_fifa_rank = 48', fr.count === 48, `n=${fr.count}`);
 

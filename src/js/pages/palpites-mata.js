@@ -8,7 +8,13 @@ import {
   localDateKey, brParts, heroMeta,
 } from '../util.js';
 import { isRealTeam, resolveSlotToTeam, computeSlotResolution } from '../bracket.js';
-import { matchPoints, scoreBreakdown, stageMultiplier, scorerBonus, championBonus } from '../scoring.js';
+import { matchPoints, scoreBreakdown, stageMultiplier, scorerBonus } from '../scoring.js';
+import {
+  championOf, isExactPred as isExactPredCore, predTeamForSide as predTeamForSideCore,
+  isPerfectKo as isPerfectKoCore, matchScorerPts as matchScorerPtsCore,
+  matchQualPts as matchQualPtsCore, matchChampionPts as matchChampionPtsCore,
+  koCardSummary,
+} from '../card-results.js';
 import {
   renderRaioXModalButton, openRaioXModal, attachRaioXTabs,
 } from '../raiox.js';
@@ -148,13 +154,7 @@ async function loadData() {
 
   // Campeão: pick do usuário + campeão real (vencedor da final, quando finalizada).
   championPickTeam = champRes.data?.team ?? null;
-  const finalM = matches.find(m => m.stage === 'final');
-  realChampion = (finalM && finalM.finished)
-    ? (finalM.actual_home > finalM.actual_away ? finalM.team_home
-       : finalM.actual_away > finalM.actual_home ? finalM.team_away
-       : finalM.pen_winner === 'home' ? finalM.team_home
-       : finalM.pen_winner === 'away' ? finalM.team_away : null)
-    : null;
+  realChampion = championOf(matches.find(m => m.stage === 'final'));
 
   // Numera as vagas de melhor-3º (1..8) por ordem de jogo, pra cada uma ser
   // distinguível ("3º①", "3º②"…) em vez de todas mostrarem só "3º".
@@ -242,25 +242,21 @@ function slotLineLabel(slot) {
 }
 
 // Acertou o placar exato deste jogo? (só o placar — conta no KPI "placares exatos".)
+// Regra pura em card-results.js (testada); aqui só amarramos o estado da página.
 function isExactPred(m, pred) {
-  return !!pred && m.finished
-    && pred.pred_home === m.actual_home && pred.pred_away === m.actual_away;
+  return isExactPredCore(m, pred);
 }
 
 // Time que VOCÊ previu nesta vaga: o próprio (se já é time real) ou o vencedor que
 // você simulou. Compartilhado pela faixa, pelo pênalti e pela regra do "perfeito".
 function predTeamForSide(m, side) {
-  const realTeam = side === 'home' ? m.team_home : m.team_away;
-  const slot = (side === 'home' ? m.slot_home : m.slot_away) || realTeam;
-  return isRealTeam(slot) ? slot : (predSlotResolution.get(slot)?.team ?? null);
+  return predTeamForSideCore(m, side, predSlotResolution);
 }
 
 // PERFEITO (dourado) no mata-mata: placar exato E os DOIS times certos na vaga — no KO
 // você também palpita QUEM chega. Placar certo com 1 time errado NÃO é perfeito.
 function isPerfectKo(m, pred) {
-  return isExactPred(m, pred)
-    && predTeamForSide(m, 'home') === m.team_home
-    && predTeamForSide(m, 'away') === m.team_away;
+  return isPerfectKoCore(m, pred, predSlotResolution);
 }
 
 // ============================================================
@@ -437,7 +433,6 @@ function renderCard(m) {
 // ---- ENCERRADO: duas faixas lado a lado (seu palpite × oficial) ----
 function renderFinishedCard(m) {
   const pred = predsByMatch.get(m.id);
-  const pts = pred?.points_earned ?? 0;
 
   const { day: _d, month: _mo } = brParts(m.match_date);
   const dateLabel = `${String(_d).padStart(2,'0')}/${MEZES[_mo - 1]}`;
@@ -449,17 +444,12 @@ function renderFinishedCard(m) {
   const qualPts = matchQualPts(m);          // bônus por acertar quem classificou
   const scorerPts = matchScorerPts(m);       // bônus por gol do seu artilheiro
   const champPts = matchChampionPts(m);      // bônus de campeão (só na final)
-  const totalPts = pts + qualPts + scorerPts + champPts;
-  const hasBonus = qualPts > 0 || scorerPts > 0 || champPts > 0;
-  // Ganhou ALGO neste jogo? (placar previsto OU bônus de classificado/artilheiro,
-  // que independem de ter palpitado o placar — vêm dos palpites de grupo/artilheiro).
-  const hasAny = !!pred || hasBonus;
-
-  // Classificado/artilheiro já contam como acerto parcial, mesmo sem palpite de placar.
-  const resultClass = !pred
-    ? (hasBonus ? 'partial' : 'no-pred')
-    : isPerfectKo(m, pred) ? 'exact'           // dourado só se cravou placar + os 2 times
-    : (pts > 0 || hasBonus) ? 'partial' : 'miss';
+  // Total exibido + classe visual: regra pura em card-results.js (testada).
+  // Dourado só se cravou placar + os 2 times; classificado/artilheiro contam
+  // como acerto parcial mesmo sem palpite de placar.
+  const { totalPts, hasAny, resultClass } = koCardSummary(m, pred, {
+    qualPts, scorerPts, champPts, perfect: isPerfectKo(m, pred),
+  });
 
   const classes = ['bracket-match', 'km-finished', resultClass, 'finished'];
   if (isFinal) classes.push('final-match');
@@ -564,27 +554,19 @@ function renderFinRow(m, lens, side) {
 }
 
 // Soma o bônus de classificado (BPE/BP) dos dois lados do confronto.
+// (Regras puras em card-results.js, testadas; aqui só o estado da página.)
 function matchQualPts(m) {
-  let sum = 0;
-  for (const side of ['home', 'away']) {
-    const q = qualifierBySide.get(`${m.id}:${side}`);
-    if (q) sum += q.pts || 0;
-  }
-  return sum;
+  return matchQualPtsCore(m, qualifierBySide);
 }
 
 // Bônus de artilheiro NESTE jogo: gols do jogador escolhido × multiplicador da fase.
 function matchScorerPts(m) {
-  if (!scorerPickId) return 0;
-  const goal = (goalsByMatch.get(m.id) ?? []).find(g => g.player_id === scorerPickId);
-  const n = goal?.goals ?? 0;
-  return n > 0 ? scorerBonus(n, m.stage) : 0;
+  return matchScorerPtsCore(m, scorerPickId, goalsByMatch);
 }
 
 // Bônus de campeão: cai SÓ no jogo da final, quando você acertou o campeão.
 function matchChampionPts(m) {
-  if (m.stage !== 'final' || !championPickTeam || !realChampion) return 0;
-  return championPickTeam === realChampion ? championBonus(true) : 0;
+  return matchChampionPtsCore(m, championPickTeam, realChampion);
 }
 
 // Quebra aditiva da pontuação: chips do placar (lado/resultado/saldo) + chips de

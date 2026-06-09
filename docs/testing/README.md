@@ -10,7 +10,8 @@ Documentação forte da suíte de testes do bolão, criada na rodada de endureci
 | **[PROJECT_CONTEXT.md](PROJECT_CONTEXT.md)** | Contexto amplo: arquitetura, modelo de dados, pontuação, segurança, triggers, gotchas. **Leia primeiro.** |
 | **[TEST_PLAN.md](TEST_PLAN.md)** | Estratégia: os 7 níveis de teste, o que cada um cobre, como rodar, gates. |
 | **[ENVIRONMENT.md](ENVIRONMENT.md)** | Como montar o ambiente local com paridade de prod (bootstrap em 1 comando). |
-| **[AUDIT_REPORT_2026-06-07.md](AUDIT_REPORT_2026-06-07.md)** | Resultados da rodada: matriz de cobertura, achados, risco, recomendações. |
+| **[AUDIT_REPORT_2026-06-10.md](AUDIT_REPORT_2026-06-10.md)** | **Rodada da véspera**: cobertura das features novas (cards/gráficos), bug de idempotência do snapshot corrigido, gates finais. |
+| **[AUDIT_REPORT_2026-06-07.md](AUDIT_REPORT_2026-06-07.md)** | Resultados da rodada anterior: matriz de cobertura, achados, risco, recomendações. |
 
 Runbook passo-a-passo (manual, complementar): [`scripts/e2e/LOCAL-E2E.md`](../../scripts/e2e/LOCAL-E2E.md)
 
@@ -24,12 +25,16 @@ node scripts/e2e/test-load-concurrency.js # carga (estouro de deadline)
 node scripts/e2e/prod-smoke.js            # smoke read-only de prod (sem source!)
 ```
 
-## Veredito da última rodada (2026-06-07)
+## Veredito da última rodada (2026-06-10 — véspera)
 
-✅ **Suíte inteira verde** — lógica crítica (pontuação, prazos, RLS, desempate FIFA, classificado,
-leaderboard, concorrência) **e** todo o harness de UI. **0 bugs de produto.** Os 8 testes de UI
-que eram frágeis num rebuild limpo foram **corrigidos** (ver AUDIT §4). Paridade prod↔repo
-confirmada (migration 052; players=1247).
+✅ **650/650 unit + todos os gates verdes.** Features novas (cards palpite×resultado,
+replay/gráficos de ranking, snapshot de integridade) ganharam módulos puros + testes
+próprios. **1 bug real corrigido**: a idempotência do snapshot nunca funcionou
+(`taken_at` entrava no hash). Paridade prod↔repo confirmada (players=**1249** após os
+overrides manuais de 06-09; sem duplicatas). Ver `AUDIT_REPORT_2026-06-10.md`.
+
+Rodada anterior (2026-06-07): suíte verde, 0 bugs de produto, 8 testes de UI frágeis
+corrigidos (ver `AUDIT_REPORT_2026-06-07.md`).
 
 **2 caminhos de estado para os testes:**
 - `bootstrap-local.sh` → estado sintético (pré-torneio). Roda os testes **standalone**.

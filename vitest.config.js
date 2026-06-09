@@ -24,7 +24,10 @@ export default defineConfig({
       // a métrica e daria falsa sensação de cobertura.
       include: [
         'src/js/bracket.js',
+        'src/js/card-results.js',
+        'src/js/chart-utils.js',
         'src/js/prize.js',
+        'src/js/progression-core.js',
         'src/js/scoring.js',
         'src/js/thirds-assign.js',
         'src/js/util.js',
@@ -34,7 +37,12 @@ export default defineConfig({
       // NUNCA descem sem justificativa. (medido em 2026-06-05)
       thresholds: {
         'src/js/bracket.js': { statements: 97, branches: 78, functions: 100, lines: 97 },
+        'src/js/card-results.js': { statements: 100, branches: 98, functions: 100, lines: 100 },
+        // chart-utils: a parte lógica (positions/timeline/bands) está 100%; o
+        // que falta são helpers de render SVG/tooltip (cobertos por e2e de UI).
+        'src/js/chart-utils.js': { statements: 71, branches: 97, functions: 73, lines: 71 },
         'src/js/prize.js': { statements: 100, branches: 100, functions: 100, lines: 100 },
+        'src/js/progression-core.js': { statements: 100, branches: 96, functions: 100, lines: 100 },
         'src/js/scoring.js': { statements: 100, branches: 100, functions: 100, lines: 100 },
         'src/js/thirds-assign.js': { statements: 100, branches: 100, functions: 100, lines: 100 },
         'src/js/util.js': { statements: 55, branches: 92, functions: 50, lines: 55 },

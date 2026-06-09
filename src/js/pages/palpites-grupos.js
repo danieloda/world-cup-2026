@@ -8,7 +8,8 @@ import {
   loadQualifiers, teamPt, groundShort, renderDateCalendar, predictionDeadline,
   localDateKey, oddsToProbs, brParts, heroMeta, wireHScroll,
 } from '../util.js';
-import { matchPoints, scoreBreakdown, scorerBonus } from '../scoring.js';
+import { matchPoints, scoreBreakdown } from '../scoring.js';
+import { matchScorerPts as matchScorerPtsCore, groupCardSummary } from '../card-results.js';
 import {
   renderGroupCard, computeThirds, countThirdsComplete, renderThirdsTable,
 } from '../standings-view.js';
@@ -141,11 +142,9 @@ async function loadData() {
 
 // Bônus de artilheiro NESTE jogo: gols do jogador escolhido × multiplicador da fase
 // (na fase de grupos o multiplicador é 1, então = 2 × gols).
+// Regra pura em card-results.js (testada); aqui só amarramos o estado da página.
 function matchScorerPts(m) {
-  if (!scorerPickId) return 0;
-  const goal = (goalsByMatch.get(m.id) ?? []).find(g => g.player_id === scorerPickId);
-  const n = goal?.goals ?? 0;
-  return n > 0 ? scorerBonus(n, m.stage) : 0;
+  return matchScorerPtsCore(m, scorerPickId, goalsByMatch);
 }
 
 // ============================================================
@@ -452,13 +451,9 @@ function renderPalpiteRow(m) {
 // alinhadas + Pontuação — mesma linguagem visual do card de mata-mata.
 function renderResultRow(m) {
   const pred = predsByMatch.get(m.id);
-  const placarPts = pred?.points_earned ?? 0;
   const scorerPts = matchScorerPts(m);            // bônus por gol do seu artilheiro
-  const pts = placarPts + scorerPts;               // total do jogo
-  const isExact = pred && pred.pred_home === m.actual_home && pred.pred_away === m.actual_away;
-  const resultClass = !pred && scorerPts === 0 ? 'no-pred'
-    : isExact ? 'exact'
-    : (placarPts > 0 || scorerPts > 0) ? 'partial' : 'miss';
+  // Total do jogo + classe visual: regra pura em card-results.js (testada).
+  const { pts, resultClass } = groupCardSummary(m, pred, scorerPts);
 
   // Quebra aditiva do palpite (lado / resultado / saldo) + chip de artilheiro.
   const chipList = [];

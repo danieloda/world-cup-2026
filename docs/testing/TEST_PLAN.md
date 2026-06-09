@@ -16,13 +16,20 @@
 
 ## Níveis
 
-### Nível 1 — Unitário (vitest, jsdom) · ~5s
+### Nível 1 — Unitário (vitest, jsdom) · ~6s
 Lógica PURA: `bracket`, `scoring`, `prize` (desempate de participantes + rateio),
 `thirds-assign`, `util`, `fifa-rank`, `qualifier`, `raiox` render, paridade de
 prazo/scoring, invariância de fuso, invariantes de RLS, sintaxe/paths.
+Desde 2026-06-10 também: `card-results` (classificação dos cards palpite×resultado
++ paridade card↔replay), `progression-core` (replay do ranking; fim de série ==
+total do leaderboard), `chart-utils` (posições/timeline/faixas dos gráficos),
+`standings-tiebreak` (cada nível do desempate pts→SG→GF→FIFA isolado),
+`leaderboard-parity` (ORDER BY do v_leaderboard ↔ prize.js) e
+`integrity-guards` (cron do snapshot + fórmula de prazo + UNIQUEs anti-duplicata).
 - **Rodar:** `npm test` · cobertura com catraca: `npm run test:coverage`
-- **Gate:** 567 testes verdes + thresholds por arquivo (não podem cair). Módulos puros
-  no escopo de cobertura: `bracket`, `prize`, `scoring`, `thirds-assign`, `util`.
+- **Gate:** 650 testes verdes + thresholds por arquivo (não podem cair). Módulos puros
+  no escopo de cobertura: `bracket`, `card-results`, `chart-utils`, `prize`,
+  `progression-core`, `scoring`, `thirds-assign`, `util`.
 - **Paridade JS↔SQL:** `scoring-parity.test.js` parseia a ÚLTIMA def SQL de cada função.
   Ao adicionar uma migration que redefine `score_prediction`/etc., **atualize a sentinela**
   do número da migration nesse teste (ex.: pênaltis cravados = migration **056**).
@@ -40,6 +47,10 @@ Os cálculos no PostgreSQL, independentes da implementação JS. Não deixam res
   anti-burla `points_earned`, visibilidade pré-kickoff, audit trail.
 - `test-deadline-boundary.js` / `test-deadline-parity.js` — travas 23h59 BRT + paridade FE↔DB.
 - `test-storage-and-validation.js` — CHECK de placar + RLS de Storage.
+- `npm run test:integrity` (`test-integrity-snapshot.js`) — roda o snapshot/verify REAIS
+  num sandbox tmp contra o DB local (só leitura): completude dos palpites travados
+  (paridade com a fórmula de prazo de `util.js`), formato canônico, idempotência e
+  detecção de adulteração na cadeia real do repo.
 
 ### Nível 4 — E2E de UI (Playwright) · ~30s-2min
 - **Specs estáveis:** `tests/e2e/auth.spec.js` + `predictions.spec.js` (21 testes).
