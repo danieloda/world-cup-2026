@@ -54,7 +54,8 @@ export function matchPoints(stage) {
  *
  * Each correct component SUMS:
  *   - +ag  for each side whose goal count is exactly right (0, 1 or 2 sides)
- *   - +ave if the winner/draw is right (knockout draw decided by pen winner)
+ *   - +ave if the winner/draw is right (KO draw by pen winner) OR the score is
+ *          exact — cravar o placar do tempo normal vale o resultado mesmo com pênalti errado
  *   - +dg  if the goal difference is right (includes 0-diff draws)
  * So a perfect score = 2*ag + ave + dg.
  *
@@ -78,10 +79,13 @@ export function scorePrediction(predHome, predAway, predPen, actualHome, actualA
   if (predHome === actualHome) pts += ag;
   if (predAway === actualAway) pts += ag;
 
-  // AVE — winner / draw
+  // AVE — winner / draw. Cravar o placar do tempo normal (gols dos dois lados
+  // iguais ao real) garante o ponto de RESULTADO mesmo errando o pênalti — a
+  // regra promete "placar exato" a quem crava (ver regras.html#penaltis).
+  const isExactScore = predHome === actualHome && predAway === actualAway;
   const predWinner = determineWinner(predHome, predAway, predPen, stage);
   const actualWinner = determineWinner(actualHome, actualAway, actualPen, stage);
-  if (predWinner === actualWinner) pts += ave;
+  if (isExactScore || predWinner === actualWinner) pts += ave;
 
   // DG — goal difference
   if ((predHome - predAway) === (actualHome - actualAway)) pts += dg;
@@ -102,7 +106,9 @@ export function scoreBreakdown(predHome, predAway, predPen, actualHome, actualAw
   const parts = [];
   if (predHome === actualHome) parts.push({ key: 'side', label: 'Gols mandante', pts: ag });
   if (predAway === actualAway) parts.push({ key: 'side', label: 'Gols visitante', pts: ag });
-  if (determineWinner(predHome, predAway, predPen, stage) === determineWinner(actualHome, actualAway, actualPen, stage)) {
+  // Cravou o placar → o ponto de resultado conta mesmo errando o pênalti.
+  const isExactScore = predHome === actualHome && predAway === actualAway;
+  if (isExactScore || determineWinner(predHome, predAway, predPen, stage) === determineWinner(actualHome, actualAway, actualPen, stage)) {
     parts.push({ key: 'winner', label: 'Resultado', pts: ave });
   }
   if ((predHome - predAway) === (actualHome - actualAway)) {

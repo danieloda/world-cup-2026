@@ -78,11 +78,12 @@ begin
   if got = exp then n_ok:=n_ok+1; else n_fail:=n_fail+1;
     raise warning 'FAIL [r16/pen home==home] got=% exp=%', got, exp; end if;
 
-  -- 6b: pred 1-1 pen=home, real 1-1 pen=away → placar exato (2ag + dg) mas vencedor errado → SEM ave
+  -- 6b: pred 1-1 pen=home, real 1-1 pen=away → CRAVOU o placar do tempo normal →
+  -- placar exato CHEIO (2ag + ave + dg) MESMO errando o pênalti (regra: cravou = exato)
   got := public.score_prediction(1,1,'home', 1,1,'away', 'r16');
-  exp := 2*3 + 1;
+  exp := 2*3 + 12 + 1;
   if got = exp then n_ok:=n_ok+1; else n_fail:=n_fail+1;
-    raise warning 'FAIL [r16/pen home!=away sem ave] got=% exp=%', got, exp; end if;
+    raise warning 'FAIL [r16/cravou empate, pênalti errado → exato cheio] got=% exp=%', got, exp; end if;
 
   -- 6c: GRUPO empate 1-1 vs 1-1 (pen irrelevante) → ave de empate conta
   got := public.score_prediction(1,1,null, 1,1,null, 'group');

@@ -107,8 +107,10 @@ describe('scorePrediction — mata-mata com pênaltis', () => {
   it('1-1(h) vs 1-1(h) oitavas = exato = 19', () => {
     expect(scorePrediction(1, 1, 'h', 1, 1, 'h', 'r16')).toBe(19);
   });
-  it('placar exato mas pênalti errado (1-1 h vs 1-1 a) = 2*ag + dg, sem ave = 7', () => {
-    expect(scorePrediction(1, 1, 'h', 1, 1, 'a', 'r16')).toBe(7);
+  it('cravou o empate mas errou o pênalti (1-1 h vs 1-1 a) → placar exato CHEIO = 19', () => {
+    // Regra (regras.html#penaltis): cravar o placar do tempo normal leva o ponto de
+    // RESULTADO mesmo errando quem passou nos pênaltis. r16: 2*ag(3)+ave(12)+dg(1)=19.
+    expect(scorePrediction(1, 1, 'h', 1, 1, 'a', 'r16')).toBe(19);
   });
   it('vencedor por pênalti certo, sem lado (2-2 h vs 1-1 h) = ave12 + dg1 = 13', () => {
     expect(scorePrediction(2, 2, 'h', 1, 1, 'h', 'r16')).toBe(13);
@@ -205,10 +207,11 @@ describe('scoreBreakdown — decomposição aditiva', () => {
     expect(b.pts).toBe(13); // ave12 + dg1
   });
 
-  it('placar exato mas pênalti errado (r16 1-1 h vs 1-1 a) → lados + saldo, SEM resultado = 7', () => {
+  it('cravou o empate mas errou o pênalti (r16 1-1 h vs 1-1 a) → exato cheio (lados+resultado+saldo) = 19', () => {
+    // Regra: cravar o placar do tempo normal leva o Resultado mesmo errando o pênalti.
     const b = scoreBreakdown(1, 1, 'h', 1, 1, 'a', 'r16');
-    expect(keys(b)).toEqual(['side', 'side', 'diff']); // 3+3+1, sem winner
-    expect(b.pts).toBe(7);
+    expect(keys(b)).toEqual(['side', 'side', 'winner', 'diff']); // 3+3+12+1
+    expect(b.pts).toBe(19);
   });
 
   // Propriedade: a soma do breakdown SEMPRE bate com scorePrediction.
