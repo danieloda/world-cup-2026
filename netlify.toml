@@ -8,6 +8,17 @@
   # Diretório a deployar (web root estático)
   publish = "src"
 
+  # ============================================================
+  # Pula o deploy quando NADA que afeta o site publicado mudou.
+  # Netlify CANCELA o build se o `ignore` sai com código 0.
+  # `git diff --quiet ... -- <paths>`: sai 0 (= pula) quando não há
+  # diff nesses paths; sai 1 (= faz deploy) quando houver.
+  # Sem isso, commits que mexem só em tests/, supabase/, docs/,
+  # scripts/ ou .github/ disparavam deploys de 15 créditos à toa
+  # (~50% dos deploys de jun/26 publicaram src/ idêntico).
+  # ============================================================
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- src netlify.toml package.json scripts/build-config.js"
+
 # ============================================================
 # ENV VARS — configurar no Netlify UI (Site Settings → Env)
 # ============================================================
