@@ -140,9 +140,14 @@ async function main() {
   const byUserMatch = (a, b) => (a.user_id < b.user_id ? -1 : a.user_id > b.user_id ? 1 : a.match_id - b.match_id);
   const byUser = (a, b) => (a.user_id < b.user_id ? -1 : a.user_id > b.user_id ? 1 : 0);
 
+  // ⚠️ NADA de timestamp aqui dentro: o conteúdo é só DADO, para que dois runs
+  // sem mudança no banco produzam o MESMO content_hash (é isso que torna o
+  // "Sem mudança" abaixo real — antes o taken_at entrava no hash e o dedupe
+  // nunca disparava: snapshots #1–#4 eram idênticos exceto pelo relógio).
+  // O instante do carimbo vive no manifest (taken_at), no nome do arquivo e
+  // nos timestamps de terceiro (git/Telegram).
   const content = {
-    version: 1,
-    taken_at: now.toISOString(),
+    version: 2,
     locked_match_ids: lockedIds,
     results: matches
       .filter((m) => m.finished)

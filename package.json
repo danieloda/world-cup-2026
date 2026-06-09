@@ -15,6 +15,7 @@
     "test:all": "npm run test && npm run test:e2e",
     "test:rls": "node scripts/e2e/test-rls-hostile.js",
     "test:render": "node scripts/e2e/test-render-adversarial.js",
+    "test:integrity": "node scripts/e2e/test-integrity-snapshot.js",
     "sync:squads": "node scripts/data/sync-squads.js",
     "sync:h2h": "node scripts/data/fetch-h2h.js",
     "sync:h2h-pairs": "node scripts/data/fetch-h2h-pairs.js",
