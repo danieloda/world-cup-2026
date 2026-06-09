@@ -596,8 +596,8 @@ function renderResultRow(m) {
           ${escapeHtml(teamPt(m.team_away))}
           <span class="flag">${flag(m.team_away)}</span>
         </div>
-        <div style="text-align:right;">
-          ${isKO ? `
+        ${isKO ? `
+          <div class="pen-cell">
             <div style="font-size:10px; color:var(--text-mute); margin-bottom:4px; letter-spacing:.1em; text-transform:uppercase;">
               Vencedor pênaltis
             </div>
@@ -606,8 +606,8 @@ function renderResultRow(m) {
               <button class="${m.pen_winner == null ? 'active' : ''}" data-action="set-pen" data-match-id="${m.id}" data-side="">—</button>
               <button class="${m.pen_winner === 'away' ? 'active' : ''}" data-action="set-pen" data-match-id="${m.id}" data-side="away">FORA</button>
             </div>
-          ` : ''}
-        </div>
+          </div>
+        ` : ''}
       </div>
 
       ${scoreFilled ? `

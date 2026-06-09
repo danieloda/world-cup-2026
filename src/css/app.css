@@ -4961,6 +4961,40 @@ input[type="number"].score-input {
   font-weight: 600; font-size: 14px;
 }
 .result-row .team-disp.right { justify-content: flex-end; }
+.result-row .pen-cell { text-align: right; }
+
+/* Lançar resultados no celular: a grid desktop tem 396px fixos (80+140+120
+   + 4 gaps) — mais que a tela. Os times colapsavam a 0 e se sobrepunham, o
+   placar saía do card e o seletor de pênaltis era clipado (bloqueando o
+   Lançar de KO empatado). Reorganiza em 3 linhas: quando / time–placar–time
+   / pênaltis. */
+@media (max-width: 700px) {
+  .result-row-top {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    grid-template-areas:
+      "when  when  when"
+      "home  score away"
+      "pen   pen   pen";
+    gap: 10px 8px;
+  }
+  .result-row .when { grid-area: when; }
+  .result-row .when strong { display: inline; margin-right: 8px; }
+  .result-row .team-disp {
+    grid-area: home;
+    flex-direction: column; justify-content: flex-start;
+    gap: 6px; min-width: 0;
+    text-align: center; font-size: 12.5px; line-height: 1.25;
+  }
+  .result-row .team-disp.right { grid-area: away; justify-content: flex-start; }
+  /* placar horizontal (1 – 1) entre os times; o base empilha em coluna */
+  .result-row .score-cell { grid-area: score; flex-direction: row; gap: 8px; align-self: center; }
+  .result-row .pen-cell { grid-area: pen; text-align: center; }
+  .result-row .pen-cell .pen-toggle { display: flex; width: 100%; margin-top: 4px; }
+  .result-row .pen-cell .pen-toggle button { flex: 1; padding: 10px 0; }
+  /* dropdown de jogador ocupa a linha; qtd + botão dividem a de baixo */
+  .scorer-add { grid-template-columns: 1fr 1fr; }
+  .scorer-add > :first-child { grid-column: 1 / -1; }
+}
 
 /* ===== Scorer section inside result-row ===== */
 .scorers {
