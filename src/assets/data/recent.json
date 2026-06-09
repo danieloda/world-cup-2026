@@ -1081,6 +1081,13 @@
   ],
   "France": [
     [
+      "2026-06-08",
+      "Northern Ireland",
+      true,
+      "3-1",
+      "Amistoso"
+    ],
+    [
       "2026-06-04",
       "Ivory Coast",
       true,
@@ -1142,13 +1149,6 @@
       false,
       "2-0",
       "Eliminatórias"
-    ],
-    [
-      "2025-06-08",
-      "Germany",
-      false,
-      "2-0",
-      "Nations League"
     ]
   ],
   "Germany": [
@@ -1873,6 +1873,13 @@
   ],
   "Netherlands": [
     [
+      "2026-06-08",
+      "Uzbekistan",
+      true,
+      "2-1",
+      "Amistoso"
+    ],
+    [
       "2026-06-03",
       "Algeria",
       true,
@@ -1933,13 +1940,6 @@
       "Poland",
       true,
       "1-1",
-      "Eliminatórias"
-    ],
-    [
-      "2025-06-10",
-      "Malta",
-      true,
-      "8-0",
       "Eliminatórias"
     ]
   ],
@@ -2737,6 +2737,13 @@
   ],
   "Spain": [
     [
+      "2026-06-09",
+      "Peru",
+      false,
+      "3-1",
+      "Amistoso"
+    ],
+    [
       "2026-06-04",
       "Iraq",
       true,
@@ -2798,13 +2805,6 @@
       false,
       "3-0",
       "Eliminatórias"
-    ],
-    [
-      "2025-06-08",
-      "Portugal",
-      false,
-      "2-2",
-      "Nations League"
     ]
   ],
   "Sweden": [
@@ -3169,6 +3169,13 @@
   ],
   "Uzbekistan": [
     [
+      "2026-06-08",
+      "Netherlands",
+      false,
+      "1-2",
+      "Amistoso"
+    ],
+    [
       "2026-06-02",
       "Canada",
       false,
@@ -3230,13 +3237,6 @@
       true,
       "2-0",
       "Amistoso"
-    ],
-    [
-      "2025-09-08",
-      "Iran",
-      false,
-      "1-0",
-      "Copa CAFA"
     ]
   ],
   "Türkiye": [
