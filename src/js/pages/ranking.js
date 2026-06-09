@@ -8,6 +8,7 @@ import {
 import { championBonus, scoreBreakdown, scorerBonus } from '../scoring.js';
 import { renderRankChart } from '../rank-chart.js';
 import { initTooltips } from '../tooltip.js';
+import { sortLeaderboard, assignRanksAndPrizes } from '../prize.js';
 
 // ============================================================
 // Estado
@@ -98,7 +99,10 @@ async function loadData() {
   if (leaderRes.error) throw leaderRes.error;
 
   stats = statsRes.data ?? { finished_matches: 0, total_matches: 104, pct_played: 0, paid_users: 0, total_pot: 0 };
-  leaderboard = leaderRes.data ?? [];
+  // Ordena pelo desempate oficial (total → exatos → V+S) no cliente — fonte da
+  // ordem exibida. Não confiamos no ORDER BY da view (o PostgREST não garante
+  // preservá-lo sem .order() explícito). Ver ../prize.js.
+  leaderboard = sortLeaderboard(leaderRes.data ?? []);
   scorerRanking = scorerRes.data ?? [];
 
   // Determina campeão real da Final
@@ -769,47 +773,11 @@ function attachEventListeners() {
 // ============================================================
 // Posições com empate + rateio do prêmio (regra SBC 2022)
 // ============================================================
-// O v_leaderboard já vem ordenado por total_pts → exact_count → winner_sg_count
-// (os 3 critérios de desempate da página de Regras). Quando dois jogadores
-// empatam NOS TRÊS não há como separá-los: dividem a MESMA posição (ex.: dois
-// "2º") e, se essa posição premia, os prêmios das casas que eles ocupam são
-// somados e divididos por igual — o rateio.
-
-// Dois jogadores empatam de verdade quando são iguais nos 3 critérios.
-function tiedPair(a, b) {
-  return a.total_pts === b.total_pts
-      && a.exact_count === b.exact_count
-      && (a.winner_sg_count ?? 0) === (b.winner_sg_count ?? 0);
-}
-
-// Muta cada linha adicionando: pos (posição "competição padrão": 1,2,2,4…),
-// tied (compartilha posição), tieSize (quantos no bloco) e prizeShare (R$ já rateado).
-// prizeByPos = [prêmio 1º, prêmio 2º, prêmio 3º] em reais.
-function assignRanksAndPrizes(rows, prizeByPos) {
-  rows.forEach((u, i) => {
-    u.pos = (i > 0 && tiedPair(rows[i - 1], u)) ? rows[i - 1].pos : i + 1;
-  });
-
-  for (let i = 0; i < rows.length;) {
-    let j = i;
-    while (j + 1 < rows.length && rows[j + 1].pos === rows[i].pos) j++;
-    const size = j - i + 1;
-    // Soma os prêmios das casas realmente ocupadas pelo bloco (pos … pos+size-1).
-    let pool = 0;
-    for (let k = 0; k < size; k++) {
-      const slot = rows[i].pos + k; // casa 1-based
-      if (slot >= 1 && slot <= prizeByPos.length) pool += prizeByPos[slot - 1];
-    }
-    const share = pool / size;
-    for (let r = i; r <= j; r++) {
-      rows[r].tied = size > 1;
-      rows[r].tieSize = size;
-      rows[r].prizeShare = share;
-    }
-    i = j + 1;
-  }
-  return rows;
-}
+// O desempate entre participantes (total → exatos → V+S) e o rateio do prêmio
+// vivem em ../prize.js — módulo PURO e testado (tests/unit/prize.test.js).
+// A ordem EXIBIDA vem de sortLeaderboard (aplicada no load); não dependemos de o
+// PostgREST preservar o ORDER BY interno do v_leaderboard. assignRanksAndPrizes
+// assume a lista já ordenada e adiciona pos/tied/tieSize/prizeShare a cada linha.
 
 // ============================================================
 // Helpers
