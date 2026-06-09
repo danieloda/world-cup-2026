@@ -6,11 +6,13 @@
  *   - ADICIONA ~10 usuários voláteis, cada um com pico de pontuação numa fase
  *     diferente (ás dos grupos, ás das oitavas, rei da final + campeão, artilheiro,
  *     etc.) pra FORÇAR muitas viradas de posição ao longo da Copa.
- *   - valida no DOM: SVG renderiza; nº de linhas == usuários pagos; a legenda
- *     mostra, por série, o MESMO total do v_leaderboard (invariante "fim da série
- *     == tabela"); muitas trocas de posição (lê a geometria das polylines);
- *     modos "Por jogo"/"Por dia"; foco/isolar via legenda; hover com tooltip de
- *     standings + confronto; linha "Você" destacada.
+ *   - valida no DOM (bump focado, 2026-06): SVG renderiza; pelotão = contexto
+ *     cinza + foco colorido (padrão Pódio+Você); legenda expandida mostra, por
+ *     série, o MESMO total do v_leaderboard (invariante "fim da série ==
+ *     tabela"); muitas trocas de posição (geometria das polylines); zooms
+ *     "Por semana"/"Jogos da semana"; seleção livre via legenda + presets como
+ *     reset; hover com tooltip de standings + confronto; linha "Você" com glow;
+ *     card "Sua jornada" no Início (KPIs com partida real + linha + dropdown).
  *
  * MUTA o DB: cria usuários (paid) + palpites e roda recompute. Limpa tudo no
  * finally (apaga os vol-*@testuser.com e recomputa), voltando ao baseline.
@@ -150,12 +152,22 @@ try {
   await page.waitForSelector('#rankChart .rc-svg', { timeout: 15000 });
   await page.locator('#rankChart').screenshot({ path: join(shotsDir, 'rank-chart-game.png') }).catch(() => {});
 
-  // (1) nº de linhas == usuários pagos
-  const lineCount = await page.locator('#rankChart polyline.rc-line').count();
-  check('SVG: 1 linha por usuário pago', lineCount === N, `linhas=${lineCount} N=${N}`);
+  // (1) pelotão completo: contexto cinza + foco colorido == usuários pagos.
+  //     Padrão = Pódio + Você (3 ou 4 linhas focadas, conforme "Você" ∈ top 3).
+  const ctxCount = await page.locator('#rankChart polyline.rc-ctx').count();
+  const focCount = await page.locator('#rankChart polyline.rc-foc').count();
+  check('SVG: contexto + foco == 1 linha por usuário pago', ctxCount + focCount === N,
+    `ctx=${ctxCount} foc=${focCount} N=${N}`);
+  const top3 = lb.slice(0, 3).map(u => u.user_id);
+  const expFoc = top3.includes(me.user_id) ? 3 : 4;
+  check(`foco padrão = Pódio + Você (${expFoc} linhas)`, focCount === expFoc, `foc=${focCount}`);
 
-  // (2) legenda: pts de cada série == v_leaderboard.total_pts  (invariante central do gráfico)
-  const legend = await page.$$eval('#rankChart .rc-leg', els => els.map(e => ({
+  // (2) legenda EXPANDIDA: pts de cada série == v_leaderboard.total_pts
+  //     (invariante central do gráfico)
+  await page.click('#rankChart [data-action="toggle-all"]');
+  await page.waitForFunction((n) =>
+    document.querySelectorAll('#rankChart .rc-leg[data-user]').length === n, N, { timeout: 5000 });
+  const legend = await page.$$eval('#rankChart .rc-leg[data-user]', els => els.map(e => ({
     uid: e.dataset.user,
     pt: parseInt((e.querySelector('.rc-pt')?.textContent || '').replace(/\D+/g, ''), 10),
     nm: e.querySelector('.rc-nm')?.textContent?.trim() || '',
@@ -169,8 +181,9 @@ try {
   const leaderUid = lb[0].user_id;
   check('legenda: topo == líder do v_leaderboard', legend[0]?.uid === leaderUid);
 
-  // (3) MUITAS viradas: lê a geometria das polylines e conta trocas de posição por coluna
-  const polys = await page.$$eval('#rankChart polyline.rc-line', els =>
+  // (3) MUITAS viradas: lê a geometria de TODAS as polylines (ctx+foc) e conta
+  //     trocas de posição por coluna (zoom padrão "Por semana")
+  const polys = await page.$$eval('#rankChart polyline.rc-ctx, #rankChart polyline.rc-foc', els =>
     els.map(e => e.getAttribute('points').trim().split(/\s+/).map(pt => Number(pt.split(',')[1]))));
   const S = polys[0]?.length || 0;
   const sameLen = polys.every(p => p.length === S);
@@ -186,36 +199,37 @@ try {
   check(`gráfico: MUITAS viradas de posição (${changeEvents} eventos em ${S} colunas)`, changeEvents >= 30,
     `linhas=${polys.length}`);
 
-  // (4) linha "Você" destacada + legenda "Você"
-  check('linha "Você" destacada (classe .me)', await page.locator('#rankChart polyline.rc-line.me').count() === 1);
-  check('legenda mostra "Você"', legend.some(l => l.nm === 'Você'));
+  // (4) linha "Você" com glow + legenda "Você"
+  check('linha "Você" destacada (classe .me)', await page.locator('#rankChart polyline.rc-foc.me').count() === 1);
+  check('legenda mostra "Você"', legend.some(l => /Você$/.test(l.nm)));
 
-  // (5) modos: Por dia / Por jogo
-  await page.click('#rankChart .rc-mode[data-mode="day"]');
-  await page.waitForSelector('#rankChart .rc-mode[data-mode="day"].active', { timeout: 5000 });
-  check('modo "Por dia": mantém N linhas', await page.locator('#rankChart polyline.rc-line').count() === N);
-  const xDay = await page.$$eval('#rankChart .rc-xlbl', els => els.map(e => e.textContent.trim()));
-  check('modo "Por dia": rótulos X são datas (d/m)', xDay.length > 0 && xDay.every(t => /^\d{1,2}\/\d{1,2}$/.test(t)),
-    `x=[${xDay.slice(0, 4).join(', ')}]`);
-  await page.locator('#rankChart').screenshot({ path: join(shotsDir, 'rank-chart-day.png') }).catch(() => {});
-  await page.click('#rankChart .rc-mode[data-mode="game"]');
-  await page.waitForSelector('#rankChart .rc-mode[data-mode="game"].active', { timeout: 5000 });
+  // (5) zooms de tempo: Por semana (padrão) / Jogos da semana
+  const xWeek = await page.$$eval('#rankChart .rc-xlbl', els => els.map(e => e.textContent.trim()));
+  check('zoom "Por semana" (padrão): rótulos X são "Semana N"', xWeek.length > 0 && xWeek.every(t => /^Semana \d+$/.test(t)),
+    `x=[${xWeek.slice(0, 4).join(', ')}]`);
+  await page.locator('#rankChart').screenshot({ path: join(shotsDir, 'rank-chart-week.png') }).catch(() => {});
+  await page.click('#rankChart .rc-seg button[data-g="jogo"]');
+  await page.waitForSelector('#rankChart .rc-seg button[data-g="jogo"].on', { timeout: 5000 });
+  check('zoom "Jogos da semana": mantém N linhas', await page.locator('#rankChart polyline.rc-ctx, #rankChart polyline.rc-foc').count() === N);
   const xGame = await page.$$eval('#rankChart .rc-xlbl', els => els.map(e => e.textContent.trim()));
-  check('modo "Por jogo": rótulos X são "Jogo N"', xGame.some(t => /^Jogo \d+$/.test(t)), `x=[${xGame.slice(0, 3).join(', ')}]`);
+  check('zoom "Jogos da semana": rótulos X são "Jogo N"', xGame.some(t => /^Jogo \d+$/.test(t)), `x=[${xGame.slice(0, 3).join(', ')}]`);
+  await page.locator('#rankChart').screenshot({ path: join(shotsDir, 'rank-chart-games.png') }).catch(() => {});
 
-  // (6) foco/isolar via legenda
-  const firstLeg = page.locator('#rankChart .rc-leg').first();
-  const firstUid = await firstLeg.getAttribute('data-user');
-  await firstLeg.click();
-  await page.waitForSelector(`#rankChart .rc-leg.active[data-user="${firstUid}"]`, { timeout: 5000 });
-  check('foco: isola 1 série (N-1 linhas .dim)', await page.locator('#rankChart polyline.rc-line.dim').count() === N - 1);
-  check('foco: botão "Ver todos" aparece', await page.locator('#rankChart .rc-clear').count() === 1);
+  // (6) seleção LIVRE via legenda + presets como reset
+  const leaderLeg = page.locator(`#rankChart .rc-leg[data-user="${leaderUid}"]`).first();
+  await leaderLeg.click();  // desliga o líder (estava no foco padrão)
+  await page.waitForFunction((n) =>
+    document.querySelectorAll('#rankChart polyline.rc-foc').length === n, expFoc - 1, { timeout: 5000 });
+  check('legenda desliga QUALQUER um (líder saiu do foco)',
+    await page.locator(`#rankChart .rc-leg[data-user="${leaderUid}"][aria-pressed="false"]`).count() === 1);
   await page.locator('#rankChart').screenshot({ path: join(shotsDir, 'rank-chart-focus.png') }).catch(() => {});
-  await page.click('#rankChart .rc-clear');
-  await page.waitForSelector('#rankChart .rc-clear', { state: 'detached', timeout: 5000 }).catch(() => {});
-  check('foco: "Ver todos" limpa o isolamento', await page.locator('#rankChart polyline.rc-line.dim').count() === 0);
+  await page.click('#rankChart .rc-chip[data-p="podio"]');  // reset
+  await page.waitForFunction((n) =>
+    document.querySelectorAll('#rankChart polyline.rc-foc').length === n, expFoc, { timeout: 5000 });
+  check('preset "Pódio + Você" reseta a seleção',
+    await page.locator('#rankChart polyline.rc-foc').count() === expFoc);
 
-  // (7) hover: linha-guia + tooltip de standings + confronto (modo por jogo)
+  // (7) hover: linha-guia + tooltip de standings + confronto (zoom por jogo)
   await page.locator('#rankChart').scrollIntoViewIfNeeded();  // o handler lê e.clientX real → chart precisa estar no viewport
   const hit = page.locator('#rankChart .rc-hit').first();
   const box = await hit.boundingBox();
@@ -230,9 +244,19 @@ try {
     const t = document.querySelector('#rankChart .rc-tip');
     return { hidden: t?.hidden, rows: t ? t.querySelectorAll('.rc-tip-r').length : 0, hasMatch: !!t?.querySelector('.rc-tip-match') };
   });
-  check('hover: tooltip aparece com standings da coluna', tip.hidden === false && tip.rows > 0, `linhas no tip=${tip.rows}`);
-  check('hover (por jogo): header mostra o confronto', tip.hasMatch);
+  check('hover: tooltip aparece com standings do foco', tip.hidden === false && tip.rows > 0, `linhas no tip=${tip.rows}`);
+  check('hover (jogos da semana): header mostra o confronto', tip.hasMatch);
   await page.locator('#rankChart').screenshot({ path: join(shotsDir, 'rank-chart-hover.png') }).catch(() => {});
+
+  // (7b) "Sua jornada" no Início: linha + KPIs com partida real + dropdown
+  await page.goto(`${BASE}/inicio.html`);
+  await page.waitForSelector('#journeyChart .jc-svg', { timeout: 15000 });
+  check('jornada: linha principal renderiza', await page.locator('#journeyChart .jc-journey').count() === 1);
+  const kpiN = await page.locator('#journeyChart .jc-kpi').count();
+  check('jornada: 5 KPIs (agora/melhor/pior/arrancada/tombo)', kpiN === 5, `kpis=${kpiN}`);
+  check('jornada: KPIs mostram partida real (bandeiras)', await page.locator('#journeyChart .jc-mtx .fi').count() >= 4);
+  check('jornada: dropdown de rival presente', await page.locator('#journeyChart .jc-dd-btn').count() === 1);
+  await page.locator('#journeyChart').screenshot({ path: join(shotsDir, 'journey-inicio.png') }).catch(() => {});
 
   // (8) MESMO bug de paginação afeta "Palpites da galera": com >1000 palpites no
   // bolão, o card da Final tem que mostrar TODOS os palpiteiros pagos (sem corte).

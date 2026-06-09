@@ -1,12 +1,13 @@
 import { requireAuth } from '../auth.js';
 import { renderShell } from '../sidebar.js';
-import { supabase, fetchAllPages } from '../supabase.js';
+import { supabase } from '../supabase.js';
 import {
   flag, escapeHtml, teamPt, formatBrShort, formatTime, showToast,
-  avatarHtml, getInitials, localDateKey, heroMeta,
+  avatarHtml, getInitials, heroMeta,
 } from '../util.js';
-import { championBonus, scoreBreakdown, scorerBonus } from '../scoring.js';
+import { championBonus, scoreBreakdown } from '../scoring.js';
 import { renderRankChart } from '../rank-chart.js';
+import { loadProgression, demoProgression } from '../progression.js';
 import { initTooltips } from '../tooltip.js';
 import { sortLeaderboard, assignRanksAndPrizes } from '../prize.js';
 
@@ -22,13 +23,8 @@ let expandedUserId = null;
 let realChampion = null;     // string — campeão real (null se final não terminou)
 const profileCache = new Map();
 
-// Dados p/ o gráfico de evolução (reconstruído por replay; ver buildProgression)
-let finishedMatches = [];    // jogos finalizados, asc por data
-let predPtsByUserMatch = new Map();  // `${user}|${match}` -> points_earned
-let goalsByMatchPlayer = new Map();  // `${match}|${player}` -> goals
-let qualByUserMatch = new Map();     // `${user}|${match}` -> pts (bônus classificado, jogo JÁ disputado)
-let qualSpillByUser = new Map();     // user -> pts de classificado cujo jogo-ref ainda não foi disputado
-let finalMatchId = null;
+// O gráfico de evolução (replay) mora em ../progression.js + ../rank-chart.js
+// e carrega DEPOIS do primeiro paint — não atrasa a tabela.
 
 // ============================================================
 // Main
@@ -44,15 +40,24 @@ try {
   pageBody.innerHTML = renderPage();
   pageBody.classList.add('fade-up');
 
+  // Gráfico de evolução: carga assíncrona pós-paint (predictions do bolão
+  // inteiro são pesadas — a tabela não espera por elas).
   const chartMount = document.getElementById('rankChart');
   if (chartMount) {
-    const progression = buildProgression();
-    if (progression) renderRankChart(chartMount, { progression, meId: profile.id });
+    loadProgression()
+      .then(prog => {
+        if (prog) renderRankChart(chartMount, { ...prog, meId: profile.id });
+        else chartMount.innerHTML = '';
+      })
+      .catch(err => {
+        console.error('[ranking] gráfico de evolução:', err);
+        chartMount.innerHTML = '';
+      });
   }
 
   // Prévia do gráfico (mesma vibe de "Palpites da galera") enquanto não há jogos.
   const chartPreviewMount = document.getElementById('rankChartPreview');
-  if (chartPreviewMount) renderRankChart(chartPreviewMount, { progression: demoProgression(), meId: 'demo-me' });
+  if (chartPreviewMount) renderRankChart(chartPreviewMount, { ...demoProgression(), meId: 'demo-me' });
 
   attachEventListeners();
   initTooltips();  // tooltips dos termos de pontuação (cabeçalhos da tabela)
@@ -71,15 +76,7 @@ try {
 // Data
 // ============================================================
 async function loadData() {
-  // Palpites pontuados de TODO o bolão: cresce com (usuários × jogos), então
-  // PAGINA — sem isso o PostgREST corta em 1000 linhas e o gráfico subconta os
-  // pontos (o fim das séries deixa de bater com o v_leaderboard). Ver fetchAllPages.
-  const predPtsPromise = fetchAllPages(() =>
-    supabase.from('predictions').select('user_id, match_id, points_earned')
-      .not('points_earned', 'is', null).order('id'));
-
-  const [statsRes, leaderRes, scorerRes, settingsRes, champRes, sPickRes, profilesRes, finalRes,
-         finMatchesRes, predPtsRows, goalsRes, qualRes] = await Promise.all([
+  const [statsRes, leaderRes, scorerRes, settingsRes, champRes, sPickRes, profilesRes, finalRes] = await Promise.all([
     supabase.from('v_pool_stats').select('*').single(),
     supabase.from('v_leaderboard').select('*'),
     supabase.from('v_scorer_ranking').select('*'),
@@ -88,12 +85,6 @@ async function loadData() {
     supabase.from('top_scorer_picks').select('*, players(full_name, team)'),
     supabase.from('profiles').select('id, avatar_url'),
     supabase.from('matches').select('team_home, team_away, actual_home, actual_away, pen_winner, finished').eq('stage', 'final').maybeSingle(),
-    // ---- dados p/ reconstruir a evolução do ranking (replay por data do jogo) ----
-    supabase.from('matches').select('id, match_date, stage, group_name, team_home, team_away, actual_home, actual_away')
-      .eq('finished', true).order('match_date', { ascending: true }),
-    predPtsPromise,
-    supabase.from('player_goals').select('player_id, match_id, goals'),
-    supabase.from('user_qualifier_points').select('user_id, breakdown'),
   ]);
 
   if (leaderRes.error) throw leaderRes.error;
@@ -124,117 +115,6 @@ async function loadData() {
   settings = Object.fromEntries(
     (settingsRes.data ?? []).map(r => [r.key, typeof r.value === 'string' ? tryParse(r.value) : r.value])
   );
-
-  // ---- prepara os índices p/ o replay da evolução ----
-  finishedMatches = finMatchesRes.data ?? [];
-  finalMatchId = finishedMatches.find(m => m.stage === 'final')?.id ?? null;
-  const finishedIds = new Set(finishedMatches.map(m => m.id));
-
-  for (const p of (predPtsRows ?? [])) {
-    predPtsByUserMatch.set(`${p.user_id}|${p.match_id}`, p.points_earned ?? 0);
-  }
-  for (const g of (goalsRes.data ?? [])) {
-    goalsByMatchPlayer.set(`${g.match_id}|${g.player_id}`, g.goals ?? 0);
-  }
-  // Bônus de classificado: cada item referencia o JOGO do mata-mata da vaga. Esse
-  // jogo pode ainda não ter sido disputado (os pontos são creditados quando as
-  // vagas se definem, p.ex. fim dos grupos). Se já foi disputado, atribui ao jogo;
-  // senão joga no "spillover" (entra no último jogo disputado, garantindo que o
-  // fim de cada série == total_pts da tabela).
-  for (const row of (qualRes.data ?? [])) {
-    for (const it of (row.breakdown?.items ?? [])) {
-      const pts = it.pts ?? 0;
-      if (pts === 0) continue;
-      if (it.match_id != null && finishedIds.has(it.match_id)) {
-        const k = `${row.user_id}|${it.match_id}`;
-        qualByUserMatch.set(k, (qualByUserMatch.get(k) ?? 0) + pts);
-      } else {
-        qualSpillByUser.set(row.user_id, (qualSpillByUser.get(row.user_id) ?? 0) + pts);
-      }
-    }
-  }
-}
-
-// ============================================================
-// Evolução do ranking — replay determinístico
-// ============================================================
-// NÃO guardamos snapshots: a posição em qualquer momento é reconstruída
-// somando, em ordem de DATA do jogo, tudo que é atribuível a um jogo:
-//   • pontos do palpite (predictions.points_earned)
-//   • artilheiro (gols do escolhido naquele jogo × multiplicador da fase)
-//   • classificado (itens do breakdown, cada um com seu match_id)
-//   • campeão (no jogo da final)
-// A última coordenada de cada série == total_pts do v_leaderboard.
-function dayKey(iso) {
-  return localDateKey(iso);  // chave de dia no fuso de Brasília (SSOT)
-}
-
-function matchDelta(userId, m) {
-  let d = predPtsByUserMatch.get(`${userId}|${m.id}`) ?? 0;
-
-  // artilheiro: gols do jogador escolhido NESTE jogo
-  const sPick = scorerPicksByUser.get(userId);
-  if (sPick?.player_id != null) {
-    const goals = goalsByMatchPlayer.get(`${m.id}|${sPick.player_id}`) ?? 0;
-    if (goals > 0) d += scorerBonus(goals, m.stage);
-  }
-
-  // classificado: pontos atribuídos a este jogo
-  d += qualByUserMatch.get(`${userId}|${m.id}`) ?? 0;
-
-  // campeão: cai no jogo da final
-  if (m.id === finalMatchId) {
-    const champ = championPicksByUser.get(userId);
-    if (champ && realChampion && champ.team === realChampion) d += championBonus(true);
-  }
-
-  return d;
-}
-
-function buildProgression() {
-  const users = leaderboard.map(u => ({ userId: u.user_id, name: u.full_name, avatar_url: u.avatar_url }));
-  if (finishedMatches.length === 0 || users.length === 0) return null;
-
-  const lastIdx = finishedMatches.length - 1;
-
-  // ----- Por jogo: uma coluna por partida finalizada -----
-  const gameLabels = finishedMatches.map((_, i) => `Jogo ${i + 1}`);
-  const gameSeries = users.map(u => {
-    const spill = qualSpillByUser.get(u.userId) ?? 0;
-    const values = [0];  // ponto inicial (antes de qualquer jogo)
-    let acc = 0;
-    finishedMatches.forEach((m, i) => {
-      acc += matchDelta(u.userId, m);
-      if (i === lastIdx) acc += spill;
-      values.push(acc);
-    });
-    return { userId: u.userId, name: u.name, avatar_url: u.avatar_url, values };
-  });
-
-  // ----- Por dia: agrupa por data do jogo -----
-  const days = [...new Set(finishedMatches.map(m => dayKey(m.match_date)))].sort();
-  const dayLabels = days.map(k => {
-    const [, mo, d] = k.split('-');  // k é yyyy-mm-dd (BRT) — sem Date, sem fuso
-    return `${+d}/${+mo}`;
-  });
-  const matchesByDay = new Map(days.map(k => [k, finishedMatches.filter(m => dayKey(m.match_date) === k)]));
-  const lastDayIdx = days.length - 1;
-  const daySeries = users.map(u => {
-    const spill = qualSpillByUser.get(u.userId) ?? 0;
-    const values = [0];
-    let acc = 0;
-    days.forEach((k, i) => {
-      for (const m of matchesByDay.get(k)) acc += matchDelta(u.userId, m);
-      if (i === lastDayIdx) acc += spill;
-      values.push(acc);
-    });
-    return { userId: u.userId, name: u.name, avatar_url: u.avatar_url, values };
-  });
-
-  return {
-    game: { labels: gameLabels, series: gameSeries, matches: finishedMatches },
-    day:  { labels: dayLabels, series: daySeries },
-  };
 }
 
 function tryParse(s) { try { return JSON.parse(s); } catch { return s; } }
@@ -311,20 +191,21 @@ function renderPage() {
 }
 
 function renderChartSection() {
-  const hasData = finishedMatches.length > 0;
+  const hasData = (stats.finished_matches ?? 0) > 0;
   return `
     <div class="section-head">
       <h3>Evolução do ranking</h3>
       <span class="see-all">posição ao longo da Copa</span>
     </div>
     ${hasData
-      ? `<div class="rank-chart" id="rankChart"></div>`
+      ? `<div class="rank-chart" id="rankChart"><div class="rc-loading">Carregando a evolução…</div></div>`
       : renderChartPreview()}
   `;
 }
 
 // Prévia "É assim que vai ficar": um bump chart de exemplo, desfocado, com
 // chamada pra ação — espelha o preview de "Palpites da galera" (historico.js).
+// A demo vem de progression.js (mesma dos dois gráficos).
 function renderChartPreview() {
   return `
     <div class="preview-wrap">
@@ -335,28 +216,11 @@ function renderChartPreview() {
         <span class="preview-badge">👀 Prévia</span>
         <h3>É assim que vai ficar</h3>
         <p>Assim que os jogos começarem, este gráfico mostra a <strong>posição de cada jogador ao longo da Copa</strong>
-           — jogo a jogo e dia a dia, com cada virada. Os nomes acima são <strong>só de exemplo</strong>.</p>
+           — semana a semana e jogo a jogo, com cada virada. Os nomes acima são <strong>só de exemplo</strong>.</p>
         <a class="btn btn-green" href="palpites-grupos.html">Fazer meus palpites →</a>
       </div>
     </div>
   `;
-}
-
-// Progressão fictícia (pontos acumulados) pra ilustrar a prévia do gráfico.
-// Mesmo formato de buildProgression: values[0] = 0 e cada etapa só soma.
-function demoProgression() {
-  const demo = [
-    { userId: 'demo-me', name: 'Você', game: [0, 7, 14, 21, 33, 40, 52], day: [0, 14, 33, 52] },
-    { userId: 'demo-1',  name: 'Diego', game: [0, 9, 12, 25, 28, 41, 47], day: [0, 12, 28, 47] },
-    { userId: 'demo-2',  name: 'Elis',  game: [0, 5, 16, 19, 31, 38, 50], day: [0, 16, 31, 50] },
-    { userId: 'demo-3',  name: 'Bia',   game: [0, 7, 11, 22, 30, 35, 44], day: [0, 11, 30, 44] },
-    { userId: 'demo-4',  name: 'Caio',  game: [0, 3, 13, 18, 26, 37, 48], day: [0, 13, 26, 48] },
-  ];
-  const series = (key) => demo.map(d => ({ userId: d.userId, name: d.name, avatar_url: null, values: d[key] }));
-  return {
-    game: { labels: ['Jogo 1', 'Jogo 2', 'Jogo 3', 'Jogo 4', 'Jogo 5', 'Jogo 6'], series: series('game') },
-    day:  { labels: ['11/6', '12/6', '13/6', '14/6'], series: series('day') },
-  };
 }
 
 function renderEmpty() {

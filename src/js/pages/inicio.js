@@ -8,6 +8,8 @@ import {
   formatBrDate, formatTime, lockCountdownLabel, stageLabel, isLive,
   teamPt, groundShort, heroMeta,
 } from '../util.js';
+import { renderJourneyChart } from '../journey-chart.js';
+import { loadProgression, demoProgression } from '../progression.js';
 
 // Estado da página
 let profile, stats, todayMatches, upcomingMatches, myStanding, lockAlerts;
@@ -61,6 +63,8 @@ function renderInicio() {
     ${renderNextMatch()}
 
     ${todayMatches.length > 0 ? renderTodaySection() : ''}
+
+    ${renderJourneySection()}
 
     ${renderUpcomingSection()}
 
@@ -292,6 +296,72 @@ function renderMatchRow(m) {
   `;
 }
 
+// ============================================================
+// Sua jornada — card pessoal de evolução no ranking
+// ============================================================
+// Três estados:
+//  • sem jogos finalizados → prévia desfocada com CTA (mesmo padrão do
+//    preview do gráfico no Ranking)
+//  • com jogos + usuário no ranking → gráfico real (carrega pós-paint)
+//  • usuário fora do ranking (não pago) → seção não aparece
+function renderJourneySection() {
+  const hasData = (stats.finished_matches ?? 0) > 0;
+  if (hasData && !myStanding) return '';
+  return `
+    <section id="journeySection">
+      <div class="section-head">
+        <h3>Sua jornada</h3>
+        <a class="see-all" href="ranking.html">Ver ranking completo →</a>
+      </div>
+      ${hasData
+        ? `<div class="journey-card" id="journeyChart"><div class="rc-loading">Carregando sua jornada…</div></div>`
+        : `
+        <div class="preview-wrap">
+          <div class="preview-blurred" aria-hidden="true">
+            <div class="journey-card" id="journeyPreview"></div>
+          </div>
+          <div class="preview-overlay">
+            <span class="preview-badge">👀 Prévia</span>
+            <h3>É assim que vai ficar</h3>
+            <p>Assim que os jogos começarem, este card conta a <strong>sua história na Copa</strong> —
+               melhor momento, arrancadas e tombos, dia a dia. Os dados acima são <strong>só de exemplo</strong>.</p>
+            <a class="btn btn-green" href="palpites-grupos.html">Fazer meus palpites →</a>
+          </div>
+        </div>`}
+    </section>
+  `;
+}
+
+// Carrega o replay e desenha a jornada (ou a prévia demo). Qualquer falha
+// derruba a seção inteira — o Início nunca quebra por causa do gráfico.
+function mountJourney() {
+  const section = document.getElementById('journeySection');
+  if (!section) return;
+
+  const previewMount = document.getElementById('journeyPreview');
+  if (previewMount) {
+    try {
+      renderJourneyChart(previewMount, { ...demoProgression(), meId: 'demo-me' });
+    } catch (err) {
+      console.error('[inicio] prévia da jornada:', err);
+      section.remove();
+    }
+    return;
+  }
+
+  const mount = document.getElementById('journeyChart');
+  if (!mount) return;
+  loadProgression()
+    .then(prog => {
+      const ok = prog && renderJourneyChart(mount, { ...prog, meId: profile.id });
+      if (!ok) section.remove();
+    })
+    .catch(err => {
+      console.error('[inicio] jornada:', err);
+      section.remove();
+    });
+}
+
 function renderQuickLinks() {
   return `
     <div class="section-head" style="margin-top:48px;">
@@ -352,6 +422,7 @@ try {
   pageBody.innerHTML = renderInicio();
   pageBody.classList.add('fade-up');
   startCountdown();  // ticker do bloco "próximo jogo"
+  mountJourney();    // gráfico "Sua jornada" (assíncrono, não trava a página)
 } catch (err) {
   console.error('[inicio] FATAL:', err);
   document.body.innerHTML = `
