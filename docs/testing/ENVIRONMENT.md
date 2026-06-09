@@ -50,8 +50,14 @@ O que ele faz (idempotente, com guard-rail que **aborta se a URL não for local*
 
 | Estado | Como chegar | Bom para testar |
 |---|---|---|
-| **Pré-torneio** (real hoje) | `bootstrap-local.sh` | palpites, travas, RLS, concorrência, Raio-X, signup |
-| **Pós-resultados** (pontuado) | `bootstrap-local.sh --playout` ou aplicar `playout.sql` | ranking, scoring, leaderboard, histórico, gráfico |
+| **Pré-torneio** (real hoje) | `bootstrap-local.sh` | palpites (inputs abertos), travas/deadline, RLS, concorrência, Raio-X, signup |
+| **Pós-resultados** (pontuado) | `bootstrap-local.sh --playout` ou aplicar `playout.sql` | ranking, scoring, leaderboard, gráfico, classificação/3ºs |
+| **Golden-path** (datas no PASSADO) | `seed-harness-state.js` (após pré-torneio) | **histórico** (cards reais), `historico-scorer`, `rank-chart`, `admin-ui-penalty`, `06-ui-assert` |
+
+> ⚠️ **O histórico revela por `match_date <= now()`** (não por `finished`). No `--playout` as datas
+> canônicas da Copa (jun–jul) são **futuras** → o histórico mostra a **PRÉVIA** (cards desfocados),
+> não cards reais. Para testar o DOM do histórico use o **golden-path** (`seed-harness-state.js`,
+> que joga o torneio com datas no passado). Ver matriz de baseline por teste no TEST_PLAN.md.
 
 Aplicar o playout manualmente a qualquer momento:
 ```bash
@@ -92,8 +98,11 @@ npx supabase stop           # mantém o volume; `--no-backup` descarta os dados
 | Sintoma | Causa / correção |
 |---|---|
 | Scripts abortam "SUPABASE_URL não é local" | Faltou `source .env.e2e.local` |
+| **`502` / `AuthRetryableFetchError {}` ao criar admin/usuários** (00-setup, seed-scale) | **Kong ficou com o upstream do auth stale após o `db reset`.** Rode `docker restart supabase_kong_world-cup-2026` (espera ~5s) e refaça os passos pós-reset (admin → seed-scale → playout → build:config). É o gargalo nº 1 de qualquer run que começa com bootstrap. |
 | `db reset` falha | Veja `/tmp/wc-bootstrap-reset.log`; confirme Docker + stack up |
 | Mata-mata não resolve | Slots não backfillados — rode o seed `01_matches.sql` (o bootstrap faz) |
 | Cenário SQL: `null user_id` | Falta o admin — rode `00-setup-local.js` (o bootstrap faz) |
 | Standings/`.chip` vazios | Estado pré-torneio (sem jogos finalizados) — use `--playout` |
+| **Histórico mostra a PRÉVIA mesmo com `--playout`** | Datas canônicas são futuras; o histórico revela por `match_date <= now()`. Use o golden-path (`seed-harness-state.js`, datas no passado). |
 | Playwright login flaky | Use `--workers=1` no local (logins simultâneos estouram timeout) |
+| `predictions.spec` falha sem jogos abertos (`.score-input`) | Estado 100%-jogado — rode os specs no **pré-torneio**, não no playout/golden-path. |

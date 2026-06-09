@@ -17,10 +17,15 @@
 ## Níveis
 
 ### Nível 1 — Unitário (vitest, jsdom) · ~5s
-Lógica PURA: `bracket`, `scoring`, `thirds-assign`, `util`, `fifa-rank`, `qualifier`, `raiox`
-render, paridade de prazo/scoring, invariância de fuso, invariantes de RLS, sintaxe/paths.
+Lógica PURA: `bracket`, `scoring`, `prize` (desempate de participantes + rateio),
+`thirds-assign`, `util`, `fifa-rank`, `qualifier`, `raiox` render, paridade de
+prazo/scoring, invariância de fuso, invariantes de RLS, sintaxe/paths.
 - **Rodar:** `npm test` · cobertura com catraca: `npm run test:coverage`
-- **Gate:** 549 testes verdes + thresholds por arquivo (não podem cair).
+- **Gate:** 567 testes verdes + thresholds por arquivo (não podem cair). Módulos puros
+  no escopo de cobertura: `bracket`, `prize`, `scoring`, `thirds-assign`, `util`.
+- **Paridade JS↔SQL:** `scoring-parity.test.js` parseia a ÚLTIMA def SQL de cada função.
+  Ao adicionar uma migration que redefine `score_prediction`/etc., **atualize a sentinela**
+  do número da migration nesse teste (ex.: pênaltis cravados = migration **056**).
 
 ### Nível 2 — Lógica de DB (psql, transação com ROLLBACK) · ~10s
 Os cálculos no PostgreSQL, independentes da implementação JS. Não deixam resíduo.
@@ -66,33 +71,46 @@ Duas formas de montar o estado do harness (10 usuários + oráculo wc2026-e2e-v1
 
 ## Como rodar tudo (ordem recomendada)
 
-```bash
-# 0. Ambiente local com paridade de prod (1 comando)
-./scripts/e2e/bootstrap-local.sh            # pré-torneio
-#   --playout  → também joga o torneio (estado pontuado, p/ ranking/scoring)
-#   --serve    → sobe o servidor estático na :3000
+> **Baseline por fase (não dá pra ter os dois estados ao mesmo tempo):** specs de
+> palpite + deadline-boundary querem **pré-torneio** (jogos abertos); histórico/ranking/
+> scoring querem **golden-path** (datas no passado). Por isso o run completo tem 2 ondas.
 
-# 1-2. Unit + DB (rápidos, alto valor)
-npm test && npm run test:coverage
+```bash
 CID=supabase_db_world-cup-2026
+
+# 0. Ambiente local com paridade de prod
+./scripts/e2e/bootstrap-local.sh --serve        # pré-torneio + servidor :3000
+#   --playout → joga o torneio (pontuado, p/ ranking/scoring; histórico fica em PRÉVIA)
+# ⚠️ Se o bootstrap falhar com 502 ao criar admin/usuários: o db reset deixou o Kong
+#    com o auth stale. Rode e refaça os passos pós-reset:
+docker restart "$CID"_kong 2>/dev/null || docker restart supabase_kong_world-cup-2026
+
+# 1-2. Unit + DB (rápidos; independem do estado)
+npm test && npm run test:coverage
 for s in scoring-sql tiebreak qualifier-bonus; do
   docker cp scripts/e2e/scenarios/$s.sql $CID:/tmp/ && docker exec $CID psql -U postgres -d postgres -f /tmp/$s.sql
 done
 
-# 3. Segurança + prazo
+# ─── ONDA A: PRÉ-TORNEIO (jogos abertos) ───
 source .env.e2e.local
 npm run test:rls
 node scripts/e2e/test-deadline-parity.js
-node scripts/e2e/test-deadline-boundary.js
-
-# 4. E2E UI (precisa do servidor: bootstrap --serve, ou `npx serve src -l 3000`)
+node scripts/e2e/test-deadline-boundary.js     # monta o jogo "vencido" como HOJE (robusto à meia-noite)
 npm run test:render
 TEST_USER_EMAIL=sim-001@bolao.test TEST_USER_PASSWORD='SimUser2026!' npx playwright test --workers=1
+node scripts/e2e/test-temporal-states.js       # exige baseline PONTUADO p/ a FASE B → rode após `--playout`
+node scripts/e2e/test-ui-pages.js && node scripts/e2e/test-odds.js && node scripts/e2e/test-fifa-tie-dom.js
+node scripts/e2e/test-signup-flow.js && node scripts/e2e/test-session.js
 
-# 6. Carga
+# ─── ONDA B: GOLDEN-PATH (datas no passado → histórico revela cards reais) ───
+docker exec -i $CID psql -U postgres -d postgres -q < supabase/seed/01_matches.sql   # volta ao pré-torneio
+docker exec -i $CID psql -U postgres -d postgres -q < supabase/seed/03_settings.sql
+node scripts/e2e/seed-harness-state.js                                                # monta o golden-path
+node scripts/e2e/test-historico-scorer.js && node scripts/e2e/test-rank-chart.js
+node scripts/e2e/test-admin-ui-penalty.js && node scripts/e2e/06-ui-assert.js
+
+# Carga + smoke de prod (este SEM source .env.e2e.local — usa .env de prod, só leitura)
 node scripts/e2e/test-load-concurrency.js --users=60
-
-# 7. Smoke de prod (SEM source .env.e2e.local — usa .env de prod, só leitura)
 node scripts/e2e/prod-smoke.js
 ```
 
