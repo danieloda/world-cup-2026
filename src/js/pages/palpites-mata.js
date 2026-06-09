@@ -468,8 +468,9 @@ function renderFinishedCard(m) {
         ${renderFinRow(m, 'official', 'home')}
         ${renderFinRow(m, 'pred', 'away')}
         ${renderFinRow(m, 'official', 'away')}
+        ${renderPredPen(m, pred)}
+        ${renderOffPen(m)}
       </div>
-      ${renderPenLines(m, pred)}
 
       <div class="km-foot">
         <div class="km-cap">Pontuação</div>
@@ -482,23 +483,22 @@ function renderFinishedCard(m) {
   `;
 }
 
-// Pênaltis no card encerrado — duas perspectivas INDEPENDENTES:
-//   • seu palpite: quando VOCÊ cravou empate, escolheu quem passa (pred_pen_winner)
-//   • oficial: quando o jogo REAL terminou empatado e foi pra disputa (pen_winner)
-// Mostra o time que VOCÊ imaginou na vaga (não o real), pra refletir o seu palpite.
-function renderPenLines(m, pred) {
-  const lines = [];
-  if (pred && pred.pred_home != null && pred.pred_home === pred.pred_away && pred.pred_pen_winner) {
-    const side = pred.pred_pen_winner;                       // 'home' | 'away'
-    const slot = (side === 'home' ? m.slot_home : m.slot_away) || (side === 'home' ? m.team_home : m.team_away);
-    const penTeam = isRealTeam(slot) ? slot : (predSlotResolution.get(slot)?.team ?? null);
-    const who = penTeam ? teamPt(penTeam) : (side === 'home' ? 'mandante' : 'visitante');
-    lines.push(`<div class="km-pen km-pen-pred">⚽ Pênaltis (seu palpite): ${escapeHtml(who)}</div>`);
-  }
-  if (m.pen_winner) {
-    lines.push(`<div class="km-pen">⚽ Pênaltis (oficial): ${escapeHtml(teamPt(m.pen_winner === 'home' ? m.team_home : m.team_away))}</div>`);
-  }
-  return lines.join('');
+// Pênalti do SEU palpite — fica DENTRO da faixa "Seu palpite" (sem rótulo, o contexto
+// já diz). Mostra o time que VOCÊ imaginou na vaga; riscado quando seu empate não rolou.
+function renderPredPen(m, pred) {
+  if (!pred || pred.pred_home == null || pred.pred_home !== pred.pred_away || !pred.pred_pen_winner) return '';
+  const side = pred.pred_pen_winner;                        // 'home' | 'away'
+  const slot = (side === 'home' ? m.slot_home : m.slot_away) || (side === 'home' ? m.team_home : m.team_away);
+  const penTeam = isRealTeam(slot) ? slot : (predSlotResolution.get(slot)?.team ?? null);
+  const who = penTeam ? teamPt(penTeam) : (side === 'home' ? 'mandante' : 'visitante');
+  const realized = m.actual_home === m.actual_away && m.pen_winner === side;  // seu empate+lado se confirmou?
+  return `<div class="km-pen km-area-predpen">pênaltis: <span class="${realized ? '' : 'pen-x'}">${escapeHtml(who)}</span></div>`;
+}
+
+// Pênalti OFICIAL — fica DENTRO da faixa "Resultado oficial". Fato → neutro.
+function renderOffPen(m) {
+  if (!m.pen_winner) return '';
+  return `<div class="km-pen km-area-offpen">pênaltis: ${escapeHtml(teamPt(m.pen_winner === 'home' ? m.team_home : m.team_away))}</div>`;
 }
 
 // Uma linha do card encerrado. lens='pred' (seu palpite) | 'official' (real); side='home'|'away'.
@@ -519,14 +519,10 @@ function renderFinRow(m, lens, side) {
 
   if (lens === 'official') {
     const score = side === 'home' ? m.actual_home : m.actual_away;
-    // Verde onde VOCÊ pontuou nessa vaga (acertou quem chega → bônus de classificado),
-    // vermelho onde não. Aposenta o realce amarelo de "vencedor": quem avança já é
-    // claro pelo placar e, no empate, pela linha "⚽ Pênaltis: …".
-    const q = qualifierBySide.get(`${m.id}:${side}`);
-    const hit = q && (q.pts ?? 0) > 0 ? 'scored' : 'missed';
+    // Nome NEUTRO (fato). O acerto da vaga é comunicado pelo selo "✓ classificado".
     const qual = renderQualBadge(m.id, side);
     return `
-      <div class="km-row km-off ${area} ${hit}">
+      <div class="km-row km-off ${area}">
         <span class="flag">${flag(realTeam)}</span>
         <div class="km-nm">
           <span class="km-name" data-team="${escapeHtml(realTeam || '')}">${escapeHtml(teamPt(realTeam))}</span>
@@ -539,6 +535,8 @@ function renderFinRow(m, lens, side) {
 
   // lens === 'pred' — time que VOCÊ imaginava na vaga + seu placar
   const pscore = pred ? (side === 'home' ? pred.pred_home : pred.pred_away) : null;
+  const actualSide = side === 'home' ? m.actual_home : m.actual_away;
+  const hit = pscore != null && pscore === actualSide;   // cravou os gols deste lado → verde
   const diverged = predTeam && isRealTeam(realTeam) && predTeam !== realTeam;
   return `
     <div class="km-row km-pred ${area} ${diverged ? 'diverged' : ''}">
@@ -547,7 +545,7 @@ function renderFinRow(m, lens, side) {
         <span class="km-name">${predTeam ? escapeHtml(teamPt(predTeam)) : '—'}</span>
         ${slotLine}
       </div>
-      <span class="km-score">${pscore ?? '–'}</span>
+      <span class="km-score${hit ? ' hit' : ''}">${pscore ?? '–'}</span>
     </div>`;
 }
 

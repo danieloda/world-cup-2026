@@ -3826,9 +3826,11 @@ input[type="number"].score-input {
     "predcap"
     "predhome"
     "predaway"
+    "predpen"
     "offcap"
     "offhome"
-    "offaway";
+    "offaway"
+    "offpen";
   align-items: start;
 }
 .km-area-predcap  { grid-area: predcap; }
@@ -3837,6 +3839,8 @@ input[type="number"].score-input {
 .km-area-offhome  { grid-area: offhome; }
 .km-area-predaway { grid-area: predaway; }
 .km-area-offaway  { grid-area: offaway; }
+.km-area-predpen  { grid-area: predpen; }
+.km-area-offpen   { grid-area: offpen; }
 /* divisor antes da faixa oficial quando empilhada (mobile) */
 .km-area-offcap { border-top: 1px dashed var(--line); padding-top: 6px; margin-top: 4px; }
 
@@ -3848,7 +3852,7 @@ input[type="number"].score-input {
   color: var(--text-mute);
   margin-bottom: 3px;
 }
-.km-cap-off { color: var(--accent); }
+.km-cap-off { } /* rótulo neutro (era dourado) — dourado fica reservado ao placar exato */
 
 .km-row {
   display: grid;
@@ -3911,16 +3915,13 @@ input[type="number"].score-input {
   text-align: center;
   color: var(--text);
 }
-/* faixa oficial: VERDE onde você pontuou a vaga (classificado), VERMELHO onde não.
-   (Aposentou o realce amarelo de "vencedor" — quem avança já é claro pelo placar /
-   pela linha de pênaltis.) */
-.km-row.km-off.scored .km-name { color: var(--positive); }
-.km-row.km-off.missed .km-name { color: var(--red); }
-/* faixa do palpite: time que você botou que NÃO chegou (divergência) */
-.km-row.diverged .km-name { color: var(--red); text-decoration: line-through; opacity: .8; }
+/* faixa oficial: nome NEUTRO (fato). O acerto da vaga vive no selo "✓ classificado". */
+/* faixa do palpite: time que você botou que NÃO chegou (divergência) → riscado */
+.km-row.diverged .km-name { color: var(--text-dim); text-decoration: line-through; opacity: .8; }
 .km-row.diverged .flag { opacity: .55; }
 .km-row.km-pred .km-name { color: var(--text-dim); }
 .km-row.km-pred .km-score { color: var(--text-dim); }
+.km-row.km-pred .km-score.hit { color: var(--positive); font-weight: 700; }  /* cravou os gols → verde */
 
 .km-pen {
   font-size: 11px;
@@ -3928,8 +3929,8 @@ input[type="number"].score-input {
   margin-top: 4px;
 }
 .km-pen { font-weight: 600; }
-/* pênalti do SEU palpite: um tom mais apagado que o oficial */
-.km-pen-pred { color: var(--text-mute); }
+/* time do pênalti que NÃO se confirmou (seu palpite) → riscado, como o time divergente */
+.km-pen .pen-x { text-decoration: line-through; opacity: .7; }
 
 .km-foot {
   border-top: 1px dashed var(--line);
@@ -4009,13 +4010,14 @@ input[type="number"].score-input {
   font-family: var(--font); font-variant-numeric: tabular-nums;
   font-weight: 800; font-size: 16px; color: var(--text-dim);
 }
-.gr-pred.hit { color: var(--accent); }   /* cravou os gols deste time */
+.gr-pred.hit { color: var(--positive); }   /* cravou os gols deste time → verde (acerto) */
 .gr-score {
   text-align: center;
   font-family: var(--font); font-variant-numeric: tabular-nums;
   font-weight: 900; font-size: 20px; color: var(--text);
 }
-.gr-row.winner .gr-name, .gr-row.winner .gr-score { color: var(--accent); }
+/* vencedor do jogo NÃO é mais destacado em dourado — o placar já mostra quem ganhou
+   (dourado fica reservado ao placar exato). Nome/placar oficiais ficam neutros. */
 
 .gr-card .km-foot { border-top: 1px dashed var(--line); margin-top: 6px; padding-top: 6px; }
 .gr-goals {
@@ -4028,7 +4030,7 @@ input[type="number"].score-input {
   text-transform: uppercase; color: var(--text-mute); margin-right: 8px;
 }
 .gr-scorer { margin-right: 10px; font-weight: 600; }
-.gr-scorer b { color: var(--accent); font-weight: 800; }
+.gr-scorer b { color: var(--text-dim); font-weight: 800; }   /* minuto do gol = fato, neutro */
 .gr-goals-sep { color: var(--text-mute); margin-right: 10px; }
 
 /* Toggle de lente (Projeção ⇄ Oficial) acima da classificação do grupo. */
@@ -4209,8 +4211,8 @@ input[type="number"].score-input {
   align-items: baseline;
   gap: 4px;
 }
-.bm-pts.win { color: var(--accent); }
-.bm-pts.exact { color: var(--accent); }    /* amarelo */
+.bm-pts.win { color: var(--positive); }     /* pontuou = verde (dourado fica só p/ exato) */
+.bm-pts.exact { color: var(--accent); }    /* dourado = placar exato (a ÚNICA celebração) */
 .bm-pts.partial { color: var(--positive); }   /* verde */
 .bm-pts.miss { color: var(--red); }       /* vermelho (errou) */
 .bm-pts.no-pred { color: var(--text-mute); }
@@ -4228,7 +4230,7 @@ input[type="number"].score-input {
   padding: 1px 7px;
 }
 .bm-break .brk b { color: var(--positive); font-weight: 800; }
-.bm-break .brk.winner b { color: var(--accent); }
+.bm-break .brk.winner b { color: var(--positive); }   /* chip ganho = acerto (verde, não dourado) */
 /* chip de classificado na Pontuação — verde sutil pra distinguir do placar */
 .bm-break .brk.qual {
   background: var(--positive-dim);
@@ -4241,7 +4243,7 @@ input[type="number"].score-input {
   background: var(--accent-dim);
   color: var(--accent);
 }
-.bm-break .brk.scorer b { color: var(--accent); }
+.bm-break .brk.scorer b { color: var(--positive); }   /* artilheiro ganho = acerto (verde) */
 /* chip de campeão — ouro de medalha (maior peso do bolão) */
 .bm-break .brk.champ {
   background: rgba(212, 167, 58, .16);   /* --medal-gold #d4a73a */
