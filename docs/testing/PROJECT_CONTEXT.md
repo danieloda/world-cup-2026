@@ -32,8 +32,8 @@ SQL (migrations) e JS (`src/js/`). A pontuação existe em 3 cópias (ver §5).
 |---|---|
 | `login` / `signup` / `forgot-password` / `reset-password` / `complete-profile` | Auth + gate de avatar |
 | `inicio` | Dashboard: KPIs, próximo jogo + countdown |
-| `palpites-grupos` | Abas: **Palpites** (72 jogos) · **Resultados/Classificação** · **Terceiros** (1 grupo por vez via stepper) |
-| `palpites-mata` | Palpites do mata-mata (bracket de 32 jogos) |
+| `palpites-grupos` | **Fluxo único** (jun/2026): card por jogo se adapta — aberto=inputs, encerrado=palpite × oficial + pontuação. Toggle **Projeção ⇄ Oficial** na classificação/3ºs (substituiu as abas). Ver `docs/features/palpites-cards.md`. |
+| `palpites-mata` | **Fluxo único** (jun/2026): card unificado palpite × resultado oficial (2 faixas no encerrado); vaga de origem em sublinha, divergência "na sua simulação", e pontuação = placar + classificado + artilheiro + campeão. Ver `docs/features/palpites-cards.md`. |
 | `campeao-artilheiro` | Escolha de campeão + artilheiro (trava no `deadline_champion_scorer`) |
 | `ranking` | Leaderboard + gráfico de evolução (bump chart) |
 | `historico` | Jogos passados + "palpites da galera" |
@@ -121,6 +121,15 @@ Lançar um resultado (`finished=true`) dispara, **em ordem**:
 - **Aba admin "Resultados → lançados"** mostra só os **60 jogos mais recentes** (sem paginação).
 - **Players = API-Football** (id = `api_player_id`). NÃO rodar `sync:players` (squads.json é legado).
   EUA = `"USA"` (não "United States", que era o time-fantasma removido pela 052).
+- **Total do card ≠ `points_earned`** (cards de palpite, jun/2026): `points_earned` é **só placar**.
+  O total exibido soma placar + **classificado** (`user_qualifier_points`) + **artilheiro**
+  (`player_goals`×`top_scorer_picks`) + **campeão** (só na final). Mesma fórmula do
+  `matchDelta()` em `ranking.js` — se mudar a regra, sincronize os dois. Detalhe e playbook
+  de debug em `docs/features/palpites-cards.md`.
+- **Demo local marca `finished` com datas futuras** → páginas date-gated (histórico/RLS) agem
+  como pré-Copa. Use `scripts/e2e/preset-inprogress.js --on` p/ um estado coerente "Copa em andamento".
+- **Calendário "Encerrado":** dias já jogados ficam neutros (não verde) — `dayPredictionStatus`
+  recebe `played` do `buildDateMeta` de cada página.
 
 ## 9. Onde a lógica testável vive
 
@@ -132,3 +141,4 @@ Lançar um resultado (`finished=true`) dispara, **em ordem**:
 | Desempate FIFA | `fifa_rank()` (015) | `src/js/fifa-rank.js` | `tiebreak.sql` B1/B2 |
 | Classificado | `qualifier_bonus_*` (021/022) | `src/js/*` | `qualifier.test.js`, `qualifier-bonus.sql` |
 | Raio-X | — | `src/js/raiox.js` | `raiox-render.test.js` |
+| Cards de palpite (grupos/mata) | — | `palpites-grupos.js`, `palpites-mata.js`, `util.js` | smoke e2e + `docs/features/palpites-cards.md` |
