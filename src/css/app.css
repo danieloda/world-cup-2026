@@ -3977,13 +3977,13 @@ input[type="number"].score-input {
   border-radius: 10px;
   padding: 11px 14px;
   margin-bottom: 10px;
-  border: 1px solid transparent;
-  border-left: 3px solid var(--line-strong);
+  border: 1px solid transparent;   /* borda INTEIRA (igual ao card de mata-mata) */
 }
-.gr-card.exact   { border-left-color: var(--accent);  background: rgba(244, 196, 48, 0.04); }
-.gr-card.partial { border-left-color: var(--positive); background: rgba(29, 185, 84, 0.04); }
-.gr-card.miss    { border-left-color: var(--red);      background: rgba(241, 94, 108, 0.04); }
-.gr-card.no-pred { border-left-color: var(--text-mute); }
+/* Tint da borda inteira pela qualidade do palpite — mesmo tratamento do .km-finished. */
+.gr-card.exact   { border-color: var(--accent);   background: rgba(244, 196, 48, 0.05); }
+.gr-card.partial { border-color: var(--positive);  background: rgba(29, 185, 84, 0.05); }
+.gr-card.miss    { border-color: var(--red);        background: rgba(241, 94, 108, 0.03); }
+.gr-card.no-pred { border-color: var(--line-strong); }
 
 .gr-grid { margin: 4px 0 2px; }
 .gr-colhead, .gr-row {
