@@ -25,6 +25,12 @@ const STAGES = [
   { id: 'final', label: 'Final & 3º lugar' },
 ];
 
+// Ordinais p/ rótulos de slots TBD (ex.: "3º (Segundo Colocado)"). DECLARADO NO TOPO de
+// propósito: o bloco de entrada (try + top-level await) chama renderPage() ANTES da posição
+// original deste const lá embaixo — com bracket de slots não resolvidos isso dava
+// ReferenceError (TDZ "Cannot access 'ORDINAIS' before initialization"). Ver teamDisplay/slotLineLabel.
+const ORDINAIS = ['Primeiro','Segundo','Terceiro','Quarto','Quinto','Sexto','Sétimo','Oitavo','Nono','Décimo','Décimo-primeiro','Décimo-segundo'];
+
 // Placar exato de cada fase (pontuação aditiva, vem de js/scoring.js — sem drift).
 function stageExact(stageId) { return matchPoints(stageId).exact; }
 
@@ -206,8 +212,7 @@ async function openRaioXForMata(homeTeam, awayTeam) {
 
 // A resolução do bracket (slots → times) vive em ../bracket.js (puro, testável).
 // Aqui só passamos o estado de módulo e consumimos o Map resultante.
-
-const ORDINAIS = ['Primeiro','Segundo','Terceiro','Quarto','Quinto','Sexto','Sétimo','Oitavo','Nono','Décimo','Décimo-primeiro','Décimo-segundo'];
+// (ORDINAIS foi içado pro topo do módulo — evita TDZ no render inicial.)
 
 function teamDisplay(slot) {
   if (isRealTeam(slot)) return teamPt(slot);
