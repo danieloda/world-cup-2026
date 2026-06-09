@@ -3937,7 +3937,7 @@ input[type="number"].score-input {
 }
 .gr-card.exact   { border-left-color: var(--accent);  background: rgba(244, 196, 48, 0.04); }
 .gr-card.partial { border-left-color: var(--positive); background: rgba(29, 185, 84, 0.04); }
-.gr-card.miss    { border-left-color: var(--red); }
+.gr-card.miss    { border-left-color: var(--red);      background: rgba(241, 94, 108, 0.04); }
 .gr-card.no-pred { border-left-color: var(--text-mute); }
 
 .gr-grid { margin: 4px 0 2px; }
