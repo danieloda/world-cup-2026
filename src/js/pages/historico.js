@@ -3,10 +3,21 @@ import { renderShell } from '../sidebar.js';
 import { supabase, fetchAllPages } from '../supabase.js';
 import {
   flag, escapeHtml, teamPt, formatBrShort, formatTime, stageLabel,
-  isLive, avatarHtml, localDateKey,
+  isLive, avatarHtml, localDateKey, renderDateCalendar, firstName,
 } from '../util.js';
 import { scorerBonus, stageMultiplier, scoreBreakdown } from '../scoring.js';
+import { KPI } from '../kpi-icons.js';
 import { initTooltips } from '../tooltip.js';
+
+// ============================================================
+// Ícones (SVG inline — nada de emoji na UI)
+// ============================================================
+const ICON = {
+  ball: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7l4 3-1.6 5h-4.8L8 10z"/></svg>',
+  eye: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>',
+  info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>',
+  flag: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h14v16l-7-3-7 3z"/></svg>',
+};
 
 // ============================================================
 // Estado
@@ -182,7 +193,10 @@ function renderPage() {
       </div>
     </section>
 
-    <p class="hist-note">Os palpites de todos ficam visíveis quando o jogo começa — em <b>Próximas partidas</b> sem pontos, e em <b>Finalizadas</b> já pontuados.</p>
+    <div class="hist-note">
+      ${ICON.info}
+      <span>Os palpites de todos ficam visíveis quando o jogo começa — em <b>Próximas partidas</b> sem pontos, e em <b>Finalizadas</b> já pontuados.</span>
+    </div>
 
     ${renderStageTabs()}
 
@@ -202,43 +216,44 @@ function renderPreview() {
     {
       home: 'Brazil', away: 'Croatia', sh: 2, sa: 1, stage: 'Grupo C',
       bets: [
-        { name: 'Você',  ph: 2, pa: 1, pts: 7, cls: 'win-exact',   pcls: 'exact',   me: true },
-        { name: 'Ana',   ph: 2, pa: 0, pts: 5, cls: 'win-partial', pcls: 'partial' },
-        { name: 'Bruno', ph: 1, pa: 1, pts: 1, cls: 'win-partial', pcls: 'partial' },
-        { name: 'Carla', ph: 0, pa: 2, pts: 0, cls: 'miss',        pcls: 'zero' },
+        { name: 'Você',  ph: 2, pa: 1, pts: 7, cls: 'win-exact',   pcls: 'exact',   rcls: 'exact',   rlbl: 'Placar exato',  me: true },
+        { name: 'Ana',   ph: 2, pa: 0, pts: 5, cls: 'win-partial', pcls: 'partial', rcls: 'partial', rlbl: 'Acerto parcial' },
+        { name: 'Bruno', ph: 1, pa: 1, pts: 1, cls: 'win-partial', pcls: 'partial', rcls: 'partial', rlbl: 'Acerto parcial' },
+        { name: 'Carla', ph: 0, pa: 2, pts: 0, cls: 'miss',        pcls: 'zero',    rcls: 'miss',    rlbl: 'Não pontuou' },
       ],
     },
     {
       home: 'Argentina', away: 'France', sh: 1, sa: 1, stage: 'Grupo D',
       bets: [
-        { name: 'Diego', ph: 1, pa: 1, pts: 7, cls: 'win-exact',   pcls: 'exact' },
-        { name: 'Elis',  ph: 0, pa: 0, pts: 5, cls: 'win-partial', pcls: 'partial' },
-        { name: 'Você',  ph: 2, pa: 1, pts: 1, cls: 'win-partial', pcls: 'partial', me: true },
+        { name: 'Diego', ph: 1, pa: 1, pts: 7, cls: 'win-exact',   pcls: 'exact',   rcls: 'exact',   rlbl: 'Placar exato' },
+        { name: 'Elis',  ph: 0, pa: 0, pts: 5, cls: 'win-partial', pcls: 'partial', rcls: 'partial', rlbl: 'Acerto parcial' },
+        { name: 'Você',  ph: 2, pa: 1, pts: 1, cls: 'win-partial', pcls: 'partial', rcls: 'partial', rlbl: 'Acerto parcial', me: true },
       ],
     },
   ];
 
+  const resIcon = c => c === 'exact' ? KPI.exact : c === 'partial' ? KPI.partial : KPI.miss;
+
   const cards = demos.map(d => `
     <div class="history-card group">
       <div class="history-head">
-        <div class="date">16:00</div>
-        <div class="matchup">
-          <span class="flag">${flag(d.home)}</span>
-          <span>${escapeHtml(teamPt(d.home))}</span>
-          <span style="color:var(--text-mute); font-weight:500;">×</span>
-          <span>${escapeHtml(teamPt(d.away))}</span>
-          <span class="flag">${flag(d.away)}</span>
-        </div>
-        <div class="score">${d.sh} — ${d.sa}</div>
-        <div class="stage">${d.stage}</div>
+        <div class="hh-meta">${d.stage} · 16:00</div>
+        <div class="hh-score">${d.sh}<i>–</i>${d.sa}</div>
+      </div>
+      <div class="history-fixture">
+        <span class="hh-team home">${flag(d.home)}<span class="tn">${escapeHtml(teamPt(d.home))}</span></span>
+        <span class="hh-rule"></span>
+        <span class="hh-team away">${flag(d.away)}<span class="tn">${escapeHtml(teamPt(d.away))}</span></span>
       </div>
       <div class="history-bets">
-        ${d.bets.map(b => `
-          <div class="hb-row ${b.cls} ${b.me ? 'me' : ''}">
-            <div class="av-mini">${avatarHtml({ full_name: b.name })}</div>
-            <div class="nm">${escapeHtml(b.name)}</div>
+        <div class="hb-head"><span class="c">#</span><span>Jogador</span><span class="c">Palpite</span><span>Resultado</span><span class="r">Pts</span></div>
+        ${d.bets.map((b, i) => `
+          <div class="hb-row ${b.cls} ${b.me ? 'me' : ''} ${i === 0 ? 'top' : ''}">
+            <span class="hb-rank">${i + 1}</span>
+            <span class="hb-player"><span class="av-mini">${avatarHtml({ full_name: b.name })}</span><span class="nm">${escapeHtml(b.name)}</span></span>
             <span class="pred">${b.ph}<span class="x">–</span>${b.pa}</span>
-            <span class="pts ${b.pcls}">${b.pts > 0 ? '+' + b.pts : '0'}</span>
+            <span class="hb-res ${b.rcls}">${resIcon(b.rcls)}<span class="w">${b.rlbl}</span></span>
+            <span class="hb-ptswrap"><span class="pts ${b.pcls}">${b.pts > 0 ? '+' + b.pts : '0'}</span></span>
           </div>
         `).join('')}
       </div>
@@ -251,7 +266,7 @@ function renderPreview() {
         <div class="history-list">${cards}</div>
       </div>
       <div class="preview-overlay">
-        <span class="preview-badge">👀 Prévia</span>
+        <span class="preview-badge">${ICON.eye} Prévia</span>
         <h3>É assim que vai ficar</h3>
         <p>Quando a Copa começar, cada jogo mostra aqui o <strong>palpite de todos os participantes</strong>,
            com os pontos de cada um. Os nomes e placares acima são <strong>só de exemplo</strong> — nada aqui é real ainda.</p>
@@ -261,12 +276,12 @@ function renderPreview() {
   `;
 }
 
-// ----- ABA 1: FASE -----
+// ----- ABA 1: FASE (controle segmentado; mantém #stageTabs + data-stage) -----
 function renderStageTabs() {
   const groupCount = revealedMatches.filter(m => m.stage === 'group').length;
   const koCount    = revealedMatches.filter(m => m.stage !== 'group').length;
   return `
-    <div class="admin-tabs" id="stageTabs">
+    <div class="admin-tabs hist-seg" id="stageTabs">
       <button class="admin-tab ${activeStage === 'group' ? 'active' : ''}" data-stage="group">
         Grupos <span class="ct">${groupCount}</span>
       </button>
@@ -277,7 +292,7 @@ function renderStageTabs() {
   `;
 }
 
-// ----- ABA 2 (dias) + FILTRO de status + lista -----
+// ----- ABA 2 (calendário) + FILTRO de status + Resumo do dia + lista -----
 function renderTabBody() {
   if (stageMatches().length === 0) {
     return renderEmptyStage();
@@ -285,28 +300,37 @@ function renderTabBody() {
   ensureValidDay();
   ensureValidStatus();
   return `
-    ${renderDayTabs()}
+    ${renderDayCalendar()}
     ${renderStatusChips()}
+    ${renderDaySummary()}
     <div id="historyList">
       ${renderList()}
     </div>
   `;
 }
 
-function renderDayTabs() {
+// Calendário "Por data" — o MESMO componente das telas de palpite (renderDateCalendar).
+// Dias passados ficam neutros (regra: nada verde no passado); o dia em andamento
+// recebe destaque ('soon') via override de status no meta.
+function renderDayCalendar() {
   const days = stageDays();
-  return `
-    <div class="day-tabs" id="dayTabs">
-      ${days.map(([key, count]) => {
-        const d = new Date(key + 'T12:00:00');
-        return `
-          <button class="day-tab ${activeDay === key ? 'active' : ''}" data-day="${key}">
-            ${formatBrShort(d)} <span class="ct">${count}</span>
-          </button>
-        `;
-      }).join('')}
-    </div>
-  `;
+  const dates = days.map(([k]) => k);
+  const meta = {};
+  for (const [k, count] of days) {
+    const dayM = stageMatches().filter(m => dayKey(m) === k);
+    const finished = dayM.filter(m => m.finished).length;
+    const live = dayM.some(m => isLive(m));
+    const d = new Date(k + 'T12:00:00');
+    meta[k] = {
+      total: count,
+      done: finished,
+      played: finished >= count,   // dia todo encerrado → 'past' (neutro)
+      title: formatBrShort(d),
+      info: live ? 'ao vivo' : '',
+      status: live ? 'soon' : undefined,
+    };
+  }
+  return `<div class="hist-cal-wrap" id="dayTabs">${renderDateCalendar({ dates, meta, activeDate: activeDay })}</div>`;
 }
 
 function renderStatusChips() {
@@ -327,6 +351,52 @@ function renderStatusChips() {
   `;
 }
 
+// ----- Resumo do dia (identidade) — derivado dos dados já carregados -----
+function renderDaySummary() {
+  const dayM = dayMatches();
+  const finished = dayM.filter(m => m.finished);
+  if (finished.length === 0) return '';
+
+  let exactsTotal = 0, myPts = 0, myExacts = 0;
+  const byUser = new Map(); // user_id -> { name, isMe, pts }
+  for (const m of finished) {
+    for (const b of (predsByMatch.get(m.id) ?? [])) {
+      const sc = scorerHitFor(b, m);
+      const tot = (b.points_earned ?? 0) + (sc ? sc.bonus : 0);
+      const isExact = b.pred_home === m.actual_home && b.pred_away === m.actual_away;
+      if (isExact) exactsTotal++;
+      const isMe = b.user_id === profile.id;
+      const u = byUser.get(b.user_id) ?? { name: b.profiles?.full_name || '?', isMe, pts: 0 };
+      u.pts += tot;
+      byUser.set(b.user_id, u);
+      if (isMe) { myPts += tot; if (isExact) myExacts++; }
+    }
+  }
+  let leader = null;
+  for (const [, u] of byUser) if (!leader || u.pts > leader.pts) leader = u;
+  const leaderName = leader ? (leader.isMe ? 'Você' : escapeHtml(firstName(leader.name))) : '—';
+  const dayLabel = activeDay ? formatBrShort(new Date(activeDay + 'T12:00:00')) : '';
+
+  const tile = (cls, icon, label, value, sub, big = false) => `
+    <div class="kpi ${cls}">
+      <div class="kpi-top"><span class="kpi-cap">${icon}</span><span class="kpi-label">${label}</span></div>
+      <div class="kpi-num"${big ? ' style="font-size:20px"' : ''}>${value}</div>
+      <div class="kpi-sub">${sub}</div>
+    </div>`;
+
+  return `
+    <div class="hist-blocklabel">Resumo do dia · ${escapeHtml(dayLabel)}</div>
+    <div class="kpis hist-summary">
+      ${tile('', KPI.total, 'Jogos do dia', String(finished.length),
+        finished.length === dayM.length ? 'todos encerrados' : `de ${dayM.length} no dia`)}
+      ${tile('green', KPI.exact, 'Cravadas', String(exactsTotal), 'placares exatos no dia')}
+      ${tile('gold', KPI.points, 'Líder do dia', leaderName, leader ? `+${leader.pts} no dia` : '', true)}
+      ${tile('', KPI.position, 'Seu dia', `+${myPts}`,
+        `${myExacts} placar${myExacts === 1 ? '' : 'es'} exato${myExacts === 1 ? '' : 's'}`)}
+    </div>
+  `;
+}
+
 // ----- Lista do dia selecionado -----
 function renderList() {
   const list = visibleMatches();
@@ -338,6 +408,7 @@ function renderEmptyStage() {
   const stageName = activeStage === 'group' ? 'fase de grupos' : 'mata-mata';
   return `
     <div class="empty">
+      <div class="empty-ic">${ICON.flag}</div>
       <h3>Nenhum jogo do ${stageName} começou ainda</h3>
       <p>O histórico aparece conforme os jogos começam.</p>
     </div>
@@ -346,6 +417,7 @@ function renderEmptyStage() {
 function renderEmptyFilter() {
   return `
     <div class="empty">
+      <div class="empty-ic">${ICON.info}</div>
       <h3>Nada nesse filtro</h3>
       <p>Tente outro dia ou status.</p>
     </div>
@@ -353,26 +425,43 @@ function renderEmptyFilter() {
 }
 
 // ============================================================
-// Card de jogo
+// Card de jogo (editorial / tabela)
 // ============================================================
 function renderMatchCard(m) {
   return matchStatus(m) === 'finished' ? renderFinishedCard(m) : renderAwaitingCard(m);
 }
 
-function matchupHtml(m) {
-  return `
-    <div class="matchup">
-      <span class="flag">${flag(m.team_home)}</span>
-      <span>${escapeHtml(teamPt(m.team_home))}</span>
-      <span style="color:var(--text-mute); font-weight:500;">×</span>
-      <span>${escapeHtml(teamPt(m.team_away))}</span>
-      <span class="flag">${flag(m.team_away)}</span>
-    </div>
-  `;
+// group → neutro · final → dourado · third → bronze · demais (r32..sf) → ko (amarelo)
+function stageCls(m) {
+  const s = m.stage;
+  return s === 'group' ? 'group' : s === 'final' ? 'final' : s === 'third' ? 'third' : 'ko';
 }
 
 function stageDisp(m) {
   return m.stage === 'group' ? `Grupo ${m.group_name}` : stageLabel(m.stage);
+}
+
+function fixtureHtml(m) {
+  return `
+    <div class="history-fixture">
+      <span class="hh-team home">${flag(m.team_home)}<span class="tn">${escapeHtml(teamPt(m.team_home))}</span></span>
+      <span class="hh-rule"></span>
+      <span class="hh-team away">${flag(m.team_away)}<span class="tn">${escapeHtml(teamPt(m.team_away))}</span></span>
+    </div>
+  `;
+}
+
+function cardHead(m, rightHtml) {
+  // Fases de peso (×>1) valem mais no bônus de artilheiro — sinaliza no topo do card.
+  const mult = stageMultiplier(m.stage);
+  const multBadge = mult > 1 ? ` <span class="hh-mult">· Artilheiro ×${fmtMult(m.stage)}</span>` : '';
+  return `
+    <div class="history-head">
+      <div class="hh-meta">${stageDisp(m)} · ${formatTime(m.match_date)}${multBadge}</div>
+      ${rightHtml}
+    </div>
+    ${fixtureHtml(m)}
+  `;
 }
 
 // Total de gols de um palpite (chave de ordenação)
@@ -466,24 +555,17 @@ function renderFinishedCard(m) {
   const goals = goalsByMatch.get(m.id) ?? [];
   const penInfo = m.pen_winner
     ? `<small>pen: ${m.pen_winner === 'home' ? teamPt(m.team_home) : teamPt(m.team_away)}</small>` : '';
-  // Fases de peso (×>1) valem mais no bônus de artilheiro — sinaliza no topo do card.
-  const mult = stageMultiplier(m.stage);
-  const multBadge = mult > 1 ? ` <span class="stage-mult">· Artilheiro ×${fmtMult(m.stage)}</span>` : '';
+  const score = `<div class="hh-score">${m.actual_home}<i>–</i>${m.actual_away}${penInfo}</div>`;
 
   return `
-    <div class="history-card ${m.stage}">
-      <div class="history-head">
-        <div class="date">${formatTime(m.match_date)}</div>
-        ${matchupHtml(m)}
-        <div class="score">${m.actual_home} — ${m.actual_away}${penInfo}</div>
-        <div class="stage">${stageDisp(m)}${multBadge}</div>
-      </div>
+    <div class="history-card ${stageCls(m)}">
+      ${cardHead(m, score)}
 
       ${renderBetsList(m, bets, true)}
 
       ${goals.length > 0 ? `
         <div class="history-scorers">
-          <span class="label">⚽ Gols:</span>
+          <span class="label">${ICON.ball} Gols</span>
           ${goals.map(g => `<span class="scorer"><span class="fl">${flag(g.players.team)}</span> ${escapeHtml(g.players.full_name)} <span class="num">${g.goals}</span></span>`).join('')}
         </div>
       ` : ''}
@@ -500,69 +582,75 @@ function renderAwaitingCard(m) {
     || (b.pred_home ?? 0) - (a.pred_home ?? 0)
     || (a.profiles?.full_name || '').localeCompare(b.profiles?.full_name || '')
   );
+  const status = `<div class="hh-status"><span class="pill ${live ? 'live' : 'locked'}">${live ? 'Ao vivo' : 'Aguardando resultado'}</span></div>`;
 
   return `
-    <div class="history-card ${m.stage} awaiting">
-      <div class="history-head">
-        <div class="date">${formatTime(m.match_date)}</div>
-        ${matchupHtml(m)}
-        <div class="status-cell">
-          <span class="pill ${live ? 'live' : 'locked'}">${live ? 'Ao vivo' : 'Aguardando resultado'}</span>
-        </div>
-        <div class="stage">${stageDisp(m)}</div>
-      </div>
+    <div class="history-card ${stageCls(m)} awaiting">
+      ${cardHead(m, status)}
 
       ${renderBetsList(m, bets, false)}
     </div>
   `;
 }
 
-// ----- Lista vertical de palpites -----
+// ----- Lista de palpites (tabela editorial) -----
 function renderBetsList(m, bets, finished) {
   if (bets.length === 0) {
     return `<div class="history-bets-empty">Nenhum palpite registrado pra este jogo.</div>`;
   }
+  if (!finished) {
+    return `
+      <div class="history-bets awaiting">
+        ${bets.map(renderAwaitingRow).join('')}
+      </div>
+    `;
+  }
   return `
     <div class="history-bets">
-      ${bets.map(b => renderBetRow(b, m, finished)).join('')}
+      <div class="hb-head"><span class="c">#</span><span>Jogador</span><span class="c">Palpite</span><span>Resultado</span><span class="r">Pts</span></div>
+      ${bets.map((b, i) => renderBetRow(b, m, i + 1)).join('')}
     </div>
   `;
 }
 
-function renderBetRow(bet, m, finished) {
+function renderAwaitingRow(bet) {
   const isMe = bet.user_id === profile.id;
   const name = isMe ? 'Você' : (bet.profiles?.full_name || '?');
+  return `
+    <div class="hb-row ${isMe ? 'me' : ''}">
+      <span class="hb-rank">—</span>
+      <span class="hb-player"><span class="av-mini">${avatarHtml(bet.profiles)}</span><span class="nm">${escapeHtml(name)}</span></span>
+      <span class="pred">${bet.pred_home}<span class="x">–</span>${bet.pred_away}</span>
+    </div>
+  `;
+}
 
-  if (!finished) {
-    return `
-      <div class="hb-row ${isMe ? 'me' : ''}">
-        <div class="av-mini">${avatarHtml(bet.profiles)}</div>
-        <div class="nm">${escapeHtml(name)}</div>
-        <span class="pred">${bet.pred_home}<span class="x">–</span>${bet.pred_away}</span>
-      </div>
-    `;
-  }
+function renderBetRow(bet, m, rank) {
+  const isMe = bet.user_id === profile.id;
+  const name = isMe ? 'Você' : (bet.profiles?.full_name || '?');
 
   const pts = bet.points_earned ?? 0;
   const isExact = bet.pred_home === m.actual_home && bet.pred_away === m.actual_away;
   const rowClass = isExact ? 'win-exact' : pts > 0 ? 'win-partial' : 'miss';
   const ptsClass = isExact ? 'exact' : pts > 0 ? 'partial' : 'zero';
+  const resClass = isExact ? 'exact' : pts > 0 ? 'partial' : 'miss';
+  const resIcon  = isExact ? KPI.exact : pts > 0 ? KPI.partial : KPI.miss;
+  const resLabel = isExact ? 'Placar exato' : pts > 0 ? 'Acerto parcial' : 'Não pontuou';
 
   // Bônus de artilheiro: chip discreto quando o artilheiro DESTA pessoa marcou no jogo.
+  // O <template class="tip-src"> tem que ser o irmão IMEDIATO do gatilho [data-tip].
   const sc = scorerHitFor(bet, m);
   const scorerChip = sc
-    ? `<span class="hb-scorer" data-tip>⚽+${sc.bonus}</span>` +
-      `<template class="tip-src">${scorerTipHtml(sc, m)}</template>`
+    ? `<span class="hb-scorer" data-tip>${ICON.ball}+${sc.bonus}</span><template class="tip-src">${scorerTipHtml(sc, m)}</template>`
     : '';
 
   return `
-    <div class="hb-row ${rowClass} ${isMe ? 'me' : ''}">
-      <div class="av-mini">${avatarHtml(bet.profiles)}</div>
-      <div class="nm">${escapeHtml(name)}</div>
+    <div class="hb-row ${rowClass} ${isMe ? 'me' : ''} ${rank === 1 ? 'top' : ''}">
+      <span class="hb-rank">${rank}</span>
+      <span class="hb-player"><span class="av-mini">${avatarHtml(bet.profiles)}</span><span class="nm">${escapeHtml(name)}</span></span>
       <span class="pred">${bet.pred_home}<span class="x">–</span>${bet.pred_away}</span>
-      <span class="pts ${ptsClass}" data-tip>${pts > 0 ? '+' + pts : '0'}</span>
-      <template class="tip-src">${betTipHtml(bet, m, pts, isExact)}</template>
-      ${scorerChip}
+      <span class="hb-res ${resClass}">${resIcon}<span class="w">${resLabel}</span></span>
+      <span class="hb-ptswrap"><span class="pts ${ptsClass}" data-tip>${pts > 0 ? '+' + pts : '0'}</span><template class="tip-src">${betTipHtml(bet, m, pts, isExact)}</template>${scorerChip}</span>
     </div>
   `;
 }
@@ -585,17 +673,15 @@ function attachEventListeners() {
       }
       return;
     }
-    // ABA 2: dia
-    const dayTab = e.target.closest('.day-tab[data-day]');
-    if (dayTab) {
-      if (dayTab.dataset.day !== activeDay) {
-        activeDay = dayTab.dataset.day;
+    // ABA 2: dia (célula do calendário)
+    const dayCell = e.target.closest('.cal-day[data-date]');
+    if (dayCell) {
+      if (dayCell.dataset.date !== activeDay) {
+        activeDay = dayCell.dataset.date;
         ensureValidStatus();  // mantém o status atual se houver jogos; senão troca
-        document.querySelectorAll('#dayTabs .day-tab').forEach(t =>
-          t.classList.toggle('active', t.dataset.day === activeDay));
-        // recontagem do status dentro do dia + lista
-        document.getElementById('statusChips').outerHTML = renderStatusChips();
-        document.getElementById('historyList').innerHTML = renderList();
+        // re-render do corpo: move o destaque do calendário + recontagem dos chips
+        // + Resumo do dia + lista, tudo coerente com o novo dia.
+        document.getElementById('tabBody').innerHTML = renderTabBody();
       }
       return;
     }
@@ -614,6 +700,5 @@ function attachEventListeners() {
   initTooltips();
 }
 
-// Tooltip flutuante (pontos / artilheiro) agora vem do módulo compartilhado
-// ../tooltip.js — mesmo contrato: gatilho [data-tip] + <template class="tip-src">
-// irmão com o HTML. Ver initTooltips() lá.
+// Tooltip flutuante (pontos / artilheiro) vem do módulo compartilhado ../tooltip.js —
+// mesmo contrato: gatilho [data-tip] + <template class="tip-src"> irmão com o HTML.

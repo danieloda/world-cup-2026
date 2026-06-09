@@ -420,7 +420,10 @@ export function renderDateCalendar({ dates, meta = {}, activeDate } = {}) {
   const last = new Date(sorted[sorted.length - 1] + 'T12:00:00');
   const todayKeyStr = todayKey();
 
-  const statusOf = (m) => dayPredictionStatus(m.done ?? 0, m.total ?? 0, m.deadline, m.played);
+  // Status do dia: usa override explícito (meta[k].status) quando fornecido —
+  // o Histórico passa 'soon' para o dia em andamento; as telas de palpite não
+  // passam nada e caem no cálculo por prazo (retrocompatível).
+  const statusOf = (m) => m.status || dayPredictionStatus(m.done ?? 0, m.total ?? 0, m.deadline, m.played);
 
   // Quais estados aparecem de fato (para a legenda enxugar o que não há).
   const present = new Set(dates.map(k => statusOf(meta[k] || {})));

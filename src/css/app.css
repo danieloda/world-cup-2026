@@ -2501,99 +2501,119 @@ body.raiox-modal-open { overflow: hidden; }
 .history-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
+/* Card editorial: profundidade (material) + elevação no hover, raio do sistema,
+   barra lateral fina marcando a fase. */
 .history-card {
   background: var(--card);
-  border-radius: 10px;
-  padding: 16px 20px;
-  border-left: 3px solid transparent;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--text-mute);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px 14px;
+  box-shadow: var(--shadow-material);
+  transition: transform .14s ease, box-shadow .14s ease, border-color .14s ease;
 }
-.history-card.group  { border-left-color: var(--text-mute); }
-.history-card.r32, .history-card.r16, .history-card.qf, .history-card.sf {
-  border-left-color: var(--accent);
-}
-.history-card.final  { border-left-color: var(--medal-gold); }
-.history-card.third  { border-left-color: var(--medal-bronze); }
+.history-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-material), var(--elev-2); }
+.history-card.group { border-left-color: var(--text-mute); }
+.history-card.ko    { border-left-color: var(--accent); }
+.history-card.final { border-left-color: var(--medal-gold); }
+.history-card.third { border-left-color: var(--medal-bronze); }
 
+/* Cabeçalho: fase·hora à esquerda, placar/estado à direita */
 .history-head {
-  display: grid;
-  grid-template-columns: auto 1fr auto auto;
-  gap: 16px;
+  display: flex;
   align-items: center;
-  margin-bottom: 14px;
+  justify-content: space-between;
+  gap: 14px;
 }
-.history-head .date {
-  font-size: 12px;
+.hh-meta {
+  font-size: 11px; font-weight: 800;
+  letter-spacing: .1em; text-transform: uppercase;
   color: var(--text-mute);
-  font-weight: 700;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  white-space: nowrap;
+  font-family: var(--font-mono);
 }
-.history-head .matchup {
-  display: flex; align-items: center; gap: 12px;
-  font-size: 17px; font-weight: 800;
-  letter-spacing: -.01em;
-}
-.history-head .matchup .flag { font-size: 22px; }
-.history-head .matchup .team-name { font-weight: 800; }
-.history-head .score {
+.hh-mult { color: var(--positive); }
+.hh-score {
   font-size: 28px; font-weight: 900;
   letter-spacing: -.03em;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+  line-height: 1;
 }
-.history-head .score small {
-  display: block;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text-mute);
-  text-align: right;
+.hh-score i { color: var(--text-mute); font-style: normal; margin: 0 4px; font-weight: 700; }
+.hh-score small {
+  display: block; text-align: right;
+  font-size: 10px; font-weight: 700; letter-spacing: .04em;
+  color: var(--text-mute); margin-top: 2px;
 }
-.history-head .stage {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  padding: 4px 8px;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, .06);
-  color: var(--text-dim);
-  font-family: var(--font-mono);
-  white-space: nowrap;
-}
-.history-card.final  .history-head .stage { background: rgba(212, 167, 58, .15); color: var(--medal-gold); }
-.history-card.third  .history-head .stage { background: rgba(205, 127, 50, .15); color: var(--medal-bronze); }
+.hh-status { display: flex; justify-content: flex-end; }
 
-/* Lista vertical de palpites */
+/* Linha dos times: bandeira + nome, régua de ligação no meio */
+.history-fixture {
+  display: flex; align-items: center; gap: 12px;
+  margin: 10px 0 13px;
+}
+.hh-team {
+  display: flex; align-items: center; gap: 9px;
+  font-size: 16px; font-weight: 800; letter-spacing: -.01em;
+  min-width: 0;
+}
+.hh-team.away { flex-direction: row-reverse; }
+.hh-team .tn { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hh-team .fi {
+  width: 26px; height: 19px; border-radius: 3px; flex: 0 0 auto;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, .3);
+}
+.hh-rule {
+  flex: 1 1 auto; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--line) 20%, var(--line) 80%, transparent);
+}
+
+/* Tabela de palpites */
 .history-bets {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  padding-top: 12px;
   border-top: 1px solid var(--line);
+  padding-top: 8px;
 }
 .history-bets-empty {
   padding-top: 12px;
   border-top: 1px solid var(--line);
   font-size: 12px; color: var(--text-mute);
 }
-.hb-row {
-  display: flex;
-  align-items: center;
+.hb-head, .hb-row {
+  display: grid;
+  grid-template-columns: 22px 1fr 56px 96px auto;
   gap: 10px;
-  padding: 7px 12px;
-  background: rgba(255, 255, 255, .02);
-  border-left: 3px solid transparent;
-  border-radius: 0 7px 7px 0;
+  align-items: center;
+}
+.hb-head {
+  font-size: 9.5px; font-weight: 800;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--text-mute);
+  padding: 0 8px 6px;
+}
+.hb-head .c { text-align: center; }
+.hb-head .r { text-align: right; }
+.hb-row {
+  padding: 6px 8px;
+  border-radius: 8px;
   font-size: 13px;
 }
-/* Estado pela barra lateral fina (em vez de fundo cheio) — mais limpo */
-.hb-row.win-exact   { border-left-color: var(--accent); }   /* amarelo (acerto cheio) */
-.hb-row.win-partial { border-left-color: var(--positive); }    /* verde  (acerto parcial) */
-.hb-row.miss        { border-left-color: var(--red); }     /* vermelho (errou) */
-.hb-row.me { outline: 1px solid var(--text); }
+.hb-row + .hb-row { margin-top: 1px; }
+.hb-row:hover { background: rgba(255, 255, 255, .03); }
+/* Sua linha: destaque com tinta de marca + anel interno */
+.hb-row.me {
+  background: rgba(244, 196, 48, .07);
+  box-shadow: inset 0 0 0 1px rgba(244, 196, 48, .22);
+}
+.hb-rank {
+  font-size: 12px; font-weight: 800;
+  color: var(--text-mute);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+.hb-row.top .hb-rank { color: var(--medal-gold); }
+.hb-player { display: flex; align-items: center; gap: 9px; min-width: 0; }
 .hb-row .av-mini {
   width: 24px; height: 24px;
   flex: 0 0 24px;
@@ -2607,7 +2627,6 @@ body.raiox-modal-open { overflow: hidden; }
 .hb-row .av-mini img { width: 100%; height: 100%; object-fit: cover; }
 .hb-row.me .av-mini { background: var(--accent); color: #000; }
 .hb-row .nm {
-  flex: 1 1 auto;
   min-width: 0;
   color: var(--text-dim);
   font-weight: 600;
@@ -2620,12 +2639,27 @@ body.raiox-modal-open { overflow: hidden; }
   color: var(--text);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+  text-align: center;
 }
-.hb-row .pred .x { color: var(--text-mute); margin: 0 1px; }
+.hb-row .pred .x { color: var(--text-mute); margin: 0 2px; }
+/* Coluna "Resultado": ícone + rótulo, cor pelo nível do acerto */
+.hb-res {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 700;
+  color: var(--text-mute);
+  min-width: 0;
+}
+.hb-res svg { width: 15px; height: 15px; flex: 0 0 15px; }
+.hb-res .w { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hb-res.exact   { color: var(--medal-gold); }
+.hb-res.partial { color: var(--positive); }
+.hb-res.miss    { color: var(--text-mute); }
+/* Pontos + chip de artilheiro (mesma célula → não vira coluna extra) */
+.hb-ptswrap { justify-self: end; display: inline-flex; align-items: center; gap: 5px; }
 .hb-row .pts {
   font-size: 12px; font-weight: 800;
-  padding: 2px 7px; border-radius: 4px;
-  min-width: 34px; text-align: center;
+  padding: 3px 8px; border-radius: 6px;
+  min-width: 40px; text-align: center;
   font-variant-numeric: tabular-nums;
   cursor: help;
 }
@@ -2634,20 +2668,30 @@ body.raiox-modal-open { overflow: hidden; }
 .hb-row .pts.zero    { background: var(--red-dim); color: var(--red); } /* vermelho */
 /* Bônus de artilheiro ganho NESTA partida — chip discreto ao lado dos pontos */
 .hb-row .hb-scorer {
-  font-size: 12px; font-weight: 800;
+  display: inline-flex; align-items: center; gap: 3px;
+  font-size: 11px; font-weight: 800;
   color: var(--positive);
   background: var(--positive-dim);
-  padding: 2px 6px; border-radius: 4px;
+  padding: 3px 6px; border-radius: 6px;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
   cursor: help;
   transition: background .12s ease, transform .12s ease;
 }
+.hb-row .hb-scorer svg { width: 12px; height: 12px; }
 .hb-row .hb-scorer:hover { background: rgba(29, 185, 84, .26); transform: translateY(-1px); }
 .hb-row .pts:hover { filter: brightness(1.08); }
 .tip-src { display: none; }
-/* Selo de peso da fase (multiplicador do artilheiro) no topo do card */
-.stage-mult { color: var(--positive); font-weight: 800; }
+
+/* Card aguardando: só rank·jogador·palpite (sem resultado/pontos) */
+.history-bets.awaiting .hb-row { grid-template-columns: 22px 1fr auto; }
+
+@media (max-width: 600px) {
+  .hb-head, .hb-row { grid-template-columns: 18px 1fr 46px 28px auto; gap: 7px; }
+  .hb-res .w { display: none; }
+  .hh-score { font-size: 24px; }
+  .hh-team { font-size: 14px; }
+}
 
 /* ============================================================
    Popover de pontos / artilheiro (tooltip flutuante no <body>)
@@ -2758,28 +2802,30 @@ body.raiox-modal-open { overflow: hidden; }
 
 /* Marcadores no fim do card de histórico */
 .history-scorers {
-  margin-top: 10px;
-  padding-top: 10px;
+  margin-top: 11px;
+  padding-top: 11px;
   border-top: 1px solid var(--line);
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
   font-size: 12px;
   color: var(--text-dim);
 }
 .history-scorers .label {
+  display: inline-flex; align-items: center; gap: 6px;
   font-weight: 800;
   letter-spacing: .08em;
   text-transform: uppercase;
   font-size: 10px;
   color: var(--text-mute);
-  margin-right: 8px;
 }
+.history-scorers .label svg { width: 14px; height: 14px; }
 .history-scorers .scorer {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  margin-right: 12px;
   font-weight: 600;
 }
-.history-scorers .scorer .fl { font-size: 14px; line-height: 1; }
+.history-scorers .scorer .fl { display: inline-flex; }
+.history-scorers .scorer .fi { width: 16px; height: 12px; border-radius: 2px; }
 .history-scorers .scorer .num {
   color: var(--accent);
   font-weight: 900;
@@ -2787,26 +2833,52 @@ body.raiox-modal-open { overflow: hidden; }
 }
 .history-scorers .scorer .num::before { content: "×"; color: var(--text-mute); font-weight: 700; }
 
-/* ===== Histórico: nota discreta sob o hero ===== */
+/* ===== Histórico: nota sob o hero (em caixa, com ícone) ===== */
 .hist-note {
-  font-size: 12px;
-  color: var(--text-mute);
-  margin: -4px 0 18px;
-  line-height: 1.5;
+  display: flex; align-items: flex-start; gap: 9px;
+  font-size: 12.5px;
+  color: var(--text-dim);
+  line-height: 1.55;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 11px 14px;
+  margin: -8px 0 20px;
 }
-.hist-note b { color: var(--text-dim); font-weight: 700; }
+.hist-note svg { width: 16px; height: 16px; flex: 0 0 16px; color: var(--text-mute); margin-top: 1px; }
+.hist-note b { color: var(--text); font-weight: 700; }
+
+/* ===== Histórico: rótulo de bloco + faixa "Resumo do dia" + fase ===== */
+.hist-blocklabel {
+  font-size: 11px; font-weight: 800;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--text-mute);
+  margin: 22px 0 11px;
+}
+.kpis.hist-summary { margin-bottom: 18px; }
+.hist-seg { margin-bottom: 18px; }
+
+/* ===== Histórico: calendário "Por data" (reusa .cal) numa moldura ===== */
+.hist-cal-wrap {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 16px 16px 13px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-material);
+}
 
 /* ===== Prévia desfocada (pré-Copa, em "Palpites da galera") ===== */
 .preview-wrap {
   position: relative;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   overflow: hidden;
   margin-top: 4px;
   min-height: 360px;
 }
 .preview-blurred {
-  filter: blur(1.5px) saturate(.95);
-  opacity: .85;
+  filter: blur(2px) saturate(.95);
+  opacity: .82;
   pointer-events: none;
   user-select: none;
 }
@@ -2814,20 +2886,22 @@ body.raiox-modal-open { overflow: hidden; }
   position: absolute; inset: 0;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  text-align: center; gap: 10px;
+  text-align: center; gap: 11px;
   padding: 32px 24px;
-  background: radial-gradient(ellipse at center, rgba(10,10,12,.2) 0%, rgba(0,0,0,.48) 100%);
+  background: radial-gradient(ellipse at center, rgba(10,10,12,.25) 0%, rgba(0,0,0,.55) 100%);
 }
 .preview-overlay .preview-badge {
+  display: inline-flex; align-items: center; gap: 7px;
   font-size: 12px; font-weight: 800;
   letter-spacing: .12em; text-transform: uppercase;
   color: var(--accent);
   background: var(--accent-dim);
   border: 1px solid var(--accent);
-  padding: 5px 12px; border-radius: 500px;
+  padding: 6px 13px; border-radius: 500px;
 }
+.preview-overlay .preview-badge svg { width: 14px; height: 14px; }
 .preview-overlay h3 {
-  font-size: 22px; font-weight: 800;
+  font-size: 23px; font-weight: 900;
   letter-spacing: -.02em; margin: 2px 0 0;
 }
 .preview-overlay p {
@@ -2837,41 +2911,7 @@ body.raiox-modal-open { overflow: hidden; }
 .preview-overlay p strong { color: var(--text); }
 .preview-overlay .btn { margin-top: 8px; }
 
-/* ===== Histórico: abas de dia (rolável horizontalmente) ===== */
-.day-tabs {
-  display: flex; gap: 8px;
-  overflow-x: auto;
-  padding-bottom: 8px;
-  margin-bottom: 16px;
-  scrollbar-width: thin;
-  scrollbar-color: var(--line) transparent;
-}
-.day-tabs::-webkit-scrollbar { height: 6px; }
-.day-tabs::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
-.day-tab {
-  flex: 0 0 auto;
-  white-space: nowrap;
-  padding: 7px 13px;
-  border-radius: 500px;
-  background: var(--card);
-  font-size: 12px; font-weight: 700;
-  color: var(--text-dim);
-  display: inline-flex; align-items: center; gap: 6px;
-  border: 1px solid var(--line); cursor: pointer;
-  font-family: var(--font);
-  transition: background .12s, color .12s, border-color .12s;
-}
-.day-tab:hover { background: var(--card-hover); color: var(--text); }
-.day-tab.active { background: var(--text); color: #000; border-color: var(--text); }
-.day-tab .ct {
-  font-size: 11px; padding: 1px 6px; border-radius: 500px;
-  background: rgba(255, 255, 255, .08); color: var(--text-mute);
-  font-variant-numeric: tabular-nums;
-}
-.day-tab.active .ct { background: rgba(0, 0, 0, .15); color: #000; }
-
 /* ===== Histórico: card aguardando resultado (Próximas partidas) ===== */
-.history-head .status-cell { display: flex; justify-content: flex-end; }
 .history-card.awaiting { background: linear-gradient(180deg, var(--card), rgba(255,255,255,.012)); }
 
 /* ===== Pódio (Ranking top 3) ===== */
