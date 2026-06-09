@@ -625,16 +625,21 @@ img { max-width: 100%; height: auto; }
 }
 .team.right { justify-content: flex-end; }
 .flag {
-  width: 28px; height: 20px; border-radius: 3px;
+  width: 28px; height: 20px; border-radius: 4px;
   background: #333; font-size: 14px; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
   overflow: hidden;
+  /* borda interna sutil: dá um contorno consistente a TODA bandeira, pra que
+     escudos com branco/clara (Coreia, Catar) ou campo único (Suíça) não pareçam
+     "flutuar" contra o card escuro. É o que padroniza o conjunto. */
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .12);
 }
 /* flag-icons styling: .fi uses background-image */
 .flag .fi {
   width: 100%; height: 100%;
   background-size: cover;
   background-position: center;
+  border-radius: 0; /* o arredondamento/clip fica por conta do .flag */
 }
 .score-cell {
   display: flex; flex-direction: column; align-items: center; gap: 4px;
