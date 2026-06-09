@@ -760,6 +760,13 @@ em { font-style: normal; font-weight: 600; }
   min-width: 0;
 }
 .match.next .team { display: flex; align-items: center; gap: 8px; min-width: 0; font-size: 15px; font-weight: 600; }
+/* CRÍTICO: o bloco @media(max-width:800px) do `.match` base define
+   `.team.home{grid-area:home}` / `.team.away{grid-area:away}`. Como é o MESMO
+   elemento, isso VAZA pra dentro do .mn-fix em todo viewport ≤800px — e como as
+   áreas "home"/"away" não existem aqui, os dois times caíam na MESMA célula
+   (nomes e bandeiras SOBREPOSTOS). Resetar p/ auto devolve o auto-placement do
+   grid espelhado (mandante na col 1, visitante na col 3). */
+.match.next .mn-fix .team { grid-area: auto; }
 /* mandante: nome + bandeira, agrupados à direita da coluna (bandeira no ×) */
 .match.next .team.home { flex-direction: row-reverse; justify-content: flex-start; }
 .match.next .team.away { justify-content: flex-start; }
@@ -771,6 +778,13 @@ em { font-style: normal; font-weight: 600; }
     grid-template-areas: "meta" "fix" "cd";
   }
   .match.next .match-cd { justify-self: start; }
+  /* Fixture empilhado (a tal "empilhado à esquerda, sem zigue-zague" do header).
+     Mesmo sem a sobreposição, o grid espelhado de 3 colunas (1ª coluna fixa em
+     clamp 150px…) é apertado demais num celular. No mobile vira coluna única e os
+     dois times empilham (bandeira + nome à esquerda), igual aos demais cards. */
+  .match.next .mn-fix { grid-template-columns: 1fr; gap: 6px 0; }
+  .match.next .mn-fix .mn-x { display: none; }
+  .match.next .team.home { flex-direction: row; justify-content: flex-start; }
 }
 @media (prefers-reduced-motion: reduce) { .match.next:hover { transform: none; } }
 
