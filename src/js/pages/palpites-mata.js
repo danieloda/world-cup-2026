@@ -395,9 +395,10 @@ function renderNote() {
         <li>➕ Não precisa cravar tudo — cada parte do placar (gols de um time, quem vence, diferença) já dá pontos.</li>
         <li>🏳️ <strong>Regra da vaga:</strong> você dá o placar de uma posição (ex.: "1º do Grupo A × 2º do Grupo B"). Vale para a seleção que <strong>realmente se classificar</strong> ali — as bandeiras são só um guia.</li>
         <li>⚽ Acha que vai dar empate? <strong>Escolha quem passa nos pênaltis</strong> (conta o placar do tempo normal).</li>
+        <li>📊 <strong>Conforme os resultados saem</strong>, cada jogo vira a comparação do seu palpite com o resultado oficial e já mostra os pontos que você fez ali — placar, bônus de classificado e de artilheiro somados.</li>
       </ul>
       <span class="note-deadline">⏰ Cada palpite fecha às 23h59 da véspera do jogo (um dia antes).
-        <span class="sub">Quando o jogo encerra, o card mostra seu palpite ao lado do resultado oficial.</span></span>
+        <span class="sub">Depois disso o jogo trava; quando termina, o card abre a comparação com o oficial.</span></span>
       <a class="note-link" href="regras.html">Ver todas as regras →</a>
     </div>
   `;

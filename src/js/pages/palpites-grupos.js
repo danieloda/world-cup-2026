@@ -221,9 +221,10 @@ function renderBody(counts) {
         <li>⚽ <strong>+${GP.ave}</strong> se acertar quem vence — ou que vai dar empate</li>
         <li>➕ <strong>+${GP.dg}</strong> se acertar a diferença de gols</li>
         <li>🎯 Cravou o placar exato? Soma tudo: <strong>${GP.exact} pontos</strong></li>
+        <li>📊 <strong>Conforme os resultados saem</strong>, cada jogo mostra seu palpite ao lado do placar oficial e já soma os pontos que você fez ali (incluindo o bônus de artilheiro).</li>
       </ul>
       <span class="note-deadline">⏰ Cada palpite fecha às 23h59 da véspera do jogo (um dia antes).
-        <span class="sub">Quando o jogo encerra, o card mostra seu palpite ao lado do resultado oficial.</span></span>
+        <span class="sub">Depois disso o jogo trava; quando termina, o card abre a comparação com o oficial.</span></span>
       <a class="note-link" href="regras.html">Ver todas as regras →</a>
     </div>
 
