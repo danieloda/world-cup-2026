@@ -44,7 +44,7 @@ try {
 } catch (err) {
   console.error('[admin] FATAL:', err);
   document.body.innerHTML = `
-    <div style="padding:40px; max-width:720px; margin:40px auto; background:#181818; border-radius:12px; color:#fff; font-family:sans-serif;">
+    <div style="padding:40px; max-width:720px; margin:40px auto; background:#181818; border-radius:12px; color:#fff; font-family:'Figtree',system-ui,-apple-system,sans-serif;">
       <h1 style="color:#f15e6c">⚠️ Erro</h1>
       <pre style="background:#000; padding:16px; border-radius:8px; overflow:auto; white-space:pre-wrap; word-break:break-word; color:#f15e6c;">${err.stack || err.message || err}</pre>
       <p style="margin-top:20px;"><a href="inicio.html" style="color:#f4c430">← Voltar</a></p>
@@ -522,7 +522,7 @@ async function renderResultsTab() {
     `).join('')}
 
     ${capped ? `<p style="color:var(--text-mute); font-size:12px; text-align:center; margin:20px 0;">Mostrando os ${CAP} mais recentes de ${showing.length}. Use a busca acima para achar os demais.</p>` : ''}
-    ${showing.length === 0 ? `<p style="color:var(--text-mute); text-align:center; margin:40px 0; font-style:italic;">${filter ? 'Nenhum jogo casa com a busca.' : 'Nenhum jogo nesta aba.'}</p>` : ''}
+    ${showing.length === 0 ? `<p style="color:var(--text-mute); text-align:center; margin:40px 0;">${filter ? 'Nenhum jogo casa com a busca.' : 'Nenhum jogo nesta aba.'}</p>` : ''}
   `;
 }
 
@@ -611,7 +611,7 @@ function renderResultRow(m) {
                 <button class="remove" data-action="remove-goal" data-goal-id="${s.id}" data-match-id="${m.id}" title="Remover">×</button>
               </div>
             `).join('')}
-            ${scorers.length === 0 ? '<div style="font-size:12px; color:var(--text-mute); padding:6px 4px; font-style:italic;">Nenhum marcador atribuído ainda.</div>' : ''}
+            ${scorers.length === 0 ? '<div style="font-size:12px; color:var(--text-mute); padding:6px 4px;">Nenhum marcador atribuído ainda.</div>' : ''}
           </div>
 
           ${goalsAttributed < totalGoals ? (
@@ -622,7 +622,7 @@ function renderResultRow(m) {
                 </button>
               </div>
             ` : (eligible.length === 0 ? `
-              <div style="font-size:12px; color:var(--yellow); padding:6px 4px; font-style:italic;">
+              <div style="font-size:12px; color:var(--yellow); padding:6px 4px;">
                 ⚠ Nenhum jogador cadastrado para essas seleções. Pode salvar sem atribuir marcadores.
               </div>
             ` : (available.length > 0 ? `
@@ -632,7 +632,7 @@ function renderResultRow(m) {
                 <button class="btn btn-dark btn-sm" data-action="add-scorer" data-match-id="${m.id}">+ Adicionar</button>
               </div>
             ` : `
-              <div style="font-size:12px; color:var(--text-mute); padding:6px 4px; font-style:italic;">
+              <div style="font-size:12px; color:var(--text-mute); padding:6px 4px;">
                 Todos os jogadores já atribuídos.
               </div>
             `))

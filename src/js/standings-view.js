@@ -199,7 +199,7 @@ function renderThirdsRow(t, rank, isOut) {
     return `
       <tr class="out">
         <td class="left"><span class="rank">${rank}</span></td>
-        <td class="left" style="color:var(--text-mute); font-style:italic;">aguardando…</td>
+        <td class="left" style="color:var(--text-mute);">aguardando…</td>
         <td class="left"><span class="group-badge">${t.group}</span></td>
         <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>
       </tr>

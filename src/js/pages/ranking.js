@@ -58,7 +58,7 @@ try {
 } catch (err) {
   console.error('[ranking] FATAL:', err);
   document.body.innerHTML = `
-    <div style="padding:40px; max-width:720px; margin:40px auto; background:#181818; border-radius:12px; color:#fff; font-family:sans-serif;">
+    <div style="padding:40px; max-width:720px; margin:40px auto; background:#181818; border-radius:12px; color:#fff; font-family:'Figtree',system-ui,-apple-system,sans-serif;">
       <h1 style="color:#f15e6c">⚠️ Erro</h1>
       <pre style="background:#000; padding:16px; border-radius:8px; overflow:auto; white-space:pre-wrap; word-break:break-word; color:#f15e6c;">${err.stack || err.message || err}</pre>
       <p style="margin-top:20px;"><a href="inicio.html" style="color:#f4c430">← Voltar</a></p>
@@ -459,7 +459,7 @@ function renderRankRow(u) {
          <span class="pick-name">${escapeHtml(teamPt(champPick.team))}</span>
          ${champPtsBadge}
        </div>`
-    : '<span style="color:var(--text-mute); font-style:italic;">—</span>';
+    : '<span style="color:var(--text-mute);">—</span>';
 
   // Artilheiro: mostra escolha + gols + pontos. Quando torneio acabou e 0 gols, mostra "0" apagado.
   const sPick = scorerPicksByUser.get(u.user_id);
@@ -481,7 +481,7 @@ function renderRankRow(u) {
          ${goals > 0 ? `<span class="pick-pts">${goals}⚽</span>` : ''}
          ${scorerPtsBadge}
        </div>`
-    : '<span style="color:var(--text-mute); font-style:italic;">—</span>';
+    : '<span style="color:var(--text-mute);">—</span>';
 
   return `
     <tr class="${rowClass}" data-user-id="${u.user_id}" tabindex="0" role="button" aria-expanded="false" aria-label="Ver perfil de ${escapeHtml(u.full_name)}">
