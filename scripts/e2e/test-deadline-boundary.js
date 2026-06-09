@@ -108,8 +108,11 @@ async function main() {
       check('P1 INSERT palpite antes do prazo', !error, error?.message || '');
     }
 
-    // P2. deadline no PASSADO → UPDATE do palpite existente rejeitado. Jogo daqui a 1h (véspera já passou).
-    await admin.from('matches').update({ match_date: iso(Date.now() + 1 * HOUR) }).eq('id', mA.id);
+    // P2. deadline no PASSADO → UPDATE do palpite existente rejeitado.
+    // Jogo HOJE (não "+1h"): a véspera de um jogo de hoje é SEMPRE ontem 23:59 (já passou),
+    // então o teste é determinístico a qualquer hora. O "+1h" cruzava a meia-noite perto das
+    // 23h (o jogo virava amanhã, véspera = hoje 23:59 ainda no futuro) → falso-negativo.
+    await admin.from('matches').update({ match_date: iso(Date.now()) }).eq('id', mA.id);
     {
       const { data, error } = await uc.from('predictions').update({ pred_home: 5, pred_away: 5 }).eq('user_id', userId).eq('match_id', mA.id).select();
       const blocked = !!error || !data || data.length === 0; // RLS UPDATE: erro OU 0 linhas afetadas
@@ -119,8 +122,8 @@ async function main() {
       check('P2b valor preservado no banco (1-0, não 5-5)', cur && cur.pred_home === 1 && cur.pred_away === 0, `db=${cur?.pred_home}-${cur?.pred_away}`);
     }
 
-    // P3. deadline no PASSADO → INSERT em outro jogo rejeitado.
-    await admin.from('matches').update({ match_date: iso(Date.now() + 1 * HOUR) }).eq('id', mB.id);
+    // P3. deadline no PASSADO → INSERT em outro jogo rejeitado (jogo HOJE → véspera ontem 23:59).
+    await admin.from('matches').update({ match_date: iso(Date.now()) }).eq('id', mB.id);
     {
       const { error } = await uc.from('predictions').insert({ user_id: userId, match_id: mB.id, pred_home: 2, pred_away: 1 });
       check('P3 INSERT palpite depois do prazo BLOQUEADO', !!error, error ? '' : 'PASSOU INDEVIDAMENTE');

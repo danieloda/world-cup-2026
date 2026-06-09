@@ -244,7 +244,7 @@ try {
   await page.click('[data-stage="ko"]');
   const { data: fm } = await admin.from('matches').select('match_date').eq('id', 104).single();
   const fDay = (() => { const d = new Date(fm.match_date); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; })();
-  await page.click(`#dayTabs .day-tab[data-day="${fDay}"]`);
+  await page.click(`.cal-day[data-date="${fDay}"]`);
   await page.waitForSelector('.history-card.final', { timeout: 8000 });
   const domFinalRows = await page.locator('.history-card.final .hb-row').count();
   check(`historico (escala, ${totalPreds} palpites > 1000): card da Final mostra todos os pagos`,

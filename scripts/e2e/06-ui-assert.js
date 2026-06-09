@@ -44,7 +44,7 @@ function expectedStandings(matches, group) {
 const admin = makeAdminClient();
 const { data: matches } = await admin.from('matches')
   .select('id,stage,group_name,team_home,team_away,actual_home,actual_away,pen_winner,finished,match_date');
-const { data: lb } = await admin.from('v_leaderboard').select('user_id,full_name,total_pts');
+const { data: lb } = await admin.from('v_leaderboard').select('user_id,full_name,total_pts,exact_count,winner_sg_count');
 
 // 8 melhores 3ºs do DB (pts→SG→GF→FIFA)
 const GROUPS = [...new Set(matches.filter(m=>m.stage==='group').map(m=>m.group_name))].sort();
@@ -74,14 +74,14 @@ await page.waitForSelector('.sidebar, [class*="sidebar"]', { timeout: 15000 });
 
 // ===== A) classificação (palpites-grupos → Resultados → Classificação) =====
 console.log(`\n${C.b}palpites-grupos → Resultados → Classificação${C.x}`);
-await page.goto(`${BASE}/palpites-grupos.html`);
-await page.waitForSelector('.admin-tabs', { timeout: 15000 });
-await page.click('[data-tab="resultados"]');  // aba Resultados (classificação oficial)
-// A aba Resultados renderiza UM grupo por vez (chips A..L) — itera os chips.
-await page.waitForSelector('.chip[data-group]', { timeout: 15000 });
+await page.goto(`${BASE}/palpites-grupos.html#classificacao`);
+await page.waitForSelector('.view-toggle, .grp-dot, .group-card', { timeout: 15000 });
+await page.click('.view-toggle button[data-view="group"]').catch(() => {});  // lente "Por grupo"
+// A classificação renderiza UM grupo por vez (dots A..L) — itera os grupos.
+await page.waitForSelector('.grp-dot[data-group]', { timeout: 15000 });
 let groupsOk = 0, groupsBad = [];
 for (const g of GROUPS) {
-  await page.click(`.chip[data-group="${g}"]`);
+  await page.click(`.grp-dot[data-group="${g}"]`);
   await page.waitForFunction(
     (gg) => (document.querySelector('.group-card .group-name')?.textContent || '').includes(`Grupo ${gg}`),
     g, { timeout: 8000 }
@@ -116,10 +116,17 @@ const domRank = await page.$$eval('#rankBody tr[data-user-id]', rows => rows.map
   uid: r.getAttribute('data-user-id'),
   pts: parseInt(r.querySelector('td.pts')?.textContent||'NaN', 10),
 })));
-const lbOrder = lb.map(u => ({ uid: u.user_id, pts: u.total_pts }));
+// Ordem ESPERADA derivada do desempate documentado (total → exatos → V+S),
+// NÃO da ordem que o PostgREST devolveu — senão o teste seria circular (compararia
+// a view com ela mesma). Assim ele valida que o ranking aplica o desempate certo.
+const lbOrder = [...lb]
+  .sort((a, b) => (b.total_pts - a.total_pts)
+    || (b.exact_count - a.exact_count)
+    || (b.winner_sg_count - a.winner_sg_count))
+  .map(u => ({ uid: u.user_id, pts: u.total_pts }));
 const orderOk = JSON.stringify(domRank.map(r=>r.uid)) === JSON.stringify(lbOrder.map(r=>r.uid));
 const ptsOk = domRank.every((r,i) => r.pts === lbOrder[i]?.pts);
-check(`ranking: ordem de ${domRank.length} usuários == v_leaderboard`, orderOk, orderOk?'':'ordem difere');
+check(`ranking: ordem de ${domRank.length} usuários == desempate oficial (total→exatos→V+S)`, orderOk, orderOk?'':'ordem difere');
 check(`ranking: pontos por linha batem com v_leaderboard`, ptsOk);
 await shot('ranking');
 
@@ -136,23 +143,25 @@ const inStageJs = (m, st) => st === 'group' ? m.stage === 'group' : m.stage !== 
 
 // (C1) recorte ativo (default: group / dia mais recente / finalizadas)
 const actStage = await page.$eval('#stageTabs .admin-tab.active', el => el.dataset.stage).catch(() => 'group');
-const actDay   = await page.$eval('#dayTabs .day-tab.active', el => el.dataset.day).catch(() => null);
+const actDay   = await page.$eval('#dayTabs .cal-day.active', el => el.dataset.date).catch(() => null);
 const domCount = await page.$$eval('.history-card', els => els.length);
 const expCount = matches.filter(m => m.finished && inStageJs(m, actStage) && localDayKey(m.match_date) === actDay).length;
 check(`historico: cards do recorte ativo (${actStage}/${actDay}) == DB`, domCount === expCount && domCount > 0,
   `dom=${domCount} db=${expCount}`);
 
 // (C2) card da final: navega fase KO + dia da final. Os cards não têm mais data-team,
-// mas há exatamente 1 .history-card.final — lemos o .score direto.
+// mas há exatamente 1 .history-card.final — lemos o placar (.hh-score) direto.
 const finalM = matches.find(m => m.stage === 'final');
 const finalDay = localDayKey(finalM.match_date);
 await page.click('[data-stage="ko"]');
-await page.waitForSelector(`#dayTabs .day-tab[data-day="${finalDay}"]`, { timeout: 8000 });
-await page.click(`#dayTabs .day-tab[data-day="${finalDay}"]`);
+await page.waitForSelector(`#dayTabs .cal-day[data-date="${finalDay}"]`, { timeout: 8000 });
+await page.click(`#dayTabs .cal-day[data-date="${finalDay}"]`);
 await page.waitForSelector('.history-card.final', { timeout: 8000 });
-const finalScore = await page.$eval('.history-card.final .score',
+const finalScore = await page.$eval('.history-card.final .hh-score',
   el => el.textContent.replace(/\s+/g, ' ').trim()).catch(() => null);
-const scoreOk = !!finalScore && finalScore.includes(`${finalM.actual_home} — ${finalM.actual_away}`);
+// placar editorial usa "–" sem espaços (ex.: "3–1"); aceita qualquer separador.
+const scoreOk = !!finalScore &&
+  new RegExp(`${finalM.actual_home}\\s*[–—-]\\s*${finalM.actual_away}`).test(finalScore);
 check(`historico: card da final mostra placar correto`, scoreOk,
   `final ${finalM.team_home} ${finalM.actual_home}-${finalM.actual_away} ${finalM.team_away} | dom='${finalScore ?? '(card não achado)'}'`);
 await shot('historico');

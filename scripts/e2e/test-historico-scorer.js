@@ -58,7 +58,7 @@ async function expectedForMatch(matchId) {
       const pts = p.points_earned ?? 0;
       return { full_name: p.profiles.full_name, ptsTxt: pts > 0 ? `+${pts}` : '0', chip };
     });
-  return { stage: m.stage, rows, chips: rows.filter(r => r.chip != null).map(r => `⚽+${r.chip}`) };
+  return { stage: m.stage, rows, chips: rows.filter(r => r.chip != null).map(r => `+${r.chip}`) };
 }
 
 // ---- leitura do DOM dentro de um card específico ----
@@ -100,8 +100,8 @@ await page.waitForSelector('.history-card', { timeout: 15000 });
 console.log(`\n${C.b}A) Final (Cabo Verde × Egito) — bônus ×5${C.x}`);
 const finalDay = dayKey(byId.get(104).match_date);
 await page.click('[data-stage="ko"]');
-await page.waitForSelector(`#dayTabs .day-tab[data-day="${finalDay}"]`, { timeout: 8000 });
-await page.click(`#dayTabs .day-tab[data-day="${finalDay}"]`);
+await page.waitForSelector(`.cal-day[data-date="${finalDay}"]`, { timeout: 8000 });
+await page.click(`.cal-day[data-date="${finalDay}"]`);
 await page.waitForSelector('.history-card.final', { timeout: 8000 });
 
 const expFinal = await expectedForMatch(104);
@@ -116,7 +116,7 @@ check('final: chips de artilheiro (conjunto) == esperado',
   ms(domChipsFinal) === ms(expFinal.chips),
   `dom=[${domChipsFinal.join(',')}] exp=[${expFinal.chips.join(',')}]`);
 check('final: todo chip da final vale +30 (3 gols × 2 × 5)',
-  domChipsFinal.length > 0 && domChipsFinal.every(c => c === '⚽+30'),
+  domChipsFinal.length > 0 && domChipsFinal.every(c => c === '+30'),
   `chips=[${domChipsFinal.join(',')}]`);
 
 const domPtsFinal = domFinal.map(r => r.ptsTxt);
@@ -125,8 +125,8 @@ check('final: pontos por linha (conjunto) == predictions.points_earned',
   ms(domPtsFinal) === ms(expPtsFinal), `dom=${ms(domPtsFinal)} exp=${ms(expPtsFinal)}`);
 
 const meRow = domFinal.find(r => r.name === 'Você');
-check('final: linha "Você" mostra +76 e chip ⚽+30',
-  !!meRow && meRow.ptsTxt === '+76' && meRow.chip === '⚽+30',
+check('final: linha "Você" mostra +76 e chip +30',
+  !!meRow && meRow.ptsTxt === '+76' && meRow.chip === '+30',
   meRow ? `pts=${meRow.ptsTxt} chip=${meRow.chip}` : 'sem linha Você');
 
 // caso NEGATIVO: cravou a final mas artilheiro não marcou → SEM chip
@@ -147,12 +147,19 @@ await page.waitForSelector('.hist-tip.show', { timeout: 4000 }).catch(() => {});
 const scorerTip = await page.locator('.hist-tip.show').innerText().catch(() => '');
 check('final: popover do artilheiro soma +30 e cita o peso ×5',
   /\+30/.test(scorerTip) && /×\s*5/.test(scorerTip), `tip="${scorerTip.replace(/\n/g, ' ⏎ ')}"`);
-await page.mouse.move(5, 5); // dispersa o hover
+await page.mouse.move(5, 5); // dispersa o hover do artilheiro
 
-// popover do palpite (betTip): total bate com os pts da linha "Você" (+76 exato)
+// popover do palpite (betTip): total bate com os pts da linha "Você" (+76 exato).
+// O .hist-tip some no 'scroll' (comportamento de produto) e o .hover() do Playwright
+// dispara um scroll de actionability — então rolamos e deixamos ASSENTAR antes do hover,
+// senão o tip recém-aberto é escondido pelo scroll e a leitura vem vazia.
 const mePtsChip = finalCard.locator('.hb-row', { hasText: 'Você' }).locator('.pts').first();
+await mePtsChip.scrollIntoViewIfNeeded();
+await page.waitForTimeout(300);
 await mePtsChip.hover();
-await page.waitForSelector('.hist-tip.show', { timeout: 4000 }).catch(() => {});
+await page.waitForFunction(
+  () => { const t = document.querySelector('.hist-tip.show'); return !!t && /\+76/.test(t.textContent || ''); },
+  { timeout: 4000 }).catch(() => {});
 const betTip = await page.locator('.hist-tip.show').innerText().catch(() => '');
 check('final: popover do palpite "Você" mostra total +76',
   /\+76/.test(betTip), `tip="${betTip.replace(/\n/g, ' ⏎ ')}"`);
@@ -165,14 +172,14 @@ console.log(`\n${C.b}B) Grupo (Cabo Verde × Arábia Saudita) — bônus ×1${C.
 const gM = byId.get(47);
 const groupDay = dayKey(gM.match_date);
 await page.click('[data-stage="group"]');
-await page.waitForSelector(`#dayTabs .day-tab[data-day="${groupDay}"]`, { timeout: 8000 });
-await page.click(`#dayTabs .day-tab[data-day="${groupDay}"]`);
+await page.waitForSelector(`.cal-day[data-date="${groupDay}"]`, { timeout: 8000 });
+await page.click(`.cal-day[data-date="${groupDay}"]`);
 await page.waitForSelector('.history-card', { timeout: 8000 });
 
 // acha o card pelos times (cards não têm match_id no DOM)
 const gIdx = await page.$$eval('.history-card', (cards, [a, b]) => {
   for (let i = 0; i < cards.length; i++) {
-    const t = cards[i].querySelector('.matchup')?.textContent || '';
+    const t = cards[i].querySelector('.history-fixture')?.textContent || '';
     if (t.includes(a) && t.includes(b)) return i;
   }
   return -1;
@@ -185,7 +192,7 @@ if (gIdx >= 0) {
   const domG = await readCard(gCard);
   const domChipsG = domG.filter(r => r.chip).map(r => r.chip);
   check('grupo: chips (conjunto) == esperado e valem +2 (1 gol × 2 × 1)',
-    ms(domChipsG) === ms(expG.chips) && domChipsG.length > 0 && domChipsG.every(c => c === '⚽+2'),
+    ms(domChipsG) === ms(expG.chips) && domChipsG.length > 0 && domChipsG.every(c => c === '+2'),
     `dom=[${domChipsG.join(',')}] exp=[${expG.chips.join(',')}]`);
 
   // popover do artilheiro no grupo: multiplicador 1 → NÃO deve citar "Peso"

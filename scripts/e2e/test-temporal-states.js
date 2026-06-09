@@ -198,13 +198,13 @@ async function main() {
     `);
 
     // B1 — classificação dos grupos renderiza
-    console.log(`\n${C.b}B1) palpites-grupos → Resultados → Classificação${C.x}`);
-    await page.goto(`${BASE}/palpites-grupos.html`);
-    await page.waitForSelector('.admin-tabs', { timeout: 15000 });
-    await page.click('[data-tab="resultados"]');
-    // A classificação renderiza na visão "Por grupo" (default é "Por data"); o
-    // seletor de grupo virou .grp-dot (antes .chip). Trocar a visão e iterar os 12.
-    await page.click('.view-toggle button[data-view="group"]');
+    console.log(`\n${C.b}B1) palpites-grupos → Classificação${C.x}`);
+    // A classificação é alcançada por deep-link de hash (#classificacao → lente oficial,
+    // visão "Por grupo"); a página não usa mais abas .admin-tabs. Ver applyHashRoute().
+    await page.goto(`${BASE}/palpites-grupos.html#classificacao`);
+    await page.waitForSelector('.view-toggle, .grp-dot, .group-card', { timeout: 15000 });
+    // garante a visão "Por grupo" e itera os 12 grupos pelo seletor .grp-dot.
+    await page.click('.view-toggle button[data-view="group"]').catch(() => {});
     await page.waitForSelector('.grp-dot[data-group]', { timeout: 15000 });
     let groupCount = 0;
     for (const g of ['A','B','C','D','E','F','G','H','I','J','K','L']) {

@@ -35,12 +35,13 @@ try {
   await page.goto(`${BASE}/login.html`);
   await page.fill('#email', process.env.ADMIN_EMAIL); await page.fill('#password', process.env.ADMIN_PASSWORD);
   await page.click('#submitBtn'); await page.waitForURL(/\/inicio(\.html)?$/, {timeout:15000});
-  await page.goto(`${BASE}/palpites-grupos.html`);
-  await page.waitForSelector('.admin-tabs', {timeout:15000});
-  await page.click('[data-tab="resultados"]');
+  // A classificação é alcançada por deep-link de hash (#classificacao); a página não
+  // usa mais abas .admin-tabs (ver applyHashRoute em palpites-grupos.js).
+  await page.goto(`${BASE}/palpites-grupos.html#classificacao`);
+  await page.waitForSelector('.view-toggle, .grp-dot, .group-card', {timeout:15000});
   // A classificação (group-card) só renderiza na visão "Por grupo" (groupBy='group');
   // o default é "Por data" (lista de resultados, sem tabela). Trocar o view-toggle.
-  await page.click('.view-toggle button[data-view="group"]');
+  await page.click('.view-toggle button[data-view="group"]').catch(() => {});
   await page.waitForSelector('.group-card .group-table', {timeout:15000});
   const order = await page.evaluate(() => {
     const card = [...document.querySelectorAll('.group-card')].find(c => (c.querySelector('.group-name')?.textContent||'').includes('A'));
