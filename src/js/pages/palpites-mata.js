@@ -5,7 +5,7 @@ import { supabase } from '../supabase.js';
 import {
   flag, escapeHtml, formatTime, formatBrDate, isLocked, lockCountdownLabel, showToast,
   loadRecentMatches, loadQualifiers, teamPt, renderDateCalendar, predictionDeadline,
-  localDateKey, brParts,
+  localDateKey, brParts, heroMeta,
 } from '../util.js';
 import { isRealTeam, resolveSlotToTeam, computeSlotResolution } from '../bracket.js';
 import { matchPoints, scoreBreakdown, stageMultiplier, scorerBonus, championBonus } from '../scoring.js';
@@ -383,11 +383,11 @@ function renderPage() {
     <section class="hero">
       <div class="hero-kicker">Palpitar placares · Mata-mata</div>
       <h1 class="hero-title">Mata-mata</h1>
-      <div class="hero-meta">
-        <b>${matches.length} jogos</b><span class="sep"></span>
-        Seu palpite e o resultado oficial no mesmo lugar<span class="sep"></span>
-        <b>${counts.totalDone}</b> palpitados
-      </div>
+      <div class="hero-meta">${heroMeta([
+        `<b>${matches.length} jogos</b>`,
+        { html: 'Seu palpite e o resultado oficial no mesmo lugar', flow: true },
+        `<b>${counts.totalDone}</b> palpitados`,
+      ])}</div>
     </section>
 
     ${renderNote()}

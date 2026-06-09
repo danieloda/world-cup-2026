@@ -3,7 +3,7 @@ import { renderShell } from '../sidebar.js';
 import { supabase, fetchAllPages } from '../supabase.js';
 import {
   flag, escapeHtml, teamPt, formatBrShort, formatTime, stageLabel,
-  isLive, avatarHtml, localDateKey, renderDateCalendar, firstName,
+  isLive, avatarHtml, localDateKey, renderDateCalendar, firstName, heroMeta,
 } from '../util.js';
 import { scorerBonus, stageMultiplier, scoreBreakdown } from '../scoring.js';
 import { KPI } from '../kpi-icons.js';
@@ -170,10 +170,10 @@ function renderPage() {
       <section class="hero">
         <div class="hero-kicker">Veja o que cada jogador apostou, jogo a jogo</div>
         <h1 class="hero-title">Palpites da galera</h1>
-        <div class="hero-meta">
-          <b>A Copa ainda não começou</b><span class="sep"></span>
-          os palpites de todos aparecem aqui assim que a bola rolar
-        </div>
+        <div class="hero-meta">${heroMeta([
+          '<b>A Copa ainda não começou</b>',
+          { html: 'os palpites de todos aparecem aqui assim que a bola rolar', flow: true },
+        ])}</div>
       </section>
 
       ${renderPreview()}
@@ -186,11 +186,11 @@ function renderPage() {
     <section class="hero">
       <div class="hero-kicker">Veja o que cada jogador apostou, jogo a jogo</div>
       <h1 class="hero-title">Palpites da galera</h1>
-      <div class="hero-meta">
-        <b>${stats.finished_matches}</b> finalizados<span class="sep"></span>
-        <b>${awaitingTotal}</b> aguardando resultado<span class="sep"></span>
-        <b>${stats.pct_played}%</b> da Copa
-      </div>
+      <div class="hero-meta">${heroMeta([
+        `<b>${stats.finished_matches}</b> finalizados`,
+        `<b>${awaitingTotal}</b> aguardando resultado`,
+        `<b>${stats.pct_played}%</b> da Copa`,
+      ])}</div>
     </section>
 
     <div class="hist-note">
@@ -246,7 +246,7 @@ function renderPreview() {
         <span class="hh-team away">${flag(d.away)}<span class="tn">${escapeHtml(teamPt(d.away))}</span></span>
       </div>
       <div class="history-bets">
-        <div class="hb-head"><span class="c">#</span><span>Jogador</span><span class="c">Palpite</span><span>Resultado</span><span class="r">Pts</span></div>
+        <div class="hb-head"><span class="c">#</span><span>Jogador</span><span class="c">Palpite</span><span class="hb-h-res">Resultado</span><span class="r">Pts</span></div>
         ${d.bets.map((b, i) => `
           <div class="hb-row ${b.cls} ${b.me ? 'me' : ''} ${i === 0 ? 'top' : ''}">
             <span class="hb-rank">${i + 1}</span>
@@ -453,11 +453,12 @@ function fixtureHtml(m) {
 
 function cardHead(m, rightHtml) {
   // Fases de peso (×>1) valem mais no bônus de artilheiro — sinaliza no topo do card.
+  // Chip (sem "· " no texto): quebrando de linha ele desce inteiro, sem dot órfão.
   const mult = stageMultiplier(m.stage);
-  const multBadge = mult > 1 ? ` <span class="hh-mult">· Artilheiro ×${fmtMult(m.stage)}</span>` : '';
+  const multBadge = mult > 1 ? ` <span class="hh-mult">Artilheiro ×${fmtMult(m.stage)}</span>` : '';
   return `
     <div class="history-head">
-      <div class="hh-meta">${stageDisp(m)} · ${formatTime(m.match_date)}${multBadge}</div>
+      <div class="hh-meta"><span class="nw">${stageDisp(m)} · ${formatTime(m.match_date)}</span>${multBadge}</div>
       ${rightHtml}
     </div>
     ${fixtureHtml(m)}
@@ -607,7 +608,7 @@ function renderBetsList(m, bets, finished) {
   }
   return `
     <div class="history-bets">
-      <div class="hb-head"><span class="c">#</span><span>Jogador</span><span class="c">Palpite</span><span>Resultado</span><span class="r">Pts</span></div>
+      <div class="hb-head"><span class="c">#</span><span>Jogador</span><span class="c">Palpite</span><span class="hb-h-res">Resultado</span><span class="r">Pts</span></div>
       ${bets.map((b, i) => renderBetRow(b, m, i + 1)).join('')}
     </div>
   `;

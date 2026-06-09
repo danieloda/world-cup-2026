@@ -6,7 +6,7 @@ import { loadLockAlerts } from '../lock-alerts.js';
 import {
   flag, escapeHtml, greeting, firstName, daysToKickoffLabel,
   formatBrDate, formatTime, lockCountdownLabel, stageLabel, isLive,
-  teamPt, groundShort,
+  teamPt, groundShort, heroMeta,
 } from '../util.js';
 
 // Estado da página
@@ -49,12 +49,11 @@ function renderInicio() {
     <section class="hero">
       <div class="hero-kicker">${greeting()}, ${escapeHtml(firstName(profile.full_name))}</div>
       <h1 class="hero-title">${todayMatches.length > 0 ? 'Jogos de hoje' : daysToKickoffLabel()}</h1>
-      <div class="hero-meta">
-        <b>${stats.finished_matches}/${stats.total_matches} jogos</b>
-        <span class="sep"></span>
-        <b>${stats.pct_played ?? 0}%</b> da Copa disputada
-        ${stats.paid_users ? `<span class="sep"></span><b>${stats.paid_users}</b> jogadores no bolão` : ''}
-      </div>
+      <div class="hero-meta">${heroMeta([
+        `<b>${stats.finished_matches}/${stats.total_matches} jogos</b>`,
+        `<b>${stats.pct_played ?? 0}%</b> da Copa disputada`,
+        stats.paid_users ? `<b>${stats.paid_users}</b> jogadores no bolão` : null,
+      ])}</div>
     </section>
 
     ${renderKpis()}

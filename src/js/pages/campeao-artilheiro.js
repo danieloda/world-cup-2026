@@ -2,7 +2,7 @@ import { requireAuth } from '../auth.js';
 import { renderShell } from '../sidebar.js';
 import { supabase } from '../supabase.js';
 import {
-  flag, escapeHtml, teamPt, showToast, brParts,
+  flag, escapeHtml, teamPt, showToast, brParts, heroMeta,
 } from '../util.js';
 import { matchPoints, championBonus } from '../scoring.js';
 
@@ -200,12 +200,12 @@ function renderPage() {
     <section class="hero">
       <div class="hero-kicker">Palpites bônus · Pontos extras</div>
       <h1 class="hero-title">Campeão & Artilheiro</h1>
-      <div class="hero-meta">
-        <b>Escolha única antes da Copa</b><span class="sep"></span>
-        ${locked
-          ? `<span style="color:var(--red); font-weight:700;">🔒 Travado</span>`
-          : `<span style="color:var(--accent)">Trava ${formatDeadline(deadline)}</span><span class="sep"></span><span id="countdown" style="color:var(--text-dim)">…</span>`}
-      </div>
+      <div class="hero-meta">${heroMeta([
+        '<b>Escolha única antes da Copa</b>',
+        ...(locked
+          ? [`<span style="color:var(--red); font-weight:700;">🔒 Travado</span>`]
+          : [`<span style="color:var(--accent)">Trava ${formatDeadline(deadline)}</span>`, `<span id="countdown" style="color:var(--text-dim)">…</span>`]),
+      ])}</div>
     </section>
 
     <div class="note">
@@ -289,7 +289,7 @@ function renderChampionLocked() {
   return `
     <div class="cs-card cs-locked" id="cardChampion">
       <div class="cs-card-icon">🏆</div>
-      <div class="cs-card-kicker">Aposta 1 · Campeão · 🔒 Travado</div>
+      <div class="cs-card-kicker">Aposta 1 · Campeão · <span class="nw">🔒 Travado</span></div>
       <h3>Campeão da Copa</h3>
       <p class="desc">Sua escolha está travada. Aguarde o fim da Final pra ver se acertou.</p>
 
@@ -401,7 +401,7 @@ function renderScorerLocked() {
   return `
     <div class="cs-card cs-locked" id="cardScorer">
       <div class="cs-card-icon">⚽</div>
-      <div class="cs-card-kicker">Aposta 2 · Artilheiro · 🔒 Travado</div>
+      <div class="cs-card-kicker">Aposta 2 · Artilheiro · <span class="nw">🔒 Travado</span></div>
       <h3>Artilheiro do Bolão</h3>
       <p class="desc">Sua escolha está travada. Os pontos vão entrando conforme ele marca gols.</p>
 

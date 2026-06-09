@@ -3,7 +3,7 @@ import { renderShell } from '../sidebar.js';
 import { supabase } from '../supabase.js';
 import {
   flag, flagEmoji, escapeHtml, teamPt, groundShort, formatTime, formatBrDate,
-  stageLabel, roundLabelPt, showToast, localDateKey, brParts,
+  stageLabel, roundLabelPt, showToast, localDateKey, brParts, wireHScroll, heroMeta,
 } from '../util.js';
 
 // ============================================================
@@ -13,6 +13,7 @@ let profile, stats;
 let activeTab = 'users';   // 'users' | 'results' | 'settings'
 let resultsSubTab = 'pending';  // 'pending' | 'launched'
 let resultsFilter = '';         // busca por time/sede na lista de resultados
+let usersFilter = '';           // busca por nome/email na lista de usuários
 
 // Data por aba (lazy-loaded)
 const cache = {
@@ -60,15 +61,12 @@ function renderPage() {
     <section class="hero">
       <div class="hero-kicker">Modo administrador</div>
       <h1 class="hero-title">Painel Admin</h1>
-      <div class="hero-meta">
-        <b id="kpiPaid">—</b> pagos
-        <span class="sep"></span>
-        <b id="kpiTotal">—</b> total
-        <span class="sep"></span>
-        <b id="kpiPot">—</b> no caixa
-        <span class="sep"></span>
-        <b>${stats.finished_matches}/${stats.total_matches}</b> jogos finalizados
-      </div>
+      <div class="hero-meta">${heroMeta([
+        '<b id="kpiPaid">—</b> pagos',
+        '<b id="kpiTotal">—</b> total',
+        '<b id="kpiPot">—</b> no caixa',
+        `<b>${stats.finished_matches}/${stats.total_matches}</b> jogos finalizados`,
+      ])}</div>
     </section>
 
     <div class="admin-tabs">
@@ -103,6 +101,14 @@ function attachListeners() {
       document.getElementById('tabBody').innerHTML = await renderResultsTab();
       // re-render troca o input; refoca e põe o caret no fim
       const s = document.getElementById('resultsSearch');
+      if (s) { s.focus(); const v = s.value; s.value = ''; s.value = v; }
+      return;
+    }
+    if (t.id === 'usersSearch') {
+      usersFilter = t.value;
+      document.getElementById('tabBody').innerHTML = await renderUsersTab();
+      wireHScroll();
+      const s = document.getElementById('usersSearch');
       if (s) { s.focus(); const v = s.value; s.value = ''; s.value = v; }
       return;
     }
@@ -199,6 +205,7 @@ async function loadTab(tab) {
   if (tab === 'users')    body.innerHTML = await renderUsersTab();
   if (tab === 'results')  body.innerHTML = await renderResultsTab();
   if (tab === 'settings') body.innerHTML = await renderSettingsTab();
+  wireHScroll();
   updateGlobalKpis();
 }
 
@@ -254,6 +261,12 @@ async function renderUsersTab() {
   const progress = cache.pred_progress ?? new Map();
   const fullCount = users.filter(u => (progress.get(u.id)?.total_count ?? 0) >= 104).length;
 
+  // Busca por nome/email (KPIs continuam contando TODO mundo).
+  const q = usersFilter.trim().toLowerCase();
+  const shown = q
+    ? users.filter(u => [u.full_name, u.email].some(v => (v || '').toLowerCase().includes(q)))
+    : users;
+
   return `
     <div class="kpis">
       <div class="kpi green">
@@ -278,6 +291,11 @@ async function renderUsersTab() {
       </div>
     </div>
 
+    <input id="usersSearch" type="search" placeholder="🔎 Buscar por nome ou email…" autocomplete="off"
+           value="${escapeHtml(usersFilter)}"
+           style="width:100%; margin-bottom:16px; padding:10px 14px; background:var(--card); border:1px solid var(--line); border-radius:8px; color:var(--text); font-size:14px;">
+
+    <div class="hscroll"><div class="hscroll-in">
     <table class="admin-table">
       <thead>
         <tr>
@@ -291,7 +309,7 @@ async function renderUsersTab() {
         </tr>
       </thead>
       <tbody>
-        ${users.map(u => {
+        ${shown.map(u => {
           const pr = progress.get(u.id) ?? { total_count: 0, group_count: 0, ko_count: 0, has_champion: false, has_scorer: false };
           const count = pr.total_count ?? 0;
           const isMe = u.id === profile.id;
@@ -328,6 +346,8 @@ async function renderUsersTab() {
         }).join('')}
       </tbody>
     </table>
+    </div></div>
+    ${q && !shown.length ? `<p style="color:var(--text-dim); font-size:13px; margin-top:12px;">Nenhum usuário casa com “${escapeHtml(usersFilter.trim())}”.</p>` : ''}
   `;
 }
 
@@ -346,7 +366,7 @@ async function togglePaid(id) {
   user.paid = newPaid;
   user.paid_at = newPaid ? new Date().toISOString() : null;
   showToast(newPaid ? `${user.full_name} marcado como pago` : `${user.full_name} desmarcado`, 'success');
-  if (activeTab === 'users') document.getElementById('tabBody').innerHTML = await renderUsersTab();
+  if (activeTab === 'users') { document.getElementById('tabBody').innerHTML = await renderUsersTab(); wireHScroll(); }
   updateGlobalKpis();
 }
 
@@ -368,7 +388,7 @@ async function toggleAdmin(id) {
   }
   user.is_admin = newAdmin;
   showToast(newAdmin ? `${user.full_name} promovido a admin` : `${user.full_name} removido do admin`, 'success');
-  if (activeTab === 'users') document.getElementById('tabBody').innerHTML = await renderUsersTab();
+  if (activeTab === 'users') { document.getElementById('tabBody').innerHTML = await renderUsersTab(); wireHScroll(); }
 }
 
 async function removeUser(id, name) {
@@ -381,6 +401,7 @@ async function removeUser(id, name) {
   cache.users = cache.users.filter(u => u.id !== id);
   showToast(`${name} removido`, 'success');
   document.getElementById('tabBody').innerHTML = await renderUsersTab();
+  wireHScroll();
   updateGlobalKpis();
 }
 

@@ -478,7 +478,7 @@ export function renderDateCalendar({ dates, meta = {}, activeDate } = {}) {
       <div class="cal-month">
         <div class="cal-mhead">${MESES_LONG[mo]} ${y}</div>
         <div class="cal-grid">
-          ${DOW_SHORT.map(d => `<div class="cal-dow">${d}</div>`).join('')}
+          ${DOW_SHORT.map(d => `<div class="cal-dow"><span class="dow-3">${d}</span><span class="dow-1">${d[0]}</span></div>`).join('')}
           ${grid}
         </div>
       </div>`;
@@ -903,6 +903,36 @@ function scoreResult(score) {
   if (a > b) return 'W';
   if (a < b) return 'L';
   return 'D';
+}
+
+// ===== Linha de meta do hero =====
+// .hero-meta é flex: <b>/texto soltos viram flex items independentes e quebram
+// separados ("62" numa linha, "jogadores no bolão" na outra) com "·" órfão.
+// Cada parte vira UM token nowrap com o separador colado no fim (nunca abre linha).
+// Partes longas (frases) passam { html, flow: true } para poderem quebrar por dentro.
+export function heroMeta(parts) {
+  const t = parts.filter(Boolean).map(p => (typeof p === 'string' ? { html: p } : p));
+  return t.map((p, i) =>
+    `<span class="seg${p.flow ? ' seg-flow' : ''}">${p.html}${i < t.length - 1 ? '<span class="sep"></span>' : ''}</span>`
+  ).join('');
+}
+
+// ===== Scroll horizontal com affordance =====
+// Tabelas largas no mobile: marca .can-left/.can-right no wrapper .hscroll
+// para o CSS desenhar o fade de "tem mais conteúdo" só quando dá pra rolar.
+export function wireHScroll(root = document) {
+  root.querySelectorAll('.hscroll').forEach((box) => {
+    const inner = box.querySelector('.hscroll-in');
+    if (!inner || box.dataset.wired) return;
+    box.dataset.wired = '1';
+    const upd = () => {
+      box.classList.toggle('can-left', inner.scrollLeft > 2);
+      box.classList.toggle('can-right', inner.scrollLeft + inner.clientWidth < inner.scrollWidth - 2);
+    };
+    inner.addEventListener('scroll', upd, { passive: true });
+    if (typeof ResizeObserver !== 'undefined') new ResizeObserver(upd).observe(inner);
+    upd();
+  });
 }
 
 // ===== Toast =====

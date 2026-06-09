@@ -36,6 +36,7 @@ export function renderGroupCard(g, groupMatches, mode, predsByMatch) {
         <div class="group-name">Grupo ${g}</div>
         <div class="group-stage-info">${statusText}</div>
       </div>
+      <div class="hscroll"><div class="hscroll-in">
       <table class="group-table">
         <thead>
           <tr>
@@ -48,6 +49,7 @@ export function renderGroupCard(g, groupMatches, mode, predsByMatch) {
           ${renderStandingsRows(standings, matches)}
         </tbody>
       </table>
+      </div></div>
     </div>
   `;
 }
@@ -77,12 +79,14 @@ export function renderStandingRow(r) {
 
 export function renderStandingTable(rows) {
   return `
+    <div class="hscroll"><div class="hscroll-in">
     <table class="group-table">
       <thead><tr>
         <th class="left">Time</th><th>J</th><th>V</th><th>E</th><th>D</th><th>SG</th><th>PTS</th>
       </tr></thead>
       <tbody>${rows.map(renderStandingRow).join('')}</tbody>
-    </table>`;
+    </table>
+    </div></div>`;
 }
 
 function renderStandingsRows(standings, matches) {
@@ -152,6 +156,7 @@ export function countThirdsComplete(thirds) {
 
 export function renderThirdsTable(thirds) {
   return `
+    <div class="hscroll"><div class="hscroll-in">
     <table class="thirds-table">
       <thead>
         <tr>
@@ -166,6 +171,7 @@ export function renderThirdsTable(thirds) {
         ${renderThirdsRows(thirds)}
       </tbody>
     </table>
+    </div></div>
   `;
 }
 

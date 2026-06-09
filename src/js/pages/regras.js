@@ -2,6 +2,7 @@ import { requireAuth } from '../auth.js';
 import { renderShell } from '../sidebar.js';
 import { supabase } from '../supabase.js';
 import { matchPoints, championBonus, scorerBonus, qualifierBonus } from '../scoring.js';
+import { heroMeta, wireHScroll } from '../util.js';
 
 // ============================================================
 // Regras & Pontuação
@@ -79,6 +80,7 @@ try {
   const pageBody = await renderShell({ active: 'regras', profile, stats });
   pageBody.innerHTML = renderPage();
   pageBody.classList.add('fade-up');
+  wireHScroll();
   attachEventListeners();
 } catch (err) {
   console.error('[regras] FATAL:', err);
@@ -115,11 +117,11 @@ function renderPage() {
     <section class="hero">
       <div class="hero-kicker">Tudo que você precisa saber, explicado com calma</div>
       <h1 class="hero-title">Regras & Pontuação</h1>
-      <div class="hero-meta">
-        <b>104 jogos</b><span class="sep"></span>
-        Cada acerto soma pontos<span class="sep"></span>
-        Quanto mais perto da final, mais vale
-      </div>
+      <div class="hero-meta">${heroMeta([
+        '<b>104 jogos</b>',
+        'Cada acerto soma pontos',
+        { html: 'Quanto mais perto da final, mais vale', flow: true },
+      ])}</div>
     </section>
 
     <nav class="rules-toc">${toc}</nav>
@@ -260,7 +262,7 @@ function renderFases() {
       <strong>${GP.exact}</strong> de um jogo de grupos. É por isso que <strong>a emoção fica para o fim</strong>:
       mesmo quem não foi bem nos grupos pode virar o jogo no mata-mata.
     </p>
-    <div class="rules-table-wrap">
+    <div class="rules-table-wrap hscroll"><div class="hscroll-in">
       <table class="rules-matrix">
         <thead>
           <tr><th class="rules-matrix-label">Acerto →</th>${head}</tr>
@@ -272,7 +274,7 @@ function renderFases() {
           ${row('🎯 Placar exato', p => p.exact, true)}
         </tbody>
       </table>
-    </div>
+    </div></div>
     <div class="rules-tip">
       💡 A linha <strong>Placar exato</strong> é o máximo que um jogo daquela fase pode dar
       (a soma de todos os acertos).
@@ -390,7 +392,7 @@ function renderClassificado() {
       <li><strong>Time certo, vaga errada:</strong> a seleção chegou àquela fase, mas em outra posição. Vale a <strong>metade</strong>.</li>
     </ul>
     <p class="rules-p">Soma a cada fase: uma seleção que você acompanha corretamente fase após fase rende bônus em todas elas.</p>
-    <div class="rules-table-wrap">
+    <div class="rules-table-wrap hscroll"><div class="hscroll-in">
       <table class="rules-matrix">
         <thead>
           <tr><th class="rules-matrix-label">Acerto →</th>${head}</tr>
@@ -400,7 +402,7 @@ function renderClassificado() {
           <tr><td class="rules-matrix-label">~ Vaga errada</td>${bpRow}</tr>
         </tbody>
       </table>
-    </div>
+    </div></div>
     <div class="rules-tip">
       💡 Acertar o caminho das seleções é mais <strong>sorte</strong> do que ciência, então esse bônus é
       pequeno de propósito: dá um tempero, mas quem decide o bolão é o acerto dos placares.

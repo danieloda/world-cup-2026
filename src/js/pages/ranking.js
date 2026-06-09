@@ -3,7 +3,7 @@ import { renderShell } from '../sidebar.js';
 import { supabase, fetchAllPages } from '../supabase.js';
 import {
   flag, escapeHtml, teamPt, formatBrShort, formatTime, showToast,
-  avatarHtml, getInitials, localDateKey,
+  avatarHtml, getInitials, localDateKey, heroMeta,
 } from '../util.js';
 import { championBonus, scoreBreakdown, scorerBonus } from '../scoring.js';
 import { renderRankChart } from '../rank-chart.js';
@@ -259,11 +259,11 @@ function renderPage() {
     <section class="hero">
       <div class="hero-kicker">Quem está ganhando o bolão</div>
       <h1 class="hero-title">Ranking</h1>
-      <div class="hero-meta">
-        <b>${leaderboard.length}</b> jogadores<span class="sep"></span>
-        <b>${stats.finished_matches}</b> jogos finalizados<span class="sep"></span>
-        atualiza em tempo real
-      </div>
+      <div class="hero-meta">${heroMeta([
+        `<b>${leaderboard.length}</b> jogadores`,
+        `<b>${stats.finished_matches}</b> jogos finalizados`,
+        'atualiza em tempo real',
+      ])}</div>
     </section>
 
     <p class="hist-note"><span>Quatro formas de pontuar: <b>Jogos</b> (cada acerto soma — lado, resultado e saldo) · <b>Campeão</b> +${championBonus(true)} · <b>Artilheiro</b> (gols × fase) · <b>Classificados</b> (time na fase certa). <a href="regras.html">Ver regras →</a></span></p>

@@ -441,6 +441,10 @@ em { font-style: normal; font-weight: 600; }
   display: flex; align-items: center; justify-content: center;
   color: var(--text-dim); font-weight: 700;
 }
+@media (max-width: 800px) {
+  /* Dedo, não mouse: alvo maior e chevron mais visível. */
+  .topbar-back { width: 40px; height: 40px; color: var(--text); }
+}
 .topbar-user {
   display: flex; align-items: center; gap: 10px;
   padding: 4px 12px 4px 4px;
@@ -490,9 +494,15 @@ em { font-style: normal; font-weight: 600; }
 .hero-meta span.sep::before {
   content: '•'; margin: 0 4px; color: var(--text-mute);
 }
+/* Tokens da meta (heroMeta em util.js): atômicos, com o separador colado no fim. */
+.hero-meta .seg { white-space: nowrap; }
+.hero-meta .seg-flow { white-space: normal; }
+/* Token inquebrável genérico (número+rótulo, fase+hora, etc.) */
+.nw { white-space: nowrap; }
 
 .section-head {
   display: flex; align-items: baseline; justify-content: space-between;
+  gap: 8px 12px; flex-wrap: wrap;   /* em 320px o link desce inteiro, sem partir */
   margin: 36px 0 16px;
 }
 .section-head h3 {
@@ -501,6 +511,8 @@ em { font-style: normal; font-weight: 600; }
 .section-head .see-all {
   font-size: 12px; font-weight: 700;
   color: var(--text-dim); text-transform: uppercase; letter-spacing: .12em;
+  white-space: nowrap;              /* a seta não cai sozinha pra 2ª linha */
+  padding: 8px 0; margin: -8px 0;   /* estende a área de toque sem mexer no layout */
 }
 .section-head .see-all:hover { color: var(--text); }
 
@@ -827,6 +839,11 @@ em { font-style: normal; font-weight: 600; }
 .rx-modal-btn:hover {
   background: var(--accent-dim); color: var(--accent-bright);
   border-color: rgba(244, 196, 48, .35);
+}
+@media (max-width: 600px) {
+  /* CTA principal do card pendente: área de toque decente no celular. */
+  .rx-modal-btn { position: relative; padding: 9px 14px; }
+  .rx-modal-btn::after { content: ''; position: absolute; inset: -7px; border-radius: inherit; }
 }
 
 body.raiox-modal-open { overflow: hidden; }
@@ -1548,11 +1565,13 @@ body.raiox-modal-open { overflow: hidden; }
   background: var(--red-dim);
   color: var(--red);
 }
-/* Dia selecionado: preenche com a cor do estado. */
+/* Dia selecionado: preenche com a cor do estado + anel branco (a cor muda
+   conforme o estado do dia; o anel é o sinal constante de "selecionado"). */
 .cal-day.active {
   background: var(--st);
   border-color: var(--st);
   color: #000;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, .8);
   transform: translateY(-1px);
 }
 .cal-day.active.st-urgent { color: #fff; }
@@ -1580,6 +1599,8 @@ body.raiox-modal-open { overflow: hidden; }
 .cal-leg.st-soon i { background: var(--accent); }
 .cal-leg.st-urgent i { background: var(--red); }
 .cal-leg.st-pending i { background: var(--text-mute); }
+/* "Encerrado" ficava sem amostra (nenhuma regra st-past): espelha o estilo do dia. */
+.cal-leg.st-past i { background: rgba(255, 255, 255, .07); border: 1px solid var(--line); }
 .cal-leg.st-locked i { background: var(--text-mute); opacity: .5; }
 
 @media (max-width: 560px) {
@@ -1589,6 +1610,15 @@ body.raiox-modal-open { overflow: hidden; }
   .cal-cell { min-height: 30px; border-radius: 6px; }
   .cal-dnum { font-size: 12px; }
   .cal-ct { padding: 0 3px; }
+  /* Célula estreita: a faixa de status de borda a borda parecia uma "tampa"
+     cortada pelo radius — vira um tick central deliberado. */
+  .cal-day::before { inset: 0 24% auto; height: 2.5px; border-radius: 0 0 3px 3px; }
+}
+/* Dias da semana: "Dom/Seg" colavam com 2 meses lado a lado — vira 1 letra. */
+.cal-dow .dow-1 { display: none; }
+@media (max-width: 430px) {
+  .cal-dow .dow-3 { display: none; }
+  .cal-dow .dow-1 { display: inline; }
 }
 @media (max-width: 360px) {
   /* Telas bem estreitas: prioriza dia + cor do estado (info sai). */
@@ -2115,6 +2145,12 @@ body.raiox-modal-open { overflow: hidden; }
   .cd-u { min-width: 48px; }
   .cd-u b { font-size: 20px; }
 }
+@media (max-width: 360px) {
+  /* "Coreia do Sul × Escócia" precisa caber em 1 linha (o × órfão é pior). */
+  .nh-match { font-size: 15px; gap: 8px; }
+  .nh-team { gap: 7px; }
+  .nh-match .flag { width: 24px; height: 18px; }
+}
 
 /* ===== Login page ===== */
 .login-page {
@@ -2547,7 +2583,13 @@ body.raiox-modal-open { overflow: hidden; }
   color: var(--text-mute);
   font-family: var(--font-mono);
 }
-.hh-mult { color: var(--positive); }
+.hh-mult {
+  color: var(--positive);
+  background: var(--positive-dim);
+  padding: 1px 7px; border-radius: 500px;
+  font-size: 10px; font-weight: 800;
+  white-space: nowrap;
+}
 .hh-score {
   font-size: 28px; font-weight: 900;
   letter-spacing: -.03em;
@@ -2703,6 +2745,12 @@ body.raiox-modal-open { overflow: hidden; }
 @media (max-width: 600px) {
   .hb-head, .hb-row { grid-template-columns: 18px 1fr 46px 28px auto; gap: 7px; }
   .hb-res .w { display: none; }
+  /* A coluna resultado vira só ícone (28px): o rótulo "Resultado" não cabe
+     e pintava por cima de "Pts". */
+  .hb-head .hb-h-res { visibility: hidden; }
+  /* Chip de artilheiro embaixo dos pontos — lado a lado a coluna `auto`
+     engorda e esmaga o nome do jogador. */
+  .hb-ptswrap { flex-direction: column; align-items: flex-end; gap: 3px; }
   .hh-score { font-size: 24px; }
   .hh-team { font-size: 14px; }
 }
@@ -2837,6 +2885,7 @@ body.raiox-modal-open { overflow: hidden; }
   align-items: center;
   gap: 5px;
   font-weight: 600;
+  white-space: nowrap;   /* nome + minuto são um token: nunca quebrar no meio */
 }
 .history-scorers .scorer .fl { display: inline-flex; }
 .history-scorers .scorer .fi { width: 16px; height: 12px; border-radius: 2px; }
@@ -2937,7 +2986,10 @@ body.raiox-modal-open { overflow: hidden; }
   margin-bottom: 32px;
 }
 @media (max-width: 720px) {
+  /* Empilhado, o 1º lugar vem primeiro (no desktop a ordem DOM é 2-1-3
+     pra montar o pódio lado a lado). */
   .podium { grid-template-columns: 1fr; }
+  .podium-card.first { order: -1; }
 }
 .podium-card {
   background: var(--card);
@@ -3054,8 +3106,12 @@ body.raiox-modal-open { overflow: hidden; }
 .pot-cell .val {
   font-size: 22px; font-weight: 900;
   letter-spacing: -.02em;
+  white-space: nowrap;   /* "R$ 6.200" não parte em "R$" / "6.200" */
 }
 .pot-cell.big .val { font-size: 32px; color: var(--accent); }
+@media (max-width: 480px) {
+  .pot-cell.big .val { font-size: 26px; }
+}
 
 /* ===== Rank table ===== */
 .rank-table-wrap {
@@ -3281,7 +3337,8 @@ body.raiox-modal-open { overflow: hidden; }
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .profile-close {
-  width: 36px; height: 36px;
+  position: relative;
+  width: 40px; height: 40px;
   border-radius: 50%;
   background: rgba(255, 255, 255, .05);
   color: var(--text-dim);
@@ -3570,6 +3627,12 @@ body.raiox-modal-open { overflow: hidden; }
   display: inline-block;
   width: 14px;
 }
+/* Telas estreitas (≤380): aperta o padding pra coluna PTS caber sem rolar;
+   se ainda assim faltar, o .hscroll deixa rolar com fade. */
+@media (max-width: 380px) {
+  .group-table thead th, .group-table tbody td { padding-left: 5px; padding-right: 5px; }
+  .group-table thead th.left, .group-table tbody td.team-cell { padding-left: 10px; }
+}
 .group-table tbody tr.qualified td { color: var(--positive); }
 .group-table tbody tr.qualified td.pts { font-weight: 800; }
 .group-table tbody tr.qualified .position { color: var(--positive); font-weight: 800; }
@@ -3826,7 +3889,9 @@ input[type="number"].score-input {
 .km-finished.no-pred { border-color: var(--line-strong); background: rgba(255, 255, 255, 0.02); }
 
 .km-tag-done {
-  color: var(--positive);
+  /* Status neutro: verde aqui brigava com a moldura semântica do card
+     (verde=pontuou / vermelho=não) — "encerrado" não é mérito. */
+  color: var(--text-mute);
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: .06em;
@@ -4044,9 +4109,14 @@ input[type="number"].score-input {
   font-size: 10px; font-weight: 800; letter-spacing: .08em;
   text-transform: uppercase; color: var(--text-mute); margin-right: 8px;
 }
-.gr-scorer { margin-right: 10px; font-weight: 600; }
+.gr-scorer {
+  display: inline-flex; align-items: center; gap: 4px;
+  margin-right: 10px; font-weight: 600;
+  white-space: nowrap;   /* nome + minuto são um token: nunca quebrar no meio */
+}
+.gr-scorer .fl { display: inline-flex; }
+.gr-scorer .fi { width: 15px; height: 11px; border-radius: 2px; }
 .gr-scorer b { color: var(--text-dim); font-weight: 800; }   /* minuto do gol = fato, neutro */
-.gr-goals-sep { color: var(--text-mute); margin-right: 10px; }
 
 /* Toggle de lente (Projeção ⇄ Oficial) acima da classificação do grupo. */
 .stand-toggle-row {
@@ -4764,6 +4834,18 @@ input[type="number"].score-input {
   font-size: 14px;
 }
 
+/* ===== Scroll horizontal com affordance (wireHScroll em util.js) ===== */
+.hscroll { position: relative; }
+.hscroll-in { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.hscroll::before, .hscroll::after {
+  content: ''; position: absolute; top: 0; bottom: 0; width: 28px;
+  pointer-events: none; opacity: 0; transition: opacity .15s ease; z-index: 2;
+}
+.hscroll::before { left: 0; background: linear-gradient(90deg, rgba(0, 0, 0, .6), transparent); }
+.hscroll::after  { right: 0; background: linear-gradient(270deg, rgba(0, 0, 0, .6), transparent); }
+.hscroll.can-left::before { opacity: 1; }
+.hscroll.can-right::after { opacity: 1; }
+
 /* ===== Admin tabs ===== */
 .admin-tabs {
   display: inline-flex; gap: 4px;
@@ -4778,10 +4860,20 @@ input[type="number"].score-input {
   border-radius: 500px;
   font-size: 12px; font-weight: 700;
   color: var(--text-dim);
+  white-space: nowrap;
   display: inline-flex; gap: 6px; align-items: center;
   border: none; background: none;
   cursor: pointer;
   font-family: var(--font);
+}
+@media (max-width: 600px) {
+  /* Barra de abas rolável — antes a 3ª aba era clipada sem como alcançar. */
+  .admin-tabs {
+    display: flex; max-width: 100%;
+    overflow-x: auto; scrollbar-width: none;
+  }
+  .admin-tabs::-webkit-scrollbar { display: none; }
+  .admin-tab { flex: 0 0 auto; padding: 12px 16px; }
 }
 .admin-tab .ct {
   font-size: 11px;
@@ -4800,6 +4892,13 @@ input[type="number"].score-input {
   border-radius: 10px;
   overflow: hidden;
   border-collapse: collapse;
+}
+/* No celular a tabela rola dentro do .hscroll; sem nowrap as células
+   quebravam o email no meio e as colunas de ação sumiam clipadas. */
+@media (max-width: 700px) {
+  .admin-table th, .admin-table td { white-space: nowrap; }
+  .kpis { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .kpis .kpi:last-child { grid-column: 1 / -1; }
 }
 .admin-table thead th {
   background: rgba(0, 0, 0, .2);
@@ -5073,7 +5172,8 @@ input[type="number"].score-input {
     background: rgba(0, 0, 0, .7);
     z-index: 99;
   }
-  .sidebar.open + .sidebar-backdrop { display: block; }
+  /* `~` (não `+`): o .sb-collapse-btn fica entre a sidebar e o backdrop. */
+  .sidebar.open ~ .sidebar-backdrop { display: block; }
   .menu-toggle {
     display: flex !important;
   }
@@ -5100,7 +5200,7 @@ input[type="number"].score-input {
 
 .menu-toggle {
   display: none;
-  width: 36px; height: 36px;
+  width: 42px; height: 42px;
   border-radius: 50%;
   background: var(--card);
   align-items: center; justify-content: center;
@@ -5143,6 +5243,9 @@ input[type="number"].score-input {
   transition: background .12s, color .12s, border-color .12s;
 }
 .rules-toc-link:hover { background: var(--card-hover); color: var(--text); border-color: var(--line-strong); }
+@media (max-width: 600px) {
+  .rules-toc-link { padding: 10px 14px; }   /* alvo de toque */
+}
 .rules-toc-link.active {
   background: var(--accent); color: #0b0b0b; border-color: var(--accent);
 }
@@ -5246,7 +5349,7 @@ input[type="number"].score-input {
 .rules-tier-ex strong { color: var(--text); }
 
 /* Matriz de multiplicadores */
-.rules-table-wrap { overflow-x: auto; border-radius: 10px; }
+.rules-table-wrap { border-radius: 10px; }   /* rolagem fica no .hscroll-in (com fade) */
 .rules-matrix {
   width: 100%; border-collapse: collapse;
   background: var(--card); border-radius: 10px; overflow: hidden;
@@ -5289,13 +5392,23 @@ input[type="number"].score-input {
   background: var(--card); border: 1px solid var(--line);
   border-radius: 10px; padding: 20px 24px; margin: 4px 0;
 }
-.rules-bignum .n { font-size: 52px; font-weight: 900; letter-spacing: -.04em; color: var(--accent); line-height: 1; }
+.rules-bignum .n { font-size: 52px; font-weight: 900; letter-spacing: -.04em; color: var(--accent); line-height: 1; white-space: nowrap; }
 .rules-bignum .l { font-size: 15px; font-weight: 700; color: var(--text-dim); }
+/* Em telas estreitas o label quebrava colado no número ("+40pontos") ou o
+   "R$ 100" partia em duas linhas — empilha número em cima, label embaixo. */
+@media (max-width: 480px) {
+  .rules-bignum { flex-direction: column; align-items: flex-start; gap: 8px; }
+}
 
 /* Grid de artilheiro por fase */
 .rules-scorer-grid {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
   gap: 8px; margin: 4px 0;
+}
+/* No mobile (3 colunas) a FINAL sobrava órfã embaixo à esquerda;
+   como é o clímax (+10), fecha a grade em linha própria inteira. */
+@media (max-width: 600px) {
+  .rules-scorer-grid > :last-child { grid-column: 1 / -1; }
 }
 .rules-scorer-col {
   background: var(--card); border: 1px solid var(--line);
@@ -5504,6 +5617,13 @@ input[type="number"].score-input {
 @media (max-width: 720px) {
   .rank-chart { padding: 12px 10px 10px; }
   .rc-tip { min-width: 130px; }
+  /* Eixos mais discretos no mobile (plot estreito) */
+  .rc-ylbl, .rc-xlbl { font-size: 11px; }
+  /* Legenda: 62 pills de 1 por linha viravam ~2.800px de scroll — grade 2 col. */
+  .rc-legend { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .rc-leg { min-width: 0; padding-right: 9px; }
+  .rc-leg .rc-nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; flex: 1; text-align: left; }
+  .rc-leg .rc-pt { flex: 0 0 auto; font-size: 12px; }
 }
 
 /* ============================================================

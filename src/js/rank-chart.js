@@ -93,7 +93,13 @@ export function renderRankChart(mount, { progression, meId }) {
     const width = Math.max(280, host.clientWidth || mount.clientWidth || 900);
 
     const PADt = 16, PADb = 30, PADl = 40;
-    const PADr = width < 520 ? 108 : 172;
+    const isNarrow = width < 520;
+    const PADr = isNarrow ? 108 : 172;
+
+    // Mobile: 60+ linhas viram parede de cor num plot de ~200px. Sem foco
+    // explícito, destaca só Você + top 3 (ordem de `series` = ranking final);
+    // o resto fica esmaecido e sem rótulo na ponta. A legenda foca qualquer um.
+    const defaultStrong = new Set([meId, ...series.slice(0, 3).map(s => s.userId)]);
     const rowH = N <= 1 ? 34 : clamp(Math.floor(680 / N), 20, 40);
     const plotTop = PADt;
     const plotH = (N <= 1 ? 1 : (N - 1)) * rowH;
@@ -112,16 +118,23 @@ export function renderRankChart(mount, { progression, meId }) {
     }
 
     // ----- rótulos de etapa (eixo X), esparsos -----
-    const xLabels = sparseIdx(steps, width < 520 ? 4 : 7).map(s =>
-      `<text class="rc-xlbl" x="${xAt(s).toFixed(1)}" y="${(height - 9).toFixed(1)}" text-anchor="middle">${escapeHtml(f.labels[s] ?? '')}</text>`
-    ).join('');
+    // Mobile: 3 rótulos com pontas ancoradas (start/end) — 4 centrados num
+    // plot de ~200px colidiam ("Jogo 30Jogo 59") e vazavam das bordas.
+    const xIdx = sparseIdx(steps, isNarrow ? 3 : 7);
+    const xLabels = xIdx.map((s, k) => {
+      const anchor = !isNarrow ? 'middle'
+        : k === 0 ? 'start' : k === xIdx.length - 1 ? 'end' : 'middle';
+      return `<text class="rc-xlbl" x="${xAt(s).toFixed(1)}" y="${(height - 9).toFixed(1)}" text-anchor="${anchor}">${escapeHtml(f.labels[s] ?? '')}</text>`;
+    }).join('');
 
     // ----- linhas + ponta -----
     const drawOrder = series.map((_, i) => i).sort((a, b) => zOf(a) - zOf(b));
     let lines = '';
     for (const i of drawOrder) {
       const s = series[i];
-      const dimmed = focusUser && s.userId !== focusUser;
+      const dimmed = focusUser
+        ? s.userId !== focusUser
+        : (isNarrow && !defaultStrong.has(s.userId));
       const isMe = s.userId === meId;
       const isFocus = s.userId === focusUser;
       const pts = pos[i].map((p, k) => `${xAt(k).toFixed(1)},${yAt(p).toFixed(1)}`).join(' ');
@@ -133,9 +146,12 @@ export function renderRankChart(mount, { progression, meId }) {
       const lx = xAt(steps - 1), ly = yAt(lp);
       lines += `<circle class="rc-dot${dimmed ? ' dim' : ''}" cx="${lx.toFixed(1)}" cy="${ly.toFixed(1)}" r="${isMe || isFocus ? 5 : 4}" fill="${color}"/>`;
 
-      // nome na ponta direita (cada linha numa posição distinta → não colide)
+      // nome na ponta direita (cada linha numa posição distinta → não colide).
+      // Mobile: só linhas em destaque ganham rótulo — 62 nomes de 9 chars
+      // truncados viravam ruído com duplicatas ("Vinícius…" ×2).
+      if (isNarrow && dimmed) continue;
       const nm = isMe ? 'Você' : s.name;
-      lines += `<text class="rc-end${dimmed ? ' dim' : ''}${isMe || isFocus ? ' strong' : ''}" x="${(x1 + 8).toFixed(1)}" y="${(ly + 4).toFixed(1)}" fill="${color}">${escapeHtml(clip(nm, width < 520 ? 9 : 16))}</text>`;
+      lines += `<text class="rc-end${dimmed ? ' dim' : ''}${isMe || isFocus ? ' strong' : ''}" x="${(x1 + 8).toFixed(1)}" y="${(ly + 4).toFixed(1)}" fill="${color}">${escapeHtml(clip(nm, isNarrow ? 12 : 16))}</text>`;
     }
 
     host.innerHTML = `
@@ -154,8 +170,9 @@ export function renderRankChart(mount, { progression, meId }) {
     attachHover(host, { f, series, N, steps, pos, xAt, yAt, x0, x1, plotTop });
 
     function zOf(i) {
-      if (series[i].userId === focusUser) return 3;
-      if (series[i].userId === meId) return 2;
+      if (series[i].userId === focusUser) return 4;
+      if (series[i].userId === meId) return 3;
+      if (isNarrow && defaultStrong.has(series[i].userId)) return 2;
       return 1;
     }
   }

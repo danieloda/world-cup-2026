@@ -6,7 +6,7 @@ import {
   flag, escapeHtml, formatBrDate, formatTime,
   isLocked, isLive, lockCountdownLabel, showToast, loadRecentMatches,
   loadQualifiers, teamPt, groundShort, renderDateCalendar, predictionDeadline,
-  localDateKey, oddsToProbs, brParts,
+  localDateKey, oddsToProbs, brParts, heroMeta, wireHScroll,
 } from '../util.js';
 import { matchPoints, scoreBreakdown, scorerBonus } from '../scoring.js';
 import {
@@ -86,6 +86,7 @@ try {
   const pageBody = await renderShell({ active: 'palpites-g', profile, stats });
   pageBody.innerHTML = renderPage();
   pageBody.classList.add('fade-up');
+  wireHScroll();
   attachEventListeners();
   attachRaioXInline();
   attachRaioXTabs();
@@ -156,11 +157,11 @@ function renderPage() {
     <section class="hero">
       <div class="hero-kicker">Palpitar placares · Fase de grupos</div>
       <h1 class="hero-title">Fase de grupos</h1>
-      <div class="hero-meta">
-        <b>${matches.length} jogos</b><span class="sep"></span>
-        Seu palpite e o resultado oficial no mesmo lugar<span class="sep"></span>
-        <b>${counts.totalDone}</b> palpitados
-      </div>
+      <div class="hero-meta">${heroMeta([
+        `<b>${matches.length} jogos</b>`,
+        { html: 'Seu palpite e o resultado oficial no mesmo lugar', flow: true },
+        `<b>${counts.totalDone}</b> palpitados`,
+      ])}</div>
     </section>
 
     <div id="tabBody">${renderBody(counts)}</div>
@@ -190,7 +191,19 @@ function applyHashRoute() {
 
 // Rola até o jogo do hash (#jogo-<id>) e dá um flash rápido pra localizar o card.
 function focusHashMatch() {
-  const jm = /^jogo-(\d+)$/.exec((location.hash || '').replace('#', ''));
+  const h = (location.hash || '').replace('#', '');
+  // Redirect da antiga terceiros.html: cumpre a promessa abrindo o popover
+  // "Melhores 3ºs" (antes caía na lista do Grupo A e o link morria ali).
+  if (h === 'terceiros') {
+    const pop = document.querySelector('.thirds-pop');
+    if (pop) {
+      pop.classList.add('open');
+      pop.querySelector('.thirds-pop-trigger')?.setAttribute('aria-expanded', 'true');
+      pop.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    return;
+  }
+  const jm = /^jogo-(\d+)$/.exec(h);
   if (!jm) return;
   const el = document.querySelector(`.match[data-match-id="${jm[1]}"]`);
   if (!el) return;
@@ -468,12 +481,12 @@ function renderResultRow(m) {
   const goals = goalsByMatch.get(m.id) ?? [];
   const homeGoals = goals.filter(g => g.players.team === m.team_home);
   const awayGoals = goals.filter(g => g.players.team === m.team_away);
+  // Bandeira por artilheiro (identifica o time sem precisar de separador "·",
+  // que abria linha sozinho no mobile); cada artilheiro é um token inquebrável.
   const goalsHtml = goals.length > 0
     ? `<div class="gr-goals">
          <span class="gr-goals-cap">⚽ Gols</span>
-         ${homeGoals.map(g => `<span class="gr-scorer">${escapeHtml(g.players.full_name)} <b>${g.goals}'</b></span>`).join('')}
-         ${homeGoals.length && awayGoals.length ? '<span class="gr-goals-sep">·</span>' : ''}
-         ${awayGoals.map(g => `<span class="gr-scorer">${escapeHtml(g.players.full_name)} <b>${g.goals}'</b></span>`).join('')}
+         ${[...homeGoals, ...awayGoals].map(g => `<span class="gr-scorer"><span class="fl">${flag(g.players.team)}</span> ${escapeHtml(g.players.full_name)} <b>${g.goals}'</b></span>`).join('')}
        </div>`
     : '';
 
@@ -713,6 +726,7 @@ function attachEventListeners() {
         if (wrap) wrap.innerHTML = renderGroupTableSection();
         const tp = document.getElementById('thirdsPopBody');
         if (tp) tp.innerHTML = renderThirdsPopBody(standMode);
+        wireHScroll();
         const trig = document.querySelector('.thirds-pop-trigger .hint');
         if (trig) trig.textContent = standMode === 'real' ? 'oficial' : 'sua projeção';
       }
@@ -841,6 +855,7 @@ function refreshProjection() {
   if (wrap) wrap.innerHTML = renderGroupTableSection();
   const tp = document.getElementById('thirdsPopBody');
   if (tp) tp.innerHTML = renderThirdsPopBody('sim');
+  wireHScroll();
 }
 
 function getTeamLabel(matchId) {
@@ -854,6 +869,7 @@ function rerenderTabBody() {
   const tabBody = document.getElementById('tabBody');
   if (!tabBody) return;
   tabBody.innerHTML = renderBody(counts);
+  wireHScroll();
 }
 
 function updateKpisAndChips() {

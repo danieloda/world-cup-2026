@@ -20,7 +20,7 @@
 //                 (predictions.percent + o objeto comparison), na ótica do
 //                 lado "casa" do confronto do bolão.
 
-import { flag, escapeHtml, teamPt } from './util.js';
+import { flag, escapeHtml, teamPt, wireHScroll } from './util.js';
 import { renderStandingTable } from './standings-view.js';
 
 const COMP_PT = {
@@ -805,6 +805,7 @@ export function openRaioXModal({ homeTeam, awayTeam, titleHtml, data }) {
   modal.querySelector('.raiox-modal-title').innerHTML = titleHtml
     || `${escapeHtml(teamPt(homeTeam))} <span class="rx-vs">×</span> ${escapeHtml(teamPt(awayTeam))}`;
   modal.querySelector('.raiox-modal-body').innerHTML = renderRaioXContent(homeTeam, awayTeam, data);
+  wireHScroll(modal);
   modal.hidden = false;
   document.body.classList.add('raiox-modal-open');
   modal.querySelector('.raiox-modal-x')?.focus();   // move o foco pra dentro do diálogo
