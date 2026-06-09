@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Protótipos — Evolução do ranking</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css" rel="stylesheet">
+<style>
+  :root {
+    --bg-page: #0c0c0c;
+    --bg-main: #161616;
+    --card: #202022;
+    --card-hover: #2b2b2d;
+    --card-elev: #262628;
+    --line: rgba(255,255,255,.10);
+    --line-strong: #3c3c40;
+    --text: #fff;
+    --text-dim: #b3b3b3;
+    --text-mute: #a3a3a3;
+    --accent: #f4c430;
+    --accent-bright: #ffd54a;
+    --accent-dim: rgba(244,196,48,.15);
+    --red: #f15e6c;
+    --red-dim: rgba(241,94,108,.15);
+    --positive: #1DB954;
+    --positive-dim: rgba(29,185,84,.15);
+    --font: 'Figtree', system-ui, -apple-system, sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; min-width: 0; margin: 0; padding: 0; }
+  :focus-visible { outline: 2px solid var(--accent-bright); outline-offset: 2px; border-radius: 6px; }
+  /* alvo de toque ≥44px em ponteiro grosso, sem inflar o desktop */
+  @media (pointer: coarse) {
+    .chip, .seg button, .dd-btn, .dd-item { padding-top: 10px; padding-bottom: 10px; }
+  }
+  html, body { background: var(--bg-page); color: var(--text); font-family: var(--font); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 28px 20px 80px; }
+
+  .intro h1 { font-size: 28px; font-weight: 800; }
+  .intro p { color: var(--text-dim); max-width: 760px; margin-top: 6px; }
+  .intro .note { font-size: 13px; color: var(--text-mute); margin-top: 8px; }
+  .intro .note b { color: var(--accent); }
+
+  nav.toc { position: sticky; top: 0; z-index: 30; background: rgba(12,12,12,.92); backdrop-filter: blur(8px); margin: 18px -20px 26px; padding: 10px 20px; border-bottom: 1px solid var(--line); display: flex; gap: 8px; flex-wrap: wrap; }
+  nav.toc a { font-size: 13px; font-weight: 600; color: var(--text-dim); background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; text-decoration: none; }
+  nav.toc a:hover { background: var(--card-hover); color: var(--text); }
+
+  section.proto { margin-bottom: 64px; scroll-margin-top: 70px; }
+  .proto-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
+  .proto-head .tag { font-size: 12px; font-weight: 800; letter-spacing: .08em; color: var(--bg-page); background: var(--accent); border-radius: 6px; padding: 2px 8px; }
+  .proto-head h2 { font-size: 21px; font-weight: 800; }
+  .proto-sub { color: var(--text-dim); font-size: 14px; max-width: 820px; margin-bottom: 14px; }
+  .proto-sub b { color: var(--text); }
+  .panel { background: var(--bg-main); border: 1px solid var(--line); border-radius: 14px; padding: 18px; }
+
+  .chip-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .chip { font-size: 13px; font-weight: 600; color: var(--text-dim); background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; }
+  .chip:hover { background: var(--card-hover); color: var(--text); }
+  .chip.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent-bright); }
+
+  /* ===== A. Corrida de barras ===== */
+  .race-top { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 8px; }
+  .race-play { width: 42px; height: 42px; border-radius: 50%; background: var(--accent); color: #111; font-size: 17px; font-weight: 800; display: grid; place-items: center; flex: none; }
+  .race-play:hover { background: var(--accent-bright); }
+  .race-scrub { flex: 1 1 220px; accent-color: var(--accent); height: 4px; }
+  .race-speed { font-size: 13px; font-weight: 700; background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; color: var(--text-dim); }
+  .race-when { font-size: 13px; color: var(--text-dim); min-width: 200px; }
+  .race-when b { color: var(--text); font-size: 15px; }
+  .race-stage { position: relative; margin-top: 10px; }
+  .race-row { position: absolute; left: 0; right: 0; height: 34px; display: flex; align-items: center; gap: 8px; transition: top .42s cubic-bezier(.22,.9,.36,1), opacity .3s; }
+  .race-pos { width: 34px; text-align: right; font-size: 13px; font-weight: 700; color: var(--text-mute); font-variant-numeric: tabular-nums; flex: none; }
+  .race-trk { flex: 1; height: 26px; position: relative; }
+  .race-bar { position: absolute; inset: 0 auto 0 0; border-radius: 6px; opacity: .9; transition: width .42s cubic-bezier(.22,.9,.36,1); min-width: 2px; }
+  .race-row.me .race-bar { opacity: 1; box-shadow: 0 0 0 1px rgba(244,196,48,.7); }
+  .race-lbl { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); font-size: 13px; font-weight: 700; white-space: nowrap; text-shadow: 0 1px 2px rgba(0,0,0,.6); }
+  .race-pts { width: 64px; font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text-dim); flex: none; }
+  .race-dlt { width: 30px; font-size: 11.5px; font-weight: 800; flex: none; }
+  .race-dlt.up { color: var(--positive); } .race-dlt.dn { color: var(--red); }
+  .race-sep { position: absolute; left: 0; right: 0; border-top: 1px dashed var(--line-strong); transition: top .42s; }
+  .race-sep span { position: absolute; right: 0; top: -9px; font-size: 11px; color: var(--text-mute); background: var(--bg-main); padding: 0 6px; }
+
+  /* ===== B. Bump focado ===== */
+  .bump-svg text { font-family: var(--font); }
+  .bump-svg .ylbl, .bump-svg .xlbl { font-size: 11.5px; fill: var(--text-mute); }
+  .bump-svg .ctx { stroke: #2e2e31; stroke-width: 1.25; fill: none; }
+  .bump-svg .foc { stroke-width: 2.6; fill: none; stroke-linejoin: round; }
+  .bump-svg .end { font-size: 12.5px; font-weight: 700; }
+  .bump-note { font-size: 12.5px; color: var(--text-mute); margin-top: 10px; }
+
+  /* ===== C. Sparklines ===== */
+  table.spk { width: 100%; border-collapse: collapse; }
+  table.spk th { font-size: 11.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-mute); text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--line); }
+  table.spk td { padding: 8px 10px; border-bottom: 1px solid var(--line); font-size: 14px; }
+  table.spk tr.me td { background: var(--accent-dim); }
+  table.spk tr:hover td { background: var(--card-hover); cursor: pointer; }
+  table.spk tr.me:hover td { background: var(--accent-dim); }
+  .spk-pos { font-weight: 800; font-variant-numeric: tabular-nums; width: 44px; }
+  .spk-nm { font-weight: 600; }
+  .spk-nm small { display: block; color: var(--text-mute); font-weight: 500; font-size: 11.5px; }
+  .spk-d { font-size: 12.5px; font-weight: 800; white-space: nowrap; width: 56px; }
+  .spk-d.up { color: var(--positive); } .spk-d.dn { color: var(--red); } .spk-d.eq { color: var(--text-mute); font-weight: 600; }
+  .spk-pts { font-weight: 800; font-variant-numeric: tabular-nums; text-align: right; width: 76px; }
+  .spk-cell { width: 150px; }
+  .spk-exp td { background: var(--card) !important; cursor: default; }
+  .spk-exp-in { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; padding: 6px 2px; }
+  .spk-exp-in .kpi { font-size: 12.5px; color: var(--text-dim); }
+  .spk-exp-in .kpi b { display: block; font-size: 17px; color: var(--text); }
+
+  /* ===== D. Minha jornada ===== */
+  .jor-controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
+  .jor-controls select { background: var(--card); color: var(--text); border: 1px solid var(--line-strong); border-radius: 8px; padding: 7px 10px; font-family: inherit; font-size: 13.5px; }
+  .jor-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(185px, 1fr)); gap: 10px; margin-bottom: 14px; }
+  .jor-kpi { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+  .jor-kpi .l { font-size: 11.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--text-mute); }
+  .jor-kpi .v { font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .jor-kpi .v small { font-size: 12px; color: var(--text-dim); font-weight: 600; }
+  .jor-svg text { font-family: var(--font); }
+  .jor-svg .ylbl, .jor-svg .xlbl { font-size: 11.5px; fill: var(--text-mute); }
+  .jor-svg .ann { font-size: 11.5px; font-weight: 700; }
+
+  /* ===== E. Slope ===== */
+  .slope-svg text { font-family: var(--font); }
+  .slope-svg .col-t { font-size: 12.5px; font-weight: 700; fill: var(--text-dim); }
+  .slope-svg .ln { fill: none; stroke-width: 1.6; opacity: .35; }
+  .slope-svg .ln.hot { opacity: 1; stroke-width: 2.6; }
+  .slope-svg .ln.me { opacity: 1; stroke-width: 3; }
+  .slope-svg .nm { font-size: 11.5px; font-weight: 600; }
+  .slope-svg .posn { font-size: 10.5px; fill: var(--text-mute); }
+  .slope-legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12.5px; color: var(--text-dim); margin-top: 10px; }
+  .slope-legend i { display: inline-block; width: 18px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 6px; }
+
+  .tipbox { position: fixed; z-index: 99; background: var(--card-elev); border: 1px solid var(--line-strong); border-radius: 10px; padding: 8px 11px; font-size: 12.5px; pointer-events: none; box-shadow: 0 8px 28px rgba(0,0,0,.5); max-width: 260px; }
+  .tipbox b { font-size: 13.5px; }
+  .tipbox .row { color: var(--text-dim); }
+  .tipbox .tr { display: flex; align-items: center; gap: 7px; padding: 2px 0; }
+  .tipbox .tr .tp { font-weight: 800; width: 26px; text-align: right; font-variant-numeric: tabular-nums; flex: none; }
+  .tipbox .tr .tn { flex: 1; font-weight: 600; }
+  .tipbox .tr .tv { font-weight: 700; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+  .tipbox .tr.me .tn, .tipbox .tr.me .tp { color: var(--accent); }
+  /* linha da partida no tooltip: flex centrado — alinhamento por baseline
+     deixava as bandeiras dançando em relação aos nomes */
+  .tipbox .mrow { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin: 4px 0 5px; }
+  .tipbox .mrow .tm { display: inline-flex; align-items: center; gap: 5px; }
+  .tipbox .mrow .fi { vertical-align: 0; }
+
+  /* ===== v2: segmented control de tempo ===== */
+  .seg { display: inline-flex; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 3px; gap: 2px; }
+  .seg button { font-size: 13px; font-weight: 700; color: var(--text-dim); padding: 6px 13px; border-radius: 8px; transition: background .18s, color .18s; }
+  .seg button:hover { color: var(--text); }
+  .seg button.on { background: var(--accent); color: #161616; }
+  .seg button:disabled { opacity: .38; cursor: not-allowed; }
+  .seg button:disabled:hover { color: var(--text-dim); }
+
+  /* ===== v2: avatares (iniciais) ===== */
+  .avh { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--card-elev); border: 2px solid currentColor; font-size: 10px; font-weight: 800; letter-spacing: .02em; flex: none; }
+  .avh.lg { width: 44px; height: 44px; font-size: 15px; border-width: 2.5px; }
+  .av-init { font-size: 8.5px; font-weight: 800; }
+
+  /* ===== v2: bump ===== */
+  .bump-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+  .bump-svg .band { fill: rgba(255,255,255,.025); }
+  .bump-svg .band-lbl { font-size: 10.5px; font-weight: 700; letter-spacing: .07em; fill: #8a8a8e; text-transform: uppercase; }
+  .bump-svg .foc.dimfoc { opacity: .25; }
+  .bump-svg .foc.meline { filter: drop-shadow(0 0 5px rgba(244,196,48,.4)); }
+  .bump-svg .cross { stroke: rgba(255,255,255,.25); stroke-dasharray: 2 3; }
+  .chip .avh { width: 20px; height: 20px; font-size: 8px; border-width: 1.5px; margin: -2px 2px -2px -4px; }
+  .chip .cpts { color: var(--text-mute); font-weight: 600; }
+  .chip.active .cpts { color: inherit; opacity: .75; }
+  .chip svg.ic { width: 13px; height: 13px; vertical-align: -2px; margin-right: 4px; }
+
+  /* ===== v3: bandeiras + KPI com partida ===== */
+  .fi { border-radius: 2px; box-shadow: 0 0 0 1px rgba(255,255,255,.08); vertical-align: -2px; }
+  .jor-kpi .mt { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; font-size: 12px; color: var(--text-dim); margin-top: 6px; line-height: 1.35; }
+  .mt .tm, .tipbox .tm { white-space: nowrap; }
+  .mt .sc, .tipbox .sc { font-weight: 800; color: var(--text); font-variant-numeric: tabular-nums; }
+  .mt .dt, .tipbox .dt { color: var(--text-mute); }
+  .jor-kpi .mtx { display: grid; gap: 3px; font-size: 12.5px; color: var(--text-dim); margin-top: 8px; }
+  .jor-kpi .mtx .ln { display: flex; align-items: center; gap: 7px; }
+  .jor-kpi .mtx .ln .tn { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .jor-kpi .mtx .ln .g { margin-left: auto; font-weight: 800; color: var(--text); font-variant-numeric: tabular-nums; }
+  .jor-kpi .mtx .dt { color: var(--text-mute); font-size: 11.5px; margin-top: 3px; }
+
+  /* ===== v3: dropdown custom (comparar com) ===== */
+  .dd { position: relative; display: inline-block; }
+  .dd-btn { display: flex; align-items: center; gap: 8px; background: var(--card-elev); border: 1px solid var(--line-strong); border-radius: 10px; padding: 7px 12px; font-size: 13.5px; font-weight: 600; color: var(--text); transition: background .18s; }
+  .dd-btn:hover { background: var(--card-hover); }
+  .dd-btn .car { color: var(--text-mute); font-size: 10px; margin-left: 2px; }
+  .dd-list { position: absolute; z-index: 50; bottom: calc(100% + 6px); left: 0; min-width: 290px; max-height: 280px; overflow: auto; background: var(--card-elev); border: 1px solid var(--line-strong); border-radius: 12px; padding: 5px; box-shadow: 0 12px 36px rgba(0,0,0,.55); }
+  .dd-item { display: flex; align-items: center; gap: 9px; width: 100%; text-align: left; font-size: 13.5px; font-weight: 600; padding: 7px 9px; border-radius: 8px; color: var(--text); }
+  .dd-item:hover { background: var(--card-hover); }
+  .dd-item.sel { background: var(--accent-dim); }
+  .dd-item .dp { font-weight: 800; font-variant-numeric: tabular-nums; width: 30px; text-align: right; flex: none; }
+  .dd-item .dn { flex: 1; white-space: nowrap; }
+  .dd-item .dv { font-size: 12px; font-weight: 600; color: var(--text-mute); font-variant-numeric: tabular-nums; }
+  .dd-item .avh { width: 24px; height: 24px; font-size: 9px; }
+
+  /* ===== v2: jornada ===== */
+  .panel.card-elev { background: var(--card); }
+  .jor-head { display: flex; align-items: center; gap: 13px; flex-wrap: wrap; margin-bottom: 14px; }
+  .jor-head .who { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 220px; }
+  .jor-head .who .nm { font-size: 18px; font-weight: 800; line-height: 1.15; }
+  .jor-head .who .ds { font-size: 13px; color: var(--text-dim); }
+  .jor-head .who .ds b.up { color: var(--positive); }
+  .jor-head .who .ds b.dn { color: var(--red); }
+  .jor-svg .band { fill: rgba(255,255,255,.025); }
+  .jor-svg .band-lbl { font-size: 10.5px; font-weight: 700; letter-spacing: .07em; fill: #8a8a8e; text-transform: uppercase; }
+  .jor-svg .journey { filter: drop-shadow(0 0 6px rgba(244,196,48,.35)); }
+  .jor-svg .ann-f { opacity: 0; animation: annIn .5s ease forwards; }
+  @keyframes annIn { to { opacity: 1; } }
+  .jor-legend { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  @media (prefers-reduced-motion: reduce) {
+    .jor-svg .ann-f { animation: none; opacity: 1; }
+    .race-row, .race-bar, .seg button { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="intro">
+    <h1>Evolução do ranking — protótipos v2</h1>
+    <p>Decisão: <b>Minha jornada → tela inicial</b> e <b>Bump focado → tela de ranking</b>. Esta versão adiciona
+       <b>avatares</b> e <b>controle do tempo</b> (Rodada / Dia / Jogo) — a granularidade é o que mata a poluição:
+       62 jogadores trocam de posição a cada jogo, mas a história que importa se conta por dia e por rodada.</p>
+    <p class="note">Dados <b>fictícios</b> (seed fixa, mesmos 62 jogadores e 88 jogos em todos os protótipos). <b>Você</b> é sempre amarelo — é o jogador com a maior arrancada na reta final da simulação, pra testar como cada forma conta uma reviravolta.
+       Pra simular o <b>início da Copa</b>, adicione <b>?jogos=N</b> na URL (ex.: <a href="?jogos=5" style="color:var(--accent)">?jogos=5</a> = 1º dia, <a href="?jogos=45" style="color:var(--accent)">?jogos=45</a> = 2ª semana).</p>
+  </div>
+
+  <nav class="toc">
+    <a href="#pd">★ Minha jornada → Início</a>
+    <a href="#pb">★ Bump focado → Ranking</a>
+    <a href="#pa">A · Corrida (referência)</a>
+    <a href="#pc">C · Sparklines (referência)</a>
+    <a href="#pe">E · Slope (referência)</a>
+  </nav>
+
+  <section class="proto" id="pd">
+    <div class="proto-head"><span class="tag">★ INÍCIO</span><h2>Minha jornada</h2></div>
+    <p class="proto-sub">Card pessoal pra tela inicial: a linha desenha sua história na Copa sobre as <b>faixas de fase</b>,
+       com melhor/pior momento e arrancada anotados. Tempo <b>por dia</b> (padrão) ou por jogo. Compare com um rival pela legenda.</p>
+    <div class="panel card-elev" id="jorMount"></div>
+  </section>
+
+  <section class="proto" id="pb">
+    <div class="proto-head"><span class="tag">★ RANKING</span><h2>Bump focado</h2></div>
+    <p class="proto-sub">Bump chart com <b>dois zooms de tempo</b>: <b>Por semana</b> (a Copa inteira, limpa) e <b>Jogos da semana</b>
+       (só a semana atual, jogo a jogo — o hover mostra a partida com bandeiras e placar). Começa com <b>Você + pódio</b> aceso;
+       a legenda liga/desliga <b>qualquer um</b> (inclusive Você) e os botões <b>Pódio + Você</b> / <b>Top 10</b> resetam a seleção.</p>
+    <div class="panel" id="bumpMount"></div>
+  </section>
+
+  <hr style="border:none;border-top:1px solid var(--line);margin:48px 0 40px">
+  <p style="color:var(--text-mute);font-size:13px;margin-bottom:26px">Abaixo: alternativas mantidas só como referência (não escolhidas).</p>
+
+  <section class="proto" id="pa">
+    <div class="proto-head"><span class="tag">A</span><h2>Corrida de barras</h2></div>
+    <p class="proto-sub">A Copa vira um <b>replay assistível</b>: aperte play e veja as barras se ultrapassando jogo a jogo.
+       Mostra só o top 12 + <b>Você</b> (fixado embaixo quando está fora) — reviravolta aparece como ultrapassagem, não como cruzamento de linha. Arraste o slider pra "voltar a fita".</p>
+    <div class="panel" id="raceMount"></div>
+  </section>
+
+  <section class="proto" id="pc">
+    <div class="proto-head"><span class="tag">C</span><h2>Sparklines na tabela</h2></div>
+    <p class="proto-sub">Em vez de um gráfico-monstro separado, <b>cada linha da tabela ganha seu mini-gráfico</b> de posição + badge de Δ (últimos 5 jogos). Espaguete zero, e a história de cada um fica onde o olho já está. Clique numa linha pra expandir a jornada.</p>
+    <div class="panel" id="spkMount"></div>
+  </section>
+
+  <section class="proto" id="pe">
+    <div class="proto-head"><span class="tag">E</span><h2>Slope por fase</h2></div>
+    <p class="proto-sub">Em vez de 88 colunas, <b>4 fotos</b>: posição no fim de cada rodada da fase de grupos e nos 16-avos. Quem subiu/caiu 14+ posições ganha cor (verde/vermelho); o resto é contexto. Passe o mouse em qualquer linha; clique pra fixar.</p>
+    <div class="panel" id="slopeMount"></div>
+    <div class="slope-legend">
+      <span><i style="background:var(--positive)"></i>subiu 14+ posições</span>
+      <span><i style="background:var(--red)"></i>caiu 14+ posições</span>
+      <span><i style="background:var(--accent)"></i>Você</span>
+      <span><i style="background:#3c3c40"></i>demais jogadores</span>
+    </div>
+  </section>
+</div>
+
+<script>
+'use strict';
+// ============================================================
+// Dados demo: 62 jogadores × 88 jogos, seed fixa
+// ============================================================
+function mulberry32(a) {
+  return function () {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+const rnd = mulberry32(20260609);
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+const FIRST =['Ana','Bruno','Camila','Daniel','Eduardo','Fernanda','Gustavo','Helena','Igor','Júlia','Lucas','Larissa','Marcelo','Mariana','Nathan','Otávio','Patrícia','Pedro','Rafael','Renata','Sofia','Thiago','Vinícius','Aline','Beatriz','Caio','Diego','Elisa','Fábio','Gabriela'];
+const LAST = ['Silva','Santos','Oliveira','Costa','Pereira','Almeida','Cardoso','Teixeira','Gomes','Martins','Araújo','Ferreira','Ribeiro','Carvalho','Nunes','Moraes','Lima','Barbosa','Rodrigues','Sousa'];
+const TEAMS = ['Brasil','Argentina','França','Inglaterra','Espanha','Alemanha','Portugal','Holanda','México','EUA','Japão','Marrocos','Croácia','Uruguai','Colômbia','Bélgica'];
+const STAGES = [
+  { until: 24, label: 'Grupos · Rodada 1' },
+  { until: 48, label: 'Grupos · Rodada 2' },
+  { until: 72, label: 'Grupos · Rodada 3' },
+  { until: 88, label: '16-avos de final' },
+];
+
+// ?jogos=N simula a Copa com só N jogos lançados (ex.: ?jogos=5 = 1º dia,
+// ?jogos=30 = meio da 2ª semana) — pra testar o comportamento no início.
+const N = 62;
+const GAMES = clamp(+new URLSearchParams(location.search).get('jogos') || 88, 2, 88);
+let MY_INDEX = -1; // "Você": escolhido após a simulação (maior arrancada tardia)
+
+const players = [];
+const seenNames = new Set();
+for (let i = 0; i < N; i++) {
+  let name;
+  do { name = FIRST[Math.floor(rnd() * FIRST.length)] + ' ' + LAST[Math.floor(rnd() * LAST.length)]; }
+  while (seenNames.has(name));
+  seenNames.add(name);
+  players.push({ id: 'p' + i, name, me: false, skill: 0.25 + rnd() * 0.6 });
+}
+
+// Confrontos fictícios pros rótulos
+const matches = [];
+for (let g = 0; g < GAMES; g++) {
+  const h = TEAMS[Math.floor(rnd() * TEAMS.length)];
+  let a; do { a = TEAMS[Math.floor(rnd() * TEAMS.length)]; } while (a === h);
+  matches.push({ home: h, away: a, sh: Math.floor(rnd() * 4), sa: Math.floor(rnd() * 3) });
+}
+
+// Pontos por jogo (placar exato 18 / V+S 12 / vencedor 10 / parcial 5) com viés de skill.
+const cum = players.map(() => [0]);            // cum[i][s] = pontos após s jogos
+for (let g = 0; g < GAMES; g++) {
+  for (let i = 0; i < N; i++) {
+    const sk = players[i].skill;
+    const r = rnd();
+    let pts = 0;
+    if (r < 0.05 + 0.07 * sk) pts = 18;
+    else if (r < 0.16 + 0.12 * sk) pts = 12;
+    else if (r < 0.34 + 0.16 * sk) pts = 10;
+    else if (r < 0.58) pts = 5;
+    cum[i].push(cum[i][g] + pts);
+  }
+}
+
+// pos[i][s] = posição (1-based) do jogador i após o jogo s+1
+const pos = players.map(() => new Array(GAMES));
+for (let s = 0; s < GAMES; s++) {
+  const col = players.map((_, i) => ({ i, pts: cum[i][s + 1] }));
+  col.sort((a, b) => b.pts - a.pts || a.i - b.i);
+  col.forEach((e, r) => { pos[e.i][s] = r + 1; });
+}
+const finalOrder = players.map((_, i) => i).sort((a, b) => pos[a][GAMES - 1] - pos[b][GAMES - 1]);
+
+// "Você" = quem teve a maior arrancada da reta final — garante que os
+// protótipos sempre tenham uma reviravolta de verdade pra contar.
+{
+  const ref = Math.floor((GAMES - 1) * 0.62);
+  let bestClimb = -1;
+  for (let i = 0; i < N; i++) {
+    const climb = pos[i][ref] - pos[i][GAMES - 1];
+    if (climb > bestClimb) { bestClimb = climb; MY_INDEX = i; }
+  }
+  players[MY_INDEX].name = 'Você';
+  players[MY_INDEX].me = true;
+}
+
+// ============================================================
+// Modelo de tempo: jogo → dia → rodada/fase
+// ============================================================
+// Dias fictícios (RNG separado pra não deslocar a seed dos dados acima):
+// fase de grupos 4-6 jogos/dia, mata-mata 2-3/dia. ~19 dias no total.
+const rnd2 = mulberry32(7);
+const dayEnds = [];           // índice do ÚLTIMO jogo de cada dia
+{
+  let g = -1;
+  while (g < GAMES - 1) {
+    const knockout = g + 1 >= 72;
+    const take = knockout ? 2 + Math.floor(rnd2() * 2) : 4 + Math.floor(rnd2() * 3);
+    let next = Math.min(GAMES - 1, g + take);
+    // um dia não atravessa fronteira de fase: trava no último jogo da fase corrente
+    const phaseEnd = STAGES.find(st => g + 1 < st.until).until - 1;
+    if (next > phaseEnd) next = phaseEnd;
+    g = next;
+    dayEnds.push(g);
+  }
+}
+const DAY0 = { d: 11, m: 6 };  // "11/6" + nº de dias (demo)
+const dayLabel = (k) => {
+  let d = DAY0.d + k, m = DAY0.m;
+  while (d > 30) { d -= 30; m++; }
+  return `${d}/${m}`;
+};
+
+// dia de cada jogo + data formatada (pros KPIs e tooltips com a partida real)
+const gameDay = new Array(GAMES);
+{
+  let k = 0;
+  for (let g = 0; g < GAMES; g++) {
+    while (g > dayEnds[k]) k++;
+    gameDay[g] = k;
+  }
+}
+const gameDate = (g) => dayLabel(gameDay[g]);
+
+// bandeiras: mesma lib do app (flag-icons), mapeada pros nomes PT do demo
+const TEAM_CODE = {
+  Brasil: 'br', Argentina: 'ar', 'França': 'fr', Inglaterra: 'gb-eng',
+  Espanha: 'es', Alemanha: 'de', Portugal: 'pt', Holanda: 'nl',
+  'México': 'mx', EUA: 'us', 'Japão': 'jp', Marrocos: 'ma',
+  'Croácia': 'hr', Uruguai: 'uy', 'Colômbia': 'co', 'Bélgica': 'be',
+};
+const flagIc = (team) => `<span class="fi fi-${TEAM_CODE[team] || 'xx'}"></span>`;
+// partida real de um jogo, inline: bandeira time placar time bandeira · data
+function matchInline(g) {
+  const m = matches[g];
+  // time+bandeira atômicos (nowrap) — quebra de linha só entre os blocos
+  return `<span class="tm">${flagIc(m.home)} ${m.home}</span> <span class="sc">${m.sh}–${m.sa}</span> <span class="tm">${m.away} ${flagIc(m.away)}</span> <span class="dt">· ${gameDate(g)}</span>`;
+}
+// versão empilhada (KPIs da jornada): um time por linha, gols à direita,
+// data + fase numa linha própria — espelha os cards de jogo do app
+function matchStack(g) {
+  const m = matches[g];
+  return `<div class="mtx">
+    <div class="ln">${flagIc(m.home)} <span class="tn">${m.home}</span> <b class="g">${m.sh}</b></div>
+    <div class="ln">${flagIc(m.away)} <span class="tn">${m.away}</span> <b class="g">${m.sa}</b></div>
+    <div class="dt">${gameDate(g)} · ${stageOf(g).replace('Grupos · ', '')}</div>
+  </div>`;
+}
+
+// semanas da Copa (7 dias a partir de 11/6) → último jogo de cada semana
+const weekEnds = [];
+{
+  for (let k = 0; k < dayEnds.length; k++) {
+    const w = Math.floor(k / 7);
+    weekEnds[w] = dayEnds[k];
+  }
+}
+const weekRange = (w) => {
+  const firstDay = w * 7;
+  const lastDay = Math.min(dayEnds.length - 1, w * 7 + 6);
+  return `${dayLabel(firstDay)}–${dayLabel(lastDay)}`;
+};
+
+// Granularidades: cada uma é uma lista de "etapas" = índices de jogo onde
+// fotografamos o ranking. A posição vem de pos[i][stepGame] — sem recalcular nada.
+const GRAN = {
+  rodada: {
+    name: 'Rodada',
+    steps: STAGES.map(st => st.until - 1),
+    label: (k) => ['Rodada 1', 'Rodada 2', 'Rodada 3', '16-avos'][k],
+    short: (k) => ['R1', 'R2', 'R3', '16-avos'][k],
+  },
+  semana: {
+    name: 'Semana',
+    steps: weekEnds,
+    label: (k) => `Semana ${k + 1}`,
+    short: (k) => `S${k + 1}`,
+  },
+  dia: {
+    name: 'Dia',
+    steps: dayEnds,
+    label: dayLabel,
+    short: dayLabel,
+  },
+  jogo: {
+    name: 'Jogo',
+    steps: [...Array(GAMES).keys()],
+    label: (k) => `Jogo ${k + 1}`,
+    short: (k) => `J${k + 1}`,
+  },
+};
+
+// Faixas de fase no fundo do plot: devolve [{x, w, label}] dado o mapeamento xAt
+// por etapa. A borda da faixa cai no meio do caminho entre etapas vizinhas.
+const PHASE_SHORT = ['R1', 'R2', 'R3', '16-avos'];
+function phaseBands(steps, xAt, x0, x1) {
+  const bands = [];
+  let from = 0;
+  STAGES.forEach((st, si) => {
+    const lastIdx = steps.findLastIndex(g => g <= st.until - 1);
+    if (lastIdx < 0) return;
+    const right = lastIdx === steps.length - 1 ? x1 : (xAt(lastIdx) + xAt(lastIdx + 1)) / 2;
+    bands.push({ x: from === 0 ? x0 : bands[bands.length - 1].x + bands[bands.length - 1].w, label: st.label.replace('Grupos · ', ''), short: PHASE_SHORT[si] });
+    const b = bands[bands.length - 1];
+    b.w = right - b.x;
+    from = right;
+  });
+  return bands;
+}
+
+// Avatar (iniciais) em SVG, com anel na cor do jogador
+function avatarSvgAt(i, cx, cy, r) {
+  const c = colorOf(i);
+  return `<g>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="var(--card-elev)" stroke="${c}" stroke-width="2"/>
+    <text class="av-init" x="${cx}" y="${cy + 3}" text-anchor="middle" fill="${c}" style="font-size:${Math.round(r * .85)}px">${initials(players[i].name)}</text>
+  </g>`;
+}
+// Avatar (iniciais) em HTML
+function avatarHtmlOf(i, cls = '') {
+  return `<span class="avh ${cls}" style="color:${colorOf(i)}">${initials(players[i].name)}</span>`;
+}
+
+const ME_COLOR = '#f4c430';
+const PALETTE = ['#1DB954','#4aa3ff','#f15e6c','#b07cff','#ff9f43','#2dd4bf','#ff6fb5','#9ccc65','#7e9cff','#ffa94d','#5ad1c9','#c98cff','#67b7ff','#ff7a7a','#74c0fc','#63e6be','#e599f7'];
+const colorOf = (i) => players[i].me ? ME_COLOR : PALETTE[finalOrder.indexOf(i) % PALETTE.length];
+const stageOf = (g) => STAGES.find(st => g < st.until).label;
+const initials = (n) => n.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+
+// tooltip flutuante compartilhado
+const tip = document.createElement('div');
+tip.className = 'tipbox'; tip.hidden = true;
+document.body.appendChild(tip);
+function showTip(html, x, y) {
+  tip.innerHTML = html; tip.hidden = false;
+  const w = tip.offsetWidth, vw = window.innerWidth;
+  tip.style.left = Math.min(vw - w - 8, x + 14) + 'px';
+  tip.style.top = (y + 14) + 'px';
+}
+function hideTip() { tip.hidden = true; }
+
+// ============================================================
+// A. Corrida de barras
+// ============================================================
+(function raceProto() {
+  const mount = document.getElementById('raceMount');
+  const SHOW = 12, ROW = 38;
+  let step = GAMES - 1, playing = false, speed = 1, timer = null;
+
+  mount.innerHTML = `
+    <div class="race-top">
+      <button class="race-play" id="racePlay" aria-label="Play">▶</button>
+      <div class="race-when" id="raceWhen"></div>
+      <input class="race-scrub" id="raceScrub" type="range" min="0" max="${GAMES - 1}" value="${GAMES - 1}">
+      <button class="race-speed" id="raceSpeed">1×</button>
+    </div>
+    <div class="race-stage" id="raceStage"></div>
+  `;
+  const stage = mount.querySelector('#raceStage');
+  const scrub = mount.querySelector('#raceScrub');
+  const playBtn = mount.querySelector('#racePlay');
+  const whenEl = mount.querySelector('#raceWhen');
+  const speedBtn = mount.querySelector('#raceSpeed');
+
+  // cria as linhas uma vez; cada update só move top/width (FLIP barato)
+  const rows = new Map();
+  players.forEach((p, i) => {
+    const el = document.createElement('div');
+    el.className = 'race-row' + (p.me ? ' me' : '');
+    el.innerHTML = `
+      <span class="race-pos"></span>
+      <span class="race-trk"><span class="race-bar" style="background:${colorOf(i)}"></span><span class="race-lbl">${p.name}</span></span>
+      <span class="race-pts"></span>
+      <span class="race-dlt"></span>
+    `;
+    el.style.opacity = '0'; el.style.top = (SHOW * ROW + 60) + 'px';
+    stage.appendChild(el);
+    rows.set(i, el);
+  });
+  const sep = document.createElement('div');
+  sep.className = 'race-sep'; sep.innerHTML = '<span>fora do top 12 — Você fixado aqui</span>'; sep.hidden = true;
+  stage.appendChild(sep);
+
+  function update() {
+    const order = players.map((_, i) => i).sort((a, b) => pos[a][step] - pos[b][step]);
+    const meIn = pos[MY_INDEX][step] <= SHOW;
+    const visible = order.slice(0, SHOW);
+    if (!meIn) visible.push(MY_INDEX);
+    const maxPts = cum[order[0]][step + 1] || 1;
+    stage.style.height = (visible.length * ROW + (meIn ? 0 : 14)) + 'px';
+    sep.hidden = meIn;
+    if (!meIn) sep.style.top = (SHOW * ROW + 4) + 'px';
+
+    const vset = new Set(visible);
+    players.forEach((_, i) => {
+      const el = rows.get(i);
+      if (!vset.has(i)) { el.style.opacity = '0'; el.style.pointerEvents = 'none'; return; }
+      const slot = vset.has(i) && pos[i][step] <= SHOW ? pos[i][step] - 1 : SHOW + 0.35;
+      el.style.opacity = '1';
+      el.style.top = (slot * ROW) + 'px';
+      el.querySelector('.race-pos').textContent = pos[i][step] + 'º';
+      el.querySelector('.race-bar').style.width = Math.max(2, 100 * cum[i][step + 1] / maxPts) + '%';
+      el.querySelector('.race-pts').textContent = cum[i][step + 1] + ' pts';
+      const prev = step > 0 ? pos[i][step - 1] : pos[i][step];
+      const d = prev - pos[i][step];
+      const dl = el.querySelector('.race-dlt');
+      dl.textContent = d > 0 ? '▲' + d : d < 0 ? '▼' + (-d) : '';
+      dl.className = 'race-dlt ' + (d > 0 ? 'up' : d < 0 ? 'dn' : '');
+    });
+
+    const m = matches[step];
+    whenEl.innerHTML = `<b>Jogo ${step + 1}</b> de ${GAMES} · ${stageOf(step)}<br>${m.home} ${m.sh}–${m.sa} ${m.away}`;
+    scrub.value = step;
+  }
+
+  function tick() {
+    if (step >= GAMES - 1) { stop(); return; }
+    step++; update();
+  }
+  function play() {
+    if (step >= GAMES - 1) step = -1;
+    playing = true; playBtn.textContent = '❚❚';
+    timer = setInterval(tick, 460 / speed);
+  }
+  function stop() { playing = false; playBtn.textContent = '▶'; clearInterval(timer); }
+
+  playBtn.addEventListener('click', () => playing ? stop() : play());
+  scrub.addEventListener('input', () => { stop(); step = +scrub.value; update(); });
+  speedBtn.addEventListener('click', () => {
+    speed = speed === 1 ? 2 : speed === 2 ? 4 : 1;
+    speedBtn.textContent = speed + '×';
+    if (playing) { clearInterval(timer); timer = setInterval(tick, 460 / speed); }
+  });
+  update();
+})();
+
+// ============================================================
+// ★ Bump focado (tela de ranking) — contexto cinza, foco em
+//   Pódio+Você / Top 10 / legenda livre; tempo por Semana ou
+//   por Jogo (só a semana atual); avatares e hover com partida
+// ============================================================
+(function bumpProto() {
+  const mount = document.getElementById('bumpMount');
+  // Início de campeonato: com menos de 2 semanas de jogos, "Por semana" teria
+  // 1 coluna só (linhas viram ponto) → botão desabilitado e abre em "Jogos da
+  // semana", que na semana 1 equivale a "todos os jogos até agora". A última
+  // etapa semanal é sempre a semana corrente, parcial (até o último jogo lançado).
+  const canWeek = weekEnds.length >= 2;
+  let granKey = canWeek ? 'semana' : 'jogo';
+  let showAllLeg = false;
+
+  // Foco 100% livre: um único Set; a legenda liga/desliga QUALQUER um
+  // (inclusive Você e o pódio). Os chips de preset funcionam como RESET.
+  const presetSet = (p) => new Set([MY_INDEX, ...finalOrder.slice(0, p === 'podio' ? 3 : 10)]);
+  const setsEq = (a, b) => a.size === b.size && [...a].every(x => b.has(x));
+  let selected = presetSet('podio');
+
+  const IC = {
+    trophy: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4z"/><path d="M7 6H4a3 3 0 0 0 3 3M17 6h3a3 3 0 0 1-3 3"/></svg>',
+    list: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>',
+  };
+
+  // semana atual = da última etapa de semana até o fim, jogo a jogo
+  const lastWeek = weekEnds.length - 1;
+  const curWeekStart = lastWeek === 0 ? 0 : weekEnds[lastWeek - 1] + 1;
+  const curWeekSteps = [];
+  for (let g = curWeekStart; g < GAMES; g++) curWeekSteps.push(g);
+
+  mount.innerHTML = `
+    <div class="bump-top">
+      <div class="chip-row" id="bumpChips" role="group" aria-label="Seleção rápida de jogadores">
+        <button class="chip" data-p="podio">${IC.trophy}Pódio + Você</button>
+        <button class="chip" data-p="top10">${IC.list}Top 10</button>
+      </div>
+      <div class="seg" id="bumpGran" role="group" aria-label="Granularidade do tempo">
+        <button data-g="semana" ${canWeek ? '' : 'disabled title="Disponível a partir da 2ª semana da Copa"'}>Por semana</button>
+        <button data-g="jogo">Jogos da semana</button>
+      </div>
+    </div>
+    <div id="bumpPlot"></div>
+    <div class="chip-row" id="bumpLegend" style="margin-top:12px"></div>
+    <p class="bump-note" id="bumpNote"></p>
+  `;
+
+  function draw() {
+    const f = selected;
+    const G = GRAN[granKey === 'jogo' ? 'jogo' : 'semana'];
+    const steps = granKey === 'jogo' ? curWeekSteps : weekEnds;
+    const K = steps.length;
+
+    const width = Math.max(300, mount.clientWidth - 36);
+    const narrow = width < 520;
+    const PADl = 40, PADr = narrow ? 108 : 170, PADt = 30, PADb = 28;
+    const rowH = Math.min(34, Math.max(6, Math.floor(420 / (N - 1))));
+    const plotH = (N - 1) * rowH;
+    const height = PADt + plotH + PADb;
+    const x0 = PADl, x1 = width - PADr;
+    const xAt = k => x0 + (x1 - x0) * (K <= 1 ? 1 : k / (K - 1));
+    const yAt = p => PADt + (p - 1) * rowH;
+
+    let g = '';
+    // faixas de fase + rótulos (na semana atual pode ser uma fase só)
+    phaseBands(steps, xAt, x0, x1).forEach((b, bi) => {
+      if (bi % 2 === 1) g += `<rect class="band" x="${b.x.toFixed(1)}" y="${PADt - 18}" width="${b.w.toFixed(1)}" height="${plotH + 18}"/>`;
+      const bl = narrow ? b.short : b.label;
+      if (b.w > (narrow ? 30 : 64)) g += `<text class="band-lbl" x="${(b.x + b.w / 2).toFixed(1)}" y="${PADt - 7}" text-anchor="middle">${bl}</text>`;
+    });
+    // eixo Y
+    const yStep = Math.max(1, Math.ceil((N - 1) / 14));
+    for (let p = 1; p <= N; p += yStep) g += `<text class="ylbl" x="${PADl - 8}" y="${yAt(p) + 4}" text-anchor="end">${p}º</text>`;
+    // eixo X: semanas mostram todas; jogos, esparso e ancorado
+    const nx = granKey === 'semana' ? K : narrow ? 3 : Math.min(6, K);
+    for (let k0 = 0; k0 < nx; k0++) {
+      const k = nx === 1 ? K - 1 : Math.round(k0 * (K - 1) / (nx - 1));
+      const anchor = k0 === 0 ? 'start' : k0 === nx - 1 ? 'end' : 'middle';
+      const lbl = granKey === 'jogo' ? (narrow ? `J${steps[k] + 1}` : `Jogo ${steps[k] + 1}`) : (narrow ? G.short(k) : G.label(k));
+      g += `<text class="xlbl" x="${xAt(k)}" y="${(height - 8).toFixed(1)}" text-anchor="${anchor}">${lbl}</text>`;
+    }
+
+    const clip = `<clipPath id="bclip"><rect x="0" y="${PADt - 3}" width="${width}" height="${plotH + 6}"/></clipPath>`;
+    let ctx = '', foc = '', lbls = '';
+    const endLabels = [];
+    const lineOf = i => steps.map((gIdx, k) => `${xAt(k).toFixed(1)},${yAt(pos[i][gIdx]).toFixed(1)}`).join(' ');
+    players.forEach((_, i) => {
+      if (!f.has(i)) { ctx += `<polyline class="ctx" points="${lineOf(i)}"/>`; return; }
+      const c = colorOf(i);
+      foc += `<polyline class="foc${players[i].me ? ' meline' : ''}" stroke="${c}" points="${lineOf(i)}" data-i="${i}"/>`;
+      endLabels.push({ i, y: yAt(pos[i][GAMES - 1]), color: c, pos: pos[i][GAMES - 1] });
+    });
+    // rótulos de ponta FORA do clip (senão o 1º corta o avatar) + anti-colisão
+    endLabels.sort((a, b) => a.y - b.y);
+    let prevY = PADt - 14;   // garante que o 1º não suba além do topo do svg
+    for (const l of endLabels) {
+      l.y = Math.max(l.y, prevY + 24);
+      prevY = l.y;
+      const nm = narrow && players[l.i].name.length > 8 ? players[l.i].name.slice(0, 7) + '…' : players[l.i].name;
+      lbls += avatarSvgAt(l.i, x1 + 14, l.y, 9);
+      lbls += `<text class="end" x="${x1 + 28}" y="${(l.y + 4).toFixed(1)}" fill="${l.color}">${l.pos}º ${nm}</text>`;
+    }
+    const svgH = Math.max(height, (endLabels[endLabels.length - 1]?.y ?? 0) + 18);
+
+    mount.querySelector('#bumpPlot').innerHTML = `
+      <svg class="bump-svg" width="${width}" height="${svgH}" viewBox="0 0 ${width} ${svgH}"
+           role="img" aria-label="Evolução da posição no ranking ao longo da Copa">
+        <defs>${clip}</defs>${g}
+        <g clip-path="url(#bclip)">${ctx}${foc}</g>
+        ${lbls}
+        <line class="cross" x1="0" x2="0" y1="${PADt}" y2="${PADt + plotH}" hidden/>
+        <g class="hdots"></g>
+        <rect class="hit" x="${x0}" y="${PADt}" width="${Math.max(0, x1 - x0)}" height="${plotH}" fill="transparent"/>
+      </svg>`;
+
+    // legenda com avatares: top 14 + você + selecionados fora do top (ou todos)
+    const baseIds = showAllLeg ? finalOrder : [...new Set([...finalOrder.slice(0, 14), MY_INDEX, ...selected])];
+    mount.querySelector('#bumpLegend').innerHTML = baseIds.map(i => `
+      <button class="chip ${f.has(i) ? 'active' : ''}" data-i="${i}" aria-pressed="${f.has(i)}" style="${f.has(i) ? `border-color:${colorOf(i)};color:${colorOf(i)};background:transparent` : ''}">
+        ${avatarHtmlOf(i)} ${pos[i][GAMES - 1]}º ${players[i].name} <span class="cpts">· ${cum[i][GAMES]} pts</span>
+      </button>`).join('') +
+      `<button class="chip" data-action="toggle-all" aria-expanded="${showAllLeg}">${showAllLeg ? '− mostrar menos' : `+ todos (${N})`}</button>`;
+    // chips de preset acendem só quando a seleção é exatamente a deles
+    mount.querySelectorAll('#bumpChips .chip').forEach(b =>
+      b.classList.toggle('active', setsEq(selected, presetSet(b.dataset.p))));
+    mount.querySelectorAll('#bumpGran button').forEach(b => {
+      const on = b.dataset.g === granKey;
+      b.classList.toggle('on', on);
+      b.setAttribute('aria-pressed', on);
+    });
+    mount.querySelector('#bumpNote').textContent =
+      selected.size === 0
+        ? 'Ninguém selecionado — clique num nome abaixo ou use Pódio + Você / Top 10 pra recomeçar.'
+        : granKey === 'semana'
+        ? 'Uma etapa por semana da Copa — a leitura limpa do torneio inteiro. Clique num nome pra ligar/desligar a linha; os botões de cima resetam a seleção.'
+        : `Jogo a jogo da semana atual (${weekRange(lastWeek)}) — o detalhe de perto, sem arrastar a Copa inteira pro zoom.`;
+
+    mount.querySelectorAll('#bumpLegend .chip[data-i]').forEach(b => b.addEventListener('click', () => {
+      const i = +b.dataset.i;
+      if (selected.has(i)) selected.delete(i); else selected.add(i);
+      draw();
+    }));
+    mount.querySelector('[data-action="toggle-all"]').addEventListener('click', () => {
+      showAllLeg = !showAllLeg; draw();
+    });
+
+    attachHover({ f, steps, K, xAt, yAt, x0, x1, G });
+  }
+
+  function attachHover({ f, steps, K, xAt, yAt, x0, x1, G }) {
+    const svg = mount.querySelector('.bump-svg');
+    const hit = svg.querySelector('.hit');
+    const cross = svg.querySelector('.cross');
+    const hdots = svg.querySelector('.hdots');
+    const width = svg.viewBox.baseVal.width;
+
+    function move(e) {
+      const cx = e.touches ? e.touches[0].clientX : e.clientX;
+      const cy = e.touches ? e.touches[0].clientY : e.clientY;
+      const r = svg.getBoundingClientRect();
+      const xv = (cx - r.left) / r.width * width;
+      const k = clamp(Math.round((xv - x0) / Math.max(1, x1 - x0) * (K - 1)), 0, K - 1);
+      const gIdx = steps[k];
+      cross.removeAttribute('hidden');
+      cross.setAttribute('x1', xAt(k)); cross.setAttribute('x2', xAt(k));
+      while (hdots.firstChild) hdots.removeChild(hdots.firstChild);
+      const rows = [...f].map(i => ({ i, p: pos[i][gIdx], pts: cum[i][gIdx + 1] }))
+        .sort((a, b) => a.p - b.p);
+      for (const rw of rows) {
+        const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        c.setAttribute('cx', xAt(k)); c.setAttribute('cy', yAt(rw.p));
+        c.setAttribute('r', players[rw.i].me ? 5 : 4);
+        c.setAttribute('fill', colorOf(rw.i));
+        hdots.appendChild(c);
+      }
+      // cabeçalho: por jogo mostra A PARTIDA (bandeiras, placar, data);
+      // por semana, o intervalo de datas
+      const header = granKey === 'jogo'
+        ? `<b>Jogo ${gIdx + 1}</b> · ${stageOf(gIdx).replace('Grupos · ', '')}<div class="mrow">${matchInline(gIdx)}</div>`
+        : `<b>Semana ${k + 1}</b> · ${weekRange(k)} · ${stageOf(gIdx).replace('Grupos · ', '')}`;
+      // nomes e posições nas cores da legenda
+      const html = header + rows.map(rw => `
+        <div class="tr">
+          <span class="tp" style="color:${colorOf(rw.i)}">${rw.p}º</span>
+          <span class="tn" style="color:${colorOf(rw.i)}">${players[rw.i].name}</span>
+          <span class="tv">${rw.pts} pts</span>
+        </div>`).join('');
+      showTip(html, cx, cy);
+    }
+    function leave() {
+      cross.setAttribute('hidden', '');
+      while (hdots.firstChild) hdots.removeChild(hdots.firstChild);
+      hideTip();
+    }
+    hit.addEventListener('mousemove', move);
+    hit.addEventListener('mouseleave', leave);
+    hit.addEventListener('touchstart', move, { passive: true });
+    hit.addEventListener('touchmove', move, { passive: true });
+    hit.addEventListener('touchend', leave);
+  }
+
+  mount.querySelectorAll('#bumpChips .chip').forEach(b => b.addEventListener('click', () => {
+    selected = presetSet(b.dataset.p); draw();   // preset = reset da seleção
+  }));
+  mount.querySelectorAll('#bumpGran button').forEach(b => b.addEventListener('click', () => {
+    granKey = b.dataset.g; draw();
+  }));
+  window.addEventListener('resize', draw);
+  draw();
+})();
+
+// ============================================================
+// C. Sparklines na tabela
+// ============================================================
+(function spkProto() {
+  const mount = document.getElementById('spkMount');
+  const LOOK = Math.min(5, GAMES - 1); // Δ vs 5 jogos atrás (ou o que houver)
+  let expanded = null;
+
+  function sparkSvg(i, w, h, big) {
+    const lo = Math.min(...pos[i]), hi = Math.max(...pos[i]);
+    const yAt = p => hi === lo ? h / 2 : 3 + (h - 6) * (p - lo) / (hi - lo);
+    const xAt = s => 2 + (w - 4) * (s / (GAMES - 1));
+    const ptsStr = pos[i].map((p, s) => `${xAt(s).toFixed(1)},${yAt(p).toFixed(1)}`).join(' ');
+    const now = pos[i][GAMES - 1], then = pos[i][GAMES - 1 - LOOK];
+    const c = players[i].me ? ME_COLOR : now < then ? 'var(--positive)' : now > then ? 'var(--red)' : '#8a8a8e';
+    return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true">
+      <polyline fill="none" stroke="${c}" stroke-width="${big ? 2.4 : 1.8}" stroke-linejoin="round" points="${ptsStr}"/>
+      <circle cx="${xAt(GAMES - 1)}" cy="${yAt(now)}" r="${big ? 4 : 2.8}" fill="${c}"/>
+    </svg>`;
+  }
+
+  function row(i) {
+    const p = pos[i][GAMES - 1], then = pos[i][GAMES - 1 - LOOK];
+    const d = then - p;
+    const dCls = d > 0 ? 'up' : d < 0 ? 'dn' : 'eq';
+    const dTxt = d > 0 ? `▲ ${d}` : d < 0 ? `▼ ${-d}` : '—';
+    return `
+      <tr data-i="${i}" class="${players[i].me ? 'me' : ''}">
+        <td class="spk-pos">${p}º</td>
+        <td class="spk-d ${dCls}" title="vs ${LOOK} jogos atrás">${dTxt}</td>
+        <td class="spk-nm">${players[i].name}</td>
+        <td class="spk-cell">${sparkSvg(i, 140, 30, false)}</td>
+        <td class="spk-pts">${cum[i][GAMES]}</td>
+      </tr>`;
+  }
+
+  function expRow(i) {
+    // estatísticas a partir do jogo 7 — antes disso a posição é ruído de empate
+    const stable = pos[i].slice(Math.min(6, GAMES - 2));
+    const best = Math.min(...stable), worst = Math.max(...stable);
+    let jump = 0, jumpAt = 0;
+    for (let s = Math.min(7, GAMES - 1); s < GAMES; s++) { const dd = pos[i][s - 1] - pos[i][s]; if (dd > jump) { jump = dd; jumpAt = s; } }
+    return `
+      <tr class="spk-exp"><td colspan="5"><div class="spk-exp-in">
+        ${sparkSvg(i, 320, 64, true)}
+        <span class="kpi">Melhor<b>${best}º</b></span>
+        <span class="kpi">Pior<b>${worst}º</b></span>
+        <span class="kpi">Maior salto<b>+${jump} <small>no Jogo ${jumpAt + 1}</small></b></span>
+        <span class="kpi">Agora<b>${pos[i][GAMES - 1]}º · ${cum[i][GAMES]} pts</b></span>
+      </div></td></tr>`;
+  }
+
+  function draw() {
+    mount.innerHTML = `
+      <table class="spk">
+        <thead><tr><th>#</th><th>Δ5</th><th>Jogador</th><th>Trajetória (88 jogos)</th><th style="text-align:right">Pts</th></tr></thead>
+        <tbody>${finalOrder.slice(0, 15).map(i =>
+          row(i) + (expanded === i ? expRow(i) : '')
+        ).join('')}${pos[MY_INDEX][GAMES - 1] > 15 ? `
+          <tr><td colspan="5" style="text-align:center;color:var(--text-mute);font-size:12px;padding:4px">⋯</td></tr>
+          ${row(MY_INDEX)}${expanded === MY_INDEX ? expRow(MY_INDEX) : ''}` : ''}</tbody>
+      </table>
+      <p class="bump-note" style="margin-top:10px">Protótipo mostra o top 15 — no app a tabela inteira (62) ganha a coluna. A cor do mini-gráfico é a tendência recente: verde subindo, vermelho caindo.</p>
+    `;
+    mount.querySelectorAll('tr[data-i]').forEach(tr => tr.addEventListener('click', () => {
+      const i = +tr.dataset.i;
+      expanded = expanded === i ? null : i;
+      draw();
+    }));
+  }
+  draw();
+})();
+
+// ============================================================
+// ★ Minha jornada (tela inicial) — avatares, faixas de fase,
+//   tempo por dia/jogo, linha com glow e draw-in
+// ============================================================
+(function jorProto() {
+  const mount = document.getElementById('jorMount');
+  let who = MY_INDEX, rival = -1, granKey = 'dia';
+  let animated = false;
+  const FROM_G = Math.min(6, GAMES - 2);   // primeiros jogos = ruído de empate (todo mundo com ~0 pt)
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // estatísticas por JOGO (verdade), independentes da granularidade exibida
+  function statsOf(i) {
+    const stable = pos[i].slice(FROM_G);
+    const best = Math.min(...stable), worst = Math.max(...stable);
+    let jump = 0, jumpAt = 0, fall = 0, fallAt = 0;
+    for (let s = FROM_G + 1; s < GAMES; s++) {
+      const dd = pos[i][s - 1] - pos[i][s];
+      if (dd > jump) { jump = dd; jumpAt = s; }
+      if (-dd > fall) { fall = -dd; fallAt = s; }
+    }
+    return { best, worst, jump, jumpAt, fall, fallAt,
+      bestAt: FROM_G + stable.indexOf(best), worstAt: FROM_G + stable.indexOf(worst) };
+  }
+
+  function draw() {
+    const G = GRAN[granKey];
+    const steps = G.steps;
+    const st = statsOf(who);
+    const myFinal = pos[who][GAMES - 1];
+
+    // Δ desde o dia anterior (cabeçalho)
+    const dPrev = dayEnds.length > 1 ? pos[who][dayEnds[dayEnds.length - 2]] - myFinal : 0;
+    const dTxt = dPrev > 0 ? `<b class="up">▲${dPrev}</b> desde ontem`
+               : dPrev < 0 ? `<b class="dn">▼${-dPrev}</b> desde ontem` : 'estável desde ontem';
+
+    // dropdown custom (com cores e avatares) no lugar do <select> nativo
+    const ddItems = [`
+      <button class="dd-item ${rival < 0 ? 'sel' : ''}" data-i="-1" role="option" aria-selected="${rival < 0}">
+        <span class="avh" style="color:var(--line-strong)">—</span>
+        <span class="dn" style="color:var(--text-dim)">ninguém</span>
+      </button>`,
+      ...finalOrder.filter(i => i !== who).map(i => `
+      <button class="dd-item ${i === rival ? 'sel' : ''}" data-i="${i}" role="option" aria-selected="${i === rival}">
+        ${avatarHtmlOf(i)}
+        <span class="dp" style="color:${colorOf(i)}">${pos[i][GAMES - 1]}º</span>
+        <span class="dn">${players[i].name}</span>
+        <span class="dv">${cum[i][GAMES]} pts</span>
+      </button>`)].join('');
+    const ddBtnFace = rival < 0
+      ? `<span style="color:var(--text-dim)">— ninguém —</span>`
+      : `${avatarHtmlOf(rival)} <b style="color:${colorOf(rival)}">${pos[rival][GAMES - 1]}º</b> ${players[rival].name}`;
+
+    mount.innerHTML = `
+      <div class="jor-head">
+        <div class="who">
+          ${avatarHtmlOf(who, 'lg')}
+          <div>
+            <div class="nm">${players[who].me ? 'Sua jornada na Copa' : players[who].name}</div>
+            <div class="ds"><b>${myFinal}º</b> · ${cum[who][GAMES]} pts · ${dTxt}</div>
+          </div>
+        </div>
+        <div class="seg" role="group" aria-label="Granularidade do tempo">
+          <button data-g="dia" class="${granKey === 'dia' ? 'on' : ''}" aria-pressed="${granKey === 'dia'}">Por dia</button>
+          <button data-g="jogo" class="${granKey === 'jogo' ? 'on' : ''}" aria-pressed="${granKey === 'jogo'}">Por jogo</button>
+        </div>
+      </div>
+      <div class="jor-kpis">
+        <div class="jor-kpi"><div class="l">Agora</div><div class="v">${myFinal}º</div><div class="mtx"><div class="dt">depois de ${GAMES} jogos</div></div></div>
+        <div class="jor-kpi"><div class="l">Melhor</div><div class="v">${st.best}º</div>${matchStack(st.bestAt)}</div>
+        <div class="jor-kpi"><div class="l">Pior</div><div class="v">${st.worst}º</div>${matchStack(st.worstAt)}</div>
+        <div class="jor-kpi"><div class="l">Maior arrancada</div>${st.jump > 0
+          ? `<div class="v" style="color:var(--positive)">+${st.jump}</div>${matchStack(st.jumpAt)}`
+          : '<div class="v" style="color:var(--text-mute)">—</div><div class="mtx"><div class="dt">ainda não houve</div></div>'}</div>
+        <div class="jor-kpi"><div class="l">Maior tombo</div>${st.fall > 0
+          ? `<div class="v" style="color:var(--red)">−${st.fall}</div>${matchStack(st.fallAt)}`
+          : '<div class="v" style="color:var(--text-mute)">—</div><div class="mtx"><div class="dt">ainda não houve</div></div>'}</div>
+      </div>
+      <div id="jorPlot"></div>
+      <div class="jor-legend">
+        <span style="font-size:13px;color:var(--text-dim);align-self:center">Comparar com</span>
+        <div class="dd" id="jorDD">
+          <button class="dd-btn" id="jorDDBtn" aria-haspopup="listbox" aria-expanded="false">${ddBtnFace}<span class="car">▼</span></button>
+          <div class="dd-list" role="listbox" aria-label="Comparar com" hidden>${ddItems}</div>
+        </div>
+      </div>
+    `;
+
+    renderPlot(steps, G, st);
+
+    mount.querySelectorAll('.seg button').forEach(b => b.addEventListener('click', () => { granKey = b.dataset.g; draw(); }));
+
+    // interações do dropdown
+    const dd = mount.querySelector('#jorDD');
+    const ddList = dd.querySelector('.dd-list');
+    dd.querySelector('#jorDDBtn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      ddList.hidden = !ddList.hidden;
+      e.currentTarget.setAttribute('aria-expanded', !ddList.hidden);
+      if (!ddList.hidden) ddList.querySelector('.dd-item.sel')?.scrollIntoView({ block: 'center' });
+    });
+    ddList.querySelectorAll('.dd-item').forEach(it => it.addEventListener('click', () => {
+      rival = +it.dataset.i; draw();
+    }));
+  }
+
+  function rivalColor() {
+    const c = colorOf(rival);
+    return c === ME_COLOR ? '#4aa3ff' : c;
+  }
+
+  function renderPlot(steps, G, st) {
+    const host = mount.querySelector('#jorPlot');
+    const width = Math.max(300, mount.clientWidth - 36);
+    const narrow = width < 520;
+    const height = narrow ? 260 : 300, PADl = 40, PADr = 26, PADt = 30, PADb = 28;
+    const ids = rival >= 0 ? [who, rival] : [who];
+    let lo = N, hi = 1;
+    for (const i of ids) { lo = Math.min(lo, ...pos[i].slice(FROM_G)); hi = Math.max(hi, ...pos[i].slice(FROM_G)); }
+    lo = Math.max(1, lo - 2); hi = Math.min(N, hi + 2);
+    const K = steps.length;
+    const xAt = k => K <= 1 ? width - PADr : PADl + (width - PADl - PADr) * (k / (K - 1));
+    const yAt = p => PADt + (height - PADt - PADb) * ((clamp(p, lo, hi) - lo) / Math.max(1, hi - lo));
+    const sample = i => steps.map(g => pos[i][g]);
+
+    let g = '';
+    // faixas de fase (alternadas) + rótulos
+    phaseBands(steps, xAt, PADl, width - PADr).forEach((b, bi) => {
+      if (bi % 2 === 1) g += `<rect class="band" x="${b.x.toFixed(1)}" y="${PADt - 18}" width="${b.w.toFixed(1)}" height="${height - PADt - PADb + 18}"/>`;
+      const bl = narrow ? b.short : b.label;
+      if (b.w > (narrow ? 30 : 64)) g += `<text class="band-lbl" x="${(b.x + b.w / 2).toFixed(1)}" y="${PADt - 7}" text-anchor="middle">${bl}</text>`;
+    });
+    // grid + eixos
+    const yStep = Math.max(1, Math.ceil((hi - lo) / 8));
+    for (let p = lo; p <= hi; p += yStep) {
+      g += `<line x1="${PADl}" x2="${width - PADr}" y1="${yAt(p)}" y2="${yAt(p)}" stroke="rgba(255,255,255,.05)"/>`;
+      g += `<text class="ylbl" x="${PADl - 8}" y="${yAt(p) + 4}" text-anchor="end">${p}º</text>`;
+    }
+    const nx = Math.min(narrow ? 3 : 6, K);
+    for (let k0 = 0; k0 < nx; k0++) {
+      const k = nx === 1 ? K - 1 : Math.round(k0 * (K - 1) / (nx - 1));
+      const anchor = k0 === 0 ? 'start' : k0 === nx - 1 ? 'end' : 'middle';
+      g += `<text class="xlbl" x="${xAt(k)}" y="${height - 8}" text-anchor="${anchor}">${G.label(k)}</text>`;
+    }
+
+    // rival (tracejado) + avatar na ponta
+    if (rival >= 0) {
+      const c2 = rivalColor();
+      const pts2 = sample(rival).map((p, k) => `${xAt(k).toFixed(1)},${yAt(p).toFixed(1)}`).join(' ');
+      g += `<polyline fill="none" stroke="${c2}" stroke-width="2" stroke-dasharray="5 4" opacity=".85" points="${pts2}"/>`;
+      g += avatarSvgAt(rival, width - PADr, yAt(pos[rival][GAMES - 1]), 9);
+    }
+
+    // linha principal: área + glow + draw-in
+    const c = colorOf(who);
+    const myPts = sample(who).map((p, k) => `${xAt(k).toFixed(1)},${yAt(p).toFixed(1)}`).join(' ');
+    g += `<polygon fill="${c}" opacity=".07" points="${xAt(0)},${height - PADb} ${myPts} ${xAt(K - 1)},${height - PADb}"/>`;
+    g += `<polyline class="journey" fill="none" stroke="${c}" stroke-width="2.6" stroke-linejoin="round" points="${myPts}"/>`;
+
+    // anotações calculadas na SÉRIE AMOSTRADA — a bolinha precisa estar sobre a
+    // linha desenhada (na granularidade "dia", o jogo exato pode passar entre
+    // dois pontos da linha). Os KPIs em cima mantêm a verdade por jogo.
+    const mySeries = sample(who);
+    const kFirst = steps.findIndex(s => s >= FROM_G);
+    let sBest = Infinity, sBestK = 0, sWorst = -Infinity, sWorstK = 0;
+    let sJump = 0, sJumpK = 0, sFall = 0, sFallK = 0;
+    for (let k = Math.max(0, kFirst); k < K; k++) {
+      if (mySeries[k] < sBest) { sBest = mySeries[k]; sBestK = k; }
+      if (mySeries[k] > sWorst) { sWorst = mySeries[k]; sWorstK = k; }
+      if (k > Math.max(0, kFirst)) {
+        const dd = mySeries[k - 1] - mySeries[k];
+        if (dd > sJump) { sJump = dd; sJumpK = k; }
+        if (-dd > sFall) { sFall = -dd; sFallK = k; }
+      }
+    }
+    const delay = animated || reduced ? 0 : 1.05;
+    const ann = (k, p, txt, color, dy, d) => `
+      <g class="ann-f" style="animation-delay:${(delay + d).toFixed(2)}s">
+        <circle cx="${xAt(k)}" cy="${yAt(p)}" r="4.5" fill="${color}"/>
+        <text class="ann" x="${clamp(xAt(k), PADl + 40, width - PADr - 46)}" y="${yAt(p) + dy}" text-anchor="middle" fill="${color}">${txt}</text>
+      </g>`;
+    g += ann(sBestK, sBest, `★ melhor: ${sBest}º`, 'var(--accent-bright)', -10, 0);
+    g += ann(sWorstK, sWorst, `pior: ${sWorst}º`, '#8a8a8e', 18, .12);
+    if (sJump >= 3 && sJumpK !== sBestK) g += ann(sJumpK, mySeries[sJumpK], `▲ +${sJump}`, 'var(--positive)', -10, .24);
+    if (sFall >= 3 && sFallK !== sWorstK) g += ann(sFallK, mySeries[sFallK], `▼ −${sFall}`, 'var(--red)', 18, .36);
+    // avatar na ponta da linha
+    g += `<g class="ann-f" style="animation-delay:${delay.toFixed(2)}s">${avatarSvgAt(who, xAt(K - 1), yAt(pos[who][GAMES - 1]), 10)}</g>`;
+
+    host.innerHTML = `<svg class="jor-svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"
+      role="img" aria-label="Sua posição no ranking ao longo da Copa">
+      ${g}
+      <line class="cross" x1="0" x2="0" y1="${PADt}" y2="${height - PADb}" stroke="rgba(255,255,255,.25)" stroke-dasharray="2 3" hidden/>
+      <rect class="hit" x="${PADl}" y="${PADt}" width="${width - PADl - PADr}" height="${height - PADt - PADb}" fill="transparent"/>
+    </svg>`;
+
+    // draw-in da linha (uma vez, respeitando reduced motion)
+    const line = host.querySelector('.journey');
+    if (!animated && !reduced && line.getTotalLength) {
+      const L = line.getTotalLength();
+      line.style.strokeDasharray = L;
+      line.style.strokeDashoffset = L;
+      requestAnimationFrame(() => {
+        line.style.transition = 'stroke-dashoffset 1.05s cubic-bezier(.45,.05,.35,1)';
+        line.style.strokeDashoffset = '0';
+      });
+      animated = true;
+    }
+
+    // hover/touch: crosshair + tooltip com posição e pontos na etapa
+    const svg = host.querySelector('svg'), hit = host.querySelector('.hit'), cross = host.querySelector('.cross');
+    function move(e) {
+      const cx = e.touches ? e.touches[0].clientX : e.clientX;
+      const cy = e.touches ? e.touches[0].clientY : e.clientY;
+      const r = svg.getBoundingClientRect();
+      const xv = (cx - r.left) / r.width * width;
+      const k = clamp(Math.round((xv - PADl) / (width - PADl - PADr) * (K - 1)), 0, K - 1);
+      cross.removeAttribute('hidden');
+      cross.setAttribute('x1', xAt(k)); cross.setAttribute('x2', xAt(k));
+      const gIdx = steps[k];
+      const colorOfLine = (i) => i === who ? colorOf(who) : rivalColor();
+      const rows = ids.map(i => `
+        <div class="tr">
+          <span class="tp" style="color:${colorOfLine(i)}">${pos[i][gIdx]}º</span>
+          <span class="tn" style="color:${colorOfLine(i)}">${players[i].name}</span>
+          <span class="tv">${cum[i][gIdx + 1]} pts</span>
+        </div>`).join('');
+      // por jogo, o cabeçalho é A PARTIDA (países, bandeiras, placar, data)
+      const header = granKey === 'jogo'
+        ? `<b>Jogo ${gIdx + 1}</b> · ${stageOf(gIdx).replace('Grupos · ', '')}<div class="mrow">${matchInline(gIdx)}</div>`
+        : `<b>${G.label(k)}</b> · ${stageOf(gIdx).replace('Grupos · ', '')}`;
+      showTip(header + rows, cx, cy);
+    }
+    function leave() { cross.setAttribute('hidden', ''); hideTip(); }
+    hit.addEventListener('mousemove', move);
+    hit.addEventListener('mouseleave', leave);
+    hit.addEventListener('touchstart', move, { passive: true });
+    hit.addEventListener('touchmove', move, { passive: true });
+    hit.addEventListener('touchend', leave);
+  }
+
+  // fecha o dropdown ao clicar fora (listener único, sobrevive aos redraws)
+  document.addEventListener('click', (e) => {
+    const list = mount.querySelector('.dd-list');
+    if (list && !list.hidden && !e.target.closest('.dd')) list.hidden = true;
+  });
+
+  window.addEventListener('resize', draw);
+  draw();
+})();
+
+// ============================================================
+// E. Slope por fase
+// ============================================================
+(function slopeProto() {
+  const mount = document.getElementById('slopeMount');
+  let COLS = STAGES.map(s => ({ label: s.label.replace('Grupos · ', ''), step: Math.min(s.until, GAMES) - 1 }))
+    .filter((c, i, a) => a.findIndex(x => x.step === c.step) === i);  // timeline curta: dedupe
+  if (COLS.length < 2) COLS = [{ label: 'Início', step: 0 }, { label: 'Agora', step: GAMES - 1 }];
+  const HOT = 14;   // só movimentos realmente grandes ganham cor — senão metade do pelotão acende
+  let pinned = -1;
+
+  function draw() {
+    const width = Math.max(320, mount.clientWidth - 36);
+    const PADl = 30, PADr = 140, PADt = 30, PADb = 10;
+    const rowH = 9.2;
+    const height = PADt + N * rowH + PADb;
+    const x0 = PADl, x1 = width - PADr;
+    const xAt = k => x0 + (x1 - x0) * (k / (COLS.length - 1));
+    const yAt = p => PADt + (p - 1) * rowH;
+
+    let g = '';
+    COLS.forEach((c, k) => {
+      g += `<text class="col-t" x="${xAt(k)}" y="${PADt - 12}" text-anchor="${k === 0 ? 'start' : k === COLS.length - 1 ? 'end' : 'middle'}">${c.label}</text>`;
+      g += `<line x1="${xAt(k)}" x2="${xAt(k)}" y1="${PADt - 4}" y2="${height - PADb}" stroke="rgba(255,255,255,.06)"/>`;
+    });
+
+    const lines = [];
+    players.forEach((_, i) => {
+      const ps = COLS.map(c => pos[i][c.step]);
+      const net = ps[0] - ps[ps.length - 1];
+      const me = players[i].me;
+      const hot = me || Math.abs(net) >= HOT || pinned === i;
+      const color = me ? ME_COLOR : pinned === i ? '#67b7ff' : net >= HOT ? 'var(--positive)' : net <= -HOT ? 'var(--red)' : '#3c3c40';
+      const pts = ps.map((p, k) => `${xAt(k).toFixed(1)},${yAt(p).toFixed(1)}`).join(' ');
+      lines.push({ i, hot, html: `<polyline class="ln ${me ? 'me' : hot ? 'hot' : ''}" data-i="${i}" stroke="${color}" points="${pts}"/>` });
+    });
+    // frios primeiro, quentes por cima
+    g += lines.filter(l => !l.hot).map(l => l.html).join('');
+    g += lines.filter(l => l.hot).map(l => l.html).join('');
+
+    // rótulos à direita: quentes + top 5
+    const labeled = new Set();
+    players.forEach((_, i) => {
+      const last = pos[i][COLS[COLS.length - 1].step];
+      const net = pos[i][COLS[0].step] - last;
+      const want = players[i].me || Math.abs(net) >= HOT || last <= 5 || pinned === i;
+      if (!want) return;
+      const ySlot = Math.round(yAt(last));
+      if (labeled.has(ySlot)) return;
+      labeled.add(ySlot);
+      const me = players[i].me;
+      const color = me ? ME_COLOR : pinned === i ? '#67b7ff' : net >= HOT ? 'var(--positive)' : net <= -HOT ? 'var(--red)' : 'var(--text-dim)';
+      const badge = net !== 0 ? ` ${net > 0 ? '▲' : '▼'}${Math.abs(net)}` : '';
+      g += `<text class="nm" x="${x1 + 8}" y="${ySlot + 3.5}" fill="${color}">${last}º ${players[i].name}${badge}</text>`;
+    });
+
+    mount.innerHTML = `<svg class="slope-svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">${g}</svg>`;
+
+    mount.querySelectorAll('.ln').forEach(ln => {
+      ln.style.cursor = 'pointer';
+      ln.addEventListener('mousemove', e => {
+        const i = +ln.dataset.i;
+        const ps = COLS.map(c => pos[i][c.step]);
+        showTip(`<b>${players[i].name}</b><div class="row">${ps.map((p, k) => `${COLS[k].label}: <b>${p}º</b>`).join(' · ')}</div>`, e.clientX, e.clientY);
+      });
+      ln.addEventListener('mouseleave', hideTip);
+      ln.addEventListener('click', () => { pinned = pinned === +ln.dataset.i ? -1 : +ln.dataset.i; hideTip(); draw(); });
+    });
+  }
+  window.addEventListener('resize', draw);
+  draw();
+})();
+</script>
+</body>
+</html>
