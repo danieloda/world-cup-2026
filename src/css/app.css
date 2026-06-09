@@ -3246,6 +3246,7 @@ body.raiox-modal-open { overflow: hidden; }
 /* Legenda abaixo da tabela de ranking (explica colunas + desempate) */
 .rank-legend { margin: 12px 0 8px; }
 .rank-legend a { color: var(--accent); white-space: nowrap; }
+.rank-legend .lk { white-space: nowrap; }   /* abreviação + significado não quebram no meio */
 
 /* ===== Drill-down (perfil expandido) ===== */
 .profile-drill {

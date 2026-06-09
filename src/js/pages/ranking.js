@@ -266,7 +266,7 @@ function renderPage() {
       </div>
     </section>
 
-    <p class="hist-note">Quatro formas de pontuar: <b>Jogos</b> (cada acerto soma — lado, resultado e saldo) · <b>Campeão</b> +${championBonus(true)} · <b>Artilheiro</b> (gols × fase) · <b>Classificados</b> (time na fase certa). <a href="regras.html">Ver regras →</a></p>
+    <p class="hist-note"><span>Quatro formas de pontuar: <b>Jogos</b> (cada acerto soma — lado, resultado e saldo) · <b>Campeão</b> +${championBonus(true)} · <b>Artilheiro</b> (gols × fase) · <b>Classificados</b> (time na fase certa). <a href="regras.html">Ver regras →</a></span></p>
 
     ${renderPot(totalPot, split)}
 
@@ -297,11 +297,11 @@ function renderPage() {
           </tbody>
         </table>
       </div>
-      <p class="hist-note rank-legend">
-        <b>Exatos</b> cravou o placar · <b>V+S</b> vencedor + saldo · <b>Venc.</b> só o vencedor · <b>Parc.</b> gols de um time · <b>Erros</b> não pontuou.
+      <p class="hist-note rank-legend"><span>
+        <span class="lk"><b>Exatos</b> cravou o placar</span> · <span class="lk"><b>V+S</b> vencedor + saldo</span> · <span class="lk"><b>Venc.</b> só o vencedor</span> · <span class="lk"><b>Parc.</b> gols de um time</span> · <span class="lk"><b>Erros</b> não pontuou</span>.
         Empate em <b>Pts</b> é desempatado por <b>Exatos</b>, depois por <b>V+S</b>. Empatou nos três? Os jogadores dividem a mesma posição e o prêmio é rateado.
         <a href="regras.html#desempate">Ver regras de desempate →</a>
-      </p>
+      </span></p>
     ` : ''}
 
     <div id="drillDown"></div>
