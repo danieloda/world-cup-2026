@@ -45,6 +45,7 @@
   --medal-gold: #d4a73a;       /* dourado (Final) */
   --medal-bronze: #cd7f32;     /* bronze (3º lugar) */
   --font: 'Figtree', system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', 'Roboto Mono', monospace;
   --sidebar-w: 240px;
 }
 
@@ -953,7 +954,7 @@ body.raiox-modal-open { overflow: hidden; }
 .rx-recent-tally .t.v { color: var(--positive); }
 .rx-recent-tally .t.e { color: var(--text-mute); }
 .rx-recent-tally .t.d { color: var(--red); }
-.rx-recent-empty { font: 500 12px/1.4 var(--font); color: var(--text-mute); font-style: italic; }
+.rx-recent-empty { font: 500 12px/1.4 var(--font); color: var(--text-mute); }
 
 .rx-recent-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
 .rx-recent-list li {
@@ -1100,7 +1101,7 @@ body.raiox-modal-open { overflow: hidden; }
 
 .ctx-h2h.is-empty { padding: 4px 0; }
 .ctx-h2h-none {
-  font: 500 12px/1.5 var(--font); color: var(--text-mute); font-style: italic;
+  font: 500 12px/1.5 var(--font); color: var(--text-mute);
   margin-top: 8px;
 }
 
@@ -1767,7 +1768,7 @@ body.raiox-modal-open { overflow: hidden; }
   overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
   flex: 1; min-width: 0;
 }
-.flag-select-display em { color: var(--text-mute); font-style: italic; }
+.flag-select-display em { color: var(--text-mute); }
 .flag-select-caret { color: var(--text-mute); font-size: 12px; }
 .flag-select-list {
   position: absolute;
@@ -1922,9 +1923,9 @@ body.raiox-modal-open { overflow: hidden; }
   max-width: 100%;
 }
 .tt-match .opp .pred b { color: var(--accent); font-weight: 800; }
-.tt-match .opp .pred.empty b { color: var(--text-mute); font-style: italic; }
+.tt-match .opp .pred.empty b { color: var(--text-mute); }
 .tt-match .res {
-  font-family: ui-monospace, monospace;
+  font-family: var(--font-mono);
   font-weight: 800;
   font-size: 14px;
   text-align: right;
@@ -2390,7 +2391,7 @@ body.raiox-modal-open { overflow: hidden; }
 }
 .result-card-info strong { color: var(--text); font-weight: 700; }
 .result-card-info .pred-score {
-  font-family: ui-monospace, monospace;
+  font-family: var(--font-mono);
   font-weight: 800;
   font-size: 13px;
   color: var(--text);
@@ -2431,7 +2432,7 @@ body.raiox-modal-open { overflow: hidden; }
 }
 .result-card-break .brk b { color: var(--positive); font-weight: 800; }
 .result-card-break .brk.winner b { color: var(--accent); }
-.result-card-break .brk.miss { color: var(--text-mute); font-style: italic; background: transparent; padding-left: 0; }
+.result-card-break .brk.miss { color: var(--text-mute); background: transparent; padding-left: 0; }
 .result-card-meta {
   text-align: right;
   font-size: 12px;
@@ -2444,7 +2445,7 @@ body.raiox-modal-open { overflow: hidden; }
   border-radius: 4px;
   background: rgba(255, 255, 255, .04);
   color: var(--text-dim);
-  font-family: ui-monospace, monospace;
+  font-family: var(--font-mono);
   margin-top: 2px;
 }
 .result-card-scorers {
@@ -2535,7 +2536,7 @@ body.raiox-modal-open { overflow: hidden; }
   border-radius: 4px;
   background: rgba(255, 255, 255, .06);
   color: var(--text-dim);
-  font-family: ui-monospace, monospace;
+  font-family: var(--font-mono);
   white-space: nowrap;
 }
 .history-card.final  .history-head .stage { background: rgba(212, 167, 58, .15); color: var(--medal-gold); }
@@ -2552,7 +2553,7 @@ body.raiox-modal-open { overflow: hidden; }
 .history-bets-empty {
   padding-top: 12px;
   border-top: 1px solid var(--line);
-  font-size: 12px; color: var(--text-mute); font-style: italic;
+  font-size: 12px; color: var(--text-mute);
 }
 .hb-row {
   display: flex;
@@ -2590,7 +2591,7 @@ body.raiox-modal-open { overflow: hidden; }
 }
 .hb-row.me .nm { color: var(--text); font-weight: 800; }
 .hb-row .pred {
-  font-family: ui-monospace, monospace;
+  font-family: var(--font-mono);
   font-weight: 800; font-size: 14px;
   color: var(--text);
   font-variant-numeric: tabular-nums;
@@ -2711,7 +2712,7 @@ body.raiox-modal-open { overflow: hidden; }
 .hist-tip .tip-row-val .op { color: var(--text-mute); font-weight: 700; margin-right: 1px; }
 .hist-tip .tip-row-val.add  { color: var(--positive); }
 .hist-tip .tip-row-val.mult { color: var(--accent); }
-.hist-tip .tip-row.miss-row .tip-row-lbl { color: var(--text-mute); font-style: italic; }
+.hist-tip .tip-row.miss-row .tip-row-lbl { color: var(--text-mute); }
 
 .hist-tip .tip-total {
   display: flex; align-items: center; justify-content: space-between; gap: 14px;
@@ -3266,12 +3267,12 @@ body.raiox-modal-open { overflow: hidden; }
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .profile-row .got {
-  font-family: ui-monospace, monospace;
+  font-family: var(--font-mono);
   color: var(--text-dim);
   font-size: 12px;
 }
 .profile-row .real {
-  font-family: ui-monospace, monospace;
+  font-family: var(--font-mono);
   font-weight: 800;
   font-size: 13px;
 }
@@ -3300,7 +3301,7 @@ body.raiox-modal-open { overflow: hidden; }
 }
 .pred-break .brk b { color: var(--positive); font-weight: 800; }
 .pred-break .brk.winner b { color: var(--accent); }
-.pred-break .brk.miss { color: var(--text-mute); font-style: italic; background: transparent; padding-left: 0; }
+.pred-break .brk.miss { color: var(--text-mute); background: transparent; padding-left: 0; }
 
 /* Champion pick result (acerto/erro do campeão) */
 .profile-row.champion-result.champion-hit {
@@ -3394,7 +3395,7 @@ body.raiox-modal-open { overflow: hidden; }
 }
 .thirds-table .group-badge {
   display: inline-block;
-  font-family: ui-monospace, monospace;
+  font-family: var(--font-mono);
   font-size: 12px;
   font-weight: 700;
   padding: 3px 8px;
@@ -3539,7 +3540,7 @@ body.raiox-modal-open { overflow: hidden; }
   color: var(--accent);
   padding: 2px 6px;
   border-radius: 4px;
-  font-family: ui-monospace, monospace;
+  font-family: var(--font-mono);
   margin-left: 6px;
   vertical-align: middle;
 }
@@ -3653,7 +3654,6 @@ body.raiox-modal-open { overflow: hidden; }
 }
 .bm-team .slot {
   color: var(--text-mute);
-  font-style: italic;
   font-weight: 500;
   font-size: 12px;
 }
@@ -3727,7 +3727,7 @@ input[type="number"].score-input {
   letter-spacing: .04em;
   cursor: help;
   flex-shrink: 0;
-  font-family: ui-monospace, monospace;
+  font-family: var(--font-mono);
 }
 
 /* ============================================================
@@ -3983,15 +3983,16 @@ input[type="number"].score-input {
    Quebra em 2 linhas em vez de cortar o nome (não aumenta o card). */
 .bm-diverge {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 2px 5px;
+  flex-direction: column;   /* rótulo em cima, time embaixo → consistente p/ qualquer nome */
+  align-items: flex-start;
+  gap: 1px;
   font-size: 11px;
   line-height: 1.35;
   font-weight: 600;
   color: var(--text-mute);
   margin-top: 3px;
   min-width: 0;
+  max-width: 100%;
 }
 .bm-diverge .dv-label { flex-shrink: 0; }
 /* bandeira + nome como uma unidade alinhada (evita desalinhar a bandeira) */
@@ -4034,7 +4035,7 @@ input[type="number"].score-input {
 .bm-pred-compare .score {
   font-weight: 800;
   color: var(--text);
-  font-family: ui-monospace, monospace;
+  font-family: var(--font-mono);
 }
 .bm-pred-compare .pen {
   color: var(--text-mute);
@@ -4119,7 +4120,7 @@ input[type="number"].score-input {
 .bm-pts.exact { color: var(--accent); }    /* amarelo */
 .bm-pts.partial { color: var(--positive); }   /* verde */
 .bm-pts.miss { color: var(--red); }       /* vermelho (errou) */
-.bm-pts.no-pred { color: var(--text-mute); font-style: italic; }
+.bm-pts.no-pred { color: var(--text-mute); }
 
 /* Quebra aditiva no card de resultado do bracket */
 .bm-break {
@@ -4157,7 +4158,7 @@ input[type="number"].score-input {
 .bm-pts .formula {
   color: var(--text-mute);
   font-weight: 700;
-  font-family: ui-monospace, monospace;
+  font-family: var(--font-mono);
 }
 .bm-pts .formula small {
   font-size: 10px;
@@ -4234,7 +4235,6 @@ input[type="number"].score-input {
   color: var(--text-mute);
   justify-content: center;
   padding: 22px;
-  font-style: italic;
   font-size: 14px;
 }
 .cs-pick-flag { line-height: 1; }
@@ -4296,7 +4296,7 @@ input[type="number"].score-input {
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .cs-row .meta {
-  font-family: ui-monospace, monospace;
+  font-family: var(--font-mono);
   font-size: 11px;
   color: var(--text-mute);
   letter-spacing: .08em;
@@ -4620,7 +4620,7 @@ input[type="number"].score-input {
   text-overflow: ellipsis;
 }
 .cs-goal-match .match-teams .score {
-  font-family: ui-monospace, monospace;
+  font-family: var(--font-mono);
   font-weight: 800;
   color: var(--positive);
   margin: 0 4px;
@@ -4635,7 +4635,7 @@ input[type="number"].score-input {
 .cs-goal-pts .formula {
   font-size: 11px;
   color: var(--text-mute);
-  font-family: ui-monospace, monospace;
+  font-family: var(--font-mono);
 }
 .cs-goal-pts .total {
   font-size: 13px;
@@ -4707,7 +4707,7 @@ input[type="number"].score-input {
 }
 .admin-table tbody tr:hover { background: rgba(255, 255, 255, .03); }
 .admin-table .em-cell {
-  font-family: ui-monospace, monospace;
+  font-family: var(--font-mono);
   color: var(--text-dim);
   font-size: 12px;
 }
@@ -4767,7 +4767,7 @@ input[type="number"].score-input {
   margin-bottom: 10px;
 }
 .scorers-head .count {
-  font-family: ui-monospace, monospace;
+  font-family: var(--font-mono);
   font-size: 12px;
   letter-spacing: 0;
   color: var(--text);
@@ -4793,7 +4793,7 @@ input[type="number"].score-input {
 .scorer-row .name { font-weight: 600; }
 .scorer-row .name small { color: var(--text-mute); font-weight: 500; }
 .scorer-row .qty {
-  font-family: ui-monospace, monospace;
+  font-family: var(--font-mono);
   font-weight: 800;
   font-size: 13px;
   color: var(--accent);
