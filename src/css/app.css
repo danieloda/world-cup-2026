@@ -741,21 +741,24 @@ img { max-width: 100%; height: auto; }
   background: var(--card-elev); border: 1px solid var(--line);
   border-radius: var(--radius-pill); padding: 4px 9px;
 }
-/* fixture em grade: a coluna do mandante (bandeira + nome) tem largura FIXA via
-   clamp — o "×" cai sempre no mesmo eixo e bandeira/nome do visitante alinham
-   linha a linha. clamp resolve por viewport (não por conteúdo), então a largura
-   é idêntica em todos os cards e o alinhamento se mantém entre as linhas.
-   Nomes longos (ex.: "Bósnia e Herzegovina") cabem em 1 linha no desktop e
-   quebram em 2 no mobile, sem tirar o "×" do eixo. */
+/* fixture espelhado em grade (estilo placar): mandante = nome + bandeira
+   (bandeira encostando no ×), visitante = bandeira + nome. As duas bandeiras
+   "se encontram" no centro, então a distância bandeira→× é SEMPRE a mesma e o
+   × cai no mesmo eixo em todas as linhas. A coluna do mandante tem largura fixa
+   via clamp (resolve por viewport, não por conteúdo) → o eixo é idêntico entre
+   os cards. Nomes longos quebram em 2 linhas sem tirar o × do eixo. */
 .match.next .mn-fix {
   grid-area: fix;
   display: grid;
-  grid-template-columns: clamp(150px, 40vw, 200px) auto minmax(0, 1fr);
+  grid-template-columns: clamp(150px, 32vw, 185px) auto minmax(0, 1fr);
   align-items: center;
   gap: 0 12px;
   min-width: 0;
 }
 .match.next .team { display: flex; align-items: center; gap: 8px; min-width: 0; font-size: 15px; font-weight: 600; }
+/* mandante: nome + bandeira, agrupados à direita da coluna (bandeira no ×) */
+.match.next .team.home { flex-direction: row-reverse; justify-content: flex-start; }
+.match.next .team.away { justify-content: flex-start; }
 .match.next .mn-x { color: var(--text-mute); font-weight: 600; }
 .match.next .match-cd { grid-area: cd; justify-self: end; font-size: 12px; color: var(--text-mute); font-weight: 600; white-space: nowrap; }
 @media (max-width: 560px) {
