@@ -241,10 +241,26 @@ function slotLineLabel(slot) {
   return slot;
 }
 
-// Acertou o placar exato deste jogo?
+// Acertou o placar exato deste jogo? (só o placar — conta no KPI "placares exatos".)
 function isExactPred(m, pred) {
   return !!pred && m.finished
     && pred.pred_home === m.actual_home && pred.pred_away === m.actual_away;
+}
+
+// Time que VOCÊ previu nesta vaga: o próprio (se já é time real) ou o vencedor que
+// você simulou. Compartilhado pela faixa, pelo pênalti e pela regra do "perfeito".
+function predTeamForSide(m, side) {
+  const realTeam = side === 'home' ? m.team_home : m.team_away;
+  const slot = (side === 'home' ? m.slot_home : m.slot_away) || realTeam;
+  return isRealTeam(slot) ? slot : (predSlotResolution.get(slot)?.team ?? null);
+}
+
+// PERFEITO (dourado) no mata-mata: placar exato E os DOIS times certos na vaga — no KO
+// você também palpita QUEM chega. Placar certo com 1 time errado NÃO é perfeito.
+function isPerfectKo(m, pred) {
+  return isExactPred(m, pred)
+    && predTeamForSide(m, 'home') === m.team_home
+    && predTeamForSide(m, 'away') === m.team_away;
 }
 
 // ============================================================
@@ -442,7 +458,7 @@ function renderFinishedCard(m) {
   // Classificado/artilheiro já contam como acerto parcial, mesmo sem palpite de placar.
   const resultClass = !pred
     ? (hasBonus ? 'partial' : 'no-pred')
-    : isExactPred(m, pred) ? 'exact'
+    : isPerfectKo(m, pred) ? 'exact'           // dourado só se cravou placar + os 2 times
     : (pts > 0 || hasBonus) ? 'partial' : 'miss';
 
   const classes = ['bracket-match', 'km-finished', resultClass, 'finished'];
@@ -488,8 +504,7 @@ function renderFinishedCard(m) {
 function renderPredPen(m, pred) {
   if (!pred || pred.pred_home == null || pred.pred_home !== pred.pred_away || !pred.pred_pen_winner) return '';
   const side = pred.pred_pen_winner;                        // 'home' | 'away'
-  const slot = (side === 'home' ? m.slot_home : m.slot_away) || (side === 'home' ? m.team_home : m.team_away);
-  const penTeam = isRealTeam(slot) ? slot : (predSlotResolution.get(slot)?.team ?? null);
+  const penTeam = predTeamForSide(m, side);
   const who = penTeam ? teamPt(penTeam) : (side === 'home' ? 'mandante' : 'visitante');
   const realized = m.actual_home === m.actual_away && m.pen_winner === side;  // seu empate+lado se confirmou?
   return `<div class="km-pen km-area-predpen">pênaltis: <span class="${realized ? '' : 'pen-x'}">${escapeHtml(who)}</span></div>`;
@@ -507,8 +522,7 @@ function renderOffPen(m) {
 function renderFinRow(m, lens, side) {
   const realTeam = side === 'home' ? m.team_home : m.team_away;
   const slotOriginal = side === 'home' ? m.slot_home : m.slot_away;
-  const slot = slotOriginal || realTeam;
-  const predTeam = isRealTeam(slot) ? slot : (predSlotResolution.get(slot)?.team ?? null);
+  const predTeam = predTeamForSide(m, side);
   const pred = predsByMatch.get(m.id);
   const area = `km-area-${lens === 'official' ? 'off' : 'pred'}${side}`;
 
