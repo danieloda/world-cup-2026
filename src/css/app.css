@@ -3928,6 +3928,8 @@ input[type="number"].score-input {
   margin-top: 4px;
 }
 .km-pen { font-weight: 600; }
+/* pênalti do SEU palpite: um tom mais apagado que o oficial */
+.km-pen-pred { color: var(--text-mute); }
 
 .km-foot {
   border-top: 1px dashed var(--line);

@@ -469,7 +469,7 @@ function renderFinishedCard(m) {
         ${renderFinRow(m, 'pred', 'away')}
         ${renderFinRow(m, 'official', 'away')}
       </div>
-      ${m.pen_winner ? `<div class="km-pen">⚽ Pênaltis: ${m.pen_winner === 'home' ? teamPt(m.team_home) : teamPt(m.team_away)}</div>` : ''}
+      ${renderPenLines(m, pred)}
 
       <div class="km-foot">
         <div class="km-cap">Pontuação</div>
@@ -480,6 +480,25 @@ function renderFinishedCard(m) {
       </div>
     </div>
   `;
+}
+
+// Pênaltis no card encerrado — duas perspectivas INDEPENDENTES:
+//   • seu palpite: quando VOCÊ cravou empate, escolheu quem passa (pred_pen_winner)
+//   • oficial: quando o jogo REAL terminou empatado e foi pra disputa (pen_winner)
+// Mostra o time que VOCÊ imaginou na vaga (não o real), pra refletir o seu palpite.
+function renderPenLines(m, pred) {
+  const lines = [];
+  if (pred && pred.pred_home != null && pred.pred_home === pred.pred_away && pred.pred_pen_winner) {
+    const side = pred.pred_pen_winner;                       // 'home' | 'away'
+    const slot = (side === 'home' ? m.slot_home : m.slot_away) || (side === 'home' ? m.team_home : m.team_away);
+    const penTeam = isRealTeam(slot) ? slot : (predSlotResolution.get(slot)?.team ?? null);
+    const who = penTeam ? teamPt(penTeam) : (side === 'home' ? 'mandante' : 'visitante');
+    lines.push(`<div class="km-pen km-pen-pred">⚽ Pênaltis (seu palpite): ${escapeHtml(who)}</div>`);
+  }
+  if (m.pen_winner) {
+    lines.push(`<div class="km-pen">⚽ Pênaltis (oficial): ${escapeHtml(teamPt(m.pen_winner === 'home' ? m.team_home : m.team_away))}</div>`);
+  }
+  return lines.join('');
 }
 
 // Uma linha do card encerrado. lens='pred' (seu palpite) | 'official' (real); side='home'|'away'.
