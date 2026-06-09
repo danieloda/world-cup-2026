@@ -3611,13 +3611,13 @@ body.raiox-modal-open { overflow: hidden; }
 .bm-team {
   display: grid;
   grid-template-columns: 26px 1fr 52px;
-  column-gap: 11px; align-items: center;
-  padding: 7px 0;
+  column-gap: 11px; align-items: start;   /* topo → bandeira/placar alinham com o NOME */
+  padding: 10px 0;
   font-size: 13px;
   font-weight: 600;
 }
 .bm-team + .bm-team { border-top: 1px solid var(--line); }
-/* bandeira em caixa fixa e centralizada → não encosta no nome */
+/* bandeira em caixa fixa, alinhada à linha do nome */
 .bm-team .flag {
   width: 26px;
   display: inline-flex;
@@ -3625,12 +3625,14 @@ body.raiox-modal-open { overflow: hidden; }
   justify-content: center;
   font-size: 16px;
   line-height: 1;
+  padding-top: 1px;
 }
 .bm-team .flag .fi, .bm-team .flag .fis { border-radius: 2px; }
+.bm-team .mini-input { align-self: start; }   /* placar na linha do nome */
 .bm-team .nm {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 5px;            /* respiro entre nome e os metadados */
   min-width: 0;
 }
 .bm-team .team-line {
@@ -3644,6 +3646,8 @@ body.raiox-modal-open { overflow: hidden; }
   overflow: hidden;
   text-overflow: ellipsis;
   font-weight: 700;
+  font-size: 14px;
+  line-height: 1.15;
   flex: 1;
   min-width: 0;
 }
@@ -3972,44 +3976,57 @@ input[type="number"].score-input {
 }
 
 /* Vaga de origem como sublinha no card ABERTO (consistente com o encerrado). */
+/* Vaga de origem (referência discreta, tier 2) */
 .bm-slot-line {
-  font-size: 10px;
-  line-height: 1.3;
-  font-weight: 600;
+  font-size: 11px;
+  line-height: 1.35;
+  font-weight: 500;
   color: var(--text-mute);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
-  margin-top: 1px;
 }
 
-/* Chip de divergência no card ABERTO (oitavas): "no seu bracket: X".
-   Quebra em 2 linhas em vez de cortar o nome (não aumenta o card). */
+/* Divergência no card ABERTO — bloco rótulo→valor ("SUA SIMULAÇÃO" / time).
+   Sempre 2 linhas, com respiro e o time em destaque. */
 .bm-diverge {
   display: flex;
-  flex-direction: column;   /* rótulo em cima, time embaixo → consistente p/ qualquer nome */
+  flex-direction: column;
   align-items: flex-start;
-  gap: 1px;
-  font-size: 11px;
-  line-height: 1.35;
-  font-weight: 600;
-  color: var(--text-mute);
-  margin-top: 3px;
+  gap: 2px;
   min-width: 0;
   max-width: 100%;
 }
-.bm-diverge .dv-label { flex-shrink: 0; }
-/* bandeira + nome como uma unidade alinhada (evita desalinhar a bandeira) */
-.bm-diverge .dv-team { display: inline-flex; align-items: center; gap: 5px; min-width: 0; }
+.bm-diverge .dv-label {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+}
+/* time previsto — bandeira + nome alinhados, com presença (tier ~1.5) */
+.bm-diverge .dv-team {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  max-width: 100%;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-dim);
+}
+.bm-diverge .dv-team > :last-child {
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
+}
 .bm-diverge .dv-flag {
   display: inline-flex;
   align-items: center;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1;
   flex-shrink: 0;
 }
-.bm-diverge .dv-flag .fi, .bm-diverge .dv-flag .fis { border-radius: 2px; vertical-align: middle; }
+.bm-diverge .dv-flag .fi, .bm-diverge .dv-flag .fis { border-radius: 2px; }
 
 .bm-pen-result {
   font-size: 12px;
