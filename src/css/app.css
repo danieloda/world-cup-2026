@@ -4086,6 +4086,14 @@ input[type="number"].score-input {
   flex-shrink: 0;
 }
 .bm-diverge .dv-flag .fi, .bm-diverge .dv-flag .fis { border-radius: 2px; }
+/* Acerto da vaga: você previu quem realmente chega → verde + ✓ (mesmo token do
+   selo "✓ classificado"). Divergência segue neutra (cinza). */
+.bm-diverge.matched .dv-team { color: var(--positive); }
+.bm-diverge.matched .dv-ok {
+  flex-shrink: 0;
+  font-weight: 900;
+  color: var(--positive);
+}
 
 .bm-pen-result {
   font-size: 12px;

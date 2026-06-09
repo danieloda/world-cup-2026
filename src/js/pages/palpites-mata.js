@@ -748,7 +748,10 @@ function renderOpenTeamRow(m, side, val, locked) {
   const showFlag = !!shown;
   const source = resolved?.source;
   const isPredSource = !realKnown && (source === 'pred-group' || source === 'pred-ko');
-  const diverged = realKnown && predTeam && predTeam !== realTeam;
+  // Você simulou ALGUÉM nesta vaga já resolvida? → acerto (mesmo time) ou divergência.
+  const simKnown = realKnown && !!predTeam;
+  const diverged = simKnown && predTeam !== realTeam;
+  const matched = simKnown && predTeam === realTeam;
 
   // Vaga de origem como sublinha (consistente com o card encerrado).
   const slotLine = slotOriginal
@@ -760,9 +763,10 @@ function renderOpenTeamRow(m, side, val, locked) {
     const sourceBadge = isPredSource
       ? '<span class="pred-source" title="Baseado nos seus palpites">P</span>'
       : '';
-    // Chip de divergência: você botou outro time nessa vaga.
-    const divChip = diverged
-      ? `<div class="bm-diverge" title="Quem você previu nesta vaga"><span class="dv-label">sua simulação</span><span class="dv-team"><span class="dv-flag">${flag(predTeam)}</span>${escapeHtml(teamPt(predTeam))}</span></div>`
+    // Chip "sua simulação": quem VOCÊ previu nesta vaga. Verde + ✓ quando você
+    // acertou quem chega; neutro quando imaginou outro time (divergência).
+    const divChip = simKnown
+      ? `<div class="bm-diverge ${matched ? 'matched' : 'diverged'}" title="${matched ? 'Você acertou quem chega nesta vaga' : 'Quem você previu nesta vaga'}"><span class="dv-label">sua simulação</span><span class="dv-team"><span class="dv-flag">${flag(predTeam)}</span>${escapeHtml(teamPt(predTeam))}${matched ? '<span class="dv-ok" aria-hidden="true">✓</span>' : ''}</span></div>`
       : '';
     nameHtml = `
       <div class="nm">
