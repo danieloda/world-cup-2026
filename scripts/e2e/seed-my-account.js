@@ -12,6 +12,7 @@
  *   node scripts/e2e/seed-my-account.js [--email=eu@local.test] [--password=Palpite2026!]
  */
 import { makeAdminClient, adminCreateProfile } from './lib/admin-client.js';
+import { genRealisticPrediction } from './lib/realistic.js';
 import { makeRng } from './lib/prng.js';
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
@@ -25,6 +26,7 @@ const args = Object.fromEntries(process.argv.slice(2).map((a) => {
 }));
 const EMAIL = args.email || 'eu@local.test';
 const PASSWORD = args.password || 'Palpite2026!';
+const SKILL = args.skill != null ? parseFloat(args.skill) : 0.5;  // mid-table: mix crível de acertos/erros
 const FULL_NAME = 'Você (local)';
 
 const admin = makeAdminClient();          // aborta se não for local
@@ -56,27 +58,25 @@ const { error: profErr } = await admin.from('profiles').upsert({
 if (profErr) throw profErr;
 console.log('✅ profile garantido (paid=true)');
 
-// 3. palpites: TODOS os 104 jogos, placar 0-3 semi-aleatório (determinístico)
-const { data: matches, error: mErr } = await admin
-  .from('matches').select('id, stage').order('id');
-if (mErr) throw mErr;
+// 3. palpites HUMANOS p/ TODOS os 104 jogos: nascem da FORÇA dos times (FIFA rank),
+//    e o skill (~0.5) aproxima da realidade SEM cravar tudo → mix crível de acertos/
+//    erros na tela de comparação (e "Você" fica meia-tabela, não em último).
+const oracle = JSON.parse(readFileSync(join(__dirname, 'expected-tournament.json'), 'utf8'));
+const { data: ranks } = await admin.from('team_fifa_rank').select('team, rank');
+const rankByTeam = new Map((ranks || []).map((r) => [r.team, r.rank]));
 
-const preds = matches.map((m) => {
-  const ph = Math.floor(rng() * 4);
-  const pa = Math.floor(rng() * 4);
-  const isKO = m.stage !== 'group';
-  const pen = isKO && ph === pa ? (rng() < 0.5 ? 'home' : 'away') : null;
-  return { user_id: user.id, match_id: m.id, pred_home: ph, pred_away: pa, pred_pen_winner: pen };
+const preds = oracle.matches.map((m) => {
+  const p = genRealisticPrediction(m.stage, m, rankByTeam.get(m.team_home), rankByTeam.get(m.team_away), SKILL, rng);
+  return { user_id: user.id, match_id: m.id, pred_home: p.pred_home, pred_away: p.pred_away, pred_pen_winner: p.pred_pen_winner };
 });
 const chunk = (arr, n) => Array.from({ length: Math.ceil(arr.length / n) }, (_, i) => arr.slice(i * n, i * n + n));
 for (const c of chunk(preds, 500)) {
   const { error } = await admin.from('predictions').upsert(c, { onConflict: 'user_id,match_id' });
   if (error) throw new Error('predictions: ' + error.message);
 }
-console.log(`✅ ${preds.length} palpites de placar gravados (todos os jogos)`);
+console.log(`✅ ${preds.length} palpites humanos gravados (skill=${SKILL})`);
 
-// 4. campeão + artilheiro (usa o oráculo → palpites "certos", pra ter o que pontuar)
-const oracle = JSON.parse(readFileSync(join(__dirname, 'expected-tournament.json'), 'utf8'));
+// 4. campeão + artilheiro (palpite "informado": usa o campeão/artilheiro reais)
 const { error: cErr } = await admin.from('champion_picks')
   .upsert({ user_id: user.id, team: oracle.champion }, { onConflict: 'user_id' });
 if (cErr) throw new Error('champion: ' + cErr.message);

@@ -37,6 +37,7 @@ import { config } from 'dotenv';
 import { makeAdminClient, adminCreateUser, adminCreateProfile } from './lib/admin-client.js';
 import { simulateTournament } from './lib/tournament-simulator.js';
 import { genPrediction, genChampionPick, genScorerPick } from './lib/predictions.js';
+import { genRealisticPrediction, genRealisticChampion, genRealisticScorer } from './lib/realistic.js';
 import { makeRng } from './lib/prng.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -49,6 +50,7 @@ const N = parseInt(args.users || '70', 10);
 const SEED = args.seed || 'wc2026-scale-v1';
 const ENRICH = args.enrichment !== false && args['no-enrichment'] !== true;
 const CLEAN = args.keep !== true;
+const REALISTIC = args.realistic === true;   // demo: N perfis HUMANOS (sem perfis-borda)
 const PASSWORD = 'SimUser2026!';
 
 const C = { reset: '\x1b[0m', red: '\x1b[31m', green: '\x1b[32m', yellow: '\x1b[33m', blue: '\x1b[34m', bold: '\x1b[1m', dim: '\x1b[2m' };
@@ -67,7 +69,24 @@ function weighted(rng, pairs) {
 }
 
 // ----- roster -----
+// Modo demo: N palpiteiros HUMANOS — nenhum perfil-borda, nenhum clone do oráculo.
+// Cada um tem um `skill` (enviesado p/ baixo: a maioria é casual, poucos são feras),
+// que o gerador realista usa p/ aproximar o palpite da realidade SEM cravar tudo.
+function buildRealisticRoster(rng) {
+  const roster = [];
+  for (let i = 0; i < N; i++) {
+    const skill = Math.max(0.08, Math.min(0.82, 0.12 + 0.62 * Math.pow(rng(), 1.35)));
+    const name = `${FIRST[Math.floor(rng() * FIRST.length)]} ${LAST[Math.floor(rng() * LAST.length)]}`;
+    roster.push({
+      key: `u${String(i + 1).padStart(3, '0')}`, idx: i, edge: false, realistic: true,
+      name, skill, paid: rng() < 0.86, pickChampion: rng() < 0.92, pickScorer: rng() < 0.84,
+    });
+  }
+  return roster;
+}
+
 function buildRoster(rng) {
+  if (REALISTIC) return buildRealisticRoster(rng);
   // 10 perfis-borda determinísticos (cobrem cada regra de scoring/bônus).
   const EDGE = [
     { key: 'perfect', strategy: 'exact_all', champion: 'match_winner', topScorer: 'actual_top', paid: true },
@@ -145,7 +164,7 @@ function buildPredictionPayload(home, away, rankH, rankA, odds, rng) {
 }
 
 async function main() {
-  log('blue', `${C.bold}🌱 seed-scale: ${N} usuários sintéticos + palpites${ENRICH ? ' + enriquecimento' : ''}${C.reset}`);
+  log('blue', `${C.bold}🌱 seed-scale: ${N} usuários ${REALISTIC ? 'HUMANOS (demo)' : 'sintéticos'} + palpites${ENRICH ? ' + enriquecimento' : ''}${C.reset}`);
   log('dim', `   seed=${SEED}  url=${process.env.SUPABASE_URL}`);
   const admin = makeAdminClient();
   const now = new Date().toISOString();
@@ -187,23 +206,49 @@ async function main() {
   for (const p of roster) {
     const email = `sim-${String(p.idx + 1).padStart(3, '0')}@bolao.test`;
     const user = await adminCreateUser(admin, email, PASSWORD, p.name);
-    await adminCreateProfile(admin, user, p.name, { paid: p.paid, avatar_url: AVATARS[p.idx % AVATARS.length] });
+    // Demo: sem avatar → o front renderiza INICIAIS (70 distintas, mais real que 2 fotos repetidas).
+    const avatar_url = REALISTIC ? undefined : AVATARS[p.idx % AVATARS.length];
+    await adminCreateProfile(admin, user, p.name, { paid: p.paid, avatar_url });
     p.user_id = user.id; p.email = email;
   }
   log('green', `   ✓ ${roster.length} usuários criados (${roster.filter((p) => p.paid).length} pagantes)`);
 
   // 5. palpites + bônus
   log('blue', '\n📝 Gerando palpites...');
+  // Favoritos do torneio (modo demo): top-12 por FIFA p/ campeão; atacantes dos times
+  // fortes p/ artilheiro. Ranks vêm do oráculo já resolvido (m.team_home/away).
+  const contenders = REALISTIC ? allTeams
+    .map((t) => ({ team: t, rank: rankByTeam.get(t) ?? 50 }))
+    .sort((a, b) => a.rank - b.rank).slice(0, 12) : [];
+  const strikers = [];
+  if (REALISTIC) {
+    for (const pl of players) {
+      if (pl.position === 'ATA' && (rankByTeam.get(pl.team) ?? 99) <= 24) {
+        strikers.push({ id: pl.id, team: pl.team, rank: rankByTeam.get(pl.team) ?? 50 });
+      }
+    }
+    if (strikers.length === 0) {   // fallback se os códigos de posição diferirem
+      const top = new Set(contenders.map((c) => c.team));
+      for (const pl of players) if (top.has(pl.team)) strikers.push({ id: pl.id, team: pl.team, rank: rankByTeam.get(pl.team) ?? 50 });
+    }
+  }
+
   const preds = [], champs = [], scorers = [];
   for (const p of roster) {
     const urng = makeRng(`pred-${p.key}-${SEED}`);
     for (const m of oracle.matches) {
-      const pred = genPrediction({ id: m.id, stage: m.stage }, m, p.strategy, urng);
+      const pred = REALISTIC
+        ? genRealisticPrediction(m.stage, m, rankByTeam.get(m.team_home), rankByTeam.get(m.team_away), p.skill, urng)
+        : genPrediction({ id: m.id, stage: m.stage }, m, p.strategy, urng);
       if (pred) preds.push({ user_id: p.user_id, match_id: m.id, pred_home: pred.pred_home, pred_away: pred.pred_away, pred_pen_winner: pred.pred_pen_winner });
     }
-    const champ = genChampionPick(p.champion, oracle.champion, allTeams, urng);
+    const champ = REALISTIC
+      ? (p.pickChampion ? genRealisticChampion(contenders, oracle.champion, p.skill, urng) : null)
+      : genChampionPick(p.champion, oracle.champion, allTeams, urng);
     if (champ) champs.push({ user_id: p.user_id, team: champ });
-    const scorerId = genScorerPick(p.topScorer, oracle.topScorer, players, urng);
+    const scorerId = REALISTIC
+      ? (p.pickScorer ? genRealisticScorer(strikers, oracle.topScorer, p.skill, urng) : null)
+      : genScorerPick(p.topScorer, oracle.topScorer, players, urng);
     if (scorerId) scorers.push({ user_id: p.user_id, player_id: scorerId });
   }
   // bulk upsert em chunks
@@ -276,8 +321,8 @@ async function main() {
 
   // 8. roster artifact
   writeFileSync(join(__dirname, 'sim-roster.json'), JSON.stringify({
-    meta: { seed: SEED, users: roster.length, paid: roster.filter((p) => p.paid).length, generated_at: now, champion: oracle.champion, topScorer: oracle.topScorer },
-    users: roster.map((p) => ({ key: p.key, email: p.email, user_id: p.user_id, name: p.name, strategy: p.strategy, champion: p.champion, topScorer: p.topScorer, paid: p.paid, edge: p.edge })),
+    meta: { seed: SEED, mode: REALISTIC ? 'realistic' : 'edge+synthetic', users: roster.length, paid: roster.filter((p) => p.paid).length, generated_at: now, champion: oracle.champion, topScorer: oracle.topScorer },
+    users: roster.map((p) => ({ key: p.key, email: p.email, user_id: p.user_id, name: p.name, strategy: p.strategy, skill: p.skill, champion: p.champion, topScorer: p.topScorer, paid: p.paid, edge: p.edge })),
   }, null, 2));
 
   log('green', `\n${C.bold}✅ Seed concluído.${C.reset}`);

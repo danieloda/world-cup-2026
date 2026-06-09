@@ -25,7 +25,7 @@ set -euo pipefail
 cd "$(dirname "$0")/../.."          # raiz do repo
 ROOT="$(pwd)"
 CID="supabase_db_world-cup-2026"
-PLAYOUT=0 ; SERVE=0 ; USERS=70 ; ENRICH_FLAG=""
+PLAYOUT=0 ; SERVE=0 ; USERS=70 ; ENRICH_FLAG="" ; REALISTIC_FLAG=""
 
 for arg in "$@"; do
   case "$arg" in
@@ -33,6 +33,7 @@ for arg in "$@"; do
     --serve) SERVE=1 ;;
     --users=*) USERS="${arg#*=}" ;;
     --no-enrichment) ENRICH_FLAG="--no-enrichment" ;;
+    --realistic) REALISTIC_FLAG="--realistic" ;;   # massa humana (demo), sem perfis-borda
     *) echo "flag desconhecida: $arg" ; exit 2 ;;
   esac
 done
@@ -59,6 +60,10 @@ TZ=America/Sao_Paulo npx --yes supabase db reset >/tmp/wc-bootstrap-reset.log 2>
   && ok "reset OK ($(grep -c 'Applying migration' /tmp/wc-bootstrap-reset.log) migrations)" \
   || die "reset falhou — veja /tmp/wc-bootstrap-reset.log"
 
+# Gotcha nº1: o Kong fica com o upstream do auth STALE após o reset → 502 ao criar
+# admin/usuários. Restart preventivo (custa ~5s, evita o gargalo de toda run).
+docker restart "supabase_kong_world-cup-2026" >/dev/null 2>&1 && sleep 5 && ok "kong reiniciado (evita 502 no auth)" || true
+
 # ---- 2. seed base (matches + settings; players vêm da migration 052) ----
 c "Seed base (matches 104 + settings)"
 docker exec -i "$CID" psql -U postgres -d postgres -q < "$ROOT/supabase/seed/01_matches.sql"  >/dev/null
@@ -74,7 +79,7 @@ node "$ROOT/scripts/e2e/00-setup-local.js" >/dev/null && ok "admin garantido ($A
 
 # ---- 4. massa sintética (~N users + palpites + enriquecimento) ----
 c "Massa sintética ($USERS usuários)"
-node "$ROOT/scripts/e2e/seed-scale.js" --users="$USERS" $ENRICH_FLAG
+node "$ROOT/scripts/e2e/seed-scale.js" --users="$USERS" $ENRICH_FLAG $REALISTIC_FLAG
 ok "seed-scale concluído"
 
 # ---- 5. playout opcional ----
