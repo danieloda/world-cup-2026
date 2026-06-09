@@ -5654,24 +5654,45 @@ input[type="number"].score-input {
 
 .topbar-user {
   cursor: pointer;
-  border: 1px solid transparent;
+  border: 1px solid var(--line);
   font-family: var(--font);
-  transition: background .12s, border-color .12s;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .055), rgba(0, 0, 0, .5));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06);
+  transition: background .16s ease, border-color .16s ease, box-shadow .16s ease;
 }
-.topbar-user:hover { background: rgba(0, 0, 0, .8); border-color: var(--line-strong); }
-.topbar-account.open .topbar-user { background: rgba(0, 0, 0, .85); border-color: var(--line-strong); }
+.topbar-user:hover {
+  border-color: var(--line-strong);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .09), 0 4px 16px -8px rgba(0, 0, 0, .6);
+}
+.topbar-account.open .topbar-user {
+  border-color: rgba(244, 196, 48, .42);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .09),
+    0 8px 24px -12px var(--glow-accent);
+}
 .topbar-user .tu-name {
   max-width: 160px;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
+
+/* Avatar do pill: anel neutro que acende em dourado quando ativo */
+.topbar-user .av {
+  box-shadow: 0 0 0 1.5px rgba(255, 255, 255, .14);
+  transition: box-shadow .16s ease;
+}
+.topbar-user:hover .av,
+.topbar-account.open .topbar-user .av { box-shadow: 0 0 0 1.5px rgba(244, 196, 48, .65); }
+.topbar-user.admin:hover .av,
+.topbar-account.open .topbar-user.admin .av { box-shadow: 0 0 0 1.5px rgba(241, 94, 108, .7); }
+
 .tu-caret {
   width: 15px; height: 15px;
-  color: var(--text-mute);
+  color: var(--text-dim);
   margin-left: 1px;
-  transition: transform .2s ease, color .12s;
+  transition: transform .22s cubic-bezier(.34, 1.4, .64, 1), color .14s;
 }
-.topbar-user:hover .tu-caret { color: var(--text-dim); }
-.topbar-account.open .tu-caret { transform: rotate(180deg); color: var(--text); }
+.topbar-user:hover .tu-caret { color: var(--text); }
+.topbar-account.open .tu-caret { transform: rotate(180deg); color: var(--accent-bright); }
 
 /* Dropdown de vidro */
 .account-menu {
@@ -5679,71 +5700,113 @@ input[type="number"].score-input {
   top: calc(100% + 10px);
   right: 0;
   z-index: 60;
-  width: 252px;
-  background: var(--glass-bg);
-  -webkit-backdrop-filter: blur(20px) saturate(1.3);
-  backdrop-filter: blur(20px) saturate(1.3);
+  width: 256px;
+  background:
+    radial-gradient(130% 80% at 100% 0, rgba(244, 196, 48, .07), transparent 55%),
+    var(--glass-bg);
+  -webkit-backdrop-filter: blur(22px) saturate(1.4);
+  backdrop-filter: blur(22px) saturate(1.4);
   border: 1px solid var(--glass-line);
-  border-radius: 14px;
+  border-radius: 16px;
   overflow: hidden;
   box-shadow:
-    0 20px 50px rgba(0, 0, 0, .6),
-    inset 0 1px 0 rgba(255, 255, 255, .06);
+    0 24px 56px -12px rgba(0, 0, 0, .7),
+    0 2px 8px rgba(0, 0, 0, .4),
+    inset 0 1px 0 rgba(255, 255, 255, .08);
   opacity: 0; visibility: hidden;
-  transform: translateY(-6px) scale(.98);
+  transform: translateY(-8px) scale(.97);
   transform-origin: top right;
-  transition: opacity .16s ease, transform .16s ease, visibility .16s;
+  transition: opacity .18s ease, transform .2s cubic-bezier(.34, 1.3, .64, 1), visibility .2s;
 }
+/* Fio de luz dourado no topo — esmaece nas pontas p/ fundir com os cantos
+   arredondados (não fica mais uma barra "solta" destacada do card). */
 .account-menu::before {
   content: '';
-  position: absolute; inset: 0 0 auto 0; height: 3px;
-  background: linear-gradient(90deg, var(--accent), var(--accent-bright));   /* marca pura (antes misturava verde de sucesso) */
+  position: absolute; top: 0; left: 16px; right: 16px; height: 1.5px;
+  background: linear-gradient(90deg, transparent, var(--accent-bright), var(--accent), transparent);
+  opacity: .85;
+}
+.account-menu.admin::before {
+  background: linear-gradient(90deg, transparent, var(--red), transparent);
 }
 .topbar-account.open .account-menu {
   opacity: 1; visibility: visible; transform: none;
 }
 
 .account-head {
-  display: flex; align-items: center; gap: 12px;
-  padding: 16px 16px 14px;
+  position: relative;
+  display: flex; align-items: center; gap: 13px;
+  padding: 17px 16px 15px;
+  background: linear-gradient(180deg, rgba(244, 196, 48, .08), transparent 90%);
   border-bottom: 1px solid var(--line);
 }
+.account-menu.admin .account-head {
+  background: linear-gradient(180deg, rgba(241, 94, 108, .08), transparent 90%);
+}
 .account-head-av {
-  width: 44px; height: 44px; border-radius: 50%;
+  width: 46px; height: 46px; border-radius: 50%;
   background: var(--accent); color: #000;
-  font-size: 15px; font-weight: 800;
+  font-size: 16px; font-weight: 800;
   display: flex; align-items: center; justify-content: center;
   overflow: hidden; flex-shrink: 0;
+  box-shadow: 0 0 0 2px rgba(244, 196, 48, .55), 0 0 18px -2px var(--glow-accent);
 }
 .account-head-av img { width: 100%; height: 100%; object-fit: cover; }
-.account-menu.admin .account-head-av { background: var(--red); color: #fff; }
+.account-menu.admin .account-head-av {
+  background: var(--red); color: #fff;
+  box-shadow: 0 0 0 2px rgba(241, 94, 108, .55), 0 0 18px -2px rgba(241, 94, 108, .45);
+}
 .account-head-info { min-width: 0; }
 .account-head-name {
-  font-size: 14px; font-weight: 800; letter-spacing: -.01em;
+  font-size: 15px; font-weight: 800; letter-spacing: -.015em;
+  line-height: 1.25;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .account-head-email {
   font-size: 12px; color: var(--text-mute);
+  margin-top: 1px;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
-.account-menu-items { padding: 6px; }
+.account-menu-items { padding: 7px; }
 .account-item {
   display: flex; align-items: center; gap: 12px;
   width: 100%;
   padding: 10px 12px;
-  border-radius: 8px;
+  border-radius: 9px;
   font-size: 13px; font-weight: 600;
   color: var(--text-dim);
   font-family: var(--font);
   text-align: left;
-  transition: background .12s, color .12s;
+  transition: background .14s ease, color .14s ease;
 }
-.account-item svg { width: 18px; height: 18px; stroke-width: 2; flex-shrink: 0; }
-.account-item:hover { background: rgba(255, 255, 255, .06); color: var(--text); }
+.account-item svg {
+  width: 18px; height: 18px; stroke-width: 2; flex-shrink: 0;
+  color: var(--text-mute);
+  transition: color .14s ease, transform .14s ease;
+}
+.account-item:hover { background: rgba(255, 255, 255, .07); color: var(--text); }
+.account-item:hover svg { color: var(--accent-bright); transform: translateX(1px); }
 .account-item.danger { color: var(--red); }
+.account-item.danger svg { color: var(--red); }
 .account-item.danger:hover { background: var(--red-dim); color: var(--red); }
-.account-sep { height: 1px; background: var(--line); margin: 6px 8px; }
+.account-item.danger:hover svg { color: var(--red); transform: translateX(1px); }
+.account-sep {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--line) 20%, var(--line) 80%, transparent);
+  margin: 7px 10px;
+}
+
+/* Revelação em cascata ao abrir (some sob prefers-reduced-motion via guard global) */
+@keyframes accItemIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to   { opacity: 1; transform: none; }
+}
+.topbar-account.open .account-menu-items > * { animation: accItemIn .26s ease both; }
+.topbar-account.open .account-menu-items > :nth-child(1) { animation-delay: .04s; }
+.topbar-account.open .account-menu-items > :nth-child(2) { animation-delay: .08s; }
+.topbar-account.open .account-menu-items > :nth-child(3) { animation-delay: .11s; }
+.topbar-account.open .account-menu-items > :nth-child(4) { animation-delay: .14s; }
 
 /* Modal */
 .modal-overlay {
