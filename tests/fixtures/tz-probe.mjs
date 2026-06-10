@@ -14,15 +14,22 @@
 // em qualquer TZ; só a renderização varia. É essa variação que caça o bug.
 
 import { makeRng } from '../../scripts/e2e/lib/prng.js';
-import { formatTime, formatBrDate, formatBrShort, localDateKey } from '../../src/js/util.js';
+import {
+  formatTime, formatBrDate, formatBrShort, localDateKey,
+  daysToKickoffLabel, brDayWindowUtc,
+} from '../../src/js/util.js';
 
 // Instantes-armadilha: viram o dia/hora em fusos diferentes do BRT.
+// ⚠️ EDGE[0..4] são âncoras indexadas no teste — só APPEND no fim.
 const EDGE = [
   Date.UTC(2026, 5, 15, 23, 0),  // 20:00 BRT, 15/jun (noite — vira dia em fusos +)
   Date.UTC(2026, 5, 21, 2, 30),  // 23:30 BRT, 20/jun (véspera da meia-noite BRT)
   Date.UTC(2026, 5, 21, 3, 30),  // 00:30 BRT, 21/jun (logo após meia-noite BRT)
   Date.UTC(2026, 5, 25, 16, 0),  // 13:00 BRT, 25/jun (tarde)
   Date.UTC(2026, 6, 19, 1, 0),   // 22:00 BRT, 18/jul (noite, fim do torneio)
+  Date.UTC(2026, 5, 10, 13, 0),  // 10:00 BRT, 10/jun (véspera — bug "Faltam 2 dias")
+  Date.UTC(2026, 5, 11, 2, 59),  // 23:59 BRT, 10/jun (último minuto da véspera)
+  Date.UTC(2026, 5, 1, 12, 0),   // 09:00 BRT, 01/jun (contagem regressiva longe)
 ];
 
 // + 60 instantes pseudo-aleatórios determinísticos na janela do torneio.
@@ -35,12 +42,15 @@ const instants = [...EDGE, ...RANDOM];
 
 const rows = instants.map((ms) => {
   const d = new Date(ms);
+  const win = brDayWindowUtc(d);
   return {
     ms,
     time: formatTime(d),
     brDate: formatBrDate(d),
     brShort: formatBrShort(d),
     key: localDateKey(d),
+    kickoff: daysToKickoffLabel(d),       // rótulo "Faltam N dias"/"amanhã"
+    dayWin: `${win.startIso}/${win.endIso}`, // janela "hoje" (dia civil BRT)
   };
 });
 

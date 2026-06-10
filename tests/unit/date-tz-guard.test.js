@@ -26,7 +26,11 @@ const SRC = join(REPO, 'src', 'js');
 const SKIP_DIRS = new Set(['node_modules', '.git']);
 const EXEMPT = new Set([join(SRC, 'util.js')]);
 
-const TZ_GETTERS = /\.(getFullYear|getMonth|getDate|getDay|getHours|getMinutes|getSeconds)\s*\(\s*\)/;
+// Getters leem e setters interpretam o relógio LOCAL do dispositivo — ambos
+// produzem a mesma classe de bug (ex.: setHours(0,0,0,0) p/ "início do dia"
+// dava a meia-noite do fuso do usuário, não a de Brasília — inicio.js, jun/26).
+const TZ_GETTERS =
+  /\.(getFullYear|getMonth|getDate|getDay|getHours|getMinutes|getSeconds)\s*\(\s*\)|\.(setFullYear|setMonth|setDate|setHours|setMinutes|setSeconds)\s*\(/;
 
 function collectJs(dir, acc = []) {
   let entries;

@@ -17,6 +17,8 @@ import {
   isLive,
   isLocked,
   lockCountdownLabel,
+  daysToKickoffLabel,
+  brDayWindowUtc,
   oddsToProbs,
 } from '../../src/js/util.js';
 
@@ -484,6 +486,51 @@ describe('lockCountdownLabel (conta até o bloqueio, não até o jogo)', () => {
   it('"Bloqueado" após o prazo', () => {
     vi.setSystemTime(new Date('2026-06-15T03:00:00Z')); // já passou 23h59 BRT da véspera
     expect(lockCountdownLabel(m.match_date)).toBe('Bloqueado');
+  });
+});
+
+describe('daysToKickoffLabel (dias civis BRT até a estreia — 11/jun 16h BRT)', () => {
+  it('véspera de manhã: "amanhã", NÃO "Faltam 2 dias" (bug do Math.ceil de 30h)', () => {
+    // 10/jun 10:00 BRT — faltam 30h corridas até o kickoff, mas é 1 dia de calendário.
+    expect(daysToKickoffLabel(new Date('2026-06-10T13:00:00Z'))).toBe('A Copa começa amanhã!');
+  });
+
+  it('véspera 00:00 BRT: ainda "amanhã"', () => {
+    expect(daysToKickoffLabel(new Date('2026-06-10T03:00:00Z'))).toBe('A Copa começa amanhã!');
+  });
+
+  it('véspera 23:59 BRT: ainda "amanhã"', () => {
+    expect(daysToKickoffLabel(new Date('2026-06-11T02:59:00Z'))).toBe('A Copa começa amanhã!');
+  });
+
+  it('dia da estreia (00:00 BRT): título neutro', () => {
+    expect(daysToKickoffLabel(new Date('2026-06-11T03:00:00Z'))).toBe('Copa do Mundo 2026');
+  });
+
+  it('2 dias antes: plural correto', () => {
+    expect(daysToKickoffLabel(new Date('2026-06-09T12:00:00Z'))).toBe('Faltam 2 dias');
+  });
+
+  it('depois da estreia: título neutro', () => {
+    expect(daysToKickoffLabel(new Date('2026-07-01T12:00:00Z'))).toBe('Copa do Mundo 2026');
+  });
+});
+
+describe('brDayWindowUtc (janela do dia civil de Brasília, em UTC)', () => {
+  it('16:00 BRT de 11/jun → [03:00Z 11/jun, 02:59:59.999Z 12/jun]', () => {
+    const w = brDayWindowUtc(new Date('2026-06-11T19:00:00Z'));
+    expect(w.startIso).toBe('2026-06-11T03:00:00.000Z');
+    expect(w.endIso).toBe('2026-06-12T02:59:59.999Z');
+  });
+
+  it('22:00 BRT de 11/jun (já 12/jun em UTC) → continua na janela de 11/jun', () => {
+    const w = brDayWindowUtc(new Date('2026-06-12T01:00:00Z'));
+    expect(w.startIso).toBe('2026-06-11T03:00:00.000Z');
+  });
+
+  it('00:00 BRT de 12/jun → vira a janela', () => {
+    const w = brDayWindowUtc(new Date('2026-06-12T03:00:00Z'));
+    expect(w.startIso).toBe('2026-06-12T03:00:00.000Z');
   });
 });
 

@@ -5,7 +5,7 @@ import { KPI } from '../kpi-icons.js';
 import { supabase } from '../supabase.js';
 import { loadLockAlerts } from '../lock-alerts.js';
 import {
-  flag, escapeHtml, greeting, firstName, daysToKickoffLabel,
+  flag, escapeHtml, greeting, firstName, daysToKickoffLabel, brDayWindowUtc,
   formatBrDate, formatTime, lockCountdownLabel, stageLabel, isLive,
   teamPt, groundShort, heroMeta,
 } from '../util.js';
@@ -21,14 +21,15 @@ let totalPlayers = 0;    // jogadores no ranking (denominador da posição)
 // Queries
 // ============================================================
 async function matchesToday() {
-  const now = new Date();
-  const start = new Date(now); start.setHours(0, 0, 0, 0);
-  const end   = new Date(now); end.setHours(23, 59, 59, 999);
+  // "Hoje" = dia civil de BRASÍLIA (princípio de exibição do util.js), não o
+  // dia do fuso do dispositivo — o heading "Hoje · formatBrDate()" já é BRT e
+  // a lista precisa concordar com ele p/ usuário fora do Brasil.
+  const { startIso, endIso } = brDayWindowUtc();
   return supabase
     .from('matches')
     .select('*')
-    .gte('match_date', start.toISOString())
-    .lte('match_date', end.toISOString())
+    .gte('match_date', startIso)
+    .lte('match_date', endIso)
     .order('match_date');
 }
 

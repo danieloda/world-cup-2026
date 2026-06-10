@@ -272,10 +272,16 @@ export function firstName(s) {
 }
 
 // ===== Datas =====
-export function daysToKickoffLabel() {
-  const kickoff = new Date('2026-06-11T13:00:00-06:00');
-  const days = Math.ceil((kickoff - new Date()) / 86400000);
+// Estreia: 11/jun 13h00 no México (16h00 BRT).
+const KICKOFF_2026 = new Date('2026-06-11T13:00:00-06:00');
+
+export function daysToKickoffLabel(now = new Date()) {
+  // Dias CIVIS no calendário de Brasília — a véspera é sempre "amanhã",
+  // independente da hora. (Math.ceil sobre horas corridas até o kickoff dava
+  // "Faltam 2 dias" na manhã da véspera: 30h ≠ 2 dias de calendário.)
+  const days = brDaysUntil(KICKOFF_2026, now);
   if (days <= 0) return 'Copa do Mundo 2026';
+  if (days === 1) return 'A Copa começa amanhã!';
   return `Faltam ${days} dias`;
 }
 
@@ -310,6 +316,31 @@ export function brParts(dateLike) {
   const minute = +p.minute;
   const dow = new Date(Date.UTC(year, month - 1, day)).getUTCDay();  // dia da semana civil, TZ-indep
   return { year, month, day, hour, minute, dow };
+}
+
+/**
+ * Dias civis (calendário de Brasília) de `now` até `target`: 0 = mesmo dia,
+ * 1 = amanhã, negativo = passado. Independe da hora e do fuso do dispositivo.
+ */
+export function brDaysUntil(target, now = new Date()) {
+  const a = brParts(now), b = brParts(target);
+  return Math.round(
+    (Date.UTC(b.year, b.month - 1, b.day) - Date.UTC(a.year, a.month - 1, a.day)) / 86400000
+  );
+}
+
+/**
+ * Janela [início, fim] do dia civil de BRASÍLIA que contém `now`, como
+ * instantes UTC em ISO — p/ queries "jogos de hoje". BRT é UTC-3 fixo (sem
+ * horário de verão desde 2019), mesmo offset de predictionDeadline.
+ */
+export function brDayWindowUtc(now = new Date()) {
+  const { year, month, day } = brParts(now);
+  const startMs = Date.UTC(year, month - 1, day) + BRT_OFFSET_MS; // 00:00 BRT
+  return {
+    startIso: new Date(startMs).toISOString(),
+    endIso: new Date(startMs + 86400000 - 1).toISOString(),       // 23:59:59.999 BRT
+  };
 }
 
 const _pad2 = (n) => String(n).padStart(2, '0');

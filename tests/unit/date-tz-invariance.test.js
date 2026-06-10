@@ -59,7 +59,7 @@ describe('exibição de data/hora — invariância ao fuso do viewer (fuzzer)', 
       for (let i = 0; i < baseline.length; i++) {
         const b = baseline[i];
         const r = rows[i];
-        for (const field of ['time', 'brDate', 'brShort', 'key']) {
+        for (const field of ['time', 'brDate', 'brShort', 'key', 'kickoff', 'dayWin']) {
           if (r[field] !== b[field]) {
             diffs.push(`ms=${b.ms} ${field}: SaoPaulo=${b[field]} vs ${tz}=${r[field]}`);
           }
@@ -93,5 +93,26 @@ describe('exibição de data/hora — âncora no relógio de Brasília', () => {
   });
   it('22:00 BRT (18/jul) — noite, fim do torneio', () => {
     expectAnchor(4, { time: '22:00', brShort: '18/jul', key: '2026-07-18' });
+  });
+});
+
+describe('countdown da estreia + janela "hoje" — âncora no calendário de Brasília', () => {
+  it('véspera de manhã (10/jun 10:00 BRT) é "amanhã", não "Faltam 2 dias"', () => {
+    expect(baseline[5].kickoff).toBe('A Copa começa amanhã!');
+  });
+  it('véspera 23:59 BRT ainda é "amanhã" (em Tóquio já é 11/jun local)', () => {
+    expect(baseline[6].kickoff).toBe('A Copa começa amanhã!');
+  });
+  it('01/jun 09:00 BRT → faltam 10 dias de calendário', () => {
+    expect(baseline[7].kickoff).toBe('Faltam 10 dias');
+  });
+  it('durante o torneio o rótulo vira o título neutro', () => {
+    expect(baseline[0].kickoff).toBe('Copa do Mundo 2026');
+  });
+  it('janela "hoje" de 15/jun 20:00 BRT = [03:00Z de 15/jun, 02:59Z de 16/jun]', () => {
+    expect(baseline[0].dayWin).toBe('2026-06-15T03:00:00.000Z/2026-06-16T02:59:59.999Z');
+  });
+  it('23:30 BRT de 20/jun segue na janela de 20/jun (não vaza p/ 21)', () => {
+    expect(baseline[1].dayWin).toBe('2026-06-20T03:00:00.000Z/2026-06-21T02:59:59.999Z');
   });
 });
