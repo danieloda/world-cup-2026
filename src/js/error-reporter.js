@@ -3,6 +3,9 @@
 // ============================================================
 // Instala handlers globais (window.onerror + unhandledrejection) e grava erros
 // não tratados no Supabase, pro admin ver bug ANTES do usuário reclamar.
+// Erros FATAIS *capturados* (catch de página → tela de erro) não passam pelos
+// handlers globais: as páginas reportam via reportFatal(). Gap exposto no
+// incidente de 2026-06-09 — o ranking caiu p/ todo usuário sem deixar rastro.
 //
 // Princípios:
 //   - NUNCA quebra a página nem cria loop (todo envio é try/catch silencioso).
@@ -42,6 +45,28 @@ async function report(kind, message, { source = '', line = '', stack = null } = 
     });
   } catch {
     // silêncio absoluto: o reporter jamais pode gerar erro (evita loop infinito).
+  }
+}
+
+/**
+ * Erro FATAL tratado: o catch de página que troca o body pela tela de erro.
+ * Os handlers globais NÃO veem erro capturado, então cada página chama isto
+ * antes de renderizar a tela. Fire-and-forget: nunca lança, nunca atrasa o
+ * render. Reusa report() (dedupe, teto, só autenticado — anon fica de fora
+ * por design, igual aos handlers globais).
+ * @param {string} page  tag da página (ex.: 'ranking'), igual ao console.error
+ * @param {*} err        Error, erro PostgREST ({message, code, ...}) ou string
+ */
+export function reportFatal(page, err) {
+  try {
+    let stack = err?.stack ?? null;
+    if (!stack && err && typeof err === 'object') {
+      // erro PostgREST não tem .stack — preserva code/details/hint no lugar
+      try { stack = JSON.stringify(err); } catch { /* circular: segue sem */ }
+    }
+    report('fatal', `[${page}] ${err?.message || err || '(sem mensagem)'}`, { stack });
+  } catch {
+    // espelha report(): o reporter jamais pode gerar erro
   }
 }
 

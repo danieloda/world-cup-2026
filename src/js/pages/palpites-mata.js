@@ -1,4 +1,5 @@
 import { requireAuth } from '../auth.js';
+import { reportFatal } from '../error-reporter.js';
 import { renderShell, refreshNavBadges } from '../sidebar.js';
 import { KPI } from '../kpi-icons.js';
 import { supabase } from '../supabase.js';
@@ -101,6 +102,7 @@ try {
   attachRaioXTabs();
 } catch (err) {
   console.error('[palpites-mata] FATAL:', err);
+  reportFatal('palpites-mata', err);
   document.body.innerHTML = `
     <div style="padding:40px; max-width:720px; margin:40px auto; background:#181818; border-radius:12px; color:#fff; font-family:'Figtree',system-ui,-apple-system,sans-serif;">
       <h1 style="color:#f15e6c">⚠️ Erro</h1>

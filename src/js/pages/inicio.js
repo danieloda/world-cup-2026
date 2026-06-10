@@ -1,4 +1,5 @@
 import { requireAuth } from '../auth.js';
+import { reportFatal } from '../error-reporter.js';
 import { renderShell, iconChart, iconClipboard, iconTrophy } from '../sidebar.js';
 import { KPI } from '../kpi-icons.js';
 import { supabase } from '../supabase.js';
@@ -425,6 +426,7 @@ try {
   mountJourney();    // gráfico "Sua jornada" (assíncrono, não trava a página)
 } catch (err) {
   console.error('[inicio] FATAL:', err);
+  reportFatal('inicio', err);
   document.body.innerHTML = `
     <div style="padding:40px; max-width:720px; margin:40px auto; background:#181818; border-radius:12px; color:#fff; font-family:'Figtree',system-ui,-apple-system,sans-serif;">
       <h1 style="color:#f15e6c">⚠️ Erro ao carregar Início</h1>

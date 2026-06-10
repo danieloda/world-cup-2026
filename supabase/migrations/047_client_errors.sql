@@ -13,7 +13,7 @@
 create table if not exists public.client_errors (
   id          bigserial primary key,
   user_id     uuid not null references public.profiles(id) on delete cascade,
-  kind        text not null,            -- 'error' | 'unhandledrejection'
+  kind        text not null,            -- 'error' | 'unhandledrejection' | 'fatal' (catch de página → tela de erro)
   message     text not null,
   stack       text,
   url         text,

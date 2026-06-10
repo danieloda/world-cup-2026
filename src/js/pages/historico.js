@@ -1,4 +1,5 @@
 import { requireAuth } from '../auth.js';
+import { reportFatal } from '../error-reporter.js';
 import { renderShell } from '../sidebar.js';
 import { supabase, fetchAllPages } from '../supabase.js';
 import {
@@ -48,6 +49,7 @@ try {
   attachEventListeners();
 } catch (err) {
   console.error('[historico] FATAL:', err);
+  reportFatal('historico', err);
   document.body.innerHTML = `
     <div style="padding:40px; max-width:720px; margin:40px auto; background:#181818; border-radius:12px; color:#fff; font-family:'Figtree',system-ui,-apple-system,sans-serif;">
       <h1 style="color:#f15e6c">⚠️ Erro</h1>

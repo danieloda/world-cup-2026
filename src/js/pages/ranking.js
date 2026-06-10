@@ -1,4 +1,5 @@
 import { requireAuth } from '../auth.js';
+import { reportFatal } from '../error-reporter.js';
 import { renderShell } from '../sidebar.js';
 import { supabase } from '../supabase.js';
 import {
@@ -63,6 +64,7 @@ try {
   initTooltips();  // tooltips dos termos de pontuação (cabeçalhos da tabela)
 } catch (err) {
   console.error('[ranking] FATAL:', err);
+  reportFatal('ranking', err);
   document.body.innerHTML = `
     <div style="padding:40px; max-width:720px; margin:40px auto; background:#181818; border-radius:12px; color:#fff; font-family:'Figtree',system-ui,-apple-system,sans-serif;">
       <h1 style="color:#f15e6c">⚠️ Erro</h1>
