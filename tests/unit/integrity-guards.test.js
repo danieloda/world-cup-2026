@@ -1,9 +1,10 @@
 // ============================================================
 // Guards do snapshot de integridade + unicidade do modelo de dados.
 //
-// 1) O snapshot dispara NO MOMENTO CERTO: cron diário às 06:10 UTC (03:10 BRT),
-//    depois de TODA trava do dia (23h59 BRT) — e o critério de "jogo travado"
-//    dentro do script é a MESMA fórmula de prazo de util.js/migration 023.
+// 1) O snapshot dispara NO MOMENTO CERTO: cron diário de madrugada (hoje
+//    03:09 UTC = 00:09 BRT), logo depois de TODA trava do dia (23h59 BRT) — e
+//    o critério de "jogo travado" no script é a MESMA fórmula de prazo de
+//    util.js/migration 023.
 // 2) Duplicatas são impossíveis POR CONSTRUÇÃO: as UNIQUE constraints de
 //    players / predictions / player_goals existem e nenhuma migration as
 //    derrubou (migrations são append-only — guard no estilo rls-invariants).
@@ -27,17 +28,18 @@ const migrations = readdirSync(MIG_DIR).filter(f => f.endsWith('.sql')).sort()
   .map(f => ({ f, sql: readFileSync(join(MIG_DIR, f), 'utf8') }));
 
 describe('agendamento — snapshot roda DEPOIS da trava do dia', () => {
-  it('cron diário às 06:10 UTC', () => {
+  it('cron diário, logo após a trava de 23h59 BRT e ainda de madrugada', () => {
     const m = workflow.match(/cron:\s*'(\d+) (\d+) (\S+) (\S+) (\S+)'/);
     expect(m).not.toBeNull();
     const [, min, hourUtc, dom, mon, dow] = m;
     expect([dom, mon, dow]).toEqual(['*', '*', '*']);     // todo dia, sem exceção
-    // 06:10 UTC − 3h = 03:10 BRT: depois da meia-noite, com folga sobre as
-    // travas de 23h59 BRT — nenhum palpite do dia escapa do carimbo seguinte.
-    const hourBrt = (Number(hourUtc) - 3 + 24) % 24;
-    expect(Number(min)).toBe(10);
-    expect(hourBrt).toBeGreaterThanOrEqual(1);
-    expect(hourBrt).toBeLessThan(12);
+    // BRT = UTC−3. A trava do dia é 23h59 BRT; o carimbo deve cair no dia
+    // seguinte BRT com >=5min de folga (relógio/atraso de cron) e antes do
+    // meio-dia — nenhum palpite do dia escapa do carimbo seguinte, e a janela
+    // trava→carimbo fica mínima (hoje: 00:09 BRT, 10 min após a trava).
+    const minutesBrt = ((Number(hourUtc) - 3 + 24) % 24) * 60 + Number(min);
+    expect(minutesBrt).toBeGreaterThanOrEqual(5);
+    expect(minutesBrt).toBeLessThan(12 * 60);
   });
 
   it('verifica a cadeia no próprio job (snapshot → verify → commit)', () => {

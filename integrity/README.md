@@ -7,9 +7,10 @@ alterados depois de travados. É a defesa contra contestação de prêmio (achad
 ## Como funciona
 
 1. Uma **GitHub Action** (`.github/workflows/integrity-snapshot.yml`) roda
-   diariamente. Para cada jogo cujo prazo de palpite já passou (véspera 23h59
-   BRT), ela exporta **todos os palpites travados** num JSON **canônico**
-   (chaves ordenadas → bytes determinísticos) em `snapshots/`.
+   diariamente às **00:09 BRT** — 10 minutos depois da trava do dia. Para cada
+   jogo cujo prazo de palpite já passou (véspera 23h59 BRT), ela exporta
+   **todos os palpites travados** num JSON **canônico** (chaves ordenadas →
+   bytes determinísticos) em `snapshots/`.
 2. Calcula o `content_hash = SHA-256(arquivo)` e **encadeia** com o snapshot
    anterior:
    ```

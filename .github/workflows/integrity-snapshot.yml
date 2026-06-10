@@ -12,8 +12,9 @@ name: Integrity Snapshot
 
 on:
   schedule:
-    # 06:10 UTC = 03:10 BRT — logo após a virada de dia (deadlines são 23h59 BRT).
-    - cron: '10 6 * * *'
+    # 03:09 UTC = 00:09 BRT — 10 min depois da trava do dia (deadlines são
+    # véspera 23h59 BRT), minimizando a janela trava→carimbo.
+    - cron: '9 3 * * *'
   workflow_dispatch:
 
 concurrency:

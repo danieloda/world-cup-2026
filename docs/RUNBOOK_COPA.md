@@ -62,8 +62,9 @@ Quando "algo está errado", cheque nesta ordem — do sinal mais barato ao mais 
 | Hora BRT | Workflow | Faz o quê | Se falhar |
 |---|---|---|---|
 | a cada **30 min** | Monitor Prod (smoke) | site no ar + schema + duplicatas | alerta no Telegram + e-mail do GitHub |
+| **00:09** | Integrity Snapshot | carimba palpites travados às 23:59 + relatório do lacre | snapshot/relatório do dia não sai |
 | **03:00** | Refresh Odds | atualiza odds (Raio-X) | só perde enriquecimento; **não** afeta pontuação |
-| **03:10** | Refresh Predictions / Integrity Snapshot | previsões do Raio-X / carimba palpites travados | Raio-X desatualiza / snapshot do dia não sai |
+| **03:10** | Refresh Predictions | previsões do Raio-X | Raio-X desatualiza |
 | **03:15** | Monitor Prod (verify) | recompute de pontuação + ranking | **alerta — investigar (seção 6.E)** |
 | **05:00** | Refresh Recent Matches | jogos recentes p/ "forma" | só perde enriquecimento |
 | **09:05** | (cron DB) digest de erros de JS | top erros do dia no Telegram | — |
