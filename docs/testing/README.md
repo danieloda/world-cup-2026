@@ -7,6 +7,7 @@ Documentação forte da suíte de testes do bolão, criada na rodada de endureci
 
 | Doc | Para quê |
 |---|---|
+| **[../RUNBOOK_COPA.md](../RUNBOOK_COPA.md)** | 🚨 **Operação durante a Copa**: onde olhar e como agir em falhas/bugs (playbooks por sintoma). **Leia em incidente.** |
 | **[PROJECT_CONTEXT.md](PROJECT_CONTEXT.md)** | Contexto amplo: arquitetura, modelo de dados, pontuação, segurança, triggers, gotchas. **Leia primeiro.** |
 | **[TEST_PLAN.md](TEST_PLAN.md)** | Estratégia: os 7 níveis de teste, o que cada um cobre, como rodar, gates. |
 | **[ENVIRONMENT.md](ENVIRONMENT.md)** | Como montar o ambiente local com paridade de prod (bootstrap em 1 comando). |
