@@ -19,7 +19,7 @@
 | **Monitoramento automático** | GitHub Actions → workflow **Monitor Prod** (smoke 30min + verify madrugada) |
 | **Alertas** | Grupo do **Telegram** (bot via edge `telegram-alert`) |
 | **Erros de JS dos usuários** | Tabela `public.client_errors` + digest diário no Telegram |
-| **Trilha de integridade** | `integrity/` no repo (snapshot diário, hash encadeado) |
+| **Trilha de integridade** | `integrity/` no repo (snapshot diário, hash encadeado) + relatório legível por lacre em `integrity/reports/` (link postado no Telegram) |
 | **Código da lógica** | `src/js/` (front) + `supabase/migrations/` (SQL) — **precisam concordar** |
 | **Credenciais locais** | `.env` (PROD, read-only nos scripts) e `.env.e2e.local` (LOCAL) |
 

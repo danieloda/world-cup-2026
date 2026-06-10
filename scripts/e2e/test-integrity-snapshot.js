@@ -60,8 +60,13 @@ const childEnv = {
 function makeSandbox(withRepoChain = false) {
   const dir = mkdtempSync(join(tmpdir(), 'wc-integrity-'));
   mkdirSync(join(dir, 'scripts', 'integrity'), { recursive: true });
-  for (const f of ['snapshot.js', 'verify.js']) {
+  for (const f of ['snapshot.js', 'report.js', 'verify.js']) {
     copyFileSync(join(ROOT, 'scripts', 'integrity', f), join(dir, 'scripts', 'integrity', f));
+  }
+  // report.js traduz seleções com o teamPt do app — espelha src/js/ no sandbox.
+  mkdirSync(join(dir, 'src', 'js'), { recursive: true });
+  for (const f of ['util.js', 'fifa-rank.js']) {
+    copyFileSync(join(ROOT, 'src', 'js', f), join(dir, 'src', 'js', f));
   }
   symlinkSync(join(ROOT, 'node_modules'), join(dir, 'node_modules'), 'dir');
   writeFileSync(join(dir, '.env'), `SUPABASE_URL=${SUPABASE_URL}\nSUPABASE_SERVICE_ROLE_KEY=${SERVICE_KEY}\n`);
@@ -109,6 +114,17 @@ const entry = manifest1.entries[0];
 const snapBody = readFileSync(join(sandbox, 'integrity', entry.file), 'utf8');
 const snap = JSON.parse(snapBody);
 
+// Relatório legível: 1 por lacre, citando o lacre que ele documenta.
+const reportDir = join(sandbox, 'integrity', 'reports');
+const reports1 = readdirSync(reportDir);
+check(reports1.length === 1 && /^0001_\d{4}-\d{2}-\d{2}\.md$/.test(reports1[0]),
+  `relatório legível do lacre gerado (${reports1[0] ?? 'nenhum'})`);
+const reportBody = readFileSync(join(reportDir, reports1[0]), 'utf8');
+check(
+  reportBody.includes(entry.chain_hash) && reportBody.includes(entry.content_hash) && reportBody.includes(entry.file),
+  'relatório cita chain_hash, content_hash e o arquivo lacrado',
+);
+
 // ============================================================
 head('2. Completude — comparação com o banco via a OUTRA fórmula de prazo');
 // ============================================================
@@ -138,6 +154,16 @@ check(
   snap.predictions.every((p) => predFields.every((f) => f in p)),
   'cada palpite carimbado tem os 6 campos (placar + pênalti + updated_at)',
 );
+
+// Nomes lacrados junto (relatório nomeia participantes) — e e-mail NUNCA vaza.
+const refUserIds = new Set(
+  [...snap.predictions, ...snap.champion_picks, ...snap.scorer_picks].map((r) => r.user_id),
+);
+check(
+  [...refUserIds].every((id) => (snap.users ?? []).some((u) => u.user_id === id && u.name)),
+  `todo user_id lacrado tem nome de usuário lacrado junto (${refUserIds.size} usuários)`,
+);
+check(!/[\w.+-]+@[\w-]+\.[A-Za-z]{2,}/.test(snapBody), 'nenhum e-mail vaza no snapshot');
 
 const { count: finCount } = await admin.from('matches').select('id', { count: 'exact', head: true }).eq('finished', true);
 check(snap.results.length === (finCount ?? 0), `resultados conhecidos completos (${snap.results.length}/${finCount ?? 0})`);
@@ -170,6 +196,7 @@ check(r2.code === 0 && /Sem mudança/.test(r2.out), 'segunda execução: "Sem mu
 const manifest2 = JSON.parse(readFileSync(manifestPath, 'utf8'));
 check(manifest2.entries.length === 1, 'não criou snapshot duplicado');
 check(readFileSync(join(sandbox, 'integrity', entry.file), 'utf8') === snapBody, 'snapshot original intacto byte a byte');
+check(readdirSync(reportDir).length === 1, 'não criou relatório duplicado (relatório só em lacre novo)');
 
 const v1 = run('verify.js', sandbox);
 check(v1.code === 0, 'verify.js aprova a cadeia do sandbox');

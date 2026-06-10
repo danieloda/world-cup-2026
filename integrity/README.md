@@ -38,12 +38,32 @@ Recomputa os hashes a partir dos arquivos commitados e confirma que:
 Saída `🎉 Cadeia íntegra` = nada foi adulterado. Qualquer divergência aponta o
 snapshot exato que não fecha.
 
+## Relatório legível por lacre (`reports/`)
+
+Cada lacre novo gera também `reports/NNNN_AAAA-MM-DD.md` — um relatório em
+português, **auto-contido**, feito para mostrar a não técnicos: quais jogos
+travaram (nome, fase, horário e prazo em BRT), o **palpite de cada participante
+pelo nome de usuário do app** (tabelas colapsáveis; e-mail NUNCA sai do banco —
+guard em `integrity-guards.test.js`), uma auditoria automática de prazo (todo
+`updated_at` lacrado ≤ deadline do jogo), os hashes da corrente, os carimbos de
+tempo de terceiros e o passo a passo de verificação. O link do relatório é
+postado no Telegram junto com o `chain_hash`.
+
+Os nomes de usuário (`profiles.full_name`) e os jogadores citados em picks são
+**lacrados dentro do snapshot** (`users`/`players`, content v3) — a associação
+nome ↔ palpite também é protegida pela corrente, não só exibida.
+
+O relatório é **derivado**, não é a prova: a prova são os bytes de `snapshots/`
++ `manifest.json`. Adulterar um relatório não engana o `integrity:verify` — e
+tudo o que ele afirma é recalculável por qualquer um a partir do snapshot.
+
 ## Conferir o seu próprio palpite
 
-Abra o snapshot mais recente em `snapshots/` (ou qualquer um após o prazo do
-jogo), procure o seu `user_id` + `match_id` e confira `pred_home`/`pred_away`/
-`pred_pen_winner`. Se bate com o que você enviou e a cadeia está íntegra, está
-provado que o valor não mudou desde aquele carimbo.
+Caminho fácil: procure o seu nome nas tabelas do relatório do lacre
+(`reports/`). Caminho técnico: abra o snapshot em `snapshots/`, ache seu
+`user_id` em `users` (pelo seu nome) e confira `pred_home`/`pred_away`/
+`pred_pen_winner` nos seus palpites. Se bate com o que você enviou e a cadeia
+está íntegra, está provado que o valor não mudou desde aquele carimbo.
 
 ## Limites (honestos)
 

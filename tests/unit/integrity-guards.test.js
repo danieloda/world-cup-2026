@@ -20,6 +20,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..', '..');
 const workflow = readFileSync(join(ROOT, '.github', 'workflows', 'integrity-snapshot.yml'), 'utf8');
 const snapshotSrc = readFileSync(join(ROOT, 'scripts', 'integrity', 'snapshot.js'), 'utf8');
+const reportSrc = readFileSync(join(ROOT, 'scripts', 'integrity', 'report.js'), 'utf8');
 const utilSrc = readFileSync(join(ROOT, 'src', 'js', 'util.js'), 'utf8');
 const MIG_DIR = join(ROOT, 'supabase', 'migrations');
 const migrations = readdirSync(MIG_DIR).filter(f => f.endsWith('.sql')).sort()
@@ -67,6 +68,35 @@ describe('critério de "travado" do snapshot == fórmula canônica do prazo', ()
   });
   it('idempotência declarada no código: mesmo conteúdo → nenhum snapshot novo', () => {
     expect(snapshotSrc).toMatch(/last\.content_hash === contentHash/);
+  });
+});
+
+describe('relatório legível por lacre (integrity/reports/)', () => {
+  // O conteúdo do relatório é testado em integrity-report.test.js; aqui ficam
+  // as invariantes de FLUXO: só nasce em lacre novo, é commitado pela Action,
+  // e continua um derivado puro (sem 3ª cópia da fórmula de prazo).
+  it('snapshot.js só gera relatório DEPOIS do dedupe (lacre novo de verdade)', () => {
+    const iDedupe = snapshotSrc.indexOf('Sem mudança');
+    const iReport = snapshotSrc.indexOf('buildReport(');
+    expect(iDedupe).toBeGreaterThan(-1);
+    expect(iReport).toBeGreaterThan(iDedupe);
+    expect(snapshotSrc).toMatch(/integrity\/reports|REPORT_DIR/);
+  });
+
+  it('a Action commita integrity/ inteiro (snapshot + manifest + relatório juntos)', () => {
+    expect(workflow).toMatch(/git add integrity\//);
+  });
+
+  it('report.js é derivado puro: sem banco/fs/rede e sem 3ª cópia da fórmula de prazo', () => {
+    expect(reportSrc).not.toMatch(/supabase|node:fs|from ['"]fs['"]|fetch\(/);
+    expect(reportSrc).toMatch(/predictionDeadline/);            // usa a fórmula injetada…
+    expect(reportSrc).not.toMatch(/getUTCDate\(\) - 1, 23, 59/); // …sem duplicá-la
+  });
+
+  it('o lacre exporta o NOME DE USUÁRIO (full_name) e NUNCA o e-mail', () => {
+    expect(snapshotSrc).toMatch(/from\('profiles'\)\.select\('id, full_name'\)/);
+    expect(snapshotSrc).not.toMatch(/email/i);  // nem na query, nem em literal nenhum
+    expect(reportSrc).not.toMatch(/email/i);
   });
 });
 

@@ -28,6 +28,7 @@ import { fileURLToPath } from 'url';
 import { createHash } from 'crypto';
 import { config } from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
+import { buildReport, brtDateStamp } from './report.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 config({ path: join(__dirname, '..', '..', '.env') });
@@ -39,8 +40,14 @@ const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
 const INTEGRITY_DIR = join(__dirname, '..', '..', 'integrity');
 const SNAP_DIR = join(INTEGRITY_DIR, 'snapshots');
+const REPORT_DIR = join(INTEGRITY_DIR, 'reports');
 const MANIFEST = join(INTEGRITY_DIR, 'manifest.json');
 const GENESIS = '0'.repeat(64);
+
+// Links públicos do relatório/Telegram. Na Action os env vem do GitHub; o
+// fallback é o repositório canônico (público) para runs manuais.
+const REPO_URL = `${process.env.GITHUB_SERVER_URL || 'https://github.com'}/${process.env.GITHUB_REPOSITORY || 'danieloda/world-cup-2026'}`;
+const BRANCH = process.env.GITHUB_REF_NAME || 'main';
 
 function assert(cond, msg) { if (!cond) { console.error('ERRO:', msg); process.exit(1); } }
 assert(SUPABASE_URL, 'SUPABASE_URL ausente em .env/secrets');
@@ -137,6 +144,28 @@ async function main() {
     ? await fetchAllPages(() => admin.from('top_scorer_picks').select('user_id, player_id, updated_at').order('user_id'))
     : [];
 
+  // Nome de usuário do app (full_name) — NUNCA o e-mail — lacrado junto, para
+  // que a associação nome ↔ palpite do relatório também seja protegida pela
+  // corrente. Só entram usuários referenciados por algum registro lacrado.
+  const refUserIds = new Set([
+    ...preds.map((p) => p.user_id),
+    ...champions.map((c) => c.user_id),
+    ...scorers.map((s) => s.user_id),
+  ]);
+  const users = refUserIds.size
+    ? (await fetchAllPages(() => admin.from('profiles').select('id, full_name').order('id')))
+        .filter((p) => refUserIds.has(p.id))
+        .map((p) => ({ user_id: p.id, name: p.full_name }))
+    : [];
+
+  // Idem para os jogadores citados em picks de artilheiro (player_id → nome).
+  const refPlayerIds = new Set(scorers.map((s) => s.player_id));
+  const players = refPlayerIds.size
+    ? (await fetchAllPages(() => admin.from('players').select('id, full_name, team').order('id')))
+        .filter((p) => refPlayerIds.has(p.id))
+        .map((p) => ({ id: p.id, name: p.full_name, team: p.team }))
+    : [];
+
   const byUserMatch = (a, b) => (a.user_id < b.user_id ? -1 : a.user_id > b.user_id ? 1 : a.match_id - b.match_id);
   const byUser = (a, b) => (a.user_id < b.user_id ? -1 : a.user_id > b.user_id ? 1 : 0);
 
@@ -147,7 +176,9 @@ async function main() {
   // O instante do carimbo vive no manifest (taken_at), no nome do arquivo e
   // nos timestamps de terceiro (git/Telegram).
   const content = {
-    version: 2,
+    version: 3,
+    users: users.sort(byUser),
+    players: players.sort((a, b) => a.id - b.id),
     locked_match_ids: lockedIds,
     results: matches
       .filter((m) => m.finished)
@@ -188,7 +219,7 @@ async function main() {
   if (!existsSync(SNAP_DIR)) mkdirSync(SNAP_DIR, { recursive: true });
   writeFileSync(join(SNAP_DIR, fname), body);
 
-  manifest.entries.push({
+  const entry = {
     seq,
     file: `snapshots/${fname}`,
     taken_at: now.toISOString(),
@@ -201,18 +232,35 @@ async function main() {
       champion_picks: champions.length,
       scorer_picks: scorers.length,
     },
-  });
+  };
+  manifest.entries.push(entry);
   writeFileSync(MANIFEST, JSON.stringify(manifest, null, 2) + '\n');
+
+  // Relatório legível do lacre (para não técnicos) — derivado do snapshot,
+  // commitado junto pela Action. "Novo neste lacre" = diff com o anterior.
+  let prevContent = null;
+  if (last) {
+    try {
+      prevContent = JSON.parse(readFileSync(join(INTEGRITY_DIR, last.file), 'utf8'));
+    } catch { /* snapshot anterior ilegível — relatório trata tudo como novo */ }
+  }
+  const reportFname = `${String(seq).padStart(4, '0')}_${brtDateStamp(now)}.md`;
+  if (!existsSync(REPORT_DIR)) mkdirSync(REPORT_DIR, { recursive: true });
+  writeFileSync(join(REPORT_DIR, reportFname), buildReport({
+    entry, content, matches, prevContent, csDeadline,
+    predictionDeadline, repoUrl: REPO_URL, branch: BRANCH,
+  }));
 
   console.log(`✅ Snapshot #${seq}: ${preds.length} palpites de ${lockedIds.length} jogos travados.`);
   console.log(`   content_hash: ${contentHash}`);
   console.log(`   chain_hash:   ${chainHash}`);
+  console.log(`   relatório:    integrity/reports/${reportFname}`);
 
   await postTelegram(
     `🔒 <b>Snapshot de integridade #${seq}</b>\n` +
     `${lockedIds.length} jogos travados · ${preds.length} palpites\n` +
     `<code>chain ${chainHash}</code>\n` +
-    `Verificável em: integrity/manifest.json`
+    `📄 <a href="${REPO_URL}/blob/${BRANCH}/integrity/reports/${reportFname}">Relatório do lacre (o que travou e como conferir)</a>`
   );
 }
 
