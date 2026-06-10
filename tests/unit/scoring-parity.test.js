@@ -14,7 +14,8 @@ import { matchPoints, stageMultiplier, championBonus, qualifierBonus } from '../
  * → "me roubaram pontos". É a mesma classe de drift do bracket/datas.
  *
  * Este teste parseia a ÚLTIMA definição SQL de cada função (migrations são
- * append-only: champion/scorer pularam p/ 039, stage_multiplier ficou na 003)
+ * append-only: champion/scorer pularam p/ 039, stage_multiplier p/ 058 — a 003
+ * tinha sido editada IN-PLACE sem re-aplicar em prod, drift achado 2026-06-09)
  * e exige que os VALORES batam com scoring.js. Qualquer edição unilateral
  * quebra aqui, no `npm test`, antes do usuário.
  */
@@ -127,6 +128,6 @@ describe('paridade de pontuação: scoring.js ↔ funções SQL', () => {
     expect(latestFnBody('qualifier_bonus_pts').num).toBe(22);
     expect(latestFnBody('champion_bonus_for').num).toBe(39);
     expect(latestFnBody('scorer_bonus_for').num).toBe(39);
-    expect(latestFnBody('stage_multiplier').num).toBe(3);
+    expect(latestFnBody('stage_multiplier').num).toBe(58);
   });
 });

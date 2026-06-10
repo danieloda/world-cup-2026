@@ -118,6 +118,10 @@ Lançar um resultado (`finished=true`) dispara, **em ordem**:
   040 revoga `champion_bonus_for` de novo e **derruba o ranking** (aconteceu em 2026-06-09; fix =
   057). As 034/039 agora terminam re-concedendo (seguras de re-colar) e o `prod-smoke` vigia os
   grants via `grants_health()` (057). Na dúvida, só re-cole a **última** migration, nunca um lote antigo.
+  ⚠️ O drift dual também aconteceu: **editar migration antiga in-place NÃO atualiza prod** — a 003
+  ganhou multiplicadores novos (qf 3/sf 4/final 5) só no repo; prod ficou com os originais até a
+  auditoria de 2026-06-09 (fix = 058). Edição de função já aplicada = sempre migration NOVA.
+  Auditoria completa repo×prod: `node scripts/dev/prod-parity-audit.mjs` (read-only).
 - **Migrations 050-052 são data-only:** reconciliam elencos. A 052 carrega o elenco canônico
   (1247) como VALUES e passa nos guards mesmo em base vazia → `db reset` recria prod fielmente.
 - **Admin isento do gate de avatar** (`auth.js`); usuários comuns sem `avatar_url` vão pra
