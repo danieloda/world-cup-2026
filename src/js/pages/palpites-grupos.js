@@ -252,7 +252,6 @@ function renderBody(counts) {
           ? renderDatePicker(counts.allByDate)
           : renderGroupNav(counts.allByGroup)}
       </div>
-      ${groupBy === 'group' ? renderThirdsPop(standMode) : ''}
     </div>
 
     <div class="tooltip-hint raiox-hint">
@@ -320,6 +319,7 @@ function renderGroupTableSection() {
         <button class="${standMode === 'sim' ? 'active' : ''}" data-stand="sim" type="button">Projeção</button>
         <button class="${standMode === 'real' ? 'active' : ''}" data-stand="real" type="button">Oficial</button>
       </div>
+      ${renderThirdsPop(standMode)}
     </div>
     ${renderGroupTable(standMode)}
   `;
@@ -721,11 +721,7 @@ function attachEventListeners() {
         standMode = s;
         const wrap = document.getElementById('groupTableWrap');
         if (wrap) wrap.innerHTML = renderGroupTableSection();
-        const tp = document.getElementById('thirdsPopBody');
-        if (tp) tp.innerHTML = renderThirdsPopBody(standMode);
         wireHScroll();
-        const trig = document.querySelector('.thirds-pop-trigger .hint');
-        if (trig) trig.textContent = standMode === 'real' ? 'oficial' : 'sua projeção';
       }
       return;
     }

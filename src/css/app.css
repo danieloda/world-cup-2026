@@ -1667,11 +1667,6 @@ body.raiox-modal-open { overflow: hidden; }
    (grid simétrico 1fr auto auto auto 1fr) em vez do espaço à esquerda do botão. */
 @media (min-width: 561px) {
   .palpites-toolbar .chips { flex-basis: 100%; }
-  .palpites-toolbar .thirds-pop { position: absolute; top: 0; right: 0; }
-}
-/* "Melhores 3ºs" fica à direita no fluxo do toolbar; em telas estreitas desce centralizado */
-@media (max-width: 560px) {
-  .palpites-toolbar .thirds-pop { width: 100%; display: flex; justify-content: center; margin-top: 14px; }
 }
 
 /* Popover (hover/clique) dos melhores 3ºs */
@@ -4121,7 +4116,10 @@ input[type="number"].score-input {
 /* Toggle de lente (Projeção ⇄ Oficial) acima da classificação do grupo. */
 .stand-toggle-row {
   display: flex;
+  align-items: center;
   justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
   margin: 28px 0 4px;
 }
 
