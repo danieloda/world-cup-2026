@@ -13,7 +13,8 @@ import { readFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { makeAdminClient } from '../e2e/lib/admin-client.js';
-import { scorePrediction, scorerBonus, stageMultiplier } from '../../src/js/scoring.js';
+import { scorePrediction } from '../../src/js/scoring.js';
+import { auditPredictionPoints, auditLeaderboard, auditSanity } from '../e2e/lib/recompute.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const admin = makeAdminClient();
@@ -72,108 +73,49 @@ fail += resMiss;
 //    (valida o trigger SQL de scoring p/ TODOS os usuários)
 // ============================================================
 head('2. Pontos por palpite (banco × recompute independente) — todos os usuários');
-let chk = 0, predMiss = 0, leakMiss = 0;
-const sample = [];
-for (const p of preds) {
-  const m = matchById.get(p.match_id);
-  if (!m) continue;
-  if (!m.finished) {
-    // jogo não finalizado → não pode ter pontos
-    if (p.points_earned != null) { leakMiss++; if (leakMiss <= 5) bad(`u=${p.user_id.slice(0, 8)} M${p.match_id}: points_earned=${p.points_earned} num jogo NÃO finalizado`); }
-    continue;
-  }
-  chk++;
-  const expected = scorePrediction(p.pred_home, p.pred_away, p.pred_pen_winner, m.actual_home, m.actual_away, m.pen_winner, m.stage);
-  const got = p.points_earned ?? 0;
-  if (expected !== got) {
-    predMiss++;
-    if (predMiss <= 10) bad(`u=${p.user_id.slice(0, 8)} M${p.match_id} (${m.stage}): palpite ${p.pred_home}-${p.pred_away}/${p.pred_pen_winner} vs ${m.actual_home}-${m.actual_away}/${m.pen_winner} → esperado ${expected}, banco ${got}`);
-  } else if (sample.length < 3 && expected > 0) {
-    sample.push(`M${p.match_id} ${m.stage}: ${p.pred_home}-${p.pred_away} vs ${m.actual_home}-${m.actual_away} = ${expected}pts`);
-  }
-}
-predMiss === 0 ? ok(`${chk} palpites pontuados conferem (recompute == banco)`) : bad(`${predMiss}/${chk} palpites com pontuação ERRADA`);
-leakMiss === 0 ? ok('nenhum ponto vazado em jogo não finalizado') : bad(`${leakMiss} pontos em jogos abertos`);
-if (sample.length) console.log(`${C.dim}     amostra ok: ${sample.join(' · ')}${C.x}`);
-fail += predMiss + leakMiss;
+const predAudit = auditPredictionPoints(preds, matchById);
+predAudit.wrong.slice(0, 10).forEach((w) =>
+  bad(`u=${w.user_id.slice(0, 8)} M${w.match_id} (${w.stage}): palpite ${w.pred} vs ${w.actual} → esperado ${w.expected}, banco ${w.got}`));
+predAudit.leaked.slice(0, 5).forEach((l) =>
+  bad(`u=${l.user_id.slice(0, 8)} M${l.match_id}: points_earned=${l.points_earned} num jogo NÃO finalizado`));
+predAudit.wrong.length === 0 ? ok(`${predAudit.checked} palpites pontuados conferem (recompute == banco)`) : bad(`${predAudit.wrong.length}/${predAudit.checked} palpites com pontuação ERRADA`);
+predAudit.leaked.length === 0 ? ok('nenhum ponto vazado em jogo não finalizado') : bad(`${predAudit.leaked.length} pontos em jogos abertos`);
+if (predAudit.sample.length) console.log(`${C.dim}     amostra ok: ${predAudit.sample.join(' · ')}${C.x}`);
+fail += predAudit.wrong.length + predAudit.leaked.length;
 
 // ============================================================
 // 3) v_leaderboard por usuário == recompute independente
 //    match_pts, scorer_pts, champion_pts, qualifier_pts, total_pts
 // ============================================================
 head('3. Ranking por usuário (v_leaderboard × recompute) — todos os pagantes');
-// índices
 const predsByUser = new Map();
 for (const p of preds) { (predsByUser.get(p.user_id) ?? predsByUser.set(p.user_id, []).get(p.user_id)).push(p); }
 const goalsByMatch = new Map();
 for (const g of goals) { (goalsByMatch.get(g.match_id) ?? goalsByMatch.set(g.match_id, []).get(g.match_id)).push(g); }
 const scorerByUser = new Map(scorerPicks.map((s) => [s.user_id, s.player_id]));
+const champByUser = new Map(champPicks.map((c) => [c.user_id, c.team]));
 const qualByUser = new Map(uqp.map((q) => [q.user_id, q.points]));
-const realChampion = oracle.champion;
+const realChampion = oracle.champion;  // LOCAL: oráculo sintético é a verdade
 const finalFinished = matches.find((m) => m.stage === 'final')?.finished;
 
-let lbMiss = 0, checkedUsers = 0;
-const cols = { match: 0, scorer: 0, champ: 0, qual: 0, total: 0 };
-for (const row of lb) {
-  checkedUsers++;
-  const uid = row.user_id;
-  const myPreds = predsByUser.get(uid) ?? [];
-  // match_pts: soma dos pontos recomputados nos jogos finalizados
-  let matchPts = 0;
-  for (const p of myPreds) {
-    const m = matchById.get(p.match_id);
-    if (m?.finished) matchPts += scorePrediction(p.pred_home, p.pred_away, p.pred_pen_winner, m.actual_home, m.actual_away, m.pen_winner, m.stage);
-  }
-  // scorer_pts: gols do jogador escolhido × 2 × mult de fase, nos jogos finalizados
-  let scorerPts = 0;
-  const pickPid = scorerByUser.get(uid);
-  if (pickPid) {
-    for (const m of matches) {
-      if (!m.finished) continue;
-      const g = (goalsByMatch.get(m.id) ?? []).find((x) => x.player_id === pickPid);
-      if (g?.goals) scorerPts += scorerBonus(g.goals, m.stage);
-    }
-  }
-  // champion_pts: 40 se acertou o campeão E a final acabou; senão 0
-  const champTeam = champPicks.find((c) => c.user_id === uid)?.team;
-  const champPts = (finalFinished && champTeam === realChampion) ? 40 : 0;
-  // qualifier: cache (validado à parte); confiro consistência view↔cache
-  const qualCache = qualByUser.get(uid) ?? 0;
-  const expectedTotal = matchPts + scorerPts + champPts + qualCache;
-
-  const diffs = [];
-  if (row.match_pts !== matchPts) { diffs.push(`match ${row.match_pts}≠${matchPts}`); cols.match++; }
-  if (row.scorer_pts !== scorerPts) { diffs.push(`scorer ${row.scorer_pts}≠${scorerPts}`); cols.scorer++; }
-  if (row.champion_pts !== champPts) { diffs.push(`champ ${row.champion_pts}≠${champPts}`); cols.champ++; }
-  if (row.qualifier_pts !== qualCache) { diffs.push(`qual(view≠cache) ${row.qualifier_pts}≠${qualCache}`); cols.qual++; }
-  if (row.total_pts !== expectedTotal) { diffs.push(`TOTAL ${row.total_pts}≠${expectedTotal}`); cols.total++; }
-  if (diffs.length) { lbMiss++; if (lbMiss <= 10) bad(`${(row.full_name || uid).padEnd(22)} ${diffs.join(' · ')}`); }
-}
-lbMiss === 0
-  ? ok(`${checkedUsers} usuários do ranking conferem (match/scorer/champ/qual/total)`)
-  : bad(`${lbMiss}/${checkedUsers} usuários com divergência — por coluna: ${JSON.stringify(cols)}`);
-fail += lbMiss;
+const lbAudit = auditLeaderboard({
+  leaderboard: lb, matches, matchById, predsByUser, goalsByMatch,
+  scorerByUser, champByUser, qualByUser, realChampion, finalFinished,
+});
+lbAudit.diffs.slice(0, 10).forEach((d) => bad(`${String(d.name).padEnd(22)} ${d.parts.join(' · ')}`));
+lbAudit.diffs.length === 0
+  ? ok(`${lbAudit.checked} usuários do ranking conferem (match/scorer/champ/qual/total)`)
+  : bad(`${lbAudit.diffs.length}/${lbAudit.checked} usuários com divergência — por coluna: ${JSON.stringify(lbAudit.cols)}`);
+fail += lbAudit.diffs.length;
 
 // ============================================================
 // 4) Sanidades extras
 // ============================================================
 head('4. Sanidades');
-// 4a. ranking só tem pagantes
-const paidIds = new Set(profiles.filter((p) => p.paid).map((p) => p.id));
-const nonPaidInLb = lb.filter((r) => !paidIds.has(r.user_id)).length;
-nonPaidInLb === 0 ? ok('v_leaderboard só tem pagantes') : bad(`${nonPaidInLb} não-pagantes no ranking`);
-// 4b. ordenação do ranking (desc por total)
-let sorted = true;
-for (let i = 1; i < lb.length; i++) if (lb[i - 1].total_pts < lb[i].total_pts) { sorted = false; break; }
-sorted ? ok('ranking ordenado por total_pts desc') : bad('ranking FORA de ordem');
-// 4c. champion zerado p/ todos (final não jogada)
-const champNonzero = lb.filter((r) => r.champion_pts !== 0).length;
-(!finalFinished ? champNonzero === 0 : true) ? ok(`champion_pts=0 p/ todos (final ${finalFinished ? 'jogada' : 'não jogada'})`) : bad(`${champNonzero} com champion_pts≠0 sem final`);
-// 4d. máximo teórico de placar nos jogos JÁ jogados (oráculo perfeito) como teto
-let teto = 0;
-for (const m of matches.filter((x) => x.finished)) { teto += scorePrediction(m.actual_home, m.actual_away, m.pen_winner, m.actual_home, m.actual_away, m.pen_winner, m.stage); }
-const maxMatch = Math.max(...lb.map((r) => r.match_pts));
-maxMatch <= teto ? ok(`líder de placar ${maxMatch} ≤ teto ${teto} (placar perfeito dos jogos jogados)`) : bad(`líder ${maxMatch} > teto ${teto} (impossível!)`);
+for (const s of auditSanity({ leaderboard: lb, profiles, matches, finalFinished })) {
+  s.pass ? ok(s.name) : bad(`${s.name}${s.detail ? ' — ' + s.detail : ''}`);
+  if (!s.pass) fail++;
+}
 
 // ============================================================
 console.log(`\n${C.bold}${fail === 0 ? C.g + '✅ TUDO CONFERE — a UI mostra dados corretos p/ todos os usuários.' : C.r + `❌ ${fail} divergência(s) — ver acima.`}${C.x}`);

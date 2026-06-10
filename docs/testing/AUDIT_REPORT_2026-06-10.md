@@ -89,10 +89,35 @@ duplicata (api_player_id único, todo elenco 26–27) em vez de só contar.
   nesta véspera de propósito (estado demo-r32 preservado). O núcleo que os alimenta
   (progression/chart-utils) agora tem unit próprio.
 
-## 5. No dia (11/jun)
+## 5. Cobertura das 5 semanas: monitoramento + XSS (adicionado pós-rodada)
+
+A pergunta "o que ainda falta?" tinha 2 respostas de alto valor que reusam o que já existe:
+
+### Monitoramento sintético (testing in production)
+Toda a verificação rodava *on demand* — alguém tinha que lembrar de rodar, e a Copa muda
+de estado todo dia por 5 semanas. Agora `.github/workflows/monitor-prod.yml` vigia produção
+**sozinho** e alerta no Telegram **só em falha**:
+- **smoke a cada 30 min** (`prod-smoke.js`): site no ar, schema, sem duplicata de jogador.
+- **verify toda madrugada** (`prod-verify.js`, **novo**): recompute independente da pontuação
+  de TODO palpite + ranking de TODO pagante. Um trigger de scoring que falhe num jogo vira
+  alerta às 3h da manhã em vez de reclamação de usuário.
+- `prod-verify` e o audit local (`verify-data.mjs`) agora **compartilham `lib/recompute.js`**
+  (mesma matemática nas duas pontas — refactor verificado: local seguiu 100% verde).
+
+### Sonda de XSS armazenado (`npm run test:xss`, **novo**)
+`full_name` é o único texto livre do usuário e renderiza para todos (ranking, galera,
+gráficos). O código escapa em todo ponto, mas **não havia teste provando** — um template
+novo podia reabrir o buraco. A sonda cria um usuário hostil com payload no nome, navega
+como vítima e prova o escape. **Controle negativo verificado:** removi um `escapeHtml` de
+propósito e a sonda falhou (o `<img onerror>` executou) — depois restaurei. Não é teste
+que sempre passa.
+
+## 6. No dia (11/jun)
 
 ```bash
 npm test && npm run test:coverage          # CI também roda no push
 node scripts/e2e/prod-smoke.js             # read-only, ~5s
+npm run verify:prod                        # recompute independente de prod (read-only)
 npm run integrity:verify                   # cadeia pública íntegra
+# + habilitar o workflow Monitor Prod no GitHub Actions (roda sozinho durante a Copa)
 ```

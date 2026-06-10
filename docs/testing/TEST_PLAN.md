@@ -51,6 +51,12 @@ Os cálculos no PostgreSQL, independentes da implementação JS. Não deixam res
   num sandbox tmp contra o DB local (só leitura): completude dos palpites travados
   (paridade com a fórmula de prazo de `util.js`), formato canônico, idempotência e
   detecção de adulteração na cadeia real do repo.
+- `npm run test:xss` (`test-xss-hostile.js`) — **stored XSS** via `full_name` (único campo
+  de texto livre do usuário, renderizado para todos). Cria um usuário HOSTIL com payload
+  no nome (quebra de tag + `<img onerror>` + `<svg onload>`), navega como uma VÍTIMA e
+  prova que o nome é **sempre escapado** (ranking, galera do histórico, gráficos). Tem
+  controle negativo verificado: remover um `escapeHtml` faz a sonda falhar. Precisa do
+  dev server (:3000).
 
 ### Nível 4 — E2E de UI (Playwright) · ~30s-2min
 - **Specs estáveis:** `tests/e2e/auth.spec.js` + `predictions.spec.js` (21 testes).
@@ -77,8 +83,22 @@ Duas formas de montar o estado do harness (10 usuários + oráculo wc2026-e2e-v1
 - `test-concurrency-alerts.js` — inserts paralelos contra UNIQUE + `send_alert`.
 
 ### Nível 7 — Smoke de Produção (read-only) · ~5s
-- `prod-smoke.js` — site no ar + paridade de schema prod↔repo + números + settings.
-  **Só lê** (zero escrita). Gate manual antes de deploy grande / no dia da Copa.
+- `prod-smoke.js` — site no ar + paridade de schema prod↔repo + números + settings +
+  **sem jogador duplicado** (api_player_id único, elencos 26–27). **Só lê** (zero escrita).
+- `prod-verify.js` (`npm run verify:prod`) — irmão **pesado**: recompute independente
+  (via `src/js/scoring.js`) da pontuação de TODO palpite e do ranking de TODO pagante,
+  comparado ao que o banco gravou. Pega trigger de scoring que falhou num jogo. Campeão
+  derivado da final (prod não tem oráculo). Compartilha `lib/recompute.js` com o audit
+  local (`verify-data.mjs`) — mesma matemática nas duas pontas, sem drift. **Só lê.**
+
+### Nível 8 — Monitoramento sintético durante a Copa · contínuo · **NOVO**
+`.github/workflows/monitor-prod.yml` vigia produção sozinho e alerta no Telegram **só em
+falha** (testing in production, read-only):
+- **smoke a cada 30 min** (`prod-smoke.js`) — site no ar + schema + duplicatas.
+- **verify toda madrugada 03:15 BRT** (`prod-verify.js`) — recompute pesado.
+- Alerta via `notify-telegram.js` (só as linhas de falha; degrada sem secrets).
+- Reusa os secrets do integrity-snapshot (`SUPABASE_URL` var + `SERVICE_ROLE`/`TELEGRAM`).
+- **Desligar após a final** (~20/jul): Actions → Monitor Prod → Disable workflow.
 
 ## Como rodar tudo (ordem recomendada)
 

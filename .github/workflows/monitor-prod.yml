@@ -1,0 +1,86 @@
+name: Monitor Prod
+
+# Monitoramento sintético durante a Copa (testing in production, read-only).
+# A suíte completa roda on-demand; mas a Copa dura 5 semanas e muda de estado
+# todo dia. Este workflow vigia produção SOZINHO e alerta no Telegram SÓ em falha:
+#   • smoke (leve) a cada 30 min  — site no ar + paridade de schema + sem duplicata
+#   • verify (pesado) toda madrugada — recompute independente de TODA a pontuação
+#     e do ranking de TODOS os pagantes (pega trigger de scoring que falhou num jogo)
+# Nenhuma escrita em produção (só select/count/HEAD).
+#
+# Pré-requisitos (Settings → Secrets and variables → Actions):
+#   Variables:  SUPABASE_URL
+#   Secrets:    SUPABASE_SERVICE_ROLE_KEY (read-only aqui), TELEGRAM_TOKEN, TELEGRAM_CHAT_ID
+#
+# Desligar após a final (≈20/jul): Actions → Monitor Prod → ⋯ → Disable workflow.
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'   # smoke a cada 30 min
+    - cron: '15 6 * * *'     # verify pesado 06:15 UTC = 03:15 BRT (madrugada calma)
+  workflow_dispatch:
+    inputs:
+      full:
+        description: 'Rodar também o verify pesado (recompute)'
+        type: boolean
+        default: false
+
+concurrency:
+  group: monitor-prod
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    name: Smoke (read-only, 30 min)
+    runs-on: ubuntu-latest
+    if: ${{ vars.SUPABASE_URL != '' && (github.event_name == 'workflow_dispatch' || github.event.schedule == '*/30 * * * *') }}
+    timeout-minutes: 5
+    env:
+      SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with: { node-version: '22', cache: 'npm' }
+      - run: npm ci
+      - name: Prod smoke
+        id: run
+        continue-on-error: true
+        run: node scripts/e2e/prod-smoke.js 2>&1 | tee smoke.log
+      - name: Alerta no Telegram (só se falhou)
+        if: steps.run.outcome == 'failure'
+        run: node scripts/e2e/notify-telegram.js "🚨 <b>Monitor prod — SMOKE falhou</b>" smoke.log
+      - name: Propaga a falha
+        if: steps.run.outcome == 'failure'
+        run: exit 1
+
+  verify:
+    name: Verify (recompute pesado, madrugada)
+    runs-on: ubuntu-latest
+    if: ${{ vars.SUPABASE_URL != '' && (github.event.schedule == '15 6 * * *' || (github.event_name == 'workflow_dispatch' && inputs.full)) }}
+    timeout-minutes: 10
+    env:
+      SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with: { node-version: '22', cache: 'npm' }
+      - run: npm ci
+      - name: Prod verify (recompute independente)
+        id: run
+        continue-on-error: true
+        run: node scripts/e2e/prod-verify.js 2>&1 | tee verify.log
+      - name: Alerta no Telegram (só se falhou)
+        if: steps.run.outcome == 'failure'
+        run: node scripts/e2e/notify-telegram.js "🚨 <b>Monitor prod — VERIFY falhou (pontuação/ranking)</b>" verify.log
+      - name: Propaga a falha
+        if: steps.run.outcome == 'failure'
+        run: exit 1
