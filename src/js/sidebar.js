@@ -39,8 +39,6 @@ const ADMIN_SECTION = {
   ],
 };
 
-const COLLAPSED_KEY = 'bolao-sidebar-collapsed';
-
 /**
  * Renderiza a estrutura completa da página com sidebar + topbar.
  *
@@ -73,18 +71,18 @@ export async function renderShell({ active, profile, stats, stageLabel, lockAler
   const total = stats?.total_matches ?? 104;
   const stageTxt = stageLabel || stageFromProgress(pct);
 
-  const startCollapsed = localStorage.getItem(COLLAPSED_KEY) === '1';
-
   app.innerHTML = `
-    <aside class="sidebar ${startCollapsed ? 'collapsed' : ''}" id="sidebar">
+    <aside class="sidebar" id="sidebar">
       <div class="sb-brand">
-        <a href="inicio.html" class="sb-brand-link sb-brand-link--sbc" aria-label="SBC 2026">
-          <img src="assets/icons/logo-social.png" alt="SBC 2026" class="sb-sbc-logo">
-        </a>
-        <span class="sb-brand-sep" aria-hidden="true"></span>
-        <a href="inicio.html" class="sb-brand-link" aria-label="FIFA World Cup 2026">
-          <img src="assets/fifa-2026-logo.png" alt="FIFA 2026" class="sb-fifa-logo">
-        </a>
+        <div class="sb-brand-row">
+          <a href="inicio.html" class="sb-brand-link sb-brand-link--sbc" aria-label="SBC 2026">
+            <img src="assets/icons/logo-social.png" alt="SBC 2026" class="sb-sbc-logo">
+          </a>
+          <span class="sb-brand-sep" aria-hidden="true"></span>
+          <a href="inicio.html" class="sb-brand-link" aria-label="FIFA World Cup 2026">
+            <img src="assets/fifa-2026-logo.png" alt="FIFA 2026" class="sb-fifa-logo">
+          </a>
+        </div>
       </div>
 
       <nav class="sb-nav">
@@ -101,10 +99,6 @@ export async function renderShell({ active, profile, stats, stageLabel, lockAler
         <div class="sb-progress-stage">${stageTxt}</div>
       </div>
     </aside>
-
-    <button class="sb-collapse-btn" id="sbCollapseBtn" aria-label="Recolher menu" title="Recolher menu">
-      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-    </button>
 
     <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
@@ -145,13 +139,14 @@ export async function renderShell({ active, profile, stats, stageLabel, lockAler
     </div>
   `;
 
-  // Collapse toggle
+  // Hover-to-expand: recolhida por padrão, expande no hover/foco (CSS).
+  // Só em desktop com mouse — em mobile (≤800px) a sidebar é o drawer do ☰,
+  // e em touch sem hover não haveria como expandir, então fica sempre aberta.
   const sidebar = document.getElementById('sidebar');
-  document.getElementById('sbCollapseBtn').addEventListener('click', () => {
-    sidebar.classList.toggle('collapsed');
-    const isCollapsed = sidebar.classList.contains('collapsed');
-    localStorage.setItem(COLLAPSED_KEY, isCollapsed ? '1' : '0');
-  });
+  const hoverDesktop = window.matchMedia('(min-width: 801px) and (hover: hover) and (pointer: fine)');
+  const applyCollapsed = () => sidebar.classList.toggle('collapsed', hoverDesktop.matches);
+  applyCollapsed();
+  hoverDesktop.addEventListener('change', applyCollapsed);
 
   // Mobile menu
   const backdrop = document.getElementById('sidebarBackdrop');

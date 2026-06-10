@@ -93,12 +93,30 @@ em { font-style: normal; font-weight: 600; }
   height: 100vh;
   overflow-y: auto;
   overflow-x: hidden;
-  transition: width .25s ease;
+  transition: width .25s ease, box-shadow .25s ease;
   width: var(--sidebar-w-expanded);
 }
+/* Hover-to-expand (desktop com mouse; ver sidebar.js): .collapsed marca o
+   estado "em repouso". No hover/foco de teclado, os seletores :not() abaixo
+   param de casar e a sidebar volta aos estilos expandidos — como OVERLAY:
+   o grid (.app:has) fica fixo na largura recolhida pra não empurrar/refluir
+   o conteúdo a cada passada de mouse.
+
+   PRINCÍPIO ANTI-ENGASGADA: a geometria interna é IDÊNTICA nos dois estados
+   (mesmos paddings, gaps, tamanhos — ícones/logos nunca se movem). Recolhida,
+   o overflow-x:hidden da própria sidebar CLIPA o que não cabe em 72px; o que
+   some de verdade (labels, progresso) sai por opacity, que transiciona. Assim
+   a animação de width é a única coisa acontecendo e o expand fica contínuo.
+   NÃO reintroduzir overrides de layout por estado (display/padding/flex):
+   display não transiciona e volta o solavanco. */
 .sidebar.collapsed {
+  z-index: 60;   /* acima da .topbar (10) pra cobrir o conteúdo ao expandir */
+}
+.sidebar.collapsed:is(:hover, :focus-within) {
+  box-shadow: 12px 0 32px rgba(0, 0, 0, .45);
+}
+.sidebar.collapsed:not(:hover, :focus-within) {
   width: var(--sidebar-w-collapsed);
-  padding-left: 6px; padding-right: 6px;
 }
 .app:has(.sidebar.collapsed) {
   grid-template-columns: var(--sidebar-w-collapsed) 1fr;
@@ -108,15 +126,24 @@ em { font-style: normal; font-weight: 600; }
   transition: grid-template-columns .25s ease;
 }
 
-/* Brand: logo FIFA centralizado */
+/* Brand: SBC + FIFA lado a lado, numa .sb-brand-row de largura max-content
+   com margin auto — centrada quando cabe (expandida); quando NÃO cabe (trilho
+   de 72px) as margens auto viram 0 por spec e a row encosta à esquerda: o SBC
+   (48px, quadrado) fica exatamente centrado no trilho (12+48+12) e sep+FIFA
+   são clipados à direita. No frame em que o conteúdo passa a caber, margem 0
+   == centrado → o slide até o centro é contínuo, sem pulo.
+   (justify-content: center direto jogaria o SBC pra fora do clip no idle.) */
 .sb-brand {
-  display: flex;
-  flex-direction: row;
-  align-items: center; justify-content: center;
-  gap: 12px;
   padding: 16px 0 18px;
   margin-bottom: 12px;
   border-bottom: 1px solid var(--line);
+}
+.sb-brand-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: max-content;
+  margin-left: auto; margin-right: auto;
 }
 .sb-brand-link {
   display: flex; align-items: center; justify-content: center;
@@ -129,15 +156,6 @@ em { font-style: normal; font-weight: 600; }
   object-fit: contain;
   filter: drop-shadow(0 2px 8px rgba(0, 0, 0, .4));
   transition: height .2s ease;
-}
-.sidebar.collapsed .sb-fifa-logo {
-  height: 26px;
-}
-.sidebar.collapsed .sb-brand {
-  flex-direction: column;
-  gap: 8px;
-  padding: 6px 0 12px;
-  margin-bottom: 6px;
 }
 
 /* Brand: FIFA + novo logo SBC lado a lado (SBC à esquerda), divisória discreta entre eles */
@@ -157,48 +175,8 @@ em { font-style: normal; font-weight: 600; }
     0 0 0 1px rgba(255, 255, 255, .05) inset;
   transition: height .2s ease;
 }
-.sidebar.collapsed .sb-sbc-logo { height: 26px; border-radius: 7px; }
-/* recolhida: empilha de novo e a divisória vira horizontal */
-.sidebar.collapsed .sb-brand-sep {
-  width: 26px; height: 1px;
-  background: linear-gradient(90deg, transparent, var(--line) 30%, var(--line) 70%, transparent);
-}
 
-/* Collapse toggle button — fora da sidebar, posicionado pelo .app */
 .app { position: relative; }
-.sb-collapse-btn {
-  position: fixed;
-  top: 70px;
-  left: calc(var(--sidebar-w-expanded) - 14px);
-  width: 28px; height: 28px;
-  border-radius: 50%;
-  background: var(--card-elev);
-  border: 1px solid var(--line-strong);
-  color: var(--text-dim);
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer;
-  z-index: 50;
-  transition: left .25s ease, background .12s, color .12s, transform .25s ease, box-shadow .12s;
-  font-family: var(--font);
-  padding: 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, .4);
-}
-.sb-collapse-btn:hover {
-  background: var(--accent);
-  color: #000;
-  border-color: var(--accent);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, .5);
-}
-.app:has(.sidebar.collapsed) .sb-collapse-btn {
-  left: calc(var(--sidebar-w-collapsed) - 14px);
-}
-.app:has(.sidebar.collapsed) .sb-collapse-btn svg {
-  transform: rotate(180deg);
-}
-.sb-collapse-btn svg { transition: transform .25s ease; }
-@media (max-width: 800px) {
-  .sb-collapse-btn { display: none; }
-}
 
 /* Navigation container */
 .sb-nav {
@@ -224,22 +202,10 @@ em { font-style: normal; font-weight: 600; }
   overflow: hidden;
   transition: opacity .15s ease;
 }
-.sidebar.collapsed .sb-section-label {
-  display: none;
-  height: 0; padding: 0; margin: 0;
-}
-.sidebar.collapsed .sb-nav {
-  gap: 0;
-  margin-top: 2px;
-}
-.sidebar.collapsed .sb-section-group {
-  gap: 2px;
-}
-/* Separador sutil entre seções no modo collapsed */
-.sidebar.collapsed .sb-section-group + .sb-section-group {
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px solid var(--line);
+/* Recolhida: o label de seção fica invisível mas SEGURA o espaço (vertical
+   idêntico nos dois estados → nada salta ao expandir). */
+.sidebar.collapsed:not(:hover, :focus-within) .sb-section-label {
+  opacity: 0;
 }
 
 /* Nav link */
@@ -278,9 +244,6 @@ em { font-style: normal; font-weight: 600; }
 .sb-link {
   position: relative;
 }
-.sidebar.collapsed .sb-link.active::before {
-  display: none;
-}
 .sb-link.admin { color: var(--red); }
 .sb-link.admin:hover { background: var(--red-dim); }
 .sb-link.admin.active {
@@ -302,47 +265,14 @@ em { font-style: normal; font-weight: 600; }
   transition: opacity .15s ease;
 }
 
-/* Collapsed: hide labels, center icons */
-.sidebar.collapsed .sb-link {
-  justify-content: center;
-  padding: 10px 0;
-  gap: 0;
-  border-radius: 6px;
+/* Recolhida: labels somem por opacity (o clip da sidebar já os esconde;
+   opacity evita sobra de reticências) e voltam em fade junto com o width.
+   Ícone/padding NÃO mudam — o ícone fica visualmente centrado no trilho
+   de 72px por construção (12 sidebar + 12 link + 20 ícone ≈ centro). */
+.sidebar.collapsed:not(:hover, :focus-within) .sb-link-label {
+  opacity: 0;
 }
-.sidebar.collapsed .sb-link-label {
-  display: none;
-}
-.sidebar.collapsed .sb-link svg {
-  width: 22px; height: 22px;
-}
-.sidebar.collapsed .sb-link.active::before {
-  display: none;
-}
-.sidebar.collapsed .sb-link.active {
-  background: var(--accent-dim);
-  color: var(--accent);
-}
-
-/* Tooltip on collapsed hover (pure CSS) */
-.sidebar.collapsed .sb-link {
-  position: relative;
-}
-.sidebar.collapsed .sb-link:hover::after {
-  content: attr(title);
-  position: absolute;
-  left: calc(100% + 12px);
-  top: 50%;
-  transform: translateY(-50%);
-  background: var(--card-elev);
-  color: var(--text);
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 12px; font-weight: 600;
-  white-space: nowrap;
-  z-index: 100;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, .4);
-  pointer-events: none;
-}
+/* (sem tooltip por ícone: hover na sidebar já expande e mostra os labels) */
 
 .sb-progress {
   margin-top: 12px;
@@ -350,7 +280,7 @@ em { font-style: normal; font-weight: 600; }
   background: linear-gradient(160deg, #1a1a1a, #0d0d0d);
   border-radius: 8px;
   border: 1px solid var(--line);
-  transition: padding .2s ease;
+  transition: opacity .2s ease;
 }
 .sb-progress-label {
   font-size: 10px; letter-spacing: .15em;
@@ -391,39 +321,19 @@ em { font-style: normal; font-weight: 600; }
   letter-spacing: .03em;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-/* Modo collapsed: progresso minimalista (só barra mini + %) */
-.sidebar.collapsed .sb-progress {
-  padding: 8px 4px;
-  background: transparent;
-  border: none;
-  text-align: center;
-}
-.sidebar.collapsed .sb-progress-label,
-.sidebar.collapsed .sb-progress-stage {
-  display: none;
-}
-.sidebar.collapsed .sb-progress-bar {
-  width: 32px;
-  margin: 0 auto 4px;
-  height: 4px;
-}
-.sidebar.collapsed .sb-progress-stats {
-  flex-direction: column;
-  gap: 0;
-  justify-content: center;
-}
-.sidebar.collapsed .sb-progress-stats span {
-  display: none;
-}
-.sidebar.collapsed .sb-progress-stats strong {
-  font-size: 12px;
-  color: var(--accent);
+/* Recolhida: o card de progresso some por fade inteiro (segurando o espaço).
+   Re-layoutar pra uma versão mini causava solavanco no expand. */
+.sidebar.collapsed:not(:hover, :focus-within) .sb-progress {
+  opacity: 0;
 }
 
 /* ===== Main content ===== */
 .main {
   background: linear-gradient(180deg, #1c1c1c 0, var(--bg-main) 320px);
-  overflow-x: hidden;
+  /* `clip` (não `hidden`): hidden força overflow-y:auto e transforma .main num
+     scroll container que nunca rola (quem rola é o documento) — isso quebrava o
+     position:sticky da .topbar, que sumia ao rolar (sem ☰ no mobile). */
+  overflow-x: clip;
 }
 .topbar {
   position: sticky; top: 0;
@@ -5204,7 +5114,6 @@ input[type="number"].score-input {
     background: rgba(0, 0, 0, .7);
     z-index: 99;
   }
-  /* `~` (não `+`): o .sb-collapse-btn fica entre a sidebar e o backdrop. */
   .sidebar.open ~ .sidebar-backdrop { display: block; }
   .menu-toggle {
     display: flex !important;
@@ -6405,7 +6314,7 @@ input[type="number"].score-input {
   50%      { box-shadow: 0 0 0 4px rgba(241, 94, 108, .22); }
 }
 /* colapsada: vira um ponto no canto do ícone */
-.sidebar.collapsed .sb-badge {
+.sidebar.collapsed:not(:hover, :focus-within) .sb-badge {
   position: absolute;
   top: 6px; right: 6px;
   min-width: 9px; width: 9px; height: 9px;
