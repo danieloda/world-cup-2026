@@ -183,3 +183,15 @@ begin
 end $$;
 
 grant execute on function public.admin_set_match_status(int, text) to authenticated;
+
+-- ============================================================
+-- [Adendo 2026-06-09 — pós-incidente; ver headers da 040 e da 057]
+-- Os revokes de champion_bonus_for/scorer_bonus_for acima preservavam o estado
+-- da 034, mas o estado CANÔNICO (040) é COM grant — as views do leaderboard
+-- chamam essas funções com EXECUTE checado contra o INVOKER. Como prod aplica
+-- migrations À MÃO no SQL Editor, REAPLICAR este arquivo depois da 040 revogava
+-- de novo e derrubou o ranking de prod em 2026-06-09 (~22h BRT). Com este bloco,
+-- o arquivo é seguro de re-colar.
+grant execute on function public.champion_bonus_for(uuid) to authenticated;
+grant execute on function public.scorer_bonus_for(uuid)   to authenticated;
+grant execute on function public.stage_multiplier(text)   to authenticated;

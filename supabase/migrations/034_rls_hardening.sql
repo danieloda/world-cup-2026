@@ -115,3 +115,15 @@ revoke execute on function public.qualifier_bonus_pts(text, boolean)            
 -- Sanidade: confirme que os 2 RPCs do front continuam executáveis por quem precisa.
 grant execute on function public.report_signup_failure(text, text) to anon, authenticated;
 grant execute on function public.admin_pred_progress() to authenticated;
+
+-- ============================================================
+-- [Adendo 2026-06-09 — pós-incidente; ver headers da 040 e da 057]
+-- Estado CANÔNICO do trio do leaderboard é COM grant: v_leaderboard e
+-- v_scorer_ranking chamam essas funções e o EXECUTE é checado contra o INVOKER
+-- (o usuário logado), então o revoke acima derruba a página de ranking. A 040
+-- já reconcedia; este bloco existe porque prod aplica migrations À MÃO no SQL
+-- Editor — REAPLICAR este arquivo depois da 040 revogava de novo e derrubou o
+-- ranking de prod em 2026-06-09. Com o bloco, o arquivo é seguro de re-colar.
+grant execute on function public.champion_bonus_for(uuid) to authenticated;
+grant execute on function public.scorer_bonus_for(uuid)   to authenticated;
+grant execute on function public.stage_multiplier(text)   to authenticated;

@@ -64,6 +64,33 @@ check('matches.status existe (migration 039)', !st.error, st.error?.message?.sli
 const lb = await db.from('v_leaderboard').select('*', { count: 'exact', head: true });
 check('v_leaderboard consultável', !lb.error, lb.error ? lb.error.message.slice(0, 40) : `${lb.count} pagantes`);
 
+// 2.5 Grants que mantêm o ranking de pé — visão do role AUTHENTICATED.
+// Incidente 2026-06-09: re-colar a 039/034 no SQL Editor depois da 040 revogou
+// champion_bonus_for e derrubou ranking.html pra todo usuário logado, com este
+// smoke VERDE (service_role tem grant próprio e não enxerga). grants_health()
+// (migration 057) é definer e responde pelos grants de authenticated.
+// KEEP IN SYNC: supabase/migrations/057_regrant_leaderboard_fns.sql.
+log('b', '\n[2.5] Grants críticos (visão authenticated, via grants_health/057)');
+{
+  const MUST_TRUE = [
+    'champion_bonus_for__auth_exec', 'scorer_bonus_for__auth_exec', 'stage_multiplier__auth_exec',
+    'v_leaderboard__auth_select', 'v_scorer_ranking__auth_select', 'v_pool_stats__auth_select',
+  ];
+  const MUST_FALSE = [
+    'score_prediction__auth_exec', 'recompute_prediction_points__auth_exec', 'compute_predicted_slots__auth_exec',
+  ];
+  const { data: gh, error: ghErr } = await db.rpc('grants_health');
+  if (ghErr && /PGRST202|could not find the function|does not exist/i.test(ghErr.message)) {
+    // 057 ainda não aplicada em prod: avisa sem falhar (ordem de deploy).
+    log('y', '   ⚠ grants_health() ausente — aplicar migration 057 no SQL Editor');
+  } else if (ghErr) {
+    check('grants_health() responde', false, ghErr.message.slice(0, 60));
+  } else {
+    for (const k of MUST_TRUE) check(`${k} = true`, gh[k] === true, gh[k] === true ? '' : 'GRANT PERDIDO — ranking quebra; re-aplicar 057');
+    for (const k of MUST_FALSE) check(`${k} = false`, gh[k] === false, gh[k] === false ? '' : 'função sensível EXPOSTA — re-aplicar 034');
+  }
+}
+
 // 3. Números esperados
 log('b', '\n[3] Dados de produção (sanidade)');
 const m = await count('matches'); check('matches = 104', m.n === 104, `n=${m.n}`);

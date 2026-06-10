@@ -114,6 +114,10 @@ Lançar um resultado (`finished=true`) dispara, **em ordem**:
   `date-tz-invariance.test.js` varia o fuso em subprocessos. **Não remova esse teste** sem
   substituir a cobertura — senão bugs de fuso (como o de jun/2026) voltam a escapar.
 - **Migrations à mão:** prod aplica migrations no **SQL Editor** (sem CLI). Local usa `supabase db reset`.
+  ⚠️ **Re-colar migration antiga desfaz fixes posteriores** — re-aplicar a 039 (ou 034) depois da
+  040 revoga `champion_bonus_for` de novo e **derruba o ranking** (aconteceu em 2026-06-09; fix =
+  057). As 034/039 agora terminam re-concedendo (seguras de re-colar) e o `prod-smoke` vigia os
+  grants via `grants_health()` (057). Na dúvida, só re-cole a **última** migration, nunca um lote antigo.
 - **Migrations 050-052 são data-only:** reconciliam elencos. A 052 carrega o elenco canônico
   (1247) como VALUES e passa nos guards mesmo em base vazia → `db reset` recria prod fielmente.
 - **Admin isento do gate de avatar** (`auth.js`); usuários comuns sem `avatar_url` vão pra
