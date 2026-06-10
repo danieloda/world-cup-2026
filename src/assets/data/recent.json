@@ -73,6 +73,13 @@
   ],
   "Argentina": [
     [
+      "2026-06-10",
+      "Iceland",
+      true,
+      "3-0",
+      "Amistoso"
+    ],
+    [
       "2026-06-07",
       "Honduras",
       true,
@@ -133,13 +140,6 @@
       "Colombia",
       true,
       "1-1",
-      "Eliminatórias"
-    ],
-    [
-      "2025-06-06",
-      "Chile",
-      false,
-      "1-0",
       "Eliminatórias"
     ]
   ],
@@ -1441,6 +1441,13 @@
   ],
   "Iraq": [
     [
+      "2026-06-10",
+      "Venezuela",
+      true,
+      "0-2",
+      "Amistoso"
+    ],
+    [
       "2026-06-04",
       "Spain",
       false,
@@ -1502,16 +1509,16 @@
       false,
       "1-1",
       "Eliminatórias"
-    ],
-    [
-      "2025-10-14",
-      "Saudi Arabia",
-      false,
-      "0-0",
-      "Eliminatórias"
     ]
   ],
   "Ivory Coast": [
+    [
+      "2026-06-08",
+      "Philadelphia Union II",
+      false,
+      "2-0",
+      "Amistoso"
+    ],
     [
       "2026-06-04",
       "France",
@@ -1573,13 +1580,6 @@
       "Oman",
       false,
       "2-0",
-      "Amistoso"
-    ],
-    [
-      "2025-11-14",
-      "Saudi Arabia",
-      false,
-      "0-1",
       "Amistoso"
     ]
   ],
@@ -2377,6 +2377,13 @@
   ],
   "Saudi Arabia": [
     [
+      "2026-06-09",
+      "Senegal",
+      true,
+      "0-0",
+      "Amistoso"
+    ],
+    [
       "2026-06-05",
       "Puerto Rico",
       false,
@@ -2437,13 +2444,6 @@
       "Comoros",
       false,
       "3-1",
-      "Arab Cup"
-    ],
-    [
-      "2025-12-02",
-      "Oman",
-      true,
-      "2-1",
       "Arab Cup"
     ]
   ],
@@ -2521,6 +2521,13 @@
   ],
   "Senegal": [
     [
+      "2026-06-09",
+      "Saudi Arabia",
+      false,
+      "0-0",
+      "Amistoso"
+    ],
+    [
       "2026-05-31",
       "USA",
       false,
@@ -2581,13 +2588,6 @@
       "Congo DR",
       true,
       "1-1",
-      "Copa Africana"
-    ],
-    [
-      "2025-12-23",
-      "Botswana",
-      true,
-      "3-0",
       "Copa Africana"
     ]
   ],
@@ -3385,6 +3385,13 @@
   ],
   "DR Congo": [
     [
+      "2026-06-09",
+      "Chile",
+      true,
+      "1-2",
+      "Amistoso"
+    ],
+    [
       "2026-06-03",
       "Denmark",
       true,
@@ -3445,13 +3452,6 @@
       "Nigeria",
       false,
       "1-1",
-      "Eliminatórias"
-    ],
-    [
-      "2025-11-13",
-      "Cameroon",
-      false,
-      "1-0",
       "Eliminatórias"
     ]
   ]
