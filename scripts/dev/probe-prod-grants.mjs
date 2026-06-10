@@ -88,6 +88,28 @@ async function probe(label, client, uid) {
 // service_role — visão do monitor (prod-verify)
 await probe('SERVICE_ROLE (monitor)', sr, '00000000-0000-0000-0000-000000000000');
 
+// ---------------------------------------------------------------------------
+// grants_health (057): grants do role AUTHENTICATED via definer — dispensa
+// login (os creds de teste do .env não existem em prod). É a mesma visão que
+// o Postgres usa ao checar EXECUTE quando um usuário logado consulta as views.
+// KEEP IN SYNC: prod-smoke [2.5] e migration 057 (MUST_TRUE/MUST_FALSE).
+// ---------------------------------------------------------------------------
+head('grants_health() — grants de authenticated, sem login (migration 057)');
+{
+  const MUST_FALSE = /^(score_prediction|recompute_prediction_points|compute_predicted_slots)__/;
+  const { data, error } = await sr.rpc('grants_health');
+  if (error) bad(`rpc grants_health → ${error.message} (057 aplicada em prod?)`);
+  else {
+    for (const [k, v] of Object.entries(data)) {
+      const wantFalse = MUST_FALSE.test(k);
+      const good = wantFalse ? v === false : v === true;
+      (good ? ok : bad)(`${k} = ${v}${good ? '' : wantFalse
+        ? '  ← deveria ser FALSE (função sensível exposta — re-aplicar 034)'
+        : '  ← deveria ser TRUE (ranking quebra — re-aplicar 057)'}`);
+    }
+  }
+}
+
 // authenticated — visão do navegador (mesmo papel do screenshot)
 const auth = createClient(URL, PUB, { auth: { persistSession: false, autoRefreshToken: false } });
 const creds = [
