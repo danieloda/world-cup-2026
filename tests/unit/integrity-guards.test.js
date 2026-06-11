@@ -22,6 +22,7 @@ const ROOT = join(__dirname, '..', '..');
 const workflow = readFileSync(join(ROOT, '.github', 'workflows', 'integrity-snapshot.yml'), 'utf8');
 const snapshotSrc = readFileSync(join(ROOT, 'scripts', 'integrity', 'snapshot.js'), 'utf8');
 const reportSrc = readFileSync(join(ROOT, 'scripts', 'integrity', 'report.js'), 'utf8');
+const tgPicksSrc = readFileSync(join(ROOT, 'scripts', 'integrity', 'telegram-picks.js'), 'utf8');
 const utilSrc = readFileSync(join(ROOT, 'src', 'js', 'util.js'), 'utf8');
 const MIG_DIR = join(ROOT, 'supabase', 'migrations');
 const migrations = readdirSync(MIG_DIR).filter(f => f.endsWith('.sql')).sort()
@@ -99,6 +100,42 @@ describe('relatório legível por lacre (integrity/reports/)', () => {
     expect(snapshotSrc).toMatch(/from\('profiles'\)\.select\('id, full_name'\)/);
     expect(snapshotSrc).not.toMatch(/email/i);  // nem na query, nem em literal nenhum
     expect(reportSrc).not.toMatch(/email/i);
+  });
+});
+
+describe('alerta de palpites lacrados no Telegram (telegram-picks.js → post-picks.js)', () => {
+  // O alerta é seguro POR CONSTRUÇÃO: derivado puro do content lacrado (sem
+  // banco/fs/rede → impossível ler palpite aberto), sem e-mail, sem 3ª cópia
+  // da fórmula de prazo — e DEPENDENTE DA PUBLICAÇÃO do relatório: o snapshot
+  // só GERA as mensagens (arquivo gitignored); quem POSTA é um passo separado
+  // da Action que roda depois do verify + commit/push (decisão 2026-06-11).
+  it('é derivado puro: sem banco/fs/rede, sem e-mail, sem cópia da fórmula de prazo', () => {
+    expect(tgPicksSrc).not.toMatch(/supabase|node:fs|from ['"]fs['"]|fetch\(/);
+    expect(tgPicksSrc).not.toMatch(/email/i);
+    expect(tgPicksSrc).not.toMatch(/getUTCDate\(\) - 1, 23, 59/);
+  });
+
+  it('snapshot.js GERA as mensagens depois do dedupe e do buildReport — e não as posta', () => {
+    const iDedupe = snapshotSrc.indexOf('Sem mudança');
+    const iReport = snapshotSrc.indexOf('buildReport(');
+    const iPicks = snapshotSrc.indexOf('buildPicksMessages(');
+    expect(iPicks).toBeGreaterThan(iReport);
+    expect(iReport).toBeGreaterThan(iDedupe);
+    // o envio fica fora do snapshot: as mensagens vão pra arquivo, não pra rede
+    expect(snapshotSrc.slice(iPicks)).not.toMatch(/postTelegram\(/);
+  });
+
+  it('a Action posta os palpites SÓ DEPOIS do commit/push do relatório', () => {
+    const iVerify = workflow.indexOf('scripts/integrity/verify.js');
+    const iPush = workflow.indexOf('git push');
+    const iPost = workflow.indexOf('scripts/integrity/post-picks.js');
+    expect(iPost).toBeGreaterThan(iPush);
+    expect(iPush).toBeGreaterThan(iVerify);
+  });
+
+  it('o arquivo intermediário é gitignored (mensagem nunca entra no lacre/commit)', () => {
+    const gitignore = readFileSync(join(ROOT, '.gitignore'), 'utf8');
+    expect(gitignore).toMatch(/scripts\/integrity\/\.tmp\//);
   });
 });
 

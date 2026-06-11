@@ -37,8 +37,8 @@ export function fmtBRT(dateLike) {
   return `${b.dow} ${p2(b.day)}/${p2(b.mo)}/${b.y} ${p2(b.h)}:${p2(b.mi)} (BRT)`;
 }
 
-/** "qui 11/06 17:00" — compacta, para células de tabela. */
-function fmtShort(dateLike) {
+/** "qui 11/06 17:00" — compacta, para células de tabela (e telegram-picks.js). */
+export function fmtShort(dateLike) {
   const b = brtParts(dateLike);
   return `${b.dow} ${p2(b.day)}/${p2(b.mo)} ${p2(b.h)}:${p2(b.mi)}`;
 }

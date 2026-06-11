@@ -25,6 +25,9 @@ scripts/e2e/render-adversarial-errors.json
 scripts/e2e/.tmp/
 error-screenshot.png
 
+# Mensagens de palpites lacrados aguardando publish (snapshot.js → post-picks.js)
+scripts/integrity/.tmp/
+
 # Supabase local
 supabase/.temp/
 supabase/.branches/

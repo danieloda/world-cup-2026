@@ -66,3 +66,12 @@ jobs:
           git add integrity/
           git commit -m "chore(integrity): snapshot automático dos palpites travados [skip ci]"
           git push
+
+      # Palpites recém-lacrados no grupo — SÓ depois do verify + commit/push:
+      # se qualquer passo acima falhar, o grupo não recebe link de relatório
+      # que não foi publicado. Sem jogo novo no lacre → no-op.
+      - name: Posta palpites recém-lacrados (depois do publish)
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: node scripts/integrity/post-picks.js

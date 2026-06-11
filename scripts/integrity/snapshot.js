@@ -29,6 +29,7 @@ import { createHash } from 'crypto';
 import { config } from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
 import { buildReport, brtDateStamp } from './report.js';
+import { buildPicksMessages } from './telegram-picks.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 config({ path: join(__dirname, '..', '..', '.env') });
@@ -43,6 +44,12 @@ const SNAP_DIR = join(INTEGRITY_DIR, 'snapshots');
 const REPORT_DIR = join(INTEGRITY_DIR, 'reports');
 const MANIFEST = join(INTEGRITY_DIR, 'manifest.json');
 const GENESIS = '0'.repeat(64);
+
+// Mensagens de palpites recém-lacrados: geradas aqui, postadas por
+// post-picks.js DEPOIS do commit/push do relatório (gitignored — nunca entra
+// no lacre). KEEP IN SYNC: post-picks.js e integrity-snapshot.yml.
+const PICKS_OUT_DIR = join(__dirname, '.tmp');
+const PICKS_OUT_FILE = join(PICKS_OUT_DIR, 'locked-picks-telegram.json');
 
 // Links públicos do relatório/Telegram. Na Action os env vem do GitHub; o
 // fallback é o repositório canônico (público) para runs manuais.
@@ -262,6 +269,22 @@ async function main() {
     `<code>chain ${chainHash}</code>\n` +
     `📄 <a href="${REPO_URL}/blob/${BRANCH}/integrity/reports/${reportFname}">Relatório do lacre (o que travou e como conferir)</a>`
   );
+
+  // Palpites recém-lacrados (decisão 2026-06-11): as mensagens são GERADAS
+  // aqui (mesmo content lacrado acima — só jogos que travaram NESTE lacre,
+  // nomes do app, nunca e-mail), mas o ENVIO é do passo seguinte da Action
+  // (post-picks.js), que só roda DEPOIS do verify + commit/push — o grupo só
+  // recebe o alerta se o relatório linkado estiver de fato publicado.
+  // Lacre sem jogo novo (ex.: só resultado) → nenhum arquivo → silêncio.
+  const picksMessages = buildPicksMessages({
+    entry, content, prevContent, matches,
+    reportUrl: `${REPO_URL}/blob/${BRANCH}/integrity/reports/${reportFname}`,
+  });
+  if (picksMessages.length) {
+    if (!existsSync(PICKS_OUT_DIR)) mkdirSync(PICKS_OUT_DIR, { recursive: true });
+    writeFileSync(PICKS_OUT_FILE, JSON.stringify({ seq, messages: picksMessages }, null, 2) + '\n');
+    console.log(`   palpites:     ${picksMessages.length} mensagem(ns) aguardando publish (post-picks.js)`);
+  }
 }
 
 main().catch((e) => { console.error(e); process.exit(1); });
