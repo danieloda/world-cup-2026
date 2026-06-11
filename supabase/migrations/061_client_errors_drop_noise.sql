@@ -1,5 +1,5 @@
 -- ============================================================
--- Migration 055: Filtra ruído de terceiros nos alertas de erro do cliente
+-- Migration 061: Filtra ruído de terceiros nos alertas de erro do cliente
 -- ============================================================
 -- O alerta tempo-real (048) e o digest (049) estavam pingando no Telegram do
 -- admin com erros que NÃO são do nosso app:
@@ -13,7 +13,7 @@
 -- Casos reais (jun/2026): 8+ pings de "Script error." em 5 páginas distintas, só
 -- iOS/Mac Safari, todos sem stack → puro ruído de extensão/blocker do visitante.
 --
--- A 055 NÃO bloqueia a gravação: a tabela segue append-only (admin ainda enxerga
+-- A 061 NÃO bloqueia a gravação: a tabela segue append-only (admin ainda enxerga
 -- tudo via SELECT). Só para de PAGAR e de contar esse ruído nos resumos. O front
 -- (error-reporter.js) já nem envia mais — esta guarda cobre clientes com JS em
 -- cache (Safari) que continuam inserindo até o cache expirar.
