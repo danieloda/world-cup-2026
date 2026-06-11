@@ -1,0 +1,2373 @@
+{
+  "champion_picks": [
+    {
+      "team": "France",
+      "updated_at": "2026-06-10T17:21:23.800385+00:00",
+      "user_id": "0004e726-2e11-4352-a95c-782c7dd2c08e"
+    },
+    {
+      "team": "France",
+      "updated_at": "2026-06-10T21:15:16.682914+00:00",
+      "user_id": "0288ea2d-2a1d-452d-86a3-f068e3f0ca07"
+    },
+    {
+      "team": "Spain",
+      "updated_at": "2026-06-08T17:55:40.112679+00:00",
+      "user_id": "05794113-baa6-4261-a38d-13c3cfc6ebb2"
+    },
+    {
+      "team": "France",
+      "updated_at": "2026-06-07T16:58:30.379941+00:00",
+      "user_id": "05c8c965-40d9-43fc-b45f-24fa6e3e3ebd"
+    },
+    {
+      "team": "Brazil",
+      "updated_at": "2026-06-06T12:19:38.672165+00:00",
+      "user_id": "0d7abcd1-142c-466f-8d89-189cc93d0e86"
+    },
+    {
+      "team": "Brazil",
+      "updated_at": "2026-06-06T00:18:48.630434+00:00",
+      "user_id": "14ce2b86-dc32-4146-a331-bada965c2a3e"
+    },
+    {
+      "team": "Brazil",
+      "updated_at": "2026-06-07T23:40:40.053173+00:00",
+      "user_id": "1d821b3c-ac46-4bff-acc3-b65cf0ce2375"
+    },
+    {
+      "team": "England",
+      "updated_at": "2026-06-10T00:19:35.596769+00:00",
+      "user_id": "203c6653-c90b-49b5-9c93-486a37dac186"
+    },
+    {
+      "team": "Spain",
+      "updated_at": "2026-06-08T12:35:52.293467+00:00",
+      "user_id": "2176d8a9-dba7-4405-af3c-dfdd441bc830"
+    },
+    {
+      "team": "Portugal",
+      "updated_at": "2026-06-10T00:38:38.668025+00:00",
+      "user_id": "22711bc5-42a0-4886-870d-f59bc5cd526c"
+    },
+    {
+      "team": "Portugal",
+      "updated_at": "2026-06-10T16:01:04.446064+00:00",
+      "user_id": "24822b75-581a-4366-9e38-e4922b31bf57"
+    },
+    {
+      "team": "Brazil",
+      "updated_at": "2026-06-06T17:22:22.385585+00:00",
+      "user_id": "2644476d-e54c-49a4-9438-a9538e5d78d9"
+    },
+    {
+      "team": "England",
+      "updated_at": "2026-06-04T19:30:05.835834+00:00",
+      "user_id": "2a94bc3a-b377-4ffc-b434-04eb7e93ce5a"
+    },
+    {
+      "team": "Brazil",
+      "updated_at": "2026-06-10T16:06:18.372471+00:00",
+      "user_id": "2c0e2b75-1424-42a2-bdf6-1f2371749efc"
+    },
+    {
+      "team": "Brazil",
+      "updated_at": "2026-06-04T00:45:48.221731+00:00",
+      "user_id": "2e44f90d-069d-4866-96cf-ae9b0f2d45ee"
+    },
+    {
+      "team": "Portugal",
+      "updated_at": "2026-06-08T22:42:45.800503+00:00",
+      "user_id": "31a5b0b9-742b-4ebb-b934-5a42a7ca3aa8"
+    },
+    {
+      "team": "Brazil",
+      "updated_at": "2026-06-04T23:48:17.279229+00:00",
+      "user_id": "31df5529-e451-4ada-a55f-1ba4c41ae084"
+    },
+    {
+      "team": "France",
+      "updated_at": "2026-06-01T17:47:54.545544+00:00",
+      "user_id": "3356bc2a-c868-434a-b8ad-bef3fe399c16"
+    },
+    {
+      "team": "Spain",
+      "updated_at": "2026-06-10T21:50:12.899905+00:00",
+      "user_id": "34490f3a-36a2-4311-b378-be6514dee637"
+    },
+    {
+      "team": "England",
+      "updated_at": "2026-06-08T21:24:33.223591+00:00",
+      "user_id": "36dc18fb-04b3-4bb5-8d9e-707aff799128"
+    },
+    {
+      "team": "Brazil",
+      "updated_at": "2026-06-08T21:54:38.911052+00:00",
+      "user_id": "3b38f476-14fb-4e73-8287-c1fb55af6c87"
+    },
+    {
+      "team": "Brazil",
+      "updated_at": "2026-06-10T17:34:52.040779+00:00",
+      "user_id": "4104da81-b3c8-4362-a61f-8eeec128513d"
+    },
+    {
+      "team": "Brazil",
+      "updated_at": "2026-06-09T21:18:24.613208+00:00",
+      "user_id": "49dd9b2e-b971-480a-80b8-8c2e8c889b94"
+    },
+    {
+      "team": "Brazil",
+      "updated_at": "2026-06-09T02:23:21.880355+00:00",
+      "user_id": "49e2603c-9e0c-454c-92d3-df9088eb6ebc"
+    },
+    {
+      "team": "Brazil",
+      "updated_at": "2026-06-09T02:23:14.294304+00:00",
+      "user_id": "4a78ab47-f1e9-49c2-adfc-4362967b19b9"
+    },
+    {
+      "team": "Argentina",
+      "updated_at": "2026-06-08T17:48:23.355305+00:00",
+      "user_id": "4bb993ea-d1c4-4262-8eb8-bda13e4d7752"
+    },
+    {
+      "team": "Portugal",
+      "updated_at": "2026-06-07T16:30:30.555134+00:00",
+      "user_id": "525e03f3-831a-41b7-8658-ed3d8e0feacd"
+    },
+    {
+      "team": "Brazil",
+      "updated_at": "2026-06-10T14:41:41.201295+00:00",
+      "user_id": "536ebef9-2d5e-4d04-9513-cc3fc65cba1f"
+    },
+    {
+      "team": "Spain",
+      "updated_at": "2026-06-09T02:46:56.782671+00:00",
+      "user_id": "563a9321-08db-4029-b193-2931a421b355"
+    },
+    {
+      "team": "Argentina",
+      "updated_at": "2026-06-10T19:37:14.575707+00:00",
+      "user_id": "667f50a8-7227-4631-a2f7-8ad874c332fd"
+    },
+    {
+      "team": "Brazil",
+      "updated_at": "2026-06-04T20:06:55.075425+00:00",
+      "user_id": "684e6b2a-67f7-4991-a469-318ed81cdb2b"
+    },
+    {
+      "team": "Brazil",
+      "updated_at": "2026-06-08T09:41:55.835253+00:00",
+      "user_id": "6a1c428d-9e0d-4982-a825-6c9430613033"
+    },
+    {
+      "team": "Brazil",
+      "updated_at": "2026-06-02T19:02:15.316516+00:00",
+      "user_id": "6ef89236-b3f6-49ac-b0dc-0b1b9b9788c8"
+    },
+    {
+      "team": "France",
+      "updated_at": "2026-06-08T12:13:21.939116+00:00",
+      "user_id": "702c5bb6-82c6-45dc-a9ac-d0af8faa4a51"
+    },
+    {
+      "team": "France",
+      "updated_at": "2026-06-11T00:15:46.981257+00:00",
+      "user_id": "74e2cd2b-511f-43c3-bfd5-6e708ab52c87"
+    },
+    {
+      "team": "France",
+      "updated_at": "2026-06-02T13:25:07.90009+00:00",
+      "user_id": "7687e825-7b18-4f16-87e3-753266275a43"
+    },
+    {
+      "team": "Portugal",
+      "updated_at": "2026-06-10T00:51:22.211535+00:00",
+      "user_id": "7c62369f-0a1a-4ba6-bac8-7cda138b8dce"
+    },
+    {
+      "team": "Spain",
+      "updated_at": "2026-06-11T01:37:50.103705+00:00",
+      "user_id": "814da98b-7fab-4d77-a15c-ef85873a17bc"
+    },
+    {
+      "team": "Spain",
+      "updated_at": "2026-06-06T22:12:09.351952+00:00",
+      "user_id": "87ee5c06-24e0-48ca-af55-2e720b7c8212"
+    },
+    {
+      "team": "Spain",
+      "updated_at": "2026-06-10T17:29:39.911062+00:00",
+      "user_id": "8af11dd6-8124-4090-9555-4743616fa2fb"
+    },
+    {
+      "team": "France",
+      "updated_at": "2026-06-11T00:15:14.757403+00:00",
+      "user_id": "8c47f63d-5ca0-4ae6-9952-e94467b922d4"
+    },
+    {
+      "team": "Spain",
+      "updated_at": "2026-06-10T16:31:41.669414+00:00",
+      "user_id": "908d4162-9803-4603-b838-eb09addbd7e4"
+    },
+    {
+      "team": "Spain",
+      "updated_at": "2026-06-09T10:47:40.494262+00:00",
+      "user_id": "96381366-0a4d-471f-b489-dab6b730a2b8"
+    },
+    {
+      "team": "Portugal",
+      "updated_at": "2026-05-28T19:52:41.791787+00:00",
+      "user_id": "98bd880d-bdee-4d37-bdfb-2cc1d8b5774d"
+    },
+    {
+      "team": "Brazil",
+      "updated_at": "2026-06-01T18:49:45.571637+00:00",
+      "user_id": "9cf06fe9-6160-4a76-8f6d-6d76e9a21f16"
+    },
+    {
+      "team": "Spain",
+      "updated_at": "2026-06-04T23:28:40.982638+00:00",
+      "user_id": "9f45f156-d638-4ecc-b187-e3a64a72af46"
+    },
+    {
+      "team": "Spain",
+      "updated_at": "2026-06-09T18:06:15.124636+00:00",
+      "user_id": "9f9b5ef1-f94a-430a-8ed5-ae3b909933d3"
+    },
+    {
+      "team": "Argentina",
+      "updated_at": "2026-06-09T23:57:28.000805+00:00",
+      "user_id": "a05f0e98-12bd-4f18-9fdc-05d836cb891f"
+    },
+    {
+      "team": "Portugal",
+      "updated_at": "2026-06-10T15:57:12.076304+00:00",
+      "user_id": "a6e46056-26b8-403b-9cab-c1386d996b4f"
+    },
+    {
+      "team": "Portugal",
+      "updated_at": "2026-06-09T12:04:33.819194+00:00",
+      "user_id": "a8e90710-98c8-4ca0-8988-e8f31d66da16"
+    },
+    {
+      "team": "Brazil",
+      "updated_at": "2026-06-09T15:18:38.517726+00:00",
+      "user_id": "aaa6562f-9ded-4a51-8b83-798cbd71edea"
+    },
+    {
+      "team": "Brazil",
+      "updated_at": "2026-06-10T12:51:36.208509+00:00",
+      "user_id": "ac50ff84-1632-4377-a04c-01f04d824b0b"
+    },
+    {
+      "team": "Norway",
+      "updated_at": "2026-06-05T00:09:06.843145+00:00",
+      "user_id": "ae42fc93-b78a-48c9-86b3-a23d6b7d8ab2"
+    },
+    {
+      "team": "Brazil",
+      "updated_at": "2026-06-04T23:23:22.891106+00:00",
+      "user_id": "af483a49-f05b-4e72-bc73-4db915e736ff"
+    },
+    {
+      "team": "Spain",
+      "updated_at": "2026-06-06T19:32:58.165314+00:00",
+      "user_id": "bcdffc98-fe54-436c-b4cc-df7dde2e69fd"
+    },
+    {
+      "team": "Saudi Arabia",
+      "updated_at": "2026-06-02T14:03:42.96031+00:00",
+      "user_id": "bdd049ec-e3aa-4f39-acec-52bea408ef00"
+    },
+    {
+      "team": "France",
+      "updated_at": "2026-06-05T17:42:14.390752+00:00",
+      "user_id": "bf66de1c-18aa-4a5f-b6c2-46dfe61cda4e"
+    },
+    {
+      "team": "Netherlands",
+      "updated_at": "2026-06-06T18:51:37.466362+00:00",
+      "user_id": "c59edccc-e37a-4937-840c-502b120411b4"
+    },
+    {
+      "team": "Brazil",
+      "updated_at": "2026-06-03T21:14:25.887372+00:00",
+      "user_id": "cc05533f-21a7-4f3d-b364-04eb80ca3ccf"
+    },
+    {
+      "team": "Brazil",
+      "updated_at": "2026-06-10T21:11:48.740022+00:00",
+      "user_id": "d8f20451-454d-4178-b4ec-7ac2b5d90832"
+    },
+    {
+      "team": "France",
+      "updated_at": "2026-06-09T10:01:14.34041+00:00",
+      "user_id": "da0841df-6c70-4c01-ab1f-9696aeeb862c"
+    },
+    {
+      "team": "Brazil",
+      "updated_at": "2026-06-09T21:41:16.022433+00:00",
+      "user_id": "db6c1f7d-985c-4635-83f6-ff4b516997f7"
+    },
+    {
+      "team": "France",
+      "updated_at": "2026-06-10T16:19:44.779473+00:00",
+      "user_id": "de9841a4-07e6-438f-9872-f1a9675508d0"
+    },
+    {
+      "team": "France",
+      "updated_at": "2026-06-09T10:35:22.594962+00:00",
+      "user_id": "dfaa9cbf-587b-42b8-9aa4-5f532857c1b3"
+    },
+    {
+      "team": "Brazil",
+      "updated_at": "2026-06-07T20:45:07.659146+00:00",
+      "user_id": "e20f949a-1c1e-4122-822b-d675ce46078f"
+    },
+    {
+      "team": "Brazil",
+      "updated_at": "2026-06-09T19:32:49.466604+00:00",
+      "user_id": "e77a12b6-27b4-47b0-b559-298e6497185b"
+    },
+    {
+      "team": "Brazil",
+      "updated_at": "2026-06-10T10:58:11.99555+00:00",
+      "user_id": "ee3b7bc9-56b0-409b-9349-31f5313e9294"
+    },
+    {
+      "team": "Portugal",
+      "updated_at": "2026-06-01T14:44:47.844763+00:00",
+      "user_id": "f0aaec3a-b9de-467e-afc7-6c9ebf855d22"
+    },
+    {
+      "team": "Brazil",
+      "updated_at": "2026-06-08T21:15:12.114526+00:00",
+      "user_id": "f1fbb1e1-de3f-40e4-a7f6-561084958ed5"
+    },
+    {
+      "team": "Brazil",
+      "updated_at": "2026-06-06T17:43:26.843233+00:00",
+      "user_id": "f2fe87c4-b4a9-415f-8d88-cfe65dad6b92"
+    },
+    {
+      "team": "France",
+      "updated_at": "2026-06-08T18:21:05.885752+00:00",
+      "user_id": "f33608e3-a94e-443c-93d7-545781ba870e"
+    },
+    {
+      "team": "Portugal",
+      "updated_at": "2026-06-05T01:30:22.989381+00:00",
+      "user_id": "f48d34e7-1753-4905-9129-8433ba9415db"
+    },
+    {
+      "team": "Spain",
+      "updated_at": "2026-06-08T15:12:27.073796+00:00",
+      "user_id": "f619522e-ad2e-42de-bc41-c680f295d435"
+    },
+    {
+      "team": "Brazil",
+      "updated_at": "2026-06-10T00:19:20.665188+00:00",
+      "user_id": "f7ae46f3-3847-49df-a902-6fdbe64302bc"
+    },
+    {
+      "team": "Spain",
+      "updated_at": "2026-06-10T03:10:06.931497+00:00",
+      "user_id": "fb90a383-7642-4f2d-87c8-1f2e02d4a598"
+    },
+    {
+      "team": "Spain",
+      "updated_at": "2026-06-07T00:05:45.420521+00:00",
+      "user_id": "fc113c1c-128f-4e53-ae2b-4e415502a6ad"
+    }
+  ],
+  "locked_match_ids": [
+    1,
+    2
+  ],
+  "players": [
+    {
+      "id": 38,
+      "name": "M. Olise",
+      "team": "France"
+    },
+    {
+      "id": 107,
+      "name": "Endrick",
+      "team": "Brazil"
+    },
+    {
+      "id": 229,
+      "name": "N. Madueke",
+      "team": "England"
+    },
+    {
+      "id": 550,
+      "name": "K. Havertz",
+      "team": "Germany"
+    },
+    {
+      "id": 575,
+      "name": "J. Álvarez",
+      "team": "Argentina"
+    },
+    {
+      "id": 579,
+      "name": "L. Messi",
+      "team": "Argentina"
+    },
+    {
+      "id": 808,
+      "name": "E. Haaland",
+      "team": "Norway"
+    },
+    {
+      "id": 1381,
+      "name": "H. Kane",
+      "team": "England"
+    },
+    {
+      "id": 1921,
+      "name": "Kylian Mbappé",
+      "team": "France"
+    },
+    {
+      "id": 1935,
+      "name": "Matheus Cunha",
+      "team": "Brazil"
+    },
+    {
+      "id": 1939,
+      "name": "Vinícius Júnior",
+      "team": "Brazil"
+    },
+    {
+      "id": 1962,
+      "name": "Lamine Yamal",
+      "team": "Spain"
+    },
+    {
+      "id": 1964,
+      "name": "Mikel Oyarzabal",
+      "team": "Spain"
+    },
+    {
+      "id": 1966,
+      "name": "Ferran Torres",
+      "team": "Spain"
+    },
+    {
+      "id": 2131,
+      "name": "Cristiano Ronaldo",
+      "team": "Portugal"
+    }
+  ],
+  "predictions": [
+    {
+      "match_id": 1,
+      "pred_away": 1,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-10T17:26:12.641171+00:00",
+      "user_id": "0004e726-2e11-4352-a95c-782c7dd2c08e"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-10T18:45:18.540148+00:00",
+      "user_id": "0004e726-2e11-4352-a95c-782c7dd2c08e"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 0,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-10T11:57:23.847946+00:00",
+      "user_id": "0288ea2d-2a1d-452d-86a3-f068e3f0ca07"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-10T21:12:11.216551+00:00",
+      "user_id": "0288ea2d-2a1d-452d-86a3-f068e3f0ca07"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 1,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-01T18:00:14.696119+00:00",
+      "user_id": "05794113-baa6-4261-a38d-13c3cfc6ebb2"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 2,
+      "pred_home": 0,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-01T18:00:42.500634+00:00",
+      "user_id": "05794113-baa6-4261-a38d-13c3cfc6ebb2"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 1,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-07T16:46:52.191174+00:00",
+      "user_id": "05c8c965-40d9-43fc-b45f-24fa6e3e3ebd"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 2,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-07T16:46:59.245512+00:00",
+      "user_id": "05c8c965-40d9-43fc-b45f-24fa6e3e3ebd"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 1,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-05T01:04:09.07085+00:00",
+      "user_id": "0d7abcd1-142c-466f-8d89-189cc93d0e86"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 0,
+      "pred_home": 0,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-05T01:04:20.840511+00:00",
+      "user_id": "0d7abcd1-142c-466f-8d89-189cc93d0e86"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 1,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-03T14:50:37.985256+00:00",
+      "user_id": "14ce2b86-dc32-4146-a331-bada965c2a3e"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 2,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-03T23:48:48.355122+00:00",
+      "user_id": "14ce2b86-dc32-4146-a331-bada965c2a3e"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 0,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-10T03:01:23.439627+00:00",
+      "user_id": "1d821b3c-ac46-4bff-acc3-b65cf0ce2375"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-10T03:01:49.277118+00:00",
+      "user_id": "1d821b3c-ac46-4bff-acc3-b65cf0ce2375"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 0,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-10T00:15:28.536386+00:00",
+      "user_id": "203c6653-c90b-49b5-9c93-486a37dac186"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 0,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-10T00:15:35.2282+00:00",
+      "user_id": "203c6653-c90b-49b5-9c93-486a37dac186"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 0,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-08T11:56:48.259707+00:00",
+      "user_id": "2176d8a9-dba7-4405-af3c-dfdd441bc830"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-08T11:57:05.304019+00:00",
+      "user_id": "2176d8a9-dba7-4405-af3c-dfdd441bc830"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 1,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-09T23:57:47.684359+00:00",
+      "user_id": "22711bc5-42a0-4886-870d-f59bc5cd526c"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 0,
+      "pred_home": 0,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-09T23:57:52.804649+00:00",
+      "user_id": "22711bc5-42a0-4886-870d-f59bc5cd526c"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 1,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-10T14:02:39.216011+00:00",
+      "user_id": "24822b75-581a-4366-9e38-e4922b31bf57"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-10T14:02:43.023377+00:00",
+      "user_id": "24822b75-581a-4366-9e38-e4922b31bf57"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 0,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-06T16:04:39.23326+00:00",
+      "user_id": "2644476d-e54c-49a4-9438-a9538e5d78d9"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 0,
+      "pred_home": 3,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-06T16:04:56.611836+00:00",
+      "user_id": "2644476d-e54c-49a4-9438-a9538e5d78d9"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 0,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-06T19:10:37.159515+00:00",
+      "user_id": "2a94bc3a-b377-4ffc-b434-04eb7e93ce5a"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 0,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-04T19:31:06.585321+00:00",
+      "user_id": "2a94bc3a-b377-4ffc-b434-04eb7e93ce5a"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 1,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-07T14:27:49.891337+00:00",
+      "user_id": "2c0e2b75-1424-42a2-bdf6-1f2371749efc"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 0,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-07T14:30:07.881731+00:00",
+      "user_id": "2c0e2b75-1424-42a2-bdf6-1f2371749efc"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 0,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-04T00:09:06.095005+00:00",
+      "user_id": "2e44f90d-069d-4866-96cf-ae9b0f2d45ee"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 2,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-04T00:14:42.132667+00:00",
+      "user_id": "2e44f90d-069d-4866-96cf-ae9b0f2d45ee"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 1,
+      "pred_home": 3,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-08T20:47:44.391659+00:00",
+      "user_id": "31a5b0b9-742b-4ebb-b934-5a42a7ca3aa8"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-08T20:54:48.505906+00:00",
+      "user_id": "31a5b0b9-742b-4ebb-b934-5a42a7ca3aa8"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 0,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-05-29T18:31:01.811429+00:00",
+      "user_id": "31df5529-e451-4ada-a55f-1ba4c41ae084"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-07T01:25:38.751418+00:00",
+      "user_id": "31df5529-e451-4ada-a55f-1ba4c41ae084"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 1,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-05-30T15:42:45.000576+00:00",
+      "user_id": "3356bc2a-c868-434a-b8ad-bef3fe399c16"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 0,
+      "pred_pen_winner": null,
+      "updated_at": "2026-05-30T15:43:08.620332+00:00",
+      "user_id": "3356bc2a-c868-434a-b8ad-bef3fe399c16"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 1,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-05-31T23:41:55.176511+00:00",
+      "user_id": "34490f3a-36a2-4311-b378-be6514dee637"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 0,
+      "pred_pen_winner": null,
+      "updated_at": "2026-05-31T23:42:03.622532+00:00",
+      "user_id": "34490f3a-36a2-4311-b378-be6514dee637"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 1,
+      "pred_home": 3,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-10T23:37:55.302829+00:00",
+      "user_id": "36dc18fb-04b3-4bb5-8d9e-707aff799128"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 2,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-10T23:38:10.819783+00:00",
+      "user_id": "36dc18fb-04b3-4bb5-8d9e-707aff799128"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 1,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-08T21:42:49.131622+00:00",
+      "user_id": "3b38f476-14fb-4e73-8287-c1fb55af6c87"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 2,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-08T21:43:00.274689+00:00",
+      "user_id": "3b38f476-14fb-4e73-8287-c1fb55af6c87"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 1,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-10T17:34:03.52946+00:00",
+      "user_id": "4104da81-b3c8-4362-a61f-8eeec128513d"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-10T17:34:10.318326+00:00",
+      "user_id": "4104da81-b3c8-4362-a61f-8eeec128513d"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 1,
+      "pred_home": 3,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-09T21:14:30.072223+00:00",
+      "user_id": "49dd9b2e-b971-480a-80b8-8c2e8c889b94"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-09T21:14:42.819238+00:00",
+      "user_id": "49dd9b2e-b971-480a-80b8-8c2e8c889b94"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 1,
+      "pred_home": 3,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-09T01:46:59.651639+00:00",
+      "user_id": "49e2603c-9e0c-454c-92d3-df9088eb6ebc"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-09T01:48:28.241109+00:00",
+      "user_id": "49e2603c-9e0c-454c-92d3-df9088eb6ebc"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 0,
+      "pred_home": 3,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-09T01:47:09.968409+00:00",
+      "user_id": "4a78ab47-f1e9-49c2-adfc-4362967b19b9"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 2,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-09T01:48:43.870171+00:00",
+      "user_id": "4a78ab47-f1e9-49c2-adfc-4362967b19b9"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 1,
+      "pred_home": 3,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-07T20:40:15.413442+00:00",
+      "user_id": "4bb993ea-d1c4-4262-8eb8-bda13e4d7752"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-07T20:40:35.84988+00:00",
+      "user_id": "4bb993ea-d1c4-4262-8eb8-bda13e4d7752"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 0,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-02T16:28:30.882976+00:00",
+      "user_id": "525e03f3-831a-41b7-8658-ed3d8e0feacd"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-02T16:28:40.074611+00:00",
+      "user_id": "525e03f3-831a-41b7-8658-ed3d8e0feacd"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 1,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-10T01:09:00.807201+00:00",
+      "user_id": "536ebef9-2d5e-4d04-9513-cc3fc65cba1f"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 2,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-10T01:10:19.774374+00:00",
+      "user_id": "536ebef9-2d5e-4d04-9513-cc3fc65cba1f"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 0,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-09T02:53:13.207552+00:00",
+      "user_id": "563a9321-08db-4029-b193-2931a421b355"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-09T02:54:36.360904+00:00",
+      "user_id": "563a9321-08db-4029-b193-2931a421b355"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 0,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-10T19:38:34.718186+00:00",
+      "user_id": "667f50a8-7227-4631-a2f7-8ad874c332fd"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 0,
+      "pred_home": 0,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-10T19:38:52.830067+00:00",
+      "user_id": "667f50a8-7227-4631-a2f7-8ad874c332fd"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 0,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-04T20:09:31.77636+00:00",
+      "user_id": "684e6b2a-67f7-4991-a469-318ed81cdb2b"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-04T20:09:48.129969+00:00",
+      "user_id": "684e6b2a-67f7-4991-a469-318ed81cdb2b"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 0,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-08T09:43:56.861979+00:00",
+      "user_id": "6a1c428d-9e0d-4982-a825-6c9430613033"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 0,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-08T09:44:28.193651+00:00",
+      "user_id": "6a1c428d-9e0d-4982-a825-6c9430613033"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 1,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-02T18:41:05.609074+00:00",
+      "user_id": "6ef89236-b3f6-49ac-b0dc-0b1b9b9788c8"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-02T18:41:32.020802+00:00",
+      "user_id": "6ef89236-b3f6-49ac-b0dc-0b1b9b9788c8"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 0,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-06T18:35:25.6559+00:00",
+      "user_id": "702c5bb6-82c6-45dc-a9ac-d0af8faa4a51"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-06T18:35:32.914153+00:00",
+      "user_id": "702c5bb6-82c6-45dc-a9ac-d0af8faa4a51"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 0,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-11T00:15:19.537042+00:00",
+      "user_id": "74e2cd2b-511f-43c3-bfd5-6e708ab52c87"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 2,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-11T00:15:29.204522+00:00",
+      "user_id": "74e2cd2b-511f-43c3-bfd5-6e708ab52c87"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 1,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-01T19:44:12.99519+00:00",
+      "user_id": "7687e825-7b18-4f16-87e3-753266275a43"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-10T12:41:50.18109+00:00",
+      "user_id": "7687e825-7b18-4f16-87e3-753266275a43"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 1,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-09T21:04:01.984526+00:00",
+      "user_id": "7c62369f-0a1a-4ba6-bac8-7cda138b8dce"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-09T21:04:58.877935+00:00",
+      "user_id": "7c62369f-0a1a-4ba6-bac8-7cda138b8dce"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 1,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-09T03:02:20.037566+00:00",
+      "user_id": "814da98b-7fab-4d77-a15c-ef85873a17bc"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 0,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-09T16:50:04.979853+00:00",
+      "user_id": "814da98b-7fab-4d77-a15c-ef85873a17bc"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 0,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-10T16:08:23.551074+00:00",
+      "user_id": "87ee5c06-24e0-48ca-af55-2e720b7c8212"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 2,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-10T16:08:30.739405+00:00",
+      "user_id": "87ee5c06-24e0-48ca-af55-2e720b7c8212"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 1,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-10T17:24:19.552372+00:00",
+      "user_id": "8af11dd6-8124-4090-9555-4743616fa2fb"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 0,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-10T17:27:02.06848+00:00",
+      "user_id": "8af11dd6-8124-4090-9555-4743616fa2fb"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 0,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-11T00:12:45.152867+00:00",
+      "user_id": "8c47f63d-5ca0-4ae6-9952-e94467b922d4"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 2,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-11T00:14:46.85523+00:00",
+      "user_id": "8c47f63d-5ca0-4ae6-9952-e94467b922d4"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 0,
+      "pred_home": 3,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-10T16:33:20.992738+00:00",
+      "user_id": "908d4162-9803-4603-b838-eb09addbd7e4"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 2,
+      "pred_home": 0,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-10T16:34:09.635462+00:00",
+      "user_id": "908d4162-9803-4603-b838-eb09addbd7e4"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 1,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-09T02:47:27.852895+00:00",
+      "user_id": "96381366-0a4d-471f-b489-dab6b730a2b8"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-09T02:47:40.345882+00:00",
+      "user_id": "96381366-0a4d-471f-b489-dab6b730a2b8"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 0,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-05-28T19:53:09.933781+00:00",
+      "user_id": "98bd880d-bdee-4d37-bdfb-2cc1d8b5774d"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-10T17:25:14.360406+00:00",
+      "user_id": "98bd880d-bdee-4d37-bdfb-2cc1d8b5774d"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 1,
+      "pred_home": 3,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-06T19:21:46.715926+00:00",
+      "user_id": "9cf06fe9-6160-4a76-8f6d-6d76e9a21f16"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-06T19:24:42.530335+00:00",
+      "user_id": "9cf06fe9-6160-4a76-8f6d-6d76e9a21f16"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 0,
+      "pred_home": 3,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-11T01:14:25.433349+00:00",
+      "user_id": "9f45f156-d638-4ecc-b187-e3a64a72af46"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 0,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-11T01:04:10.07433+00:00",
+      "user_id": "9f45f156-d638-4ecc-b187-e3a64a72af46"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 1,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-05T14:26:46.356999+00:00",
+      "user_id": "9f9b5ef1-f94a-430a-8ed5-ae3b909933d3"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 0,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-05T14:27:08.109407+00:00",
+      "user_id": "9f9b5ef1-f94a-430a-8ed5-ae3b909933d3"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 0,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-09T11:55:57.797767+00:00",
+      "user_id": "a05f0e98-12bd-4f18-9fdc-05d836cb891f"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-09T11:56:13.417013+00:00",
+      "user_id": "a05f0e98-12bd-4f18-9fdc-05d836cb891f"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 1,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-10T15:47:59.924852+00:00",
+      "user_id": "a6e46056-26b8-403b-9cab-c1386d996b4f"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 3,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-10T15:48:03.489103+00:00",
+      "user_id": "a6e46056-26b8-403b-9cab-c1386d996b4f"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 1,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-05T17:22:49.308425+00:00",
+      "user_id": "a8e90710-98c8-4ca0-8988-e8f31d66da16"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-05T17:23:02.804235+00:00",
+      "user_id": "a8e90710-98c8-4ca0-8988-e8f31d66da16"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 0,
+      "pred_home": 3,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-09T14:45:18.0721+00:00",
+      "user_id": "aaa6562f-9ded-4a51-8b83-798cbd71edea"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 0,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-09T14:44:24.815042+00:00",
+      "user_id": "aaa6562f-9ded-4a51-8b83-798cbd71edea"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 0,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-10T04:39:43.960073+00:00",
+      "user_id": "ac50ff84-1632-4377-a04c-01f04d824b0b"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-10T04:40:05.856852+00:00",
+      "user_id": "ac50ff84-1632-4377-a04c-01f04d824b0b"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 0,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-06T14:34:15.024447+00:00",
+      "user_id": "ae42fc93-b78a-48c9-86b3-a23d6b7d8ab2"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-04T20:26:46.844663+00:00",
+      "user_id": "ae42fc93-b78a-48c9-86b3-a23d6b7d8ab2"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 0,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-04T00:31:46.021751+00:00",
+      "user_id": "af483a49-f05b-4e72-bc73-4db915e736ff"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 2,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-04T00:32:03.270654+00:00",
+      "user_id": "af483a49-f05b-4e72-bc73-4db915e736ff"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 0,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-07T14:50:38.841083+00:00",
+      "user_id": "bcdffc98-fe54-436c-b4cc-df7dde2e69fd"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 0,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-07T15:03:20.684236+00:00",
+      "user_id": "bcdffc98-fe54-436c-b4cc-df7dde2e69fd"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 1,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-02T02:55:29.136+00:00",
+      "user_id": "bdd049ec-e3aa-4f39-acec-52bea408ef00"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 0,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-02T02:55:45.745812+00:00",
+      "user_id": "bdd049ec-e3aa-4f39-acec-52bea408ef00"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 1,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-05T17:37:45.12152+00:00",
+      "user_id": "bf66de1c-18aa-4a5f-b6c2-46dfe61cda4e"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 0,
+      "pred_home": 3,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-05T17:37:54.912415+00:00",
+      "user_id": "bf66de1c-18aa-4a5f-b6c2-46dfe61cda4e"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 0,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-04T16:06:09.632977+00:00",
+      "user_id": "c59edccc-e37a-4937-840c-502b120411b4"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 0,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-04T16:07:22.840758+00:00",
+      "user_id": "c59edccc-e37a-4937-840c-502b120411b4"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 1,
+      "pred_home": 3,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-10T23:41:25.040358+00:00",
+      "user_id": "cc05533f-21a7-4f3d-b364-04eb80ca3ccf"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 0,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-10T23:41:41.590629+00:00",
+      "user_id": "cc05533f-21a7-4f3d-b364-04eb80ca3ccf"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 1,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-05T14:01:10.525629+00:00",
+      "user_id": "d8f20451-454d-4178-b4ec-7ac2b5d90832"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 0,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-05T14:02:34.635781+00:00",
+      "user_id": "d8f20451-454d-4178-b4ec-7ac2b5d90832"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 1,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-06T22:31:45.423331+00:00",
+      "user_id": "da0841df-6c70-4c01-ab1f-9696aeeb862c"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 2,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-06T22:32:44.04695+00:00",
+      "user_id": "da0841df-6c70-4c01-ab1f-9696aeeb862c"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 1,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-08T18:31:56.037481+00:00",
+      "user_id": "db6c1f7d-985c-4635-83f6-ff4b516997f7"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-08T18:32:04.549826+00:00",
+      "user_id": "db6c1f7d-985c-4635-83f6-ff4b516997f7"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 0,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-04T20:21:12.429348+00:00",
+      "user_id": "de9841a4-07e6-438f-9872-f1a9675508d0"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-09T12:00:58.06146+00:00",
+      "user_id": "de9841a4-07e6-438f-9872-f1a9675508d0"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 0,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-09T10:39:17.683462+00:00",
+      "user_id": "dfaa9cbf-587b-42b8-9aa4-5f532857c1b3"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 0,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-09T10:39:27.910088+00:00",
+      "user_id": "dfaa9cbf-587b-42b8-9aa4-5f532857c1b3"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 1,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-05T21:29:54.632682+00:00",
+      "user_id": "e20f949a-1c1e-4122-822b-d675ce46078f"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-05T21:31:31.318592+00:00",
+      "user_id": "e20f949a-1c1e-4122-822b-d675ce46078f"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 0,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-09T19:30:16.662475+00:00",
+      "user_id": "e77a12b6-27b4-47b0-b559-298e6497185b"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-09T19:30:30.580215+00:00",
+      "user_id": "e77a12b6-27b4-47b0-b559-298e6497185b"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 1,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-07T21:20:29.954448+00:00",
+      "user_id": "ee3b7bc9-56b0-409b-9349-31f5313e9294"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-07T21:19:39.908267+00:00",
+      "user_id": "ee3b7bc9-56b0-409b-9349-31f5313e9294"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 1,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-10T13:00:59.646522+00:00",
+      "user_id": "f0aaec3a-b9de-467e-afc7-6c9ebf855d22"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 2,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-10T13:01:29.842891+00:00",
+      "user_id": "f0aaec3a-b9de-467e-afc7-6c9ebf855d22"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 0,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-08T21:15:44.917612+00:00",
+      "user_id": "f1fbb1e1-de3f-40e4-a7f6-561084958ed5"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-08T21:16:40.082064+00:00",
+      "user_id": "f1fbb1e1-de3f-40e4-a7f6-561084958ed5"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 1,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-06T17:27:13.441326+00:00",
+      "user_id": "f2fe87c4-b4a9-415f-8d88-cfe65dad6b92"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-06T17:27:22.786594+00:00",
+      "user_id": "f2fe87c4-b4a9-415f-8d88-cfe65dad6b92"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 0,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-08T16:09:01.31165+00:00",
+      "user_id": "f33608e3-a94e-443c-93d7-545781ba870e"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-08T16:10:18.689216+00:00",
+      "user_id": "f33608e3-a94e-443c-93d7-545781ba870e"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 0,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-05T01:48:56.915383+00:00",
+      "user_id": "f48d34e7-1753-4905-9129-8433ba9415db"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-10T22:47:06.075659+00:00",
+      "user_id": "f48d34e7-1753-4905-9129-8433ba9415db"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 1,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-08T14:54:20.344374+00:00",
+      "user_id": "f619522e-ad2e-42de-bc41-c680f295d435"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-08T14:54:27.910513+00:00",
+      "user_id": "f619522e-ad2e-42de-bc41-c680f295d435"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 0,
+      "pred_home": 3,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-08T15:12:42.005044+00:00",
+      "user_id": "f7ae46f3-3847-49df-a902-6fdbe64302bc"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 2,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-08T15:12:50.952847+00:00",
+      "user_id": "f7ae46f3-3847-49df-a902-6fdbe64302bc"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 1,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-09T14:02:51.8177+00:00",
+      "user_id": "fb90a383-7642-4f2d-87c8-1f2e02d4a598"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-09T14:04:47.336766+00:00",
+      "user_id": "fb90a383-7642-4f2d-87c8-1f2e02d4a598"
+    },
+    {
+      "match_id": 1,
+      "pred_away": 0,
+      "pred_home": 2,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-06T21:55:30.497227+00:00",
+      "user_id": "fc113c1c-128f-4e53-ae2b-4e415502a6ad"
+    },
+    {
+      "match_id": 2,
+      "pred_away": 1,
+      "pred_home": 1,
+      "pred_pen_winner": null,
+      "updated_at": "2026-06-06T21:58:14.383533+00:00",
+      "user_id": "fc113c1c-128f-4e53-ae2b-4e415502a6ad"
+    }
+  ],
+  "results": [],
+  "scorer_picks": [
+    {
+      "player_id": 1921,
+      "updated_at": "2026-06-10T17:22:55.320612+00:00",
+      "user_id": "0004e726-2e11-4352-a95c-782c7dd2c08e"
+    },
+    {
+      "player_id": 1921,
+      "updated_at": "2026-06-10T21:15:31.678146+00:00",
+      "user_id": "0288ea2d-2a1d-452d-86a3-f068e3f0ca07"
+    },
+    {
+      "player_id": 1921,
+      "updated_at": "2026-06-08T17:57:05.669437+00:00",
+      "user_id": "05794113-baa6-4261-a38d-13c3cfc6ebb2"
+    },
+    {
+      "player_id": 1921,
+      "updated_at": "2026-06-07T17:01:46.250525+00:00",
+      "user_id": "05c8c965-40d9-43fc-b45f-24fa6e3e3ebd"
+    },
+    {
+      "player_id": 2131,
+      "updated_at": "2026-06-06T14:51:25.43241+00:00",
+      "user_id": "0d7abcd1-142c-466f-8d89-189cc93d0e86"
+    },
+    {
+      "player_id": 1921,
+      "updated_at": "2026-06-11T02:11:48.326564+00:00",
+      "user_id": "14ce2b86-dc32-4146-a331-bada965c2a3e"
+    },
+    {
+      "player_id": 2131,
+      "updated_at": "2026-06-10T03:16:36.583704+00:00",
+      "user_id": "1d821b3c-ac46-4bff-acc3-b65cf0ce2375"
+    },
+    {
+      "player_id": 1381,
+      "updated_at": "2026-06-10T00:19:22.671052+00:00",
+      "user_id": "203c6653-c90b-49b5-9c93-486a37dac186"
+    },
+    {
+      "player_id": 1964,
+      "updated_at": "2026-06-08T12:38:17.731342+00:00",
+      "user_id": "2176d8a9-dba7-4405-af3c-dfdd441bc830"
+    },
+    {
+      "player_id": 1921,
+      "updated_at": "2026-06-10T00:39:02.432694+00:00",
+      "user_id": "22711bc5-42a0-4886-870d-f59bc5cd526c"
+    },
+    {
+      "player_id": 1921,
+      "updated_at": "2026-06-10T16:07:08.006053+00:00",
+      "user_id": "24822b75-581a-4366-9e38-e4922b31bf57"
+    },
+    {
+      "player_id": 579,
+      "updated_at": "2026-06-06T17:22:54.338447+00:00",
+      "user_id": "2644476d-e54c-49a4-9438-a9538e5d78d9"
+    },
+    {
+      "player_id": 1921,
+      "updated_at": "2026-06-06T13:32:23.114193+00:00",
+      "user_id": "2a94bc3a-b377-4ffc-b434-04eb7e93ce5a"
+    },
+    {
+      "player_id": 107,
+      "updated_at": "2026-06-10T16:06:29.688832+00:00",
+      "user_id": "2c0e2b75-1424-42a2-bdf6-1f2371749efc"
+    },
+    {
+      "player_id": 107,
+      "updated_at": "2026-06-08T16:42:38.299143+00:00",
+      "user_id": "2e44f90d-069d-4866-96cf-ae9b0f2d45ee"
+    },
+    {
+      "player_id": 1921,
+      "updated_at": "2026-06-08T22:46:13.527128+00:00",
+      "user_id": "31a5b0b9-742b-4ebb-b934-5a42a7ca3aa8"
+    },
+    {
+      "player_id": 1962,
+      "updated_at": "2026-06-06T13:32:23.114193+00:00",
+      "user_id": "31df5529-e451-4ada-a55f-1ba4c41ae084"
+    },
+    {
+      "player_id": 1921,
+      "updated_at": "2026-06-06T13:32:23.114193+00:00",
+      "user_id": "3356bc2a-c868-434a-b8ad-bef3fe399c16"
+    },
+    {
+      "player_id": 1921,
+      "updated_at": "2026-06-10T21:49:33.122725+00:00",
+      "user_id": "34490f3a-36a2-4311-b378-be6514dee637"
+    },
+    {
+      "player_id": 1381,
+      "updated_at": "2026-06-08T21:26:46.764517+00:00",
+      "user_id": "36dc18fb-04b3-4bb5-8d9e-707aff799128"
+    },
+    {
+      "player_id": 1381,
+      "updated_at": "2026-06-08T21:54:30.605064+00:00",
+      "user_id": "3b38f476-14fb-4e73-8287-c1fb55af6c87"
+    },
+    {
+      "player_id": 1921,
+      "updated_at": "2026-06-10T17:35:06.004297+00:00",
+      "user_id": "4104da81-b3c8-4362-a61f-8eeec128513d"
+    },
+    {
+      "player_id": 1939,
+      "updated_at": "2026-06-09T21:19:38.39952+00:00",
+      "user_id": "49dd9b2e-b971-480a-80b8-8c2e8c889b94"
+    },
+    {
+      "player_id": 1921,
+      "updated_at": "2026-06-09T02:23:38.496167+00:00",
+      "user_id": "49e2603c-9e0c-454c-92d3-df9088eb6ebc"
+    },
+    {
+      "player_id": 1921,
+      "updated_at": "2026-06-09T02:23:46.968944+00:00",
+      "user_id": "4a78ab47-f1e9-49c2-adfc-4362967b19b9"
+    },
+    {
+      "player_id": 808,
+      "updated_at": "2026-06-07T21:10:54.617061+00:00",
+      "user_id": "4bb993ea-d1c4-4262-8eb8-bda13e4d7752"
+    },
+    {
+      "player_id": 1381,
+      "updated_at": "2026-06-02T16:26:55.758604+00:00",
+      "user_id": "525e03f3-831a-41b7-8658-ed3d8e0feacd"
+    },
+    {
+      "player_id": 808,
+      "updated_at": "2026-06-10T14:42:03.748817+00:00",
+      "user_id": "536ebef9-2d5e-4d04-9513-cc3fc65cba1f"
+    },
+    {
+      "player_id": 1381,
+      "updated_at": "2026-06-11T02:17:29.853817+00:00",
+      "user_id": "563a9321-08db-4029-b193-2931a421b355"
+    },
+    {
+      "player_id": 579,
+      "updated_at": "2026-06-10T19:37:31.586963+00:00",
+      "user_id": "667f50a8-7227-4631-a2f7-8ad874c332fd"
+    },
+    {
+      "player_id": 575,
+      "updated_at": "2026-06-11T00:57:12.816509+00:00",
+      "user_id": "684e6b2a-67f7-4991-a469-318ed81cdb2b"
+    },
+    {
+      "player_id": 1962,
+      "updated_at": "2026-06-08T09:43:07.273111+00:00",
+      "user_id": "6a1c428d-9e0d-4982-a825-6c9430613033"
+    },
+    {
+      "player_id": 1935,
+      "updated_at": "2026-06-09T23:05:19.035223+00:00",
+      "user_id": "6ef89236-b3f6-49ac-b0dc-0b1b9b9788c8"
+    },
+    {
+      "player_id": 1921,
+      "updated_at": "2026-06-08T12:13:36.554004+00:00",
+      "user_id": "702c5bb6-82c6-45dc-a9ac-d0af8faa4a51"
+    },
+    {
+      "player_id": 38,
+      "updated_at": "2026-06-11T00:16:06.605703+00:00",
+      "user_id": "74e2cd2b-511f-43c3-bfd5-6e708ab52c87"
+    },
+    {
+      "player_id": 1921,
+      "updated_at": "2026-06-06T13:32:23.114193+00:00",
+      "user_id": "7687e825-7b18-4f16-87e3-753266275a43"
+    },
+    {
+      "player_id": 1921,
+      "updated_at": "2026-06-10T00:52:20.308928+00:00",
+      "user_id": "7c62369f-0a1a-4ba6-bac8-7cda138b8dce"
+    },
+    {
+      "player_id": 2131,
+      "updated_at": "2026-06-11T01:37:37.771866+00:00",
+      "user_id": "814da98b-7fab-4d77-a15c-ef85873a17bc"
+    },
+    {
+      "player_id": 1381,
+      "updated_at": "2026-06-06T22:13:59.083333+00:00",
+      "user_id": "87ee5c06-24e0-48ca-af55-2e720b7c8212"
+    },
+    {
+      "player_id": 1962,
+      "updated_at": "2026-06-10T17:31:44.281613+00:00",
+      "user_id": "8af11dd6-8124-4090-9555-4743616fa2fb"
+    },
+    {
+      "player_id": 1921,
+      "updated_at": "2026-06-06T13:32:23.114193+00:00",
+      "user_id": "8c47f63d-5ca0-4ae6-9952-e94467b922d4"
+    },
+    {
+      "player_id": 1921,
+      "updated_at": "2026-06-10T16:32:20.267532+00:00",
+      "user_id": "908d4162-9803-4603-b838-eb09addbd7e4"
+    },
+    {
+      "player_id": 1962,
+      "updated_at": "2026-06-09T10:48:01.649166+00:00",
+      "user_id": "96381366-0a4d-471f-b489-dab6b730a2b8"
+    },
+    {
+      "player_id": 1381,
+      "updated_at": "2026-05-28T19:52:46.041755+00:00",
+      "user_id": "98bd880d-bdee-4d37-bdfb-2cc1d8b5774d"
+    },
+    {
+      "player_id": 1921,
+      "updated_at": "2026-06-06T13:32:23.114193+00:00",
+      "user_id": "9cf06fe9-6160-4a76-8f6d-6d76e9a21f16"
+    },
+    {
+      "player_id": 1921,
+      "updated_at": "2026-06-06T13:32:23.114193+00:00",
+      "user_id": "9f45f156-d638-4ecc-b187-e3a64a72af46"
+    },
+    {
+      "player_id": 1921,
+      "updated_at": "2026-06-06T12:51:07.776432+00:00",
+      "user_id": "9f9b5ef1-f94a-430a-8ed5-ae3b909933d3"
+    },
+    {
+      "player_id": 1921,
+      "updated_at": "2026-06-09T23:57:44.277993+00:00",
+      "user_id": "a05f0e98-12bd-4f18-9fdc-05d836cb891f"
+    },
+    {
+      "player_id": 1921,
+      "updated_at": "2026-06-10T15:50:19.799752+00:00",
+      "user_id": "a6e46056-26b8-403b-9cab-c1386d996b4f"
+    },
+    {
+      "player_id": 2131,
+      "updated_at": "2026-06-09T12:05:07.458014+00:00",
+      "user_id": "a8e90710-98c8-4ca0-8988-e8f31d66da16"
+    },
+    {
+      "player_id": 1921,
+      "updated_at": "2026-06-09T15:27:17.485898+00:00",
+      "user_id": "aaa6562f-9ded-4a51-8b83-798cbd71edea"
+    },
+    {
+      "player_id": 1921,
+      "updated_at": "2026-06-10T12:52:04.04291+00:00",
+      "user_id": "ac50ff84-1632-4377-a04c-01f04d824b0b"
+    },
+    {
+      "player_id": 808,
+      "updated_at": "2026-06-05T00:10:30.086325+00:00",
+      "user_id": "ae42fc93-b78a-48c9-86b3-a23d6b7d8ab2"
+    },
+    {
+      "player_id": 107,
+      "updated_at": "2026-06-08T23:21:53.863603+00:00",
+      "user_id": "af483a49-f05b-4e72-bc73-4db915e736ff"
+    },
+    {
+      "player_id": 1966,
+      "updated_at": "2026-06-07T13:45:51.769222+00:00",
+      "user_id": "bcdffc98-fe54-436c-b4cc-df7dde2e69fd"
+    },
+    {
+      "player_id": 1962,
+      "updated_at": "2026-06-06T13:32:23.114193+00:00",
+      "user_id": "bdd049ec-e3aa-4f39-acec-52bea408ef00"
+    },
+    {
+      "player_id": 1921,
+      "updated_at": "2026-06-06T13:32:23.114193+00:00",
+      "user_id": "bf66de1c-18aa-4a5f-b6c2-46dfe61cda4e"
+    },
+    {
+      "player_id": 1921,
+      "updated_at": "2026-06-06T18:51:51.719697+00:00",
+      "user_id": "c59edccc-e37a-4937-840c-502b120411b4"
+    },
+    {
+      "player_id": 550,
+      "updated_at": "2026-06-10T23:24:43.705413+00:00",
+      "user_id": "cc05533f-21a7-4f3d-b364-04eb80ca3ccf"
+    },
+    {
+      "player_id": 1921,
+      "updated_at": "2026-06-10T21:12:34.192803+00:00",
+      "user_id": "d8f20451-454d-4178-b4ec-7ac2b5d90832"
+    },
+    {
+      "player_id": 1921,
+      "updated_at": "2026-06-09T10:03:19.462362+00:00",
+      "user_id": "da0841df-6c70-4c01-ab1f-9696aeeb862c"
+    },
+    {
+      "player_id": 107,
+      "updated_at": "2026-06-09T21:41:51.406975+00:00",
+      "user_id": "db6c1f7d-985c-4635-83f6-ff4b516997f7"
+    },
+    {
+      "player_id": 1921,
+      "updated_at": "2026-06-10T16:15:12.402574+00:00",
+      "user_id": "de9841a4-07e6-438f-9872-f1a9675508d0"
+    },
+    {
+      "player_id": 1921,
+      "updated_at": "2026-06-09T10:36:34.396352+00:00",
+      "user_id": "dfaa9cbf-587b-42b8-9aa4-5f532857c1b3"
+    },
+    {
+      "player_id": 1921,
+      "updated_at": "2026-06-07T20:45:52.25286+00:00",
+      "user_id": "e20f949a-1c1e-4122-822b-d675ce46078f"
+    },
+    {
+      "player_id": 107,
+      "updated_at": "2026-06-09T19:34:37.642451+00:00",
+      "user_id": "e77a12b6-27b4-47b0-b559-298e6497185b"
+    },
+    {
+      "player_id": 1381,
+      "updated_at": "2026-06-10T10:59:34.032942+00:00",
+      "user_id": "ee3b7bc9-56b0-409b-9349-31f5313e9294"
+    },
+    {
+      "player_id": 1921,
+      "updated_at": "2026-06-06T13:32:23.114193+00:00",
+      "user_id": "f0aaec3a-b9de-467e-afc7-6c9ebf855d22"
+    },
+    {
+      "player_id": 1381,
+      "updated_at": "2026-06-06T19:07:54.401788+00:00",
+      "user_id": "f1fbb1e1-de3f-40e4-a7f6-561084958ed5"
+    },
+    {
+      "player_id": 1921,
+      "updated_at": "2026-06-06T17:45:26.154185+00:00",
+      "user_id": "f2fe87c4-b4a9-415f-8d88-cfe65dad6b92"
+    },
+    {
+      "player_id": 1381,
+      "updated_at": "2026-06-08T18:21:19.434265+00:00",
+      "user_id": "f33608e3-a94e-443c-93d7-545781ba870e"
+    },
+    {
+      "player_id": 1921,
+      "updated_at": "2026-06-10T11:09:05.091825+00:00",
+      "user_id": "f48d34e7-1753-4905-9129-8433ba9415db"
+    },
+    {
+      "player_id": 1381,
+      "updated_at": "2026-06-08T15:12:56.581618+00:00",
+      "user_id": "f619522e-ad2e-42de-bc41-c680f295d435"
+    },
+    {
+      "player_id": 229,
+      "updated_at": "2026-06-10T00:19:40.822525+00:00",
+      "user_id": "f7ae46f3-3847-49df-a902-6fdbe64302bc"
+    },
+    {
+      "player_id": 1921,
+      "updated_at": "2026-06-10T03:11:28.732165+00:00",
+      "user_id": "fb90a383-7642-4f2d-87c8-1f2e02d4a598"
+    },
+    {
+      "player_id": 1381,
+      "updated_at": "2026-06-07T00:08:45.454833+00:00",
+      "user_id": "fc113c1c-128f-4e53-ae2b-4e415502a6ad"
+    }
+  ],
+  "users": [
+    {
+      "name": "Trevisan",
+      "user_id": "0004e726-2e11-4352-a95c-782c7dd2c08e"
+    },
+    {
+      "name": "Giba",
+      "user_id": "0288ea2d-2a1d-452d-86a3-f068e3f0ca07"
+    },
+    {
+      "name": "MINORU",
+      "user_id": "05794113-baa6-4261-a38d-13c3cfc6ebb2"
+    },
+    {
+      "name": "FANTA",
+      "user_id": "05c8c965-40d9-43fc-b45f-24fa6e3e3ebd"
+    },
+    {
+      "name": "Claudia Zan",
+      "user_id": "0d7abcd1-142c-466f-8d89-189cc93d0e86"
+    },
+    {
+      "name": "Valter Hanaoka",
+      "user_id": "14ce2b86-dc32-4146-a331-bada965c2a3e"
+    },
+    {
+      "name": "GMA",
+      "user_id": "1d821b3c-ac46-4bff-acc3-b65cf0ce2375"
+    },
+    {
+      "name": "Nandin",
+      "user_id": "203c6653-c90b-49b5-9c93-486a37dac186"
+    },
+    {
+      "name": "Marcus TiroCerto",
+      "user_id": "2176d8a9-dba7-4405-af3c-dfdd441bc830"
+    },
+    {
+      "name": "Gordela",
+      "user_id": "22711bc5-42a0-4886-870d-f59bc5cd526c"
+    },
+    {
+      "name": "Gabriel Zan",
+      "user_id": "24822b75-581a-4366-9e38-e4922b31bf57"
+    },
+    {
+      "name": "Elda Zan",
+      "user_id": "2644476d-e54c-49a4-9438-a9538e5d78d9"
+    },
+    {
+      "name": "Rubão",
+      "user_id": "2a94bc3a-b377-4ffc-b434-04eb7e93ce5a"
+    },
+    {
+      "name": "Giacomo e Ana",
+      "user_id": "2c0e2b75-1424-42a2-bdf6-1f2371749efc"
+    },
+    {
+      "name": "Gobel.lek",
+      "user_id": "2e44f90d-069d-4866-96cf-ae9b0f2d45ee"
+    },
+    {
+      "name": "Brasilino",
+      "user_id": "31a5b0b9-742b-4ebb-b934-5a42a7ca3aa8"
+    },
+    {
+      "name": "Luriza",
+      "user_id": "31df5529-e451-4ada-a55f-1ba4c41ae084"
+    },
+    {
+      "name": "Sergio Oda",
+      "user_id": "3356bc2a-c868-434a-b8ad-bef3fe399c16"
+    },
+    {
+      "name": "Soneca",
+      "user_id": "34490f3a-36a2-4311-b378-be6514dee637"
+    },
+    {
+      "name": "Maurilio",
+      "user_id": "36dc18fb-04b3-4bb5-8d9e-707aff799128"
+    },
+    {
+      "name": "Ricardo Fantacini",
+      "user_id": "3b38f476-14fb-4e73-8287-c1fb55af6c87"
+    },
+    {
+      "name": "LFausto",
+      "user_id": "4104da81-b3c8-4362-a61f-8eeec128513d"
+    },
+    {
+      "name": "Aírton Oda",
+      "user_id": "49dd9b2e-b971-480a-80b8-8c2e8c889b94"
+    },
+    {
+      "name": "Pedro Henrique Kudo",
+      "user_id": "49e2603c-9e0c-454c-92d3-df9088eb6ebc"
+    },
+    {
+      "name": "Fabio Kudo",
+      "user_id": "4a78ab47-f1e9-49c2-adfc-4362967b19b9"
+    },
+    {
+      "name": "Karla Fantacini",
+      "user_id": "4bb993ea-d1c4-4262-8eb8-bda13e4d7752"
+    },
+    {
+      "name": "Pavie ⚽️🔮🥅",
+      "user_id": "525e03f3-831a-41b7-8658-ed3d8e0feacd"
+    },
+    {
+      "name": "Gabriel Suppa",
+      "user_id": "536ebef9-2d5e-4d04-9513-cc3fc65cba1f"
+    },
+    {
+      "name": "Silvinho",
+      "user_id": "563a9321-08db-4029-b193-2931a421b355"
+    },
+    {
+      "name": "Enrique",
+      "user_id": "667f50a8-7227-4631-a2f7-8ad874c332fd"
+    },
+    {
+      "name": "Chico",
+      "user_id": "684e6b2a-67f7-4991-a469-318ed81cdb2b"
+    },
+    {
+      "name": "Gigio",
+      "user_id": "6a1c428d-9e0d-4982-a825-6c9430613033"
+    },
+    {
+      "name": "Paulooda",
+      "user_id": "6ef89236-b3f6-49ac-b0dc-0b1b9b9788c8"
+    },
+    {
+      "name": "Paulo Lara",
+      "user_id": "702c5bb6-82c6-45dc-a9ac-d0af8faa4a51"
+    },
+    {
+      "name": "Ammss",
+      "user_id": "74e2cd2b-511f-43c3-bfd5-6e708ab52c87"
+    },
+    {
+      "name": "Akemi",
+      "user_id": "7687e825-7b18-4f16-87e3-753266275a43"
+    },
+    {
+      "name": "Diniz",
+      "user_id": "7c62369f-0a1a-4ba6-bac8-7cda138b8dce"
+    },
+    {
+      "name": "Daniel Oda",
+      "user_id": "814da98b-7fab-4d77-a15c-ef85873a17bc"
+    },
+    {
+      "name": "Samuel Lima",
+      "user_id": "87ee5c06-24e0-48ca-af55-2e720b7c8212"
+    },
+    {
+      "name": "Lulion09",
+      "user_id": "8af11dd6-8124-4090-9555-4743616fa2fb"
+    },
+    {
+      "name": "Gabriel Rossato",
+      "user_id": "8c47f63d-5ca0-4ae6-9952-e94467b922d4"
+    },
+    {
+      "name": "Cassio",
+      "user_id": "908d4162-9803-4603-b838-eb09addbd7e4"
+    },
+    {
+      "name": "Fabiana",
+      "user_id": "96381366-0a4d-471f-b489-dab6b730a2b8"
+    },
+    {
+      "name": "Leco",
+      "user_id": "98bd880d-bdee-4d37-bdfb-2cc1d8b5774d"
+    },
+    {
+      "name": "Caio Branco",
+      "user_id": "9cf06fe9-6160-4a76-8f6d-6d76e9a21f16"
+    },
+    {
+      "name": "Gabriela França",
+      "user_id": "9f45f156-d638-4ecc-b187-e3a64a72af46"
+    },
+    {
+      "name": "Sussumu",
+      "user_id": "9f9b5ef1-f94a-430a-8ed5-ae3b909933d3"
+    },
+    {
+      "name": "helena",
+      "user_id": "a05f0e98-12bd-4f18-9fdc-05d836cb891f"
+    },
+    {
+      "name": "Denis",
+      "user_id": "a6e46056-26b8-403b-9cab-c1386d996b4f"
+    },
+    {
+      "name": "THD",
+      "user_id": "a8e90710-98c8-4ca0-8988-e8f31d66da16"
+    },
+    {
+      "name": "Vânia",
+      "user_id": "aaa6562f-9ded-4a51-8b83-798cbd71edea"
+    },
+    {
+      "name": "Buchecha",
+      "user_id": "ac50ff84-1632-4377-a04c-01f04d824b0b"
+    },
+    {
+      "name": "Adriano RPO",
+      "user_id": "ae42fc93-b78a-48c9-86b3-a23d6b7d8ab2"
+    },
+    {
+      "name": "Haroldo Chaud",
+      "user_id": "af483a49-f05b-4e72-bc73-4db915e736ff"
+    },
+    {
+      "name": "Tita",
+      "user_id": "bcdffc98-fe54-436c-b4cc-df7dde2e69fd"
+    },
+    {
+      "name": "Rumiko",
+      "user_id": "bdd049ec-e3aa-4f39-acec-52bea408ef00"
+    },
+    {
+      "name": "Angela Watanabe",
+      "user_id": "bf66de1c-18aa-4a5f-b6c2-46dfe61cda4e"
+    },
+    {
+      "name": "Tiago Carvalho",
+      "user_id": "c59edccc-e37a-4937-840c-502b120411b4"
+    },
+    {
+      "name": "Franҫa",
+      "user_id": "cc05533f-21a7-4f3d-b364-04eb80ca3ccf"
+    },
+    {
+      "name": "João Paulo Feres",
+      "user_id": "d8f20451-454d-4178-b4ec-7ac2b5d90832"
+    },
+    {
+      "name": "Flávia e Luiz",
+      "user_id": "da0841df-6c70-4c01-ab1f-9696aeeb862c"
+    },
+    {
+      "name": "Letícia Oda",
+      "user_id": "db6c1f7d-985c-4635-83f6-ff4b516997f7"
+    },
+    {
+      "name": "Joao Leite (MH)",
+      "user_id": "de9841a4-07e6-438f-9872-f1a9675508d0"
+    },
+    {
+      "name": "Sergio Kudo",
+      "user_id": "dfaa9cbf-587b-42b8-9aa4-5f532857c1b3"
+    },
+    {
+      "name": "Daniel Feres",
+      "user_id": "e20f949a-1c1e-4122-822b-d675ce46078f"
+    },
+    {
+      "name": "Zeppa",
+      "user_id": "e77a12b6-27b4-47b0-b559-298e6497185b"
+    },
+    {
+      "name": "Meirelles",
+      "user_id": "ee3b7bc9-56b0-409b-9349-31f5313e9294"
+    },
+    {
+      "name": "Mateus O Lima",
+      "user_id": "f0aaec3a-b9de-467e-afc7-6c9ebf855d22"
+    },
+    {
+      "name": "Fervana",
+      "user_id": "f1fbb1e1-de3f-40e4-a7f6-561084958ed5"
+    },
+    {
+      "name": "Telma",
+      "user_id": "f2fe87c4-b4a9-415f-8d88-cfe65dad6b92"
+    },
+    {
+      "name": "Bingão",
+      "user_id": "f33608e3-a94e-443c-93d7-545781ba870e"
+    },
+    {
+      "name": "Ana Paula",
+      "user_id": "f48d34e7-1753-4905-9129-8433ba9415db"
+    },
+    {
+      "name": "Heitor",
+      "user_id": "f619522e-ad2e-42de-bc41-c680f295d435"
+    },
+    {
+      "name": "Rodrigo e Diego",
+      "user_id": "f7ae46f3-3847-49df-a902-6fdbe64302bc"
+    },
+    {
+      "name": "Amanda Carvalho",
+      "user_id": "fb90a383-7642-4f2d-87c8-1f2e02d4a598"
+    },
+    {
+      "name": "LUÍS HENRIQUE",
+      "user_id": "fc113c1c-128f-4e53-ae2b-4e415502a6ad"
+    }
+  ],
+  "version": 3
+}
