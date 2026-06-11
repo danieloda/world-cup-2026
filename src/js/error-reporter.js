@@ -28,6 +28,23 @@ function trunc(s, n) {
   return s == null ? null : String(s).slice(0, n);
 }
 
+// Origens de terceiros que NÃO são nosso código: extensões do navegador e
+// content blockers que injetam script na página (ex.: carteiras cripto que
+// disputam window.ethereum). Erros vindos daí não são acionáveis.
+const THIRD_PARTY = /\b(?:chrome|moz|safari(?:-web)?|ms-browser|webkit-masked-url)-extension:\/\//i;
+
+// Erros sem valor de observabilidade — só geram ruído no Telegram do admin:
+//   - "Script error.": erro de script cross-origin SEM CORS. O navegador esconde
+//     mensagem/linha/stack por segurança. Nosso código é same-origin (reportaria
+//     detalhe real), então isso é sempre terceiro (extensão/blocker/injeção).
+//   - Stack/origem em extensão do navegador (vide THIRD_PARTY).
+// Espelha o ignoreErrors padrão do Sentry. KEEP IN SYNC: 048/049 (alerta/digest).
+function isNoise(message, source, stack) {
+  if (/^script error\.?$/i.test(String(message ?? '').trim())) return true;
+  if (THIRD_PARTY.test(source ?? '') || THIRD_PARTY.test(stack ?? '')) return true;
+  return false;
+}
+
 async function report(kind, message, { source = '', line = '', stack = null } = {}) {
   try {
     if (!currentUserId || sentCount >= MAX_PER_LOAD) return;
@@ -81,13 +98,17 @@ export function installErrorReporter(userId) {
   installed = true;
 
   window.addEventListener('error', (e) => {
+    const stack = e.error?.stack;
+    if (isNoise(e.message, e.filename, stack)) return;
     report('error', e.message || 'window.onerror', {
-      source: e.filename, line: e.lineno, stack: e.error?.stack,
+      source: e.filename, line: e.lineno, stack,
     });
   });
 
   window.addEventListener('unhandledrejection', (e) => {
     const r = e.reason;
-    report('unhandledrejection', r?.message || String(r), { stack: r?.stack });
+    const msg = r?.message || String(r);
+    if (isNoise(msg, null, r?.stack)) return;
+    report('unhandledrejection', msg, { stack: r?.stack });
   });
 }
