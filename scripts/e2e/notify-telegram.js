@@ -25,9 +25,12 @@ function buildBody() {
   let raw = '';
   try { raw = readFileSync(logPath, 'utf8'); } catch { return ''; }
   const fails = stripAnsi(raw).split('\n').filter((l) => l.includes('✗')).slice(0, 15);
-  const ctx = process.env.GITHUB_RUN_ID
-    ? `\n\nRun: https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`
+  // Link direto/explícito (mesma regra da 045: label = URL) — não depende do
+  // auto-link do cliente Telegram.
+  const runUrl = process.env.GITHUB_RUN_ID
+    ? `https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`
     : '';
+  const ctx = runUrl ? `\n\nRun: <a href="${runUrl}">${runUrl}</a>` : '';
   if (fails.length === 0) return ctx;
   const escaped = fails.map((l) => l.replace(/[<>&]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c])));
   return `\n<pre>${escaped.join('\n')}</pre>${ctx}`;
