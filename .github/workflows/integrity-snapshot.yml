@@ -67,9 +67,20 @@ jobs:
           git commit -m "chore(integrity): snapshot automático dos palpites travados [skip ci]"
           git push
 
-      # Palpites recém-lacrados no grupo — SÓ depois do verify + commit/push:
-      # se qualquer passo acima falhar, o grupo não recebe link de relatório
-      # que não foi publicado. Sem jogo novo no lacre → no-op.
+      # Confirma que o report deste lacre EXISTE no GitHub (raw + chain_hash)
+      # e registra a publicação no banco — é o que revela os palpites no app
+      # antes do apito (migration 060). Falhou → app segue no fallback do
+      # apito e este passo fica vermelho.
+      - name: Confirma publicação e libera revelação no app
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/integrity/confirm-publication.js
+
+      # Palpites recém-lacrados no grupo — SÓ depois do verify + commit/push +
+      # confirmação acima: se qualquer passo anterior falhar, o grupo não
+      # recebe link de relatório que não foi publicado. Sem jogo novo no
+      # lacre → no-op.
       - name: Posta palpites recém-lacrados (depois do publish)
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}

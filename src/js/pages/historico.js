@@ -9,6 +9,7 @@ import {
 import { scorerBonus, stageMultiplier, scoreBreakdown } from '../scoring.js';
 import { KPI } from '../kpi-icons.js';
 import { initTooltips } from '../tooltip.js';
+import { startAutoRefresh } from '../auto-refresh.js';
 
 // ============================================================
 // Ícones (SVG inline — nada de emoji na UI)
@@ -24,7 +25,7 @@ const ICON = {
 // Estado
 // ============================================================
 let profile, stats;
-let revealedMatches = [];          // jogos já iniciados (match_date <= now), desc por data
+let revealedMatches = [];          // jogos revelados (lacre publicado OU já começados), desc por data
 let predsByMatch = new Map();      // match_id -> [{...prediction, profiles}]
 let goalsByMatch = new Map();      // match_id -> [{...goal, players}]
 let scorerPickByUser = new Map();  // user_id -> { playerId, name }  (artilheiro escolhido)
@@ -47,6 +48,7 @@ try {
   pageBody.classList.add('fade-up');
 
   attachEventListeners();
+  startAutoRefresh();  // lacre publicado / apito / resultado lançado → recarrega
 } catch (err) {
   console.error('[historico] FATAL:', err);
   reportFatal('historico', err);
@@ -65,9 +67,11 @@ try {
 async function loadData() {
   const [statsRes, matchesRes] = await Promise.all([
     supabase.from('v_pool_stats').select('*').single(),
-    // Um jogo entra no Histórico quando JÁ COMEÇOU (apito inicial): é o momento
-    // em que o RLS revela os palpites alheios (predictions_select_own_or_locked).
-    supabase.from('matches').select('*').lte('match_date', new Date().toISOString())
+    // Um jogo entra no Histórico quando os palpites de todos estão REVELADOS:
+    // lacre do dia publicado no GitHub OU jogo já começado (fallback). A view
+    // v_revealed_matches (migration 060) usa o MESMO predicado do RLS
+    // (predictions_select_own_or_revealed) — página e banco nunca divergem.
+    supabase.from('v_revealed_matches').select('*')
       .order('match_date', { ascending: false }),
   ]);
 
@@ -165,7 +169,7 @@ function stageDays() {
 // Render — página
 // ============================================================
 function renderPage() {
-  // Antes da Copa começar nenhum jogo foi revelado (nenhum começou): em vez de uma
+  // Antes do primeiro lacre publicado nenhum jogo foi revelado: em vez de uma
   // tela vazia, mostramos uma PRÉVIA desfocada do que a página vai exibir.
   if (revealedMatches.length === 0) {
     return `
@@ -174,7 +178,7 @@ function renderPage() {
         <h1 class="hero-title">Palpites da galera</h1>
         <div class="hero-meta">${heroMeta([
           '<b>A Copa ainda não começou</b>',
-          { html: 'os palpites de todos aparecem aqui assim que a bola rolar', flow: true },
+          { html: 'os palpites de todos aparecem aqui assim que o lacre do dia for publicado', flow: true },
         ])}</div>
       </section>
 
@@ -197,7 +201,7 @@ function renderPage() {
 
     <div class="hist-note">
       ${ICON.info}
-      <span>Os palpites de todos ficam visíveis quando o jogo começa — em <b>Próximas partidas</b> sem pontos, e em <b>Finalizadas</b> já pontuados.</span>
+      <span>Os palpites de todos ficam visíveis quando o lacre do dia é publicado — em <b>Próximas partidas</b> sem pontos, e em <b>Finalizadas</b> já pontuados.</span>
     </div>
 
     ${renderStageTabs()}
@@ -213,7 +217,7 @@ function renderPage() {
 // ============================================================
 function renderPreview() {
   // Exemplos 100% fictícios só para mostrar o formato da tela. Ninguém vê palpite
-  // de ninguém antes do apito inicial — por isso fica borrado e marcado como "Prévia".
+  // de ninguém antes do lacre publicado — por isso fica borrado e marcado como "Prévia".
   const demos = [
     {
       home: 'Brazil', away: 'Croatia', sh: 2, sa: 1, stage: 'Grupo C',
@@ -579,13 +583,17 @@ function renderFinishedCard(m) {
 // ----- Próxima partida (aguardando): palpites de todos, SEM pontos -----
 function renderAwaitingCard(m) {
   const live = isLive(m);
+  const started = new Date(m.match_date) <= new Date();
   // Ordena por total de gols desc → mandante desc → nome ("Você" fica destacado pelo estilo)
   const bets = [...(predsByMatch.get(m.id) ?? [])].sort((a, b) =>
     predGoals(b) - predGoals(a)
     || (b.pred_home ?? 0) - (a.pred_home ?? 0)
     || (a.profiles?.full_name || '').localeCompare(b.profiles?.full_name || '')
   );
-  const status = `<div class="hh-status"><span class="pill ${live ? 'live' : 'locked'}">${live ? 'Ao vivo' : 'Aguardando resultado'}</span></div>`;
+  // Revelado pelo lacre mas ainda sem apito → "Lacrado": deixa claro que os
+  // palpites estão visíveis porque ninguém pode mais editar (não por jogo rolando).
+  const pillTxt = live ? 'Ao vivo' : started ? 'Aguardando resultado' : 'Lacrado · aguarda o apito';
+  const status = `<div class="hh-status"><span class="pill ${live ? 'live' : 'locked'}">${pillTxt}</span></div>`;
 
   return `
     <div class="history-card ${stageCls(m)} awaiting">

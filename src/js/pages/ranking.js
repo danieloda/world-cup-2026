@@ -11,6 +11,7 @@ import { renderRankChart } from '../rank-chart.js';
 import { loadProgression, demoProgression } from '../progression.js';
 import { initTooltips } from '../tooltip.js';
 import { sortLeaderboard, assignRanksAndPrizes } from '../prize.js';
+import { startAutoRefresh } from '../auto-refresh.js';
 
 // ============================================================
 // Estado
@@ -62,6 +63,7 @@ try {
 
   attachEventListeners();
   initTooltips();  // tooltips dos termos de pontuação (cabeçalhos da tabela)
+  startAutoRefresh();  // resultado lançado → recarrega (tabela + gráfico)
 } catch (err) {
   console.error('[ranking] FATAL:', err);
   reportFatal('ranking', err);

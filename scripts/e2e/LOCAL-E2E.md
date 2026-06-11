@@ -26,6 +26,18 @@ docker exec -i $CID psql -U postgres -d postgres < supabase/seed/03_settings.sql
 > O `01_matches.sql` já faz o backfill de `slot_home/away` no final — sem isso o
 > mata-mata não resolve (a migration 005 backfilla antes do seed, em tabela vazia).
 
+### 2.5 Grants de paridade com prod (CLI ≥ ~2.1xx)
+A imagem local nova NÃO dá mais DML a `anon/authenticated/service_role` por
+default privilege em tabela criada por `postgres` (ficam só TRUNCATE/REFERENCES/
+TRIGGER) — sem isto TODO E2E falha com `permission denied for table …`. Prod
+(projeto antigo) tem esses grants; replique:
+```bash
+docker exec -i $CID psql -U postgres -d postgres -c "
+grant select, insert, update, delete on all tables in schema public to anon, authenticated, service_role;
+grant usage, select on all sequences in schema public to anon, authenticated, service_role;"
+```
+> RLS continua mandando (grant ≠ policy). Re-rode após cada `db reset`.
+
 ## 3. (Opcional) Desativar triggers de alerta localmente
 Evita POSTs ao edge de produção (Telegram). Inofensivos sem a key, mas para zero
 contato externo:
@@ -94,6 +106,9 @@ docker cp scripts/e2e/scenarios/scoring-sql.sql $CID:/tmp/ && docker exec $CID p
 #   ^ score_prediction (DB) vs canônico ag/ave/dg por fase + pênaltis (47 checks)
 docker cp scripts/e2e/scenarios/tiebreak.sql $CID:/tmp/ && docker exec $CID psql -U postgres -d postgres -f /tmp/tiebreak.sql
 docker cp scripts/e2e/scenarios/qualifier-bonus.sql $CID:/tmp/ && docker exec $CID psql -U postgres -d postgres -f /tmp/qualifier-bonus.sql
+docker exec -i $CID psql -U postgres -d postgres -v ON_ERROR_STOP=1 < scripts/e2e/scenarios/reveal-publication.sql
+#   ^ revelação pós-publicação do lacre (migration 060): publicado→vê pré-apito,
+#     adiado→re-esconde, apito→fallback, escrita só service_role (12 checks)
 
 # Cobertura estendida (cada um faz snapshot/restore do que mexe):
 node scripts/e2e/test-storage-and-validation.js   # RLS de avatar Storage + validação de placar

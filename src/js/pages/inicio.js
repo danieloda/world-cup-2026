@@ -11,6 +11,7 @@ import {
 } from '../util.js';
 import { renderJourneyChart } from '../journey-chart.js';
 import { loadProgression, demoProgression } from '../progression.js';
+import { startAutoRefresh } from '../auto-refresh.js';
 
 // Estado da página
 let profile, stats, todayMatches, upcomingMatches, myStanding, lockAlerts;
@@ -425,6 +426,7 @@ try {
   pageBody.classList.add('fade-up');
   startCountdown();  // ticker do bloco "próximo jogo"
   mountJourney();    // gráfico "Sua jornada" (assíncrono, não trava a página)
+  startAutoRefresh(); // resultado lançado / jogo começando → recarrega (KPIs, jornada)
 } catch (err) {
   console.error('[inicio] FATAL:', err);
   reportFatal('inicio', err);

@@ -68,13 +68,16 @@ check('v_leaderboard consultável', !lb.error, lb.error ? lb.error.message.slice
 // Incidente 2026-06-09: re-colar a 039/034 no SQL Editor depois da 040 revogou
 // champion_bonus_for e derrubou ranking.html pra todo usuário logado, com este
 // smoke VERDE (service_role tem grant próprio e não enxerga). grants_health()
-// (migration 057) é definer e responde pelos grants de authenticated.
-// KEEP IN SYNC: supabase/migrations/057_regrant_leaderboard_fns.sql.
-log('b', '\n[2.5] Grants críticos (visão authenticated, via grants_health/057)');
+// (migrations 057/060) é definer e responde pelos grants de authenticated.
+// KEEP IN SYNC: supabase/migrations/057_regrant_leaderboard_fns.sql e
+// 060_reveal_after_publication.sql.
+log('b', '\n[2.5] Grants críticos (visão authenticated, via grants_health/057+060)');
 {
   const MUST_TRUE = [
     'champion_bonus_for__auth_exec', 'scorer_bonus_for__auth_exec', 'stage_multiplier__auth_exec',
     'v_leaderboard__auth_select', 'v_scorer_ranking__auth_select', 'v_pool_stats__auth_select',
+    // 060: Histórico consome a view; publications alimenta a revelação pós-lacre
+    'v_revealed_matches__auth_select', 'integrity_publications__auth_select',
   ];
   const MUST_FALSE = [
     'score_prediction__auth_exec', 'recompute_prediction_points__auth_exec', 'compute_predicted_slots__auth_exec',
@@ -85,8 +88,13 @@ log('b', '\n[2.5] Grants críticos (visão authenticated, via grants_health/057)
     log('y', '   ⚠ grants_health() ausente — aplicar migration 057 no SQL Editor');
   } else if (ghErr) {
     check('grants_health() responde', false, ghErr.message.slice(0, 60));
+  } else if (!('v_revealed_matches__auth_select' in gh)) {
+    // 060 ainda não aplicada: as chaves novas não existem — avisa sem falhar.
+    log('y', '   ⚠ grants_health() sem as chaves da 060 — aplicar migration 060 no SQL Editor');
+    for (const k of MUST_TRUE.filter((k) => k in gh)) check(`${k} = true`, gh[k] === true, gh[k] === true ? '' : 'GRANT PERDIDO — ranking quebra; re-aplicar 057');
+    for (const k of MUST_FALSE) check(`${k} = false`, gh[k] === false, gh[k] === false ? '' : 'função sensível EXPOSTA — re-aplicar 034');
   } else {
-    for (const k of MUST_TRUE) check(`${k} = true`, gh[k] === true, gh[k] === true ? '' : 'GRANT PERDIDO — ranking quebra; re-aplicar 057');
+    for (const k of MUST_TRUE) check(`${k} = true`, gh[k] === true, gh[k] === true ? '' : 'GRANT PERDIDO — re-aplicar 057/060');
     for (const k of MUST_FALSE) check(`${k} = false`, gh[k] === false, gh[k] === false ? '' : 'função sensível EXPOSTA — re-aplicar 034');
   }
 }

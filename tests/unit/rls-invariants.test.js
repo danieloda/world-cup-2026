@@ -62,10 +62,29 @@ describe('invariantes de RLS (anti-regressão das migrations)', () => {
     expect(p).toMatch(/prediction_deadline/);
   });
 
-  it('predictions SELECT: não vaza palpite alheio antes do apito', () => {
-    const p = latestPolicy('predictions_select_own_or_locked');
+  it('predictions SELECT: revela alheio só com lacre publicado ou após o apito (060)', () => {
+    const p = latestPolicy('predictions_select_own_or_revealed');
     expect(p).toMatch(/user_id = auth\.uid\(\)/);
-    expect(p).toMatch(/match_date <= now\(\)/);
+    expect(p).toMatch(/match_date <= now\(\)/);       // fallback do apito
+    expect(p).toMatch(/prediction_deadline/);         // nunca antes da trava da véspera
+    expect(p).toMatch(/integrity_publications/);      // gate: lacre publicado no GitHub
+    // a policy antiga (apito-only) tem que ter sido derrubada na 060
+    const dropped = lastStatement(/drop policy if exists "predictions_select_own_or_locked"[^;]*;/gis);
+    expect(dropped, 'falta o drop da policy antiga').toBeTruthy();
+  });
+
+  it('integrity_publications: leitura authenticated, escrita só service_role (060)', () => {
+    const p = latestPolicy('integrity_publications_select_all');
+    expect(p).toMatch(/for select/);
+    // NENHUMA policy de escrita pra authenticated: quem registra publicação é a
+    // Action (service_role, bypassa RLS) — usuário não pode "publicar" lacre.
+    const writePol = lastStatement(/create policy[^;]*on public\.integrity_publications[^;]*for (insert|update|delete|all)[^;]*;/gis);
+    expect(writePol, 'integrity_publications NÃO pode ter policy de escrita').toBeNull();
+    // ^-anchor (multiline): não casa menções em comentário `-- ...`, só statements.
+    // service_role é o escritor designado (confirm-publication.js) — a proibição
+    // de grant de escrita vale pra authenticated/anon.
+    const writeGrant = lastStatement(/^\s*grant[^;]*\b(insert|update|delete|all)\b[^;]*on public\.integrity_publications[^;]*\b(authenticated|anon)\b[^;]*;/gims);
+    expect(writeGrant, 'integrity_publications NÃO pode ter grant de escrita pra authenticated/anon').toBeNull();
   });
 
   it('profiles UPDATE: não dá pra auto-promover a admin/paid', () => {

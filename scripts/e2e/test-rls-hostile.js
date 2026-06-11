@@ -8,6 +8,8 @@
  *   2. Alice NÃO pode editar prediction do Bob
  *   3. Alice NÃO vê predictions do Bob ANTES do kickoff
  *   4. Alice VÊ predictions do Bob DEPOIS do kickoff (esperado — histórico)
+ *  4b. Alice VÊ predictions do Bob com lacre PUBLICADO pré-apito (migration 060)
+ *  4c. Publicação não basta sem deadline passado (defesa em profundidade da 060)
  *   5. Alice NÃO pode marcar a si mesma como paid/admin (escalonamento)
  *   6. Alice NÃO vê champion_pick do Bob antes do deadline
  *   7. Alice NÃO pode inserir champion_pick com user_id do Bob
@@ -41,6 +43,15 @@ const ALICE_EMAIL = `test-alice-${TS}@testuser.com`;
 const BOB_EMAIL = `test-bob-${TS}@testuser.com`;
 const PASSWORD = 'TestRls2026!';
 const TEST_MATCH = 1;
+const PUB_SEQ = 999999;   // seq sintético em integrity_publications (4b/4c) — nunca colide com lacre real
+
+// Deadline do palpite: véspera 23h59 BRT — cópia de src/js/util.js (KEEP IN SYNC).
+const BRT_OFFSET_MS = 3 * 3600000;
+function predictionDeadline(matchDate) {
+  const brt = new Date(new Date(matchDate).getTime() - BRT_OFFSET_MS);
+  const wall = Date.UTC(brt.getUTCFullYear(), brt.getUTCMonth(), brt.getUTCDate() - 1, 23, 59, 0);
+  return new Date(wall + BRT_OFFSET_MS);
+}
 
 const C = { reset: '\x1b[0m', red: '\x1b[31m', green: '\x1b[32m', yellow: '\x1b[33m', blue: '\x1b[34m', bold: '\x1b[1m', dim: '\x1b[2m' };
 const log = (c, m) => console.log(`${C[c] || ''}${m}${C.reset}`);
@@ -86,6 +97,7 @@ async function teardown() {
     if (origMatchDate) await admin.from('matches').update({ match_date: origMatchDate }).eq('id', TEST_MATCH);
     if (origFinished !== null) await admin.from('matches').update({ finished: origFinished }).eq('id', TEST_MATCH);
     if (origDeadline) await admin.from('settings').upsert({ key: 'deadline_champion_scorer', value: JSON.stringify(origDeadline) });
+    await admin.from('integrity_publications').delete().eq('seq', PUB_SEQ);  // rede de segurança do 4b/4c
   } catch (e) { log('red', `   ⚠ restore: ${e.message}`); }
   for (const u of [alice, bob]) {
     if (!u) continue;
@@ -131,6 +143,33 @@ async function main() {
   const { data: seenAfter } = await aliceClient.from('predictions').select('*').eq('user_id', bob.id).eq('match_id', TEST_MATCH);
   check('Vê palpite alheio após kickoff (esperado)', (seenAfter?.length ?? 0) === 1, `viu ${seenAfter?.length} rows`);
   await admin.from('matches').update({ match_date: '2027-01-01T00:00:00+00:00' }).eq('id', TEST_MATCH);
+
+  // ===== Revelação pós-lacre (migration 060) =====
+  log('blue', '\n[4b] Lacre PUBLICADO antes do apito → Alice VÊ (migration 060):');
+  // Jogo daqui a 30 min: deadline (véspera 23h59 BRT) já passou, apito ainda não.
+  // Edge: rodando entre 23h29–23h59 BRT o "daqui a 30 min" cai no dia BRT
+  // seguinte e o deadline ainda não passou — cenário não se aplica (skip).
+  const soon = new Date(Date.now() + 30 * 60000);
+  const pubIns = await admin.from('integrity_publications').upsert({
+    seq: PUB_SEQ, report_file: 'reports/test-rls-hostile.md',
+    chain_hash: 'test-rls-hostile', locked_match_ids: [TEST_MATCH],
+  });
+  if (pubIns.error) {
+    log('yellow', `   ⚠ integrity_publications indisponível (${pubIns.error.message.slice(0, 50)}) — aplicar migration 060; 4b/4c pulados`);
+  } else if (predictionDeadline(soon) > new Date()) {
+    log('yellow', '   ⚠ janela de meia-noite BRT — 4b/4c pulados (deadline do jogo-teste ainda não teria passado)');
+    await admin.from('integrity_publications').delete().eq('seq', PUB_SEQ);
+  } else {
+    await admin.from('matches').update({ match_date: soon.toISOString() }).eq('id', TEST_MATCH);
+    const { data: seenPub } = await aliceClient.from('predictions').select('*').eq('user_id', bob.id).eq('match_id', TEST_MATCH);
+    check('Vê palpite alheio com lacre publicado pré-apito (060)', (seenPub?.length ?? 0) === 1, `viu ${seenPub?.length ?? 0} rows`);
+
+    log('blue', '\n[4c] Publicação NÃO basta sem deadline passado (defesa em profundidade):');
+    await admin.from('matches').update({ match_date: '2027-01-01T00:00:00+00:00' }).eq('id', TEST_MATCH);
+    const { data: seenFut } = await aliceClient.from('predictions').select('*').eq('user_id', bob.id).eq('match_id', TEST_MATCH);
+    check('Jogo re-agendado pro futuro re-esconde mesmo publicado (060)', (seenFut?.length ?? 0) === 0, `viu ${seenFut?.length ?? 0} rows`);
+    await admin.from('integrity_publications').delete().eq('seq', PUB_SEQ);
+  }
 
   log('blue', '\n[5] Alice tenta se promover a paid/admin (escalonamento):');
   r = await aliceClient.from('profiles').update({ paid: true, is_admin: true }).eq('id', alice.id);
