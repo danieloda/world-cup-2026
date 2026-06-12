@@ -793,6 +793,13 @@
   ],
   "Czech Republic": [
     [
+      "2026-06-12",
+      "South Korea",
+      false,
+      "1-2",
+      "World Cup"
+    ],
+    [
       "2026-06-05",
       "Guatemala",
       true,
@@ -854,13 +861,6 @@
       true,
       "1-1",
       "Amistoso"
-    ],
-    [
-      "2025-09-05",
-      "Montenegro",
-      false,
-      "2-0",
-      "Eliminatórias"
     ]
   ],
   "Ecuador": [
@@ -1729,6 +1729,13 @@
   ],
   "Mexico": [
     [
+      "2026-06-11",
+      "South Africa",
+      true,
+      "2-0",
+      "World Cup"
+    ],
+    [
       "2026-06-05",
       "Serbia",
       true,
@@ -1789,13 +1796,6 @@
       "Paraguay",
       true,
       "1-2",
-      "Amistoso"
-    ],
-    [
-      "2025-11-16",
-      "Uruguay",
-      true,
-      "0-0",
       "Amistoso"
     ]
   ],
@@ -2593,6 +2593,13 @@
   ],
   "South Africa": [
     [
+      "2026-06-11",
+      "Mexico",
+      false,
+      "0-2",
+      "World Cup"
+    ],
+    [
       "2026-06-06",
       "Jamaica",
       false,
@@ -2654,16 +2661,16 @@
       true,
       "1-0",
       "Amistoso"
-    ],
-    [
-      "2025-11-15",
-      "Zambia",
-      true,
-      "3-1",
-      "Amistoso"
     ]
   ],
   "South Korea": [
+    [
+      "2026-06-12",
+      "Czech Republic",
+      true,
+      "2-1",
+      "World Cup"
+    ],
     [
       "2026-06-04",
       "El Salvador",
@@ -2725,13 +2732,6 @@
       "Mexico",
       false,
       "2-2",
-      "Amistoso"
-    ],
-    [
-      "2025-09-06",
-      "USA",
-      false,
-      "2-0",
       "Amistoso"
     ]
   ],
