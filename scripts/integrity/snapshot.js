@@ -263,11 +263,13 @@ async function main() {
   console.log(`   chain_hash:   ${chainHash}`);
   console.log(`   relatório:    integrity/reports/${reportFname}`);
 
+  // Link sempre puro e visível (feedback 2026-06-12).
   await postTelegram(
     `🔒 <b>Snapshot de integridade #${seq}</b>\n` +
     `${lockedIds.length} jogos travados · ${preds.length} palpites\n` +
     `<code>chain ${chainHash}</code>\n` +
-    `📄 <a href="${REPO_URL}/blob/${BRANCH}/integrity/reports/${reportFname}">Relatório do lacre (o que travou e como conferir)</a>`
+    `📄 Relatório do lacre (o que travou e como conferir):\n` +
+    `${REPO_URL}/blob/${BRANCH}/integrity/reports/${reportFname}`
   );
 
   // Palpites recém-lacrados (decisão 2026-06-11): as mensagens são GERADAS

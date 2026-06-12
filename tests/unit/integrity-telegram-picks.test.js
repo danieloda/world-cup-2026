@@ -92,7 +92,7 @@ describe('escopo — só o que travou NESTE lacre vira bloco de jogo', () => {
   const all = msgs.join('\n');
 
   it('inclui os jogos novos com nome traduzido, fase e horário BRT', () => {
-    expect(all).toContain('<b>México × Polônia</b> · Grupos · qui 11/06 17:00');
+    expect(all).toContain('<b>México × Polônia</b>\nGrupos · qui 11/06 17:00');
     expect(all).toContain('<b>Canadá × Senegal</b>');
   });
 
@@ -117,7 +117,7 @@ describe('estatísticas por jogo — sem lista de palpites', () => {
   });
 
   it('placar da galera = placar mais cravado, com contagem', () => {
-    expect(all).toContain('🔥 Placar da galera: 2×1 (2 cravaram)');
+    expect(all).toContain('🔥 Placar da galera: 2×1 (2 palpitaram)');
   });
 
   it('aposta solitária nomeia quem está sozinho num resultado e os pts em jogo', () => {
@@ -161,7 +161,7 @@ describe('bloco de ranking — derivado do content lacrado (scoring SSOT)', () =
   const all = buildPicksMessages(base).join('\n');
 
   it('top 3 com pontos calculados dos resultados lacrados', () => {
-    expect(all).toContain('🥇 Ana 7 pts · 🥈 Bruno 5 pts · 🥉 Carlos 1 pt');
+    expect(all).toContain('🥇 Ana 7 pts\n🥈 Bruno 5 pts\n🥉 Carlos 1 pt');
   });
 
   it('duelo líder × vice: onde divergem nos jogos novos e o swing máximo', () => {
@@ -192,7 +192,7 @@ describe('bloco de ranking — derivado do content lacrado (scoring SSOT)', () =
     };
     const all2 = buildPicksMessages({ ...base, content: copycat }).join('\n');
     expect(all2).toContain('🤝 Duelo do topo: Ana e Bruno palpitaram IGUAL nos jogos deste lacre — 2 pts de diferença segue intacta');
-    expect(all2).toContain('👯 Gêmeos do lacre: Ana e Bruno cravaram exatamente os mesmos placares em todos os jogos');
+    expect(all2).toContain('👯 Gêmeos do lacre: Ana e Bruno fizeram exatamente os mesmos palpites em todos os jogos');
   });
 
   it('lanterna aparece com pelotão de 4+ e fundo de tabela real', () => {
@@ -207,7 +207,7 @@ describe('bloco de ranking — derivado do content lacrado (scoring SSOT)', () =
         { user_id: U5, match_id: 3, pred_home: 0, pred_away: 0, pred_pen_winner: null, updated_at: '2026-06-08T12:00:00Z' }],
     };
     const all3 = buildPicksMessages({ ...base, content: tied }).join('\n');
-    expect(all3).toContain('🥉 Carlos 1 pt · +1 empatado com 1 pt');
+    expect(all3).toContain('🥉 Carlos 1 pt\n(+1 empatado com 1 pt)');
   });
 });
 
@@ -272,7 +272,8 @@ describe('higiene — HTML escapado e nada de e-mail', () => {
   it('cabeçalho identifica o lacre e rodapé linka o relatório publicado', () => {
     const all = buildPicksMessages(base).join('\n');
     expect(all).toContain('Palpites lacrados — lacre #7');
-    expect(all).toContain(`<a href="${base.reportUrl}">Palpite por palpite no relatório do lacre #7</a>`);
+    expect(all).toContain(`Palpite por palpite no relatório do lacre #7:\n${base.reportUrl}`);
+    expect(all).not.toContain('<a href=');
   });
 });
 

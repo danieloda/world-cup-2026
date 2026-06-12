@@ -78,11 +78,12 @@ function gameBlock(m, id, preds, nameOf, champs) {
   const away = teamPlain(m?.team_away);
   const n = preds.length;
 
+  // Título em duas linhas + linha em branco antes das estatísticas — respiro
+  // visual no chat (feedback 2026-06-12).
   const title = m
-    ? `⚽ <b>${esc(home)} × ${esc(away)}</b>`
-      + ` · ${esc(STAGE_LABEL[m.stage] || m.stage)} · ${esc(fmtShort(m.match_date))}`
+    ? `⚽ <b>${esc(home)} × ${esc(away)}</b>\n${esc(STAGE_LABEL[m.stage] || m.stage)} · ${esc(fmtShort(m.match_date))}`
     : `⚽ <b>Jogo #${id}</b>`;
-  const lines = [title];
+  const lines = [title, ''];
 
   // Divisão por resultado — no mata-mata, vitória nos pênaltis conta pro lado
   // e ganha a anotação; "Empate 0" só aparece onde empate existe (grupos).
@@ -118,8 +119,10 @@ function gameBlock(m, id, preds, nameOf, champs) {
   const topCount = ranked[0][1];
   if (topCount >= 2) {
     const top = ranked.filter(([, c]) => c === topCount).map(([s]) => s);
+    // "palpitaram", nunca "cravaram" — cravar soa como acerto de jogo já
+    // disputado (feedback 2026-06-12).
     lines.push(top.length === 1
-      ? `🔥 Placar da galera: ${esc(top[0])} (${topCount} cravaram)`
+      ? `🔥 Placar da galera: ${esc(top[0])} (${topCount} palpitaram)`
       : `🔥 Placares da galera: ${esc(top.join(' e '))} (${topCount} cada)`);
   } else if (n >= MIN_POOL) {
     lines.push(`🎯 ${n} palpites, ${n} placares diferentes — ninguém combinou nada`);
@@ -203,17 +206,17 @@ function rankingBlock({ content, newLocked, byId, predsByMatch, nameOf }) {
   if (table.length < 2 || !table.some(([, p]) => p > 0)) return null;
 
   const medals = ['🥇', '🥈', '🥉'];
-  let topLine = table.slice(0, 3)
+  let podium = table.slice(0, 3)
     .map(([uid, p], i) => `${medals[i]} ${esc(nameOf(uid))} ${pts(p)}`)
-    .join(' · ');
+    .join('\n');
   // Empate além do pódio: com poucos jogos, meio pelotão divide o 3º lugar —
   // esconder isso faria o pódio parecer mais exclusivo do que é.
   if (table.length > 3) {
     const third = table[2][1];
     const extra = table.slice(3).filter(([, p]) => p === third).length;
-    if (extra > 0) topLine += ` · +${extra} empatado${extra === 1 ? '' : 's'} com ${pts(third)}`;
+    if (extra > 0) podium += `\n(+${extra} empatado${extra === 1 ? '' : 's'} com ${pts(third)})`;
   }
-  const lines = ['📈 <b>Olho no ranking</b>', topLine];
+  const lines = ['📈 <b>Olho no ranking</b>', '', podium];
 
   const [[u1, p1], [u2, p2]] = table;
   const gap = p1 - p2;
@@ -236,12 +239,12 @@ function rankingBlock({ content, newLocked, byId, predsByMatch, nameOf }) {
     const where = duel.length === 1
       ? esc(matchName(byId.get(duel[0])))
       : `${duel.length} jogos deste lacre`;
-    lines.push(`⚔️ Duelo do topo: ${esc(nameOf(u1))} × ${esc(nameOf(u2))} (${gapTxt}) palpitaram diferente em ${where} — até ${pts(swing)} de swing${swing > gap ? '. A liderança está em jogo!' : ''}`);
+    lines.push('', `⚔️ Duelo do topo: ${esc(nameOf(u1))} × ${esc(nameOf(u2))} (${gapTxt}) palpitaram diferente em ${where} — até ${pts(swing)} de swing${swing > gap ? '. A liderança está em jogo!' : ''}`);
   } else if (comparable > 0) {
     const tail = gap === 0
       ? 'seguem colados, empatados na ponta'
       : `${pts(gap)} de diferença segue intacta`;
-    lines.push(`🤝 Duelo do topo: ${esc(nameOf(u1))} e ${esc(nameOf(u2))} palpitaram IGUAL nos jogos deste lacre — ${tail}`);
+    lines.push('', `🤝 Duelo do topo: ${esc(nameOf(u1))} e ${esc(nameOf(u2))} palpitaram IGUAL nos jogos deste lacre — ${tail}`);
   }
 
   // Lanterna — tradição de bolão. Só com pelotão de verdade (4+) e quando
@@ -253,7 +256,7 @@ function rankingBlock({ content, newLocked, byId, predsByMatch, nameOf }) {
       const who = bottom.length <= 2
         ? nameList(bottom)
         : `${bottom.length} empatados`;
-      lines.push(`🐢 Lanterna: ${esc(who)} (${pts(minPts)}) — todo campeão já foi lanterna um dia`);
+      lines.push('', `🐢 Lanterna: ${esc(who)} (${pts(minPts)}) — todo campeão já foi lanterna um dia`);
     }
   }
 
@@ -286,7 +289,7 @@ function twinsLine({ newLocked, predsByMatch, nameOf }) {
   // placares é a norma (visto no lacre #7: 15 grupos de "gêmeos" em 75) — aí
   // a linha vira spam, não graça.
   if (!twins.length || twins.length > 2) return null;
-  return `👯 Gêmeos do lacre: ${esc(twins.join('; '))} cravaram exatamente os mesmos placares em todos os jogos`;
+  return `👯 Gêmeos do lacre: ${esc(twins.join('; '))} fizeram exatamente os mesmos palpites em todos os jogos`;
 }
 
 // Expectativa de gols: o jogo que a galera enxerga aberto (média alta) e o
@@ -383,19 +386,21 @@ export function buildPicksMessages({
   if (ranking) blocks.push(ranking);
 
   const extras = [twinsLine(ctx), ...goalsLines(ctx), boldestLine(ctx)].filter(Boolean);
-  if (extras.length) blocks.push(['🍿 <b>Extras do lacre</b>', ...extras].join('\n'));
+  if (extras.length) blocks.push(['🍿 <b>Extras do lacre</b>', '', extras.join('\n\n')].join('\n'));
 
   const header = (cont) => `🔓 <b>Palpites lacrados — lacre #${entry.seq}</b>${cont ? ' (cont.)' : ''}`;
-  const intro = `${gameCount} jogo(s) com prazo encerrado (véspera 23h59) — `
-    + 'ninguém altera mais nada. Raio-X do que a galera cravou:';
+  const intro = `${gameCount} jogo(s) com prazo encerrado (véspera 23h59) — ninguém altera mais nada.\n`
+    + 'Raio-X do que a galera palpitou:';
+  // Link sempre puro e visível (feedback 2026-06-12; mesma linha da migração
+  // 045, que força cta_label = cta_url nos alertas do bolão).
   const footer = reportUrl
-    ? `📄 <a href="${reportUrl}">Palpite por palpite no relatório do lacre #${entry.seq}</a>`
+    ? `📄 Palpite por palpite no relatório do lacre #${entry.seq}:\n${reportUrl}`
     : '';
 
   // Empacota blocos em mensagens <= maxLen (bloco individual nunca é quebrado:
   // são poucas linhas de estatística, ordens de grandeza abaixo do teto).
   const messages = [];
-  let cur = `${header(false)}\n${intro}`;
+  let cur = `${header(false)}\n\n${intro}`;
   for (const b of blocks) {
     if (`${cur}\n\n${b}`.length > maxLen) {
       messages.push(cur);
