@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PROTO · Login — depois</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&family=Anton&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0b;
+    --card: #202022;
+    --line: rgba(255,255,255,.10);
+    --text: #fff;
+    --text-dim: #b3b3b3;
+    --text-mute: #a3a3a3;
+    --accent: #f4c430;
+    --accent-bright: #ffd54a;
+    --positive: #1DB954;
+    --font: 'Figtree', system-ui, sans-serif;
+    --display: 'Anton', 'Figtree', sans-serif;
+    --gold-grad: linear-gradient(135deg, #ffd54a 0%, #f4c430 45%, #d4a73a 100%);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: var(--font); font-size: 15px; line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .split { display: grid; grid-template-columns: 1.15fr 1fr; min-height: 100vh; }
+
+  /* ============ Painel-pôster (esquerda) ============ */
+  .poster {
+    position: relative; overflow: hidden;
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: clamp(24px, 4vw, 56px);
+    background:
+      radial-gradient(120% 90% at 70% -20%, rgba(244,196,48,.16), transparent 55%),
+      radial-gradient(80% 60% at 0% 100%, rgba(29,185,84,.05), transparent 60%),
+      linear-gradient(180deg, #101011, #0a0a0b);
+  }
+  /* círculo central do gramado, como marca d'água */
+  .pitch {
+    position: absolute; inset: auto -18% -42% auto; width: 75%; aspect-ratio: 1;
+    border: 1.5px solid rgba(255,255,255,.05); border-radius: 50%;
+    pointer-events: none;
+  }
+  .pitch::after {
+    content: ''; position: absolute; inset: 18%;
+    border: 1.5px solid rgba(255,255,255,.035); border-radius: 50%;
+  }
+  /* feixes de refletor */
+  .beam {
+    position: absolute; top: -30%; width: 38%; height: 90%;
+    background: linear-gradient(195deg, rgba(255,213,74,.07), transparent 65%);
+    transform: skewX(-12deg); filter: blur(8px); pointer-events: none;
+  }
+  .beam.b1 { left: 8%; }
+  .beam.b2 { left: 42%; transform: skewX(8deg); opacity: .6; }
+
+  .brand-row { display: flex; align-items: center; gap: 14px; position: relative; }
+  .crest {
+    width: 52px; height: 52px; border-radius: 12px;
+    background: var(--gold-grad);
+    display: grid; place-items: center;
+    font-family: var(--display); font-size: 20px; color: #161000; letter-spacing: .02em;
+    box-shadow: 0 6px 24px rgba(244,196,48,.35), inset 0 1px 0 rgba(255,255,255,.4);
+  }
+  .brand-name { font-weight: 800; letter-spacing: .14em; font-size: 13px; color: var(--text-dim); text-transform: uppercase; }
+  .brand-name b { display: block; color: var(--text); font-size: 15px; letter-spacing: .2em; }
+
+  .poster-main { position: relative; max-width: 560px; }
+  .poster-kicker {
+    font-size: 12px; font-weight: 800; letter-spacing: .22em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 14px;
+  }
+  .poster-title {
+    font-family: var(--display); font-weight: 400;
+    font-size: clamp(44px, 5.6vw, 84px); line-height: .98; letter-spacing: .015em;
+    text-transform: uppercase;
+  }
+  .poster-title .stroke {
+    color: transparent; -webkit-text-stroke: 1.5px rgba(255,255,255,.55);
+  }
+  .poster-title .gold {
+    background: var(--gold-grad); -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .poster-sub { margin-top: 18px; color: var(--text-dim); font-size: 16px; max-width: 40ch; }
+
+  .stats { position: relative; display: flex; gap: clamp(20px, 3vw, 44px); }
+  .stat .n {
+    font-family: var(--display); font-size: clamp(26px, 2.6vw, 40px); letter-spacing: .02em;
+    color: var(--text);
+  }
+  .stat .n em { font-style: normal; color: var(--accent); }
+  .stat .l { font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--text-mute); margin-top: 2px; }
+  .stat { padding-left: 14px; border-left: 2px solid rgba(244,196,48,.35); }
+
+  /* ============ Painel do form (direita) ============ */
+  .pane {
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    padding: clamp(24px, 4vw, 56px); position: relative;
+    background: #161617; border-left: 1px solid var(--line);
+  }
+  .form { width: min(380px, 100%); }
+  .form h1 { font-size: 26px; font-weight: 800; letter-spacing: -.01em; }
+  .form .hint { color: var(--text-mute); margin: 6px 0 28px; font-size: 14px; }
+
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 7px; }
+  .field input {
+    width: 100%; height: 48px; padding: 0 14px; border-radius: 10px;
+    background: #0f0f10; border: 1px solid var(--line); color: var(--text);
+    font-size: 15px; transition: border-color .15s, box-shadow .15s;
+  }
+  .field input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(244,196,48,.18); }
+
+  .row-between { display: flex; justify-content: space-between; align-items: center; margin: 4px 0 20px; }
+  .row-between a { color: var(--text-dim); font-size: 13px; text-decoration: none; }
+  .row-between a:hover { color: var(--accent-bright); }
+
+  .btn-primary {
+    width: 100%; height: 50px; border: none; border-radius: 12px; cursor: pointer;
+    background: var(--gold-grad); color: #161000;
+    font-family: var(--font); font-size: 15px; font-weight: 800; letter-spacing: .02em;
+    box-shadow: 0 8px 28px -8px rgba(244,196,48,.55), inset 0 1px 0 rgba(255,255,255,.45);
+    transition: transform .15s cubic-bezier(.22,1,.36,1), box-shadow .15s;
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 12px 34px -8px rgba(244,196,48,.65), inset 0 1px 0 rgba(255,255,255,.45); }
+  .btn-primary:active { transform: translateY(0); }
+
+  .alt { margin-top: 26px; text-align: center; font-size: 14px; color: var(--text-mute); }
+  .alt a { color: var(--accent); font-weight: 700; text-decoration: none; }
+
+  .kick { margin-top: 34px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 12px;
+    display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,.02); }
+  .kick .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--positive); box-shadow: 0 0 10px var(--positive); animation: pulse 2s infinite; }
+  @keyframes pulse { 50% { opacity: .4; } }
+  .kick .t { font-size: 13px; color: var(--text-dim); }
+  .kick .t b { color: var(--text); }
+
+  /* entrada orquestrada */
+  .fade { opacity: 0; transform: translateY(12px); animation: in .6s cubic-bezier(.22,1,.36,1) forwards; }
+  .d1 { animation-delay: .05s; } .d2 { animation-delay: .12s; } .d3 { animation-delay: .2s; } .d4 { animation-delay: .28s; }
+  @keyframes in { to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .fade { animation: none; opacity: 1; transform: none; } .kick .dot { animation: none; } }
+
+  /* ============ Mobile ============ */
+  @media (max-width: 880px) {
+    .split { grid-template-columns: 1fr; min-height: 100svh; }
+    .poster { padding: 20px 20px 24px; gap: 22px; }
+    .poster-main { order: 1; }
+    .poster-title { font-size: clamp(38px, 11vw, 52px); }
+    .poster-sub { font-size: 14px; margin-top: 10px; }
+    .stats { order: 2; gap: 18px; flex-wrap: wrap; }
+    .stat .n { font-size: 24px; }
+    .pitch, .beam.b2 { display: none; }
+    .pane { border-left: none; border-top: 1px solid var(--line); padding: 28px 20px calc(28px + env(safe-area-inset-bottom)); }
+    .kick { margin-top: 24px; }
+  }
+</style>
+</head>
+<body>
+  <div class="split">
+    <aside class="poster">
+      <span class="beam b1"></span><span class="beam b2"></span><span class="pitch"></span>
+      <div class="brand-row fade d1">
+        <div class="crest">SBC</div>
+        <div class="brand-name">Desde 1994 <b>Super Bolão Copa</b></div>
+      </div>
+      <div class="poster-main fade d2">
+        <div class="poster-kicker">Copa do Mundo FIFA 2026 · Bolão privado</div>
+        <div class="poster-title">
+          <span class="stroke">A Copa</span><br>
+          é entre <span class="gold">amigos.</span>
+        </div>
+        <p class="poster-sub">Palpites, ranking ao vivo e 30 anos de provocação acumulada. O SBC está de volta.</p>
+      </div>
+      <div class="stats fade d3">
+        <div class="stat"><div class="n">R$ <em data-count="6200">6.200</em></div><div class="l">no pote</div></div>
+        <div class="stat"><div class="n" data-count="62">62</div><div class="l">jogadores</div></div>
+        <div class="stat"><div class="n" data-count="104">104</div><div class="l">jogos</div></div>
+      </div>
+    </aside>
+
+    <main class="pane">
+      <form class="form" onsubmit="return false">
+        <h1 class="fade d2">Bora palpitar.</h1>
+        <p class="hint fade d2">Entra com a conta que você usou pra se inscrever no bolão.</p>
+        <div class="field fade d3">
+          <label for="email">E-mail</label>
+          <input id="email" type="email" placeholder="voce@exemplo.com" autocomplete="email">
+        </div>
+        <div class="field fade d3">
+          <label for="pass">Senha</label>
+          <input id="pass" type="password" placeholder="••••••••" autocomplete="current-password">
+        </div>
+        <div class="row-between fade d3">
+          <span></span>
+          <a href="#">Esqueceu a senha?</a>
+        </div>
+        <button class="btn-primary fade d4" type="submit">Entrar no bolão</button>
+        <p class="alt fade d4">Primeira vez? <a href="#">Criar conta</a></p>
+        <div class="kick fade d4">
+          <span class="dot"></span>
+          <span class="t"><b>México × África do Sul</b> abre a Copa em <b>1 dia</b> — palpite antes da bola rolar.</span>
+        </div>
+      </form>
+    </main>
+  </div>
+  <script>
+    // count-up dos números do pôster (600ms, uma vez)
+    const ease = t => 1 - Math.pow(1 - t, 3);
+    document.querySelectorAll('[data-count]').forEach(el => {
+      const target = +el.dataset.count; const t0 = performance.now();
+      const fmt = n => target >= 1000 ? n.toLocaleString('pt-BR') : String(n);
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) { el.textContent = fmt(target); return; }
+      (function tick(now) {
+        const p = Math.min(1, (now - t0) / 700);
+        el.textContent = fmt(Math.round(target * ease(p)));
+        if (p < 1) requestAnimationFrame(tick);
+      })(t0);
+    });
+  </script>
+</body>
+</html>

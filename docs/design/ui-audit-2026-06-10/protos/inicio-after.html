@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PROTO · Início — depois</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&family=Anton&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.5.0/css/flag-icons.min.css" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0b; --bg-main: #131314; --card: #202022; --card-hover: #2b2b2d;
+    --line: rgba(255,255,255,.10); --line-faint: rgba(255,255,255,.05);
+    --text: #fff; --text-dim: #b3b3b3; --text-mute: #a3a3a3;
+    --accent: #f4c430; --accent-bright: #ffd54a; --accent-dim: rgba(244,196,48,.15);
+    --positive: #1DB954; --positive-dim: rgba(29,185,84,.15);
+    --red: #f15e6c;
+    --font: 'Figtree', system-ui, sans-serif;
+    --display: 'Anton', sans-serif;
+    --gold-grad: linear-gradient(135deg, #ffd54a, #f4c430 45%, #d4a73a);
+    --ease-emph: cubic-bezier(.22,1,.36,1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; min-width: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  .fi { display: inline-block; width: 1.33em; height: 1em; background-size: cover; background-position: center; border-radius: 2px; }
+
+  .app { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+
+  /* ===== Sidebar (contexto, simplificada) ===== */
+  .sidebar { border-right: 1px solid var(--line); padding: 20px 12px; position: sticky; top: 0; height: 100vh; background: var(--bg); }
+  .sb-brand { display: flex; align-items: center; gap: 10px; padding: 6px 10px 20px; border-bottom: 1px solid var(--line); margin-bottom: 14px; }
+  .crest { width: 40px; height: 40px; border-radius: 10px; background: var(--gold-grad); display: grid; place-items: center; font-family: var(--display); font-size: 15px; color: #161000; }
+  .sb-brand b { font-size: 13px; letter-spacing: .14em; }
+  .sb-label { font-size: 11px; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; color: var(--text-mute); padding: 12px 10px 6px; }
+  .sb-link { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px; color: var(--text-dim); font-weight: 600; font-size: 14px; }
+  .sb-link.active { background: var(--accent-dim); color: var(--accent-bright); box-shadow: inset 2px 0 0 var(--accent); }
+  .sb-link svg { width: 18px; height: 18px; flex: none; }
+
+  /* ===== Main ===== */
+  .main { background: var(--bg-main); padding: 0 clamp(16px, 3vw, 40px) 80px; position: relative; overflow: hidden; }
+  /* floodlight do header */
+  .main::before { content: ''; position: absolute; inset: 0 0 auto; height: 420px; pointer-events: none;
+    background: radial-gradient(90% 100% at 50% -30%, rgba(244,196,48,.10), transparent 70%); }
+
+  .topbar { display: flex; justify-content: flex-end; align-items: center; gap: 12px; padding: 14px 0; position: relative; }
+  .avatar-chip { display: flex; align-items: center; gap: 9px; background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px 5px 6px; font-weight: 700; font-size: 13px; }
+  .avatar-chip .av { width: 28px; height: 28px; border-radius: 50%; background: var(--gold-grad); display: grid; place-items: center; color: #161000; font-size: 12px; font-weight: 900; }
+
+  .hero { padding: 18px 0 8px; position: relative; }
+  .hero-kicker { font-size: 12px; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; color: var(--accent); }
+  .hero-title { font-family: var(--display); font-weight: 400; text-transform: uppercase; letter-spacing: .01em;
+    font-size: clamp(40px, 5vw, 64px); line-height: 1.04; margin: 6px 0 10px; }
+  .hero-meta { color: var(--text-dim); font-size: 14px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .hero-meta b { color: var(--text); }
+  .hero-meta .sep { color: var(--text-mute); }
+  .hero-rule { height: 1px; margin-top: 18px; background: linear-gradient(90deg, var(--accent), rgba(244,196,48,.25) 30%, transparent 75%); }
+
+  /* ===== Próximo jogo (herói fundido) ===== */
+  .next-hero { position: relative; margin-top: 22px; border-radius: 18px; border: 1px solid var(--line);
+    background:
+      radial-gradient(80% 120% at 18% -20%, color-mix(in srgb, var(--c-home) 14%, transparent), transparent 55%),
+      radial-gradient(80% 120% at 82% -20%, color-mix(in srgb, var(--c-away) 14%, transparent), transparent 55%),
+      linear-gradient(180deg, #1d1d1f, #181819);
+    box-shadow: 0 24px 60px -28px rgba(0,0,0,.8), inset 0 1px 0 rgba(255,255,255,.06);
+    padding: clamp(18px, 3vw, 30px); overflow: hidden; }
+  .nh-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .nh-kicker { font-size: 11px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; color: #161000;
+    background: var(--gold-grad); border-radius: 999px; padding: 5px 12px; }
+  .nh-when { color: var(--text-dim); font-size: 13px; font-weight: 600; }
+  .nh-grid { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: clamp(10px, 3vw, 28px); margin-top: 22px; }
+  .nh-side { display: flex; align-items: center; gap: 14px; }
+  .nh-side.away { justify-content: flex-end; text-align: right; }
+  .nh-flag { font-size: 44px; line-height: 1; filter: drop-shadow(0 6px 16px rgba(0,0,0,.5)); border-radius: 6px; }
+  .nh-team { font-size: clamp(18px, 2.2vw, 26px); font-weight: 800; letter-spacing: -.01em; }
+  .nh-rank { display: block; font-size: 12px; color: var(--text-mute); font-weight: 600; }
+  .nh-center { text-align: center; }
+  .countdown { display: flex; gap: 8px; justify-content: center; }
+  .cd-u { background: #0f0f10; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px 6px; min-width: 64px; }
+  .cd-u b { display: block; font-family: var(--display); font-weight: 400; font-size: 32px; line-height: 1; color: var(--accent-bright); }
+  .cd-u span { font-size: 10px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--text-mute); }
+  .nh-foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 22px; flex-wrap: wrap; }
+  .nh-stage { color: var(--text-mute); font-size: 13px; font-weight: 600; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 20px; border-radius: 12px; border: none; cursor: pointer; font-family: var(--font); font-size: 14px; font-weight: 800; }
+  .btn-gold { background: var(--gold-grad); color: #161000; box-shadow: 0 8px 24px -8px rgba(244,196,48,.5), inset 0 1px 0 rgba(255,255,255,.4); transition: transform .15s var(--ease-emph); }
+  .btn-gold:hover { transform: translateY(-1px); }
+
+  /* ===== KPIs ===== */
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 26px; }
+  .kpi { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; position: relative; overflow: hidden;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.05); transition: transform .18s var(--ease-emph), border-color .18s; }
+  .kpi:hover { transform: translateY(-2px); border-color: rgba(255,255,255,.16); }
+  .kpi-label { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--text-mute); }
+  .kpi-num { font-family: var(--display); font-weight: 400; font-size: 40px; line-height: 1.1; margin-top: 8px; font-variant-numeric: tabular-nums; }
+  .kpi-num small { font-size: 22px; }
+  .kpi-sub { font-size: 12.5px; color: var(--text-mute); margin-top: 2px; }
+  .kpi.pos { border-color: rgba(244,196,48,.35); background: linear-gradient(160deg, rgba(244,196,48,.10), transparent 45%), var(--card); }
+  .kpi.pos .kpi-num { color: var(--accent-bright); }
+  .kpi .delta { position: absolute; top: 14px; right: 14px; font-size: 12px; font-weight: 800; color: var(--positive); background: var(--positive-dim); border-radius: 999px; padding: 3px 9px; }
+  .kpi .spark { position: absolute; right: 12px; bottom: 12px; opacity: .8; }
+
+  /* ===== Hoje ===== */
+  .section-head { display: flex; justify-content: space-between; align-items: baseline; margin: 36px 0 14px; }
+  .section-head h3 { font-size: 18px; font-weight: 800; letter-spacing: -.01em; }
+  .see-all { color: var(--text-dim); font-size: 13px; font-weight: 700; text-decoration: none; }
+  .see-all:hover { color: var(--accent-bright); }
+  .today-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .today-card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; box-shadow: inset 0 1px 0 rgba(255,255,255,.05); }
+  .tc-head { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-mute); font-weight: 600; margin-bottom: 10px; }
+  .pill { border-radius: 999px; padding: 2px 9px; font-size: 11px; font-weight: 800; }
+  .pill.live { background: rgba(241,94,108,.16); color: var(--red); animation: blink 2s infinite; }
+  .pill.open { background: rgba(255,255,255,.06); color: var(--text-dim); }
+  @keyframes blink { 50% { opacity: .55; } }
+  .tc-row { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px; }
+  .tc-team { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; }
+  .tc-team.away { justify-content: flex-end; }
+  .tc-score { font-family: var(--display); font-size: 22px; color: var(--text); letter-spacing: .06em; }
+
+  .fade { opacity: 0; transform: translateY(12px); animation: in .55s var(--ease-emph) forwards; }
+  .d1 { animation-delay: .04s; } .d2 { animation-delay: .1s; } .d3 { animation-delay: .17s; } .d4 { animation-delay: .24s; } .d5 { animation-delay: .3s; }
+  @keyframes in { to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .fade { animation: none; opacity: 1; transform: none; } .pill.live { animation: none; } }
+
+  /* ===== Tab bar mobile ===== */
+  .tabbar { display: none; }
+
+  @media (max-width: 880px) {
+    .app { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .main { padding: 0 16px 96px; }
+    .topbar { justify-content: space-between; }
+    .greet-mob { font-size: 13px; font-weight: 700; color: var(--text-dim); }
+    .hero-title { font-size: clamp(34px, 10vw, 44px); }
+    .next-hero { padding: 18px 16px; }
+    .nh-grid { grid-template-columns: 1fr; gap: 14px; }
+    .nh-side, .nh-side.away { justify-content: center; text-align: center; }
+    .nh-flag { font-size: 38px; }
+    .cd-u { min-width: 58px; padding: 7px 8px 5px; }
+    .cd-u b { font-size: 26px; }
+    .nh-foot { justify-content: center; }
+    .nh-foot .btn { width: 100%; justify-content: center; }
+    .kpis { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .kpi { padding: 13px 14px; }
+    .kpi-num { font-size: 30px; }
+    .today-grid { grid-template-columns: 1fr; }
+
+    .tabbar { display: grid; grid-template-columns: repeat(5, 1fr); position: fixed; left: 0; right: 0; bottom: 0; z-index: 100;
+      background: rgba(12,12,13,.92); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      border-top: 1px solid var(--line); padding: 6px 4px calc(6px + env(safe-area-inset-bottom)); }
+    .tab { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 0 4px; color: var(--text-mute); font-size: 10.5px; font-weight: 700; text-decoration: none; border-radius: 10px; min-height: 48px; }
+    .tab svg { width: 22px; height: 22px; }
+    .tab.active { color: var(--accent-bright); }
+    .tab.active::after { content: ''; width: 4px; height: 4px; border-radius: 50%; background: var(--accent); }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="sb-brand"><div class="crest">SBC</div><b>SBC 2026</b></div>
+    <div class="sb-label">Principal</div>
+    <a class="sb-link active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5 12 4l9 6.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>Início</a>
+    <a class="sb-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5M10 19V9M16 19v-7M22 19H2"/></svg>Ranking</a>
+    <div class="sb-label">Palpites</div>
+    <a class="sb-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="m8 12 3 3 5-6"/></svg>Grupos</a>
+    <a class="sb-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h6v6H3zM3 13h6v6H3zM15 9h6v6h-6zM9 8h3v8H9zM12 12h3"/></svg>Mata-mata</a>
+    <a class="sb-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/></svg>Campeão</a>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <span class="greet-mob" style="display:none">Boa noite, Daniel 👋</span>
+      <div class="avatar-chip"><span class="av">DT</span> Daniel Teixeira</div>
+    </div>
+
+    <section class="hero fade d1">
+      <div class="hero-kicker">Boa noite, Daniel · Rumo às oitavas</div>
+      <h1 class="hero-title">A Copa está <span style="background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;color:transparent;">no mata-mata.</span></h1>
+      <div class="hero-meta">
+        <span><b>88/104</b> jogos</span><span class="sep">·</span>
+        <span><b data-count="84.6">84,6%</b> da Copa disputada</span><span class="sep">·</span>
+        <span><b>62</b> jogadores no bolão</span>
+      </div>
+      <div class="hero-rule"></div>
+    </section>
+
+    <section class="next-hero fade d2" style="--c-home:#BC002D; --c-away:#0051BA;">
+      <div class="nh-top">
+        <span class="nh-kicker">Próximo jogo</span>
+        <span class="nh-when">Sexta, 12/jun · 11:54 · Estádio Azteca</span>
+      </div>
+      <div class="nh-grid">
+        <div class="nh-side home">
+          <span class="fi fi-kr nh-flag"></span>
+          <span><span class="nh-team">Coreia do Sul</span><span class="nh-rank">23º da FIFA · 1º do grupo F</span></span>
+        </div>
+        <div class="nh-center">
+          <div class="countdown" aria-label="Tempo até o apito inicial">
+            <div class="cd-u"><b data-cd>01</b><span>dia</span></div>
+            <div class="cd-u"><b data-cd>16</b><span>hrs</span></div>
+            <div class="cd-u"><b data-cd>03</b><span>min</span></div>
+            <div class="cd-u"><b data-cd>20</b><span>seg</span></div>
+          </div>
+        </div>
+        <div class="nh-side away">
+          <span><span class="nh-team">Escócia</span><span class="nh-rank">39º da FIFA · 2º do grupo K</span></span>
+          <span class="fi fi-gb-sct nh-flag"></span>
+        </div>
+      </div>
+      <div class="nh-foot">
+        <span class="nh-stage">Oitavas de final · vale <b style="color:var(--accent-bright)">2× pontos</b></span>
+        <button class="btn btn-gold">Palpitar este jogo →</button>
+      </div>
+    </section>
+
+    <div class="kpis">
+      <div class="kpi pos fade d3">
+        <div class="kpi-label">Sua posição</div>
+        <div class="kpi-num">22º</div>
+        <div class="kpi-sub">de 62 jogadores</div>
+        <span class="delta">▲ 3 hoje</span>
+        <svg class="spark" width="72" height="26" viewBox="0 0 72 26" fill="none">
+          <path d="M2 20 L14 16 L26 18 L38 10 L50 13 L62 6 L70 4" stroke="#f4c430" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="kpi fade d3">
+        <div class="kpi-label">Seus pontos</div>
+        <div class="kpi-num" data-count="365">365</div>
+        <div class="kpi-sub">inclui o artilheiro</div>
+        <span class="delta">+6 ↗</span>
+      </div>
+      <div class="kpi fade d4">
+        <div class="kpi-label">Placares exatos</div>
+        <div class="kpi-num" data-count="12">12</div>
+        <div class="kpi-sub">seu maior acerto</div>
+      </div>
+      <div class="kpi fade d4">
+        <div class="kpi-label">Copa disputada</div>
+        <div class="kpi-num">84<small>,6%</small></div>
+        <div class="kpi-sub">88/104 jogos</div>
+      </div>
+    </div>
+
+    <div class="section-head fade d5">
+      <h3>Hoje · terça, 10 de junho</h3>
+      <a class="see-all" href="#">Ver tudo →</a>
+    </div>
+    <div class="today-grid fade d5">
+      <div class="today-card">
+        <div class="tc-head"><span>Estádio MetLife · Oitavas</span><span class="pill live">● Ao vivo 71'</span></div>
+        <div class="tc-row">
+          <span class="tc-team"><span class="fi fi-br"></span>Brasil</span>
+          <span class="tc-score">2 — 0</span>
+          <span class="tc-team away">Marrocos<span class="fi fi-ma"></span></span>
+        </div>
+      </div>
+      <div class="today-card">
+        <div class="tc-head"><span>SoFi Stadium · Oitavas</span><span class="pill open">16:00</span></div>
+        <div class="tc-row">
+          <span class="tc-team"><span class="fi fi-fr"></span>França</span>
+          <span class="tc-score">— —</span>
+          <span class="tc-team away">Uruguai<span class="fi fi-uy"></span></span>
+        </div>
+      </div>
+      <div class="today-card">
+        <div class="tc-head"><span>Estádio Akron · Oitavas</span><span class="pill open">20:30</span></div>
+        <div class="tc-row">
+          <span class="tc-team"><span class="fi fi-de"></span>Alemanha</span>
+          <span class="tc-score">— —</span>
+          <span class="tc-team away">Japão<span class="fi fi-jp"></span></span>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<nav class="tabbar" aria-label="Navegação principal">
+  <a class="tab active" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5 12 4l9 6.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>Início</a>
+  <a class="tab" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="m8 12 3 3 5-6"/></svg>Palpites</a>
+  <a class="tab" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5M10 19V9M16 19v-7M22 19H2"/></svg>Ranking</a>
+  <a class="tab" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/></svg>Histórico</a>
+  <a class="tab" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>Mais</a>
+</nav>
+
+<script>
+  // greeting mobile
+  if (matchMedia('(max-width: 880px)').matches) {
+    document.querySelector('.greet-mob').style.display = 'block';
+  }
+  // count-up
+  const ease = t => 1 - Math.pow(1 - t, 3);
+  document.querySelectorAll('[data-count]').forEach(el => {
+    const raw = el.dataset.count; const target = parseFloat(raw);
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const dec = raw.includes('.') ? 1 : 0;
+    const t0 = performance.now();
+    (function tick(now) {
+      const p = Math.min(1, (now - t0) / 700);
+      const v = target * ease(p);
+      el.textContent = dec ? v.toFixed(1).replace('.', ',') + '%' : String(Math.round(v));
+      if (p < 1) requestAnimationFrame(tick);
+    })(t0);
+  });
+</script>
+</body>
+</html>

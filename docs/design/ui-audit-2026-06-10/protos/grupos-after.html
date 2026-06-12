@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PROTO · Grupos & Melhores 3ºs — depois</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&family=Anton&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.5.0/css/flag-icons.min.css" rel="stylesheet">
+<style>
+  :root {
+    --bg-main: #131314; --card: #202022; --line: rgba(255,255,255,.10);
+    --text: #fff; --text-dim: #b3b3b3; --text-mute: #a3a3a3;
+    --accent: #f4c430; --accent-bright: #ffd54a; --accent-dim: rgba(244,196,48,.15);
+    --positive: #1DB954; --positive-dim: rgba(29,185,84,.15); --red: #f15e6c;
+    --font: 'Figtree', system-ui, sans-serif; --display: 'Anton', sans-serif;
+    --gold-grad: linear-gradient(135deg, #ffd54a, #f4c430 45%, #d4a73a);
+    --ease-emph: cubic-bezier(.22,1,.36,1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; min-width: 0; }
+  body { background: var(--bg-main); color: var(--text); font-family: var(--font); font-size: 15px; -webkit-font-smoothing: antialiased; }
+  .fi { display: inline-block; width: 1.33em; height: 1em; background-size: cover; background-position: center; border-radius: 2px; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 28px clamp(14px, 3vw, 40px) 90px; position: relative; }
+  .wrap::before { content: ''; position: fixed; inset: 0 0 auto; height: 320px; pointer-events: none;
+    background: radial-gradient(80% 100% at 50% -30%, rgba(244,196,48,.09), transparent 70%); }
+
+  .hero-kicker { font-size: 12px; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; color: var(--accent); }
+  h1 { font-family: var(--display); font-weight: 400; text-transform: uppercase; font-size: clamp(38px, 5vw, 56px); line-height: 1.05; margin: 4px 0 6px; }
+  .hero-meta { color: var(--text-dim); font-size: 14px; }
+  .hero-meta b { color: var(--text); }
+  .hero-rule { height: 1px; margin: 16px 0 20px; background: linear-gradient(90deg, var(--accent), rgba(244,196,48,.25) 30%, transparent 75%); }
+
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; font-size: 12.5px; color: var(--text-dim); font-weight: 600; }
+  .legend .sw { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+
+  /* ===== Visão geral: 12 grupos ===== */
+  .groups-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .gcard { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.05); transition: transform .15s var(--ease-emph), border-color .15s; cursor: pointer; }
+  .gcard:hover { transform: translateY(-2px); border-color: rgba(244,196,48,.4); }
+  .g-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .g-letter { font-family: var(--display); font-size: 18px; color: var(--accent-bright); }
+  .g-done { font-size: 10.5px; font-weight: 800; color: var(--positive); letter-spacing: .06em; }
+  .g-row { display: flex; align-items: center; gap: 8px; padding: 4px 6px; border-radius: 7px; font-size: 12.5px; font-weight: 700; color: var(--text-dim); }
+  .g-row .p { width: 14px; font-size: 11px; font-weight: 800; color: var(--text-mute); font-variant-numeric: tabular-nums; }
+  .g-row .pts { margin-left: auto; font-variant-numeric: tabular-nums; font-weight: 800; color: var(--text); }
+  .g-row.q1, .g-row.q2 { color: var(--text); }
+  .g-row.q1 .st, .g-row.q2 .st { color: var(--positive); }
+  .g-row.q3 .st { color: var(--accent-bright); }
+  .g-row.out { opacity: .45; }
+  .g-row .st { width: 14px; text-align: center; font-size: 11px; font-weight: 900; }
+
+  /* ===== Melhores 3ºs — a linha de corte ===== */
+  .thirds { margin-top: 38px; }
+  .thirds-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 4px; }
+  .thirds-head h2 { font-family: var(--display); font-weight: 400; text-transform: uppercase; font-size: 28px; letter-spacing: .02em; }
+  .thirds-head span { font-size: 13px; color: var(--text-mute); }
+  .thirds-sub { color: var(--text-dim); font-size: 13.5px; margin-bottom: 16px; max-width: 70ch; }
+  .thirds-sub b { color: var(--accent-bright); }
+
+  .t3 { border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+  .t3-row { display: grid; grid-template-columns: 44px 1fr 90px 64px 64px; align-items: center; gap: 10px;
+    padding: 10px 16px; font-size: 14px; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,.05); background: var(--card); }
+  .t3-row.head { font-size: 10.5px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--text-mute); background: #1a1a1c; }
+  .t3-row .pos { font-family: var(--display); font-size: 16px; color: var(--text-mute); }
+  .t3-row .tm { display: flex; align-items: center; gap: 10px; }
+  .t3-row .tm .fi { font-size: 19px; }
+  .t3-row .gp { color: var(--text-mute); font-size: 12px; font-weight: 800; }
+  .t3-row .num { font-variant-numeric: tabular-nums; text-align: right; }
+  .t3-row.in { background: linear-gradient(90deg, rgba(29,185,84,.10), var(--card) 55%); }
+  .t3-row.in .pos { color: var(--positive); }
+  .t3-row.out { opacity: .55; }
+
+  /* a linha de corte como momento */
+  .cutline { position: relative; display: flex; align-items: center; gap: 12px; padding: 8px 16px;
+    background: #15140e; border-top: 1.5px dashed rgba(244,196,48,.7); border-bottom: 1.5px dashed rgba(244,196,48,.7); }
+  .cutline .scissors { font-size: 15px; filter: drop-shadow(0 0 8px rgba(244,196,48,.6)); }
+  .cutline .txt { font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-bright); }
+  .cutline .det { margin-left: auto; font-size: 12px; color: var(--text-dim); font-weight: 600; }
+  .cutline .det b { color: var(--text); }
+
+  .fade { opacity: 0; transform: translateY(12px); animation: in .55s var(--ease-emph) forwards; }
+  .d1 { animation-delay: .04s; } .d2 { animation-delay: .12s; } .d3 { animation-delay: .2s; }
+  @keyframes in { to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .fade { animation: none; opacity: 1; transform: none; } }
+
+  @media (max-width: 980px) { .groups-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 720px) {
+    .groups-grid { grid-template-columns: repeat(2, 1fr); gap: 9px; }
+    .gcard { padding: 10px 11px; }
+    .t3-row { grid-template-columns: 36px 1fr 56px 50px; }
+    .t3-row .gp2 { display: none; }
+    .cutline .det { display: none; }
+  }
+  @media (max-width: 400px) { .groups-grid { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="fade d1">
+    <div class="hero-kicker">Classificação real da Copa</div>
+    <h1>Grupos</h1>
+    <div class="hero-meta"><b>12 grupos</b> · fase encerrada · <b>8 melhores 3ºs</b> avançaram</div>
+    <div class="hero-rule"></div>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--positive)"></span>Classificado direto</span>
+      <span><span class="sw" style="background:var(--accent)"></span>Na zona dos 3ºs</span>
+      <span><span class="sw" style="background:#4a4a4e"></span>Eliminado</span>
+    </div>
+  </section>
+
+  <div class="groups-grid fade d2">
+    <div class="gcard">
+      <div class="g-head"><span class="g-letter">GRUPO A</span><span class="g-done">✓ 6/6</span></div>
+      <div class="g-row q1"><span class="p">1</span><span class="fi fi-mx"></span>México<span class="st">●</span><span class="pts">7</span></div>
+      <div class="g-row q2"><span class="p">2</span><span class="fi fi-kr"></span>Coreia do Sul<span class="st">●</span><span class="pts">5</span></div>
+      <div class="g-row q3"><span class="p">3</span><span class="fi fi-za"></span>África do Sul<span class="st">◆</span><span class="pts">4</span></div>
+      <div class="g-row out"><span class="p">4</span><span class="fi fi-dk"></span>Dinamarca<span class="st"></span><span class="pts">0</span></div>
+    </div>
+    <div class="gcard">
+      <div class="g-head"><span class="g-letter">GRUPO B</span><span class="g-done">✓ 6/6</span></div>
+      <div class="g-row q1"><span class="p">1</span><span class="fi fi-ca"></span>Canadá<span class="st">●</span><span class="pts">9</span></div>
+      <div class="g-row q2"><span class="p">2</span><span class="fi fi-it"></span>Itália<span class="st">●</span><span class="pts">6</span></div>
+      <div class="g-row q3 out"><span class="p">3</span><span class="fi fi-hn"></span>Honduras<span class="st"></span><span class="pts">3</span></div>
+      <div class="g-row out"><span class="p">4</span><span class="fi fi-qa"></span>Catar<span class="st"></span><span class="pts">0</span></div>
+    </div>
+    <div class="gcard">
+      <div class="g-head"><span class="g-letter">GRUPO C</span><span class="g-done">✓ 6/6</span></div>
+      <div class="g-row q1"><span class="p">1</span><span class="fi fi-br"></span>Brasil<span class="st">●</span><span class="pts">9</span></div>
+      <div class="g-row q2"><span class="p">2</span><span class="fi fi-ma"></span>Marrocos<span class="st">●</span><span class="pts">6</span></div>
+      <div class="g-row q3"><span class="p">3</span><span class="fi fi-rs"></span>Sérvia<span class="st">◆</span><span class="pts">4</span></div>
+      <div class="g-row out"><span class="p">4</span><span class="fi fi-nz"></span>N. Zelândia<span class="st"></span><span class="pts">1</span></div>
+    </div>
+    <div class="gcard">
+      <div class="g-head"><span class="g-letter">GRUPO D</span><span class="g-done">✓ 6/6</span></div>
+      <div class="g-row q1"><span class="p">1</span><span class="fi fi-us"></span>EUA<span class="st">●</span><span class="pts">7</span></div>
+      <div class="g-row q2"><span class="p">2</span><span class="fi fi-py"></span>Paraguai<span class="st">●</span><span class="pts">5</span></div>
+      <div class="g-row q3"><span class="p">3</span><span class="fi fi-au"></span>Austrália<span class="st">◆</span><span class="pts">4</span></div>
+      <div class="g-row out"><span class="p">4</span><span class="fi fi-cz"></span>Tchéquia<span class="st"></span><span class="pts">1</span></div>
+    </div>
+  </div>
+  <p class="fade d2" style="margin-top:10px; font-size:12.5px; color:var(--text-mute);">…e mais 8 grupos no mesmo grid (E–L), tudo numa tela só.</p>
+
+  <div class="thirds fade d3">
+    <div class="thirds-head">
+      <h2>Melhores 3ºs · a linha de corte</h2>
+      <span>critério: pontos → saldo → gols</span>
+    </div>
+    <p class="thirds-sub">Os <b>8 melhores terceiros</b> avançam. A régua dourada é a vida ou a morte — visão completa, não um popover.</p>
+    <div class="t3">
+      <div class="t3-row head"><span>#</span><span>Seleção</span><span class="gp2">Grupo</span><span class="num">SG</span><span class="num">Pts</span></div>
+      <div class="t3-row in"><span class="pos">6º</span><span class="tm"><span class="fi fi-za"></span>África do Sul</span><span class="gp gp2">Grupo A</span><span class="num">+1</span><span class="num">4</span></div>
+      <div class="t3-row in"><span class="pos">7º</span><span class="tm"><span class="fi fi-rs"></span>Sérvia</span><span class="gp gp2">Grupo C</span><span class="num">0</span><span class="num">4</span></div>
+      <div class="t3-row in"><span class="pos">8º</span><span class="tm"><span class="fi fi-au"></span>Austrália</span><span class="gp gp2">Grupo D</span><span class="num">−1</span><span class="num">4</span></div>
+      <div class="cutline">
+        <span class="scissors">✂️</span>
+        <span class="txt">Linha de corte</span>
+        <span class="det">Austrália passou por <b>1 gol de saldo</b> sobre o Equador</span>
+      </div>
+      <div class="t3-row out"><span class="pos">9º</span><span class="tm"><span class="fi fi-ec"></span>Equador</span><span class="gp gp2">Grupo H</span><span class="num">−2</span><span class="num">4</span></div>
+      <div class="t3-row out"><span class="pos">10º</span><span class="tm"><span class="fi fi-hn"></span>Honduras</span><span class="gp gp2">Grupo B</span><span class="num">−3</span><span class="num">3</span></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

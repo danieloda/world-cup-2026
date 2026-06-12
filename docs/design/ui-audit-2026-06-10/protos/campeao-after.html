@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PROTO · Campeão & Artilheiro — depois</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&family=Anton&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.5.0/css/flag-icons.min.css" rel="stylesheet">
+<style>
+  :root {
+    --bg-main: #131314; --card: #202022; --line: rgba(255,255,255,.10);
+    --text: #fff; --text-dim: #b3b3b3; --text-mute: #a3a3a3;
+    --accent: #f4c430; --accent-bright: #ffd54a; --accent-dim: rgba(244,196,48,.15);
+    --positive: #1DB954; --red: #f15e6c;
+    --font: 'Figtree', system-ui, sans-serif; --display: 'Anton', sans-serif;
+    --gold-grad: linear-gradient(135deg, #ffd54a, #f4c430 45%, #d4a73a);
+    --ease-emph: cubic-bezier(.22,1,.36,1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; min-width: 0; }
+  body { background: var(--bg-main); color: var(--text); font-family: var(--font); font-size: 15px; -webkit-font-smoothing: antialiased; }
+  .fi { display: inline-block; width: 1.33em; height: 1em; background-size: cover; background-position: center; border-radius: 3px; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 28px clamp(14px, 3vw, 40px) 90px; position: relative; }
+  .wrap::before { content: ''; position: fixed; inset: 0 0 auto; height: 360px; pointer-events: none;
+    background: radial-gradient(80% 100% at 50% -30%, rgba(244,196,48,.10), transparent 70%); }
+
+  .hero-kicker { font-size: 12px; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; color: var(--accent); }
+  h1 { font-family: var(--display); font-weight: 400; text-transform: uppercase; font-size: clamp(36px, 5vw, 56px); line-height: 1.05; margin: 4px 0 6px; }
+  .hero-meta { color: var(--text-dim); font-size: 14px; }
+  .hero-meta b { color: var(--text); }
+  .lock-pill { display: inline-flex; align-items: center; gap: 7px; margin-left: 10px; font-size: 12px; font-weight: 800;
+    color: var(--accent-bright); background: var(--accent-dim); border-radius: 999px; padding: 3px 11px; }
+  .hero-rule { height: 1px; margin: 16px 0 26px; background: linear-gradient(90deg, var(--accent), rgba(244,196,48,.25) 30%, transparent 75%); }
+
+  .grid2 { display: grid; grid-template-columns: 1.25fr 1fr; gap: 22px; align-items: start; }
+
+  /* ===== Pôster do campeão escolhido ===== */
+  .champ-poster { position: relative; border-radius: 20px; overflow: hidden; border: 1px solid rgba(244,196,48,.4);
+    background:
+      radial-gradient(120% 100% at 50% -30%, color-mix(in srgb, var(--c1) 30%, transparent), transparent 60%),
+      radial-gradient(100% 80% at 100% 110%, color-mix(in srgb, var(--c2) 18%, transparent), transparent 55%),
+      linear-gradient(175deg, #1b1b1d, #111112);
+    padding: clamp(22px, 3.5vw, 38px); text-align: center;
+    box-shadow: 0 30px 80px -35px color-mix(in srgb, var(--c1) 55%, transparent), inset 0 1px 0 rgba(255,255,255,.08); }
+  .cp-kicker { font-size: 11px; font-weight: 800; letter-spacing: .22em; text-transform: uppercase; color: var(--text-mute); }
+  .cp-flag { font-size: 92px; line-height: 1; margin: 18px auto 8px; display: inline-block; border-radius: 10px;
+    filter: drop-shadow(0 16px 40px color-mix(in srgb, var(--c1) 60%, transparent)); }
+  .cp-name { font-family: var(--display); font-weight: 400; text-transform: uppercase; font-size: clamp(38px, 5vw, 58px); line-height: 1; }
+  .cp-sub { color: var(--text-dim); font-size: 13.5px; margin-top: 8px; }
+  .cp-sub b { color: var(--accent-bright); }
+  .cp-stats { display: flex; justify-content: center; gap: 26px; margin-top: 20px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,.08); }
+  .cp-stats div b { display: block; font-family: var(--display); font-weight: 400; font-size: 24px; }
+  .cp-stats div span { font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--text-mute); }
+  .cp-change { margin-top: 20px; }
+  .btn-ghost { background: none; border: 1px solid var(--line); color: var(--text-dim); border-radius: 999px; height: 40px; padding: 0 18px;
+    font-family: var(--font); font-weight: 700; font-size: 13px; cursor: pointer; }
+  .btn-ghost:hover { border-color: rgba(244,196,48,.5); color: var(--accent-bright); }
+
+  /* ===== Mosaico de seleção ===== */
+  .pick-panel h3 { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
+  .pick-panel p { font-size: 13px; color: var(--text-mute); margin-bottom: 14px; }
+  .mosaic { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .nation { position: relative; border: 1px solid var(--line); background: var(--card); border-radius: 12px;
+    padding: 10px 6px 8px; text-align: center; cursor: pointer; font-family: var(--font);
+    transition: transform .15s var(--ease-emph), border-color .15s; min-height: 64px; }
+  .nation:hover { transform: translateY(-2px); border-color: rgba(255,255,255,.25); }
+  .nation .fi { font-size: 26px; }
+  .nation .nm { display: block; font-size: 10.5px; font-weight: 700; color: var(--text-dim); margin-top: 4px; }
+  .nation .odd { display: block; font-size: 9.5px; font-weight: 800; color: var(--text-mute); }
+  .nation.sel { border-color: var(--accent); background: var(--accent-dim); box-shadow: 0 0 0 1px var(--accent), 0 10px 26px -10px rgba(244,196,48,.5); }
+  .nation.sel .nm { color: var(--accent-bright); }
+  .nation.out { opacity: .35; }
+  .nation.out::after { content: 'fora'; position: absolute; top: 6px; right: 6px; font-size: 8.5px; font-weight: 900;
+    letter-spacing: .06em; text-transform: uppercase; color: var(--red); }
+
+  /* ===== Artilheiro ===== */
+  .scorer { margin-top: 34px; }
+  .scorer-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
+  .scorer-head h3 { font-size: 17px; font-weight: 800; }
+  .scorer-head span { font-size: 12.5px; color: var(--text-mute); }
+  .sc-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .player { display: flex; align-items: center; gap: 11px; background: var(--card); border: 1px solid var(--line);
+    border-radius: 12px; padding: 10px 12px; cursor: pointer; transition: transform .15s var(--ease-emph), border-color .15s; }
+  .player:hover { transform: translateY(-2px); }
+  .player .ph { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #3a3a3e, #232325);
+    display: grid; place-items: center; font-weight: 900; font-size: 13px; color: var(--text-dim); flex: none; }
+  .player .nm { font-weight: 800; font-size: 13.5px; line-height: 1.25; }
+  .player .tm { font-size: 11px; color: var(--text-mute); font-weight: 600; display: flex; align-items: center; gap: 5px; }
+  .player .g { margin-left: auto; text-align: right; }
+  .player .g b { font-family: var(--display); font-weight: 400; font-size: 20px; color: var(--accent-bright); }
+  .player .g span { display: block; font-size: 9px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--text-mute); }
+  .player.sel { border-color: var(--accent); background: var(--accent-dim); box-shadow: 0 0 0 1px var(--accent); }
+
+  .fade { opacity: 0; transform: translateY(12px); animation: in .55s var(--ease-emph) forwards; }
+  .d1 { animation-delay: .04s; } .d2 { animation-delay: .12s; } .d3 { animation-delay: .2s; }
+  @keyframes in { to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .fade { animation: none; opacity: 1; transform: none; } }
+
+  @media (max-width: 880px) {
+    .grid2 { grid-template-columns: 1fr; }
+    .mosaic { grid-template-columns: repeat(4, 1fr); }
+    .sc-grid { grid-template-columns: 1fr; }
+    .cp-flag { font-size: 72px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="fade d1">
+    <div class="hero-kicker">Apostas de Copa inteira</div>
+    <h1>Campeão & Artilheiro</h1>
+    <div class="hero-meta">Vale <b>+40 pts</b> cada · <span class="lock-pill">⏱ trava em 13h 22min</span></div>
+    <div class="hero-rule"></div>
+  </section>
+
+  <div class="grid2">
+    <div class="champ-poster fade d2" style="--c1:#009C3B; --c2:#FFDF00;">
+      <div class="cp-kicker">Seu campeão</div>
+      <span class="fi fi-br cp-flag"></span>
+      <div class="cp-name">Brasil</div>
+      <div class="cp-sub">Escolhido por <b>23 de 62</b> jogadores · 5× campeão</div>
+      <div class="cp-stats">
+        <div><b>1º</b><span>Ranking FIFA</span></div>
+        <div><b>92%</b><span>chega ao mata</span></div>
+        <div><b>+40</b><span>pts se cravar</span></div>
+      </div>
+      <div class="cp-change"><button class="btn-ghost">Trocar palpite</button></div>
+    </div>
+
+    <div class="pick-panel fade d2">
+      <h3>Quem levanta a taça?</h3>
+      <p>16 ainda vivas — eliminadas ficam apagadas. A ousadia paga: campeão menos votado vale a glória eterna.</p>
+      <div class="mosaic">
+        <button class="nation sel"><span class="fi fi-br"></span><span class="nm">Brasil</span><span class="odd">23 votos</span></button>
+        <button class="nation"><span class="fi fi-fr"></span><span class="nm">França</span><span class="odd">11 votos</span></button>
+        <button class="nation"><span class="fi fi-ar"></span><span class="nm">Argentina</span><span class="odd">9 votos</span></button>
+        <button class="nation"><span class="fi fi-es"></span><span class="nm">Espanha</span><span class="odd">7 votos</span></button>
+        <button class="nation"><span class="fi fi-gb-eng"></span><span class="nm">Inglaterra</span><span class="odd">5 votos</span></button>
+        <button class="nation"><span class="fi fi-nl"></span><span class="nm">P. Baixos</span><span class="odd">3 votos</span></button>
+        <button class="nation"><span class="fi fi-pt"></span><span class="nm">Portugal</span><span class="odd">2 votos</span></button>
+        <button class="nation"><span class="fi fi-kr"></span><span class="nm">Coreia</span><span class="odd">1 voto</span></button>
+        <button class="nation out"><span class="fi fi-de"></span><span class="nm">Alemanha</span><span class="odd">—</span></button>
+        <button class="nation out"><span class="fi fi-it"></span><span class="nm">Itália</span><span class="odd">—</span></button>
+        <button class="nation out"><span class="fi fi-ma"></span><span class="nm">Marrocos</span><span class="odd">—</span></button>
+        <button class="nation"><span class="fi fi-uy"></span><span class="nm">Uruguai</span><span class="odd">0 votos</span></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="scorer fade d3">
+    <div class="scorer-head">
+      <h3>Artilheiro da Copa</h3>
+      <span>gols na fase atual · 🔍 buscar outro jogador</span>
+    </div>
+    <div class="sc-grid">
+      <button class="player sel">
+        <span class="ph">JA</span>
+        <span><span class="nm">J. Antonisse</span><span class="tm"><span class="fi fi-cw"></span>Curaçao</span></span>
+        <span class="g"><b>6</b><span>gols</span></span>
+      </button>
+      <button class="player">
+        <span class="ph">KM</span>
+        <span><span class="nm">Kylian Mbappé</span><span class="tm"><span class="fi fi-fr"></span>França</span></span>
+        <span class="g"><b>5</b><span>gols</span></span>
+      </button>
+      <button class="player">
+        <span class="ph">VJ</span>
+        <span><span class="nm">Vini Jr.</span><span class="tm"><span class="fi fi-br"></span>Brasil</span></span>
+        <span class="g"><b>4</b><span>gols</span></span>
+      </button>
+    </div>
+  </div>
+</div>
+</body>
+</html>

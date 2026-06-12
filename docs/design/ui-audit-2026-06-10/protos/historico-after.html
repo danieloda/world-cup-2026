@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PROTO · Histórico — depois</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&family=Anton&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.5.0/css/flag-icons.min.css" rel="stylesheet">
+<style>
+  :root {
+    --bg-main: #131314; --card: #202022; --line: rgba(255,255,255,.10);
+    --text: #fff; --text-dim: #b3b3b3; --text-mute: #a3a3a3;
+    --accent: #f4c430; --accent-bright: #ffd54a; --accent-dim: rgba(244,196,48,.15);
+    --positive: #1DB954; --positive-dim: rgba(29,185,84,.15); --red: #f15e6c;
+    --font: 'Figtree', system-ui, sans-serif; --display: 'Anton', sans-serif;
+    --gold-grad: linear-gradient(135deg, #ffd54a, #f4c430 45%, #d4a73a);
+    --ease-emph: cubic-bezier(.22,1,.36,1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; min-width: 0; }
+  body { background: var(--bg-main); color: var(--text); font-family: var(--font); font-size: 15px; -webkit-font-smoothing: antialiased; }
+  .fi { display: inline-block; width: 1.33em; height: 1em; background-size: cover; background-position: center; border-radius: 3px; }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 28px clamp(14px, 3vw, 40px) 90px; position: relative; }
+  .wrap::before { content: ''; position: fixed; inset: 0 0 auto; height: 320px; pointer-events: none;
+    background: radial-gradient(80% 100% at 50% -30%, rgba(244,196,48,.09), transparent 70%); }
+
+  .hero-kicker { font-size: 12px; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; color: var(--accent); }
+  h1 { font-family: var(--display); font-weight: 400; text-transform: uppercase; font-size: clamp(38px, 5vw, 56px); line-height: 1.05; margin: 4px 0 6px; }
+  .hero-meta { color: var(--text-dim); font-size: 14px; }
+  .hero-meta b { color: var(--text); }
+  .hero-rule { height: 1px; margin: 16px 0 14px; background: linear-gradient(90deg, var(--accent), rgba(244,196,48,.25) 30%, transparent 75%); }
+
+  /* day rail sticky */
+  .day-rail { display: flex; gap: 8px; overflow-x: auto; padding: 6px 2px 12px; position: sticky; top: 0; z-index: 40;
+    background: linear-gradient(180deg, var(--bg-main) 78%, transparent); }
+  .day { flex: none; min-width: 62px; text-align: center; border: 1px solid var(--line); background: var(--card);
+    border-radius: 12px; padding: 7px 10px 6px; cursor: pointer; font-family: var(--font); color: var(--text-dim); }
+  .day .dw { display: block; font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--text-mute); }
+  .day .dn { display: block; font-family: var(--display); font-size: 19px; color: var(--text); }
+  .day .pts { display: block; font-size: 9.5px; font-weight: 800; color: var(--positive); }
+  .day.active { background: var(--accent-dim); border-color: rgba(244,196,48,.6); }
+  .day.active .dn { color: var(--accent-bright); }
+
+  /* resumo do dia */
+  .day-sum { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 14px 0 24px; }
+  .ds { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+  .ds .l { font-size: 10.5px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--text-mute); }
+  .ds .v { font-family: var(--display); font-size: 26px; margin-top: 2px; }
+  .ds .v small { font-family: var(--font); font-size: 12px; color: var(--text-mute); font-weight: 700; }
+  .ds.me .v { color: var(--accent-bright); }
+
+  /* ===== Card de resultado: placar como momento ===== */
+  .rcard { background: var(--card); border: 1px solid var(--line); border-radius: 16px; margin-bottom: 14px; overflow: hidden;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.05); }
+  .r-board { position: relative; padding: 20px 18px 16px; text-align: center;
+    background:
+      radial-gradient(70% 110% at 20% -20%, color-mix(in srgb, var(--c-home) 13%, transparent), transparent 55%),
+      radial-gradient(70% 110% at 80% -20%, color-mix(in srgb, var(--c-away) 13%, transparent), transparent 55%); }
+  .r-meta { font-size: 11.5px; color: var(--text-mute); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 12px; }
+  .r-row { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 14px; }
+  .r-team { display: flex; flex-direction: column; align-items: center; gap: 6px; font-weight: 800; font-size: 14.5px; }
+  .r-team .fi { font-size: 34px; border-radius: 5px; filter: drop-shadow(0 6px 14px rgba(0,0,0,.45)); }
+  .r-score { font-family: var(--display); font-size: 46px; line-height: 1; letter-spacing: .04em; }
+  .r-scorers { margin-top: 10px; font-size: 12px; color: var(--text-dim); }
+  .r-mybet { display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 12.5px; font-weight: 800;
+    border-radius: 999px; padding: 4px 14px; }
+  .r-mybet.exact { background: linear-gradient(135deg, #34e07a, #1DB954); color: #03130a; box-shadow: 0 8px 22px -8px rgba(29,185,84,.6); }
+  .r-mybet.partial { background: var(--positive-dim); color: var(--positive); }
+  .r-mybet.miss { background: rgba(241,94,108,.14); color: var(--red); }
+
+  /* ===== Raio-X: consenso + tiers colapsados ===== */
+  .rx { border-top: 1px solid var(--line); padding: 16px 18px 18px; }
+  .rx h4 { font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--text-mute); margin-bottom: 12px; }
+  .consensus { display: flex; flex-direction: column; gap: 7px; margin-bottom: 16px; }
+  .cons-row { display: grid; grid-template-columns: 64px 1fr 70px; align-items: center; gap: 10px; font-size: 12.5px; }
+  .cons-row .lab { font-weight: 800; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+  .cons-row .bar { height: 18px; border-radius: 6px; background: rgba(255,255,255,.05); overflow: hidden; }
+  .cons-row .bar span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, rgba(255,255,255,.16), rgba(255,255,255,.10)); }
+  .cons-row.hit .bar span { background: linear-gradient(90deg, #34e07a, #1DB954); }
+  .cons-row.mine .lab { color: var(--accent-bright); }
+  .cons-row.mine .bar { box-shadow: 0 0 0 1px rgba(244,196,48,.5); }
+  .cons-row .n { color: var(--text-mute); font-weight: 700; text-align: right; }
+  .cons-row .n b { color: var(--text-dim); }
+
+  .tier { border: 1px solid var(--line); border-radius: 12px; margin-bottom: 8px; overflow: hidden; }
+  .tier summary { list-style: none; display: flex; align-items: center; gap: 10px; padding: 11px 14px; cursor: pointer; font-size: 13.5px; font-weight: 700; }
+  .tier summary::-webkit-details-marker { display: none; }
+  .tier .cnt { margin-left: auto; font-size: 12px; color: var(--text-mute); font-weight: 800; }
+  .tier .pts { font-size: 12px; font-weight: 900; border-radius: 999px; padding: 2px 10px; }
+  .tier.t-exact .pts { background: var(--positive-dim); color: var(--positive); }
+  .tier.t-partial .pts { background: rgba(255,255,255,.07); color: var(--text-dim); }
+  .tier.t-miss .pts { background: rgba(241,94,108,.12); color: var(--red); }
+  .tier .people { padding: 4px 14px 12px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .pp { display: inline-flex; align-items: center; gap: 7px; background: rgba(255,255,255,.04); border: 1px solid var(--line);
+    border-radius: 999px; padding: 4px 12px 4px 5px; font-size: 12.5px; font-weight: 700; color: var(--text-dim); }
+  .pp .av { width: 22px; height: 22px; border-radius: 50%; background: linear-gradient(135deg, #9aa0ab, #6e747e); display: grid; place-items: center; font-size: 9px; font-weight: 900; color: #161000; }
+  .pp.me { border-color: rgba(244,196,48,.55); color: var(--accent-bright); background: var(--accent-dim); }
+  .pp.me .av { background: var(--gold-grad); }
+
+  .fade { opacity: 0; transform: translateY(12px); animation: in .55s var(--ease-emph) forwards; }
+  .d1 { animation-delay: .04s; } .d2 { animation-delay: .12s; } .d3 { animation-delay: .2s; }
+  @keyframes in { to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .fade { animation: none; opacity: 1; transform: none; } }
+
+  @media (max-width: 720px) {
+    .day-sum { grid-template-columns: 1fr 1fr; }
+    .r-score { font-size: 38px; }
+    .cons-row { grid-template-columns: 52px 1fr 58px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="fade d1">
+    <div class="hero-kicker">Como todo mundo foi</div>
+    <h1>Histórico</h1>
+    <div class="hero-meta"><b>88 jogos</b> finalizados · raio-x palpite a palpite</div>
+    <div class="hero-rule"></div>
+  </section>
+
+  <div class="day-rail fade d2">
+    <button class="day"><span class="dw">Sáb</span><span class="dn">06</span><span class="pts">+9</span></button>
+    <button class="day"><span class="dw">Dom</span><span class="dn">07</span><span class="pts">+14</span></button>
+    <button class="day"><span class="dw">Seg</span><span class="dn">08</span><span class="pts">+3</span></button>
+    <button class="day active"><span class="dw">Ter</span><span class="dn">09</span><span class="pts">+31</span></button>
+    <button class="day"><span class="dw">Hoje</span><span class="dn">10</span><span class="pts">…</span></button>
+  </div>
+
+  <div class="day-sum fade d2">
+    <div class="ds me"><div class="l">Seus pontos no dia</div><div class="v">+31</div></div>
+    <div class="ds"><div class="l">Líder do dia</div><div class="v" style="font-size:17px; font-family:var(--font); font-weight:800; margin-top:6px;">Marina F. <small>+38</small></div></div>
+    <div class="ds"><div class="l">Placares exatos</div><div class="v">7 <small>no bolão</small></div></div>
+    <div class="ds"><div class="l">Zebra do dia</div><div class="v" style="font-size:17px; font-family:var(--font); font-weight:800; margin-top:6px;">Noruega 2×0 <small>71% erraram</small></div></div>
+  </div>
+
+  <article class="rcard fade d3" style="--c-home:#009C3B; --c-away:#C1272D;">
+    <div class="r-board">
+      <div class="r-meta">Ter 09 · Oitavas · Estádio MetLife · ⚡ vale 2×</div>
+      <div class="r-row">
+        <span class="r-team"><span class="fi fi-br"></span>Brasil</span>
+        <span class="r-score">3 — 1</span>
+        <span class="r-team"><span class="fi fi-ma"></span>Marrocos</span>
+      </div>
+      <div class="r-scorers">⚽ Vini Jr. 2× (12', 64') · Rodrygo (78') — En-Nesyri (81')</div>
+      <span class="r-mybet exact">⚡ Você cravou 3×1 · +25 pts</span>
+    </div>
+    <div class="rx">
+      <h4>Raio-X dos 62 palpites</h4>
+      <div class="consensus">
+        <div class="cons-row hit mine"><span class="lab">3×1</span><div class="bar"><span style="width:7%"></span></div><span class="n"><b>4</b> · você ⚡</span></div>
+        <div class="cons-row"><span class="lab">2×0</span><div class="bar"><span style="width:34%"></span></div><span class="n"><b>21</b> palpites</span></div>
+        <div class="cons-row"><span class="lab">2×1</span><div class="bar"><span style="width:27%"></span></div><span class="n"><b>17</b> palpites</span></div>
+        <div class="cons-row"><span class="lab">1×0</span><div class="bar"><span style="width:18%"></span></div><span class="n"><b>11</b> palpites</span></div>
+        <div class="cons-row"><span class="lab">outros</span><div class="bar"><span style="width:14%"></span></div><span class="n"><b>9</b> palpites</span></div>
+      </div>
+      <details class="tier t-exact" open>
+        <summary>⚡ Cravaram o placar <span class="pts">+25</span><span class="cnt">4 jogadores</span></summary>
+        <div class="people">
+          <span class="pp me"><span class="av">DT</span>Você</span>
+          <span class="pp"><span class="av">VC</span>Vinícius Costa</span>
+          <span class="pp"><span class="av">MF</span>Marina Fontes</span>
+          <span class="pp"><span class="av">RM</span>Rita Moreira</span>
+        </div>
+      </details>
+      <details class="tier t-partial">
+        <summary>✓ Acertaram o vencedor <span class="pts">+10/+12</span><span class="cnt">36 jogadores</span></summary>
+        <div class="people"><span class="pp"><span class="av">··</span>expande sob demanda</span></div>
+      </details>
+      <details class="tier t-miss">
+        <summary>✗ Não pontuaram <span class="pts">0</span><span class="cnt">22 jogadores</span></summary>
+        <div class="people"><span class="pp"><span class="av">··</span>expande sob demanda</span></div>
+      </details>
+    </div>
+  </article>
+</div>
+</body>
+</html>

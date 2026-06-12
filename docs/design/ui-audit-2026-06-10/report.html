@@ -1,0 +1,677 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SBC 2026 · Auditoria UI/UX & Direção de Design — Luz de Estádio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&family=Anton&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0b; --bg2: #131314; --card: #1d1d1f; --card2: #232325;
+    --line: rgba(255,255,255,.10); --line-faint: rgba(255,255,255,.05);
+    --text: #fff; --dim: #b8b8b8; --mute: #9a9a9a;
+    --gold: #f4c430; --gold-b: #ffd54a; --gold-dim: rgba(244,196,48,.14);
+    --green: #1DB954; --green-dim: rgba(29,185,84,.14);
+    --red: #f15e6c; --red-dim: rgba(241,94,108,.14);
+    --blue: #6aa9ff;
+    --font: 'Figtree', system-ui, sans-serif; --display: 'Anton', sans-serif;
+    --gold-grad: linear-gradient(135deg, #ffd54a, #f4c430 45%, #d4a73a);
+    --ease: cubic-bezier(.22,1,.36,1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; min-width: 0; }
+  html { scroll-behavior: smooth; scroll-padding-top: 70px; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 15.5px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  ::selection { background: rgba(244,196,48,.35); }
+
+  /* ===== nav ===== */
+  .nav { position: sticky; top: 0; z-index: 200; display: flex; align-items: center; gap: 4px; overflow-x: auto;
+    background: rgba(10,10,11,.88); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--line); padding: 10px 18px; }
+  .nav .logo { font-family: var(--display); font-size: 15px; color: var(--gold-b); margin-right: 14px; letter-spacing: .06em; flex: none; }
+  .nav a { flex: none; color: var(--dim); text-decoration: none; font-size: 13px; font-weight: 700; padding: 6px 11px; border-radius: 999px; }
+  .nav a:hover { color: var(--gold-b); background: var(--gold-dim); }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 clamp(16px, 3vw, 40px); }
+
+  /* ===== capa ===== */
+  .cover { position: relative; padding: clamp(60px, 9vw, 120px) 0 60px; overflow: hidden; }
+  .cover::before { content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(90% 90% at 50% -30%, rgba(244,196,48,.16), transparent 60%); }
+  .cover-kicker { font-size: 13px; font-weight: 800; letter-spacing: .24em; text-transform: uppercase; color: var(--gold); }
+  .cover h1 { font-family: var(--display); font-weight: 400; text-transform: uppercase; font-size: clamp(44px, 7vw, 96px); line-height: .98; margin: 14px 0 10px; }
+  .cover h1 .stroke { color: transparent; -webkit-text-stroke: 1.5px rgba(255,255,255,.5); }
+  .cover h1 .gold { background: var(--gold-grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .cover-sub { color: var(--dim); font-size: 17px; max-width: 72ch; }
+  .cover-meta { display: flex; gap: 26px; flex-wrap: wrap; margin-top: 34px; }
+  .cm { padding-left: 14px; border-left: 2px solid rgba(244,196,48,.4); }
+  .cm b { display: block; font-family: var(--display); font-weight: 400; font-size: 30px; }
+  .cm span { font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--mute); }
+
+  /* ===== sections ===== */
+  section.block { padding: 48px 0 8px; }
+  .sec-kicker { font-size: 12px; font-weight: 800; letter-spacing: .22em; text-transform: uppercase; color: var(--gold); }
+  h2 { font-family: var(--display); font-weight: 400; text-transform: uppercase; font-size: clamp(30px, 4vw, 46px); line-height: 1.05; margin: 6px 0 8px; }
+  .sec-sub { color: var(--dim); max-width: 80ch; font-size: 15.5px; }
+  .rule { height: 1px; margin: 18px 0 26px; background: linear-gradient(90deg, var(--gold), rgba(244,196,48,.25) 30%, transparent 75%); }
+  h3 { font-size: 19px; font-weight: 800; letter-spacing: -.01em; }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .panel { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 20px 22px; box-shadow: inset 0 1px 0 rgba(255,255,255,.05); }
+  .panel h4 { font-size: 15px; font-weight: 800; margin-bottom: 6px; }
+  .panel p, .panel li { font-size: 14px; color: var(--dim); }
+  .panel ul { padding-left: 18px; }
+  .panel .big { font-family: var(--display); font-size: 30px; }
+
+  /* veredito strengths/levers */
+  .verdict-grade { display: inline-flex; align-items: baseline; gap: 10px; background: var(--card); border: 1px solid rgba(244,196,48,.4);
+    border-radius: 16px; padding: 14px 22px; margin: 8px 0 18px; }
+  .verdict-grade b { font-family: var(--display); font-weight: 400; font-size: 44px; color: var(--gold-b); }
+  .verdict-grade span { color: var(--dim); font-size: 14px; max-width: 38ch; }
+
+  /* ===== direção: swatches & type ===== */
+  .swatches { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0; }
+  .sw { width: 120px; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); }
+  .sw .c { height: 56px; }
+  .sw .l { font-size: 11px; padding: 7px 10px; background: var(--card); color: var(--dim); font-weight: 700; }
+  .sw .l b { display: block; color: var(--text); font-size: 11.5px; }
+  .type-demo { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: stretch; margin-top: 14px; }
+  .type-card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 22px; }
+  .type-card .anton { font-family: var(--display); font-weight: 400; text-transform: uppercase; font-size: 44px; line-height: 1; }
+  .type-card .fig { font-weight: 800; font-size: 22px; }
+  .type-card .cap { font-size: 11px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: var(--mute); margin-bottom: 10px; }
+  .type-card p { font-size: 13px; color: var(--dim); margin-top: 8px; }
+
+  /* mini demos de movimento */
+  .motion-demos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 14px; }
+  .mdemo { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px; text-align: center; }
+  .mdemo .cap { font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--mute); margin-bottom: 12px; }
+  .mdemo .stage { height: 84px; display: grid; place-items: center; }
+  .m-cards { display: flex; gap: 6px; }
+  .m-cards i { width: 34px; height: 50px; border-radius: 7px; background: var(--card2); border: 1px solid var(--line); opacity: 0; transform: translateY(10px); animation: mIn .5s var(--ease) forwards; }
+  .m-cards i:nth-child(2) { animation-delay: .12s; } .m-cards i:nth-child(3) { animation-delay: .24s; }
+  @keyframes mIn { to { opacity: 1; transform: none; } }
+  .m-count { font-family: var(--display); font-size: 40px; color: var(--gold-b); }
+  .m-skel { width: 80%; }
+  .m-skel i { display: block; height: 12px; border-radius: 6px; margin: 8px 0; background: linear-gradient(90deg, #242426 25%, #2f2f33 50%, #242426 75%); background-size: 200% 100%; animation: shimmer 1.6s infinite linear; }
+  @keyframes shimmer { to { background-position: -200% 0; } }
+  .replay { margin-top: 10px; background: none; border: 1px solid var(--line); color: var(--dim); font-family: var(--font); font-weight: 700; font-size: 12px; border-radius: 999px; padding: 5px 14px; cursor: pointer; }
+  .replay:hover { color: var(--gold-b); border-color: rgba(244,196,48,.5); }
+
+  /* ===== per-page: before/after ===== */
+  .page-block { margin-bottom: 26px; }
+  .ba { display: grid; grid-template-columns: 1fr 1.35fr; gap: 16px; margin: 18px 0; align-items: start; }
+  .ba-col { background: var(--card); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+  .ba-col.after { border-color: rgba(244,196,48,.35); box-shadow: 0 18px 50px -28px rgba(244,196,48,.3); }
+  .ba-tag { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; font-size: 11px; font-weight: 900; letter-spacing: .16em; text-transform: uppercase; }
+  .ba-col.before .ba-tag { color: var(--mute); background: #161617; border-bottom: 1px solid var(--line); }
+  .ba-col.after .ba-tag { color: #161000; background: var(--gold-grad); }
+  .ba-tag .vp-toggle { display: flex; gap: 4px; }
+  .vp-toggle button { border: none; cursor: pointer; font-family: var(--font); font-size: 10.5px; font-weight: 900; letter-spacing: .04em;
+    border-radius: 999px; padding: 3px 10px; background: rgba(0,0,0,.22); color: inherit; }
+  .vp-toggle button.on { background: rgba(0,0,0,.5); color: #ffd54a; }
+  .ba-col.before .vp-toggle button.on { color: var(--gold-b); }
+  .shots { display: flex; gap: 0; align-items: flex-start; background: #0d0d0e; }
+  .shots img { display: block; width: 100%; height: auto; }
+  .shots.dual { display: grid; grid-template-columns: 2.2fr 1fr; gap: 1px; background: var(--line); }
+  .shots.dual > div { background: #0d0d0e; }
+  .proto-frame { background: #0d0d0e; display: flex; justify-content: center; }
+  .proto-frame iframe { border: none; width: 100%; height: 640px; transition: width .35s var(--ease); background: #131314; }
+  .proto-frame.mob iframe { width: 375px; }
+  .open-proto { font-size: 12px; font-weight: 700; }
+  .ba-col.after .open-proto a { color: #161000; text-decoration: underline; }
+
+  /* findings */
+  .findings { display: grid; gap: 10px; margin-top: 14px; }
+  .fnd { display: grid; grid-template-columns: auto 1fr; gap: 14px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }
+  .fnd .chips { display: flex; flex-direction: column; gap: 6px; align-items: center; width: 56px; }
+  .chip { font-size: 10.5px; font-weight: 900; letter-spacing: .04em; border-radius: 999px; padding: 3px 10px; white-space: nowrap; }
+  .chip.p0 { background: var(--red); color: #2a050a; }
+  .chip.p1 { background: var(--red-dim); color: var(--red); }
+  .chip.p2 { background: var(--gold-dim); color: var(--gold-b); }
+  .chip.p3 { background: rgba(255,255,255,.08); color: var(--dim); }
+  .chip.wow { background: var(--green-dim); color: var(--green); }
+  .chip.eff { background: rgba(255,255,255,.06); color: var(--mute); }
+  .chip.mob { background: rgba(106,169,255,.14); color: var(--blue); }
+  .fnd h5 { font-size: 14.5px; font-weight: 800; margin-bottom: 3px; }
+  .fnd .cur { font-size: 13px; color: var(--mute); }
+  .fnd .cur b { color: var(--dim); font-weight: 700; }
+  .fnd .prop { font-size: 13.5px; color: var(--dim); margin-top: 6px; padding-left: 12px; border-left: 2px solid rgba(244,196,48,.45); }
+  .fnd .prop b { color: var(--gold-b); }
+
+  /* roadmap */
+  .road { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .road .panel { position: relative; }
+  .road .ph { font-family: var(--display); font-size: 22px; color: var(--gold-b); margin-bottom: 4px; }
+  .road li { margin: 7px 0; }
+  .road li b { color: var(--text); }
+
+  table.cmp { width: 100%; border-collapse: collapse; font-size: 13.5px; margin-top: 12px; }
+  table.cmp th { text-align: left; font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--mute); padding: 9px 12px; border-bottom: 1px solid var(--line); }
+  table.cmp td { padding: 9px 12px; border-bottom: 1px solid var(--line-faint); color: var(--dim); }
+  table.cmp td b { color: var(--text); }
+  .ok { color: var(--green); font-weight: 800; }
+  .bad { color: var(--red); font-weight: 800; }
+  .warn { color: var(--gold-b); font-weight: 800; }
+
+  footer { padding: 50px 0 70px; color: var(--mute); font-size: 13px; }
+
+  @media (max-width: 920px) {
+    .grid2, .grid3, .type-demo, .motion-demos, .road { grid-template-columns: 1fr; }
+    .ba { grid-template-columns: 1fr; }
+    .shots.dual { grid-template-columns: 1fr; }
+    .proto-frame iframe { height: 560px; }
+    .fnd { grid-template-columns: 1fr; }
+    .fnd .chips { flex-direction: row; width: auto; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <span class="logo">SBC·AUDIT</span>
+  <a href="#veredito">Veredito</a>
+  <a href="#direcao">Direção</a>
+  <a href="#login">Login</a>
+  <a href="#inicio">Início</a>
+  <a href="#palpites">Palpites</a>
+  <a href="#mata">Mata-mata</a>
+  <a href="#campeao">Campeão</a>
+  <a href="#ranking">Ranking</a>
+  <a href="#historico">Histórico</a>
+  <a href="#grupos">Grupos</a>
+  <a href="#outras">Outras</a>
+  <a href="#mobile">Mobile</a>
+  <a href="#a11y">A11y</a>
+  <a href="#roadmap">Roadmap</a>
+</nav>
+
+<header class="cover">
+  <div class="wrap">
+    <div class="cover-kicker">Super Bolão Copa · Auditoria UI/UX · 10 jun 2026</div>
+    <h1><span class="stroke">Do funcional</span><br>ao <span class="gold">memorável.</span></h1>
+    <p class="cover-sub">Relatório completo de evolução visual do SBC 2026 — o que existe hoje, o que separa o app de um
+      portfólio premiável, e protótipos navegáveis do "depois". Uma única direção coerente: <b>Luz de Estádio</b>.
+      Nada aqui foi implementado — este documento é a proposta para alinharmos antes de mexer em código.</p>
+    <div class="cover-meta">
+      <div class="cm"><b data-n="META_FINDINGS">—</b><span>achados catalogados</span></div>
+      <div class="cm"><b data-n="META_CONFIRMED">—</b><span>P0/P1 verificados</span></div>
+      <div class="cm"><b>8</b><span>protótipos navegáveis</span></div>
+      <div class="cm"><b>31</b><span>telas auditadas (desk+mob)</span></div>
+      <div class="cm"><b>15+10</b><span>agentes: auditoria + contraprova</span></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<!-- ============ VEREDITO ============ -->
+<section class="block" id="veredito">
+  <div class="sec-kicker">Veredito executivo</div>
+  <h2>Fundação forte, teto baixo</h2>
+  <div class="rule"></div>
+  <div class="verdict-grade">
+    <b>8 / 5</b>
+    <span><b>8/10 em produto e higiene</b> — mas <b>5/10 em memorabilidade</b>. O app é top-5% entre projetos
+    independentes; o que falta para nível "award" não é correção, é <b>teatro</b>.</span>
+  </div>
+  <div class="grid2">
+    <div class="panel" style="border-color:rgba(29,185,84,.35);">
+      <h4 style="color:var(--green)">O que já é forte (preservar, não regredir)</h4>
+      <ul>
+        <li><b>Higiene rara em projeto vanilla:</b> focus-rings globais, kill-switch de reduced-motion, contraste AA aprovado em todas as combinações de token medidas, formulários 100% rotulados.</li>
+        <li><b>Componentes de elite:</b> o card palpite×oficial com breakdown de pontos (mata-mata) e o bump chart da jornada são "o melhor do app" segundo auditores independentes.</li>
+        <li><b>Identidade coerente:</b> dark + amarelo + Figtree aplicados com consistência; sidebar hover-expand sofisticada; 29 keyframes com guards.</li>
+        <li><b>Engenharia de UX real:</b> auto-save preservando foco, re-render sem perder caret (quase sempre), RPCs atômicas no admin.</li>
+      </ul>
+    </div>
+    <div class="panel" style="border-color:rgba(244,196,48,.4);">
+      <h4 style="color:var(--gold-b)">As 5 alavancas que separam "bom" de "premiável"</h4>
+      <ul>
+        <li><b>1 · Teatro nos momentos que importam:</b> a chave do mata-mata (hoje uma escadaria com 70% de vazio — P0), o pódio, a escolha do campeão e o placar exato rendem cartões cinza. São os artefatos mais emocionais do futebol.</li>
+        <li><b>2 · Tipografia-placar + atmosfera:</b> tudo é Figtree em pesos parecidos sobre preto chapado; nenhuma página tem um "rosto".</li>
+        <li><b>3 · Consciência de estado:</b> headline cega à fase, CTAs que mandam "palpitar" quem já palpitou, deadline hardcoded vencido.</li>
+        <li><b>4 · Mobile como app, não como site espremido:</b> grids com buracos, alvos de 23px no calendário, páginas de 32.000px sem navegação persistente, toda navegação atrás do hambúrguer.</li>
+        <li><b>5 · Loop social:</b> um bolão de 70 amigos no WhatsApp sem botão de compartilhar — o app não sai do app.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="panel" style="margin-top:16px;">
+    <h4>Como ler este relatório</h4>
+    <p>Cada página tem <b>antes</b> (screenshot real, estado demo "Copa em andamento") e <b>depois</b> (protótipo HTML navegável —
+    alterne Desktop/375px ou abra em tela cheia). Achados trazem chips de severidade (P0 = bug visual embaraçoso · P1 = machuca a
+    experiência · P2 = upgrade relevante · P3 = polish), estrelas de <b>wow</b> (contribuição para nível award), esforço (S/M/L) e
+    o selo <b>✓ verificado</b> quando a contraprova adversarial confirmou o achado contra código e screenshot.
+    Achados refutados pela contraprova foram removidos.</p>
+  </div>
+</section>
+
+<!-- ============ DIREÇÃO ============ -->
+<section class="block" id="direcao">
+  <div class="sec-kicker">A proposta · um sistema, não remendos</div>
+  <h2>Direção: Luz de Estádio</h2>
+  <p class="sec-sub">Uma única metáfora governa tudo: <b>noite de jogo</b> — arquibancada escura, gramado iluminado, refletor dourado.
+    O que a marca já tem (dark Spotify + amarelo #f4c430 + Figtree) permanece; entram <b>quatro camadas aditivas</b> que
+    transformam utilidade em experiência. Regra de ouro mantida: <b>1 cor = 1 significado</b> (amarelo = marca/destaque,
+    verde = acerto/sucesso, vermelho = urgência/erro).</p>
+  <div class="rule"></div>
+
+  <div class="type-demo">
+    <div class="type-card">
+      <div class="cap">Camada 1 · Tipografia-placar</div>
+      <div class="anton">Anton <span style="background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;color:transparent;">26</span></div>
+      <p><b>Anton</b> (1 peso, Google Fonts, zero custo) entra SOMENTE para números-herói e títulos de página:
+        countdown, posição no ranking, placares, h1. Cria o contraste tipográfico de "placar de estádio" que falta hoje,
+        onde tudo é Figtree e os pesos 800/900 se anulam entre si.</p>
+    </div>
+    <div class="type-card">
+      <div class="cap">Continua igual · UI</div>
+      <div class="fig">Figtree segue dona da interface</div>
+      <p>Corpo, navegação, formulários, tabelas: nada muda. Dados tabulares ganham <b>font-variant-numeric: tabular-nums</b>
+        para colunas de pontos alinharem. Anton nunca aparece em texto corrido — é tinta de momento, não de parágrafo.</p>
+    </div>
+  </div>
+
+  <div class="swatches">
+    <div class="sw"><div class="c" style="background:#0a0a0b"></div><div class="l"><b>#0a0a0b</b>fundo (mantém)</div></div>
+    <div class="sw"><div class="c" style="background:#202022"></div><div class="l"><b>#202022</b>card (mantém)</div></div>
+    <div class="sw"><div class="c" style="background:linear-gradient(135deg,#ffd54a,#f4c430 45%,#d4a73a)"></div><div class="l"><b>--gold-grad</b>novo · só p/ momentos</div></div>
+    <div class="sw"><div class="c" style="background:#f4c430"></div><div class="l"><b>#f4c430</b>marca (mantém)</div></div>
+    <div class="sw"><div class="c" style="background:#1DB954"></div><div class="l"><b>#1DB954</b>acerto (mantém)</div></div>
+    <div class="sw"><div class="c" style="background:radial-gradient(120% 140% at 50% -40%, rgba(244,196,48,.35), #131314 70%)"></div><div class="l"><b>floodlight</b>novo · header de página</div></div>
+    <div class="sw"><div class="c" style="background:linear-gradient(135deg,#009C3B 50%,#FFDF00 50%)"></div><div class="l"><b>--c-home/away</b>novo · cor de nação</div></div>
+  </div>
+
+  <div class="grid2">
+    <div class="panel">
+      <h4>Camada 2 · Atmosfera "floodlight"</h4>
+      <p>Cada página logada ganha um header-herói: gradiente radial dourado vindo do topo (≤6% de opacidade),
+        h1 em Anton e uma hairline dourada que esmaece — a "linha do horizonte". O fundo aurora/partículas que hoje
+        roda o app inteiro fica restrito ao login, onde é cartão de visita e não ruído.</p>
+    </div>
+    <div class="panel">
+      <h4>Camada 3 · Cor de nação (wow controlado)</h4>
+      <p>Cards de jogo recebem <b>--c-home/--c-away</b> (2 cores da bandeira, mapa estático JS). Uso restrito:
+        glow radial atrás dos cantos do card e drop-shadow da bandeira. Nunca preenchimento. Brasil×Marrocos fica
+        verde-ouro × vermelho sem quebrar o tema — é o estádio recebendo as torcidas.</p>
+    </div>
+  </div>
+
+  <h3 style="margin-top:26px;">Camada 4 · Um vocabulário de movimento</h3>
+  <p class="sec-sub">Hoje a página "pisca pronta" (um <code>fade-up</code> único) e números aparecem secos. O sistema proposto tem
+    <b>4 verbos</b>, todos vanilla CSS/JS e atrás de <code>prefers-reduced-motion</code> (já global no app):</p>
+  <div class="motion-demos">
+    <div class="mdemo">
+      <div class="cap">1 · Entrada orquestrada</div>
+      <div class="stage"><div class="m-cards"><i></i><i></i><i></i></div></div>
+      <p style="font-size:12.5px;color:var(--mute)">cascata de 40–80ms entre blocos, 1× por visita</p>
+    </div>
+    <div class="mdemo">
+      <div class="cap">2 · Count-up de números-herói</div>
+      <div class="stage"><span class="m-count" data-target="365">0</span></div>
+      <p style="font-size:12.5px;color:var(--mute)">700ms ease-out via IntersectionObserver</p>
+    </div>
+    <div class="mdemo">
+      <div class="cap">3 · Skeleton em vez de "Carregando…"</div>
+      <div class="stage"><div class="m-skel"><i style="width:90%"></i><i style="width:70%"></i><i style="width:80%"></i></div></div>
+      <p style="font-size:12.5px;color:var(--mute)">shimmer sutil, reserva o espaço, sem layout-jump</p>
+    </div>
+  </div>
+  <div class="grid2" style="margin-top:14px;">
+    <div class="panel">
+      <h4>4 · Continuidade entre páginas (View Transitions)</h4>
+      <p>O app é multi-page vanilla — caso perfeito para <b>cross-document View Transitions</b>
+        (<code>@view-transition {navigation: auto}</code> + <code>view-transition-name</code> na sidebar/topbar).
+        Navegar entre Início → Ranking deixa de ser um flash branco de recarga e vira um app fluido.
+        Progressive enhancement: Chrome/Edge já; quem não suporta vê a navegação de sempre.</p>
+    </div>
+    <div class="panel">
+      <h4>Celebração com parcimônia (2 momentos, só)</h4>
+      <p><b>Placar exato novo</b>: confete dourado pontual no card (canvas 1s, uma vez) + chip "+25" com count-up.
+        <b>Pódio final da Copa</b>: celebração completa. Nada de confete gratuito — escassez é o que dá valor ao momento.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LOGIN ============ -->
+<section class="block page-block" id="login">
+  <div class="sec-kicker">Página 1 · porta de entrada</div>
+  <h2>Login & Auth</h2>
+  <p class="sec-sub">Primeira impressão do app (o index é só um splash que redireciona). Hoje: um formulário escuro competente,
+    mas genérico — nada diz "Copa do Mundo", nada vende o que existe lá dentro. A proposta transforma a tela em
+    <b>pôster de evento</b>: painel com atmosfera, manchete editorial e as 3 estatísticas vivas do bolão.</p>
+  <div class="ba">
+    <div class="ba-col before">
+      <div class="ba-tag"><span>Antes · atual</span></div>
+      <div class="shots dual">
+        <div><img src="before/out_login__desk.png" alt="Login atual desktop" loading="lazy"></div>
+        <div><img src="before/out_login__mob.png" alt="Login atual mobile" loading="lazy"></div>
+      </div>
+    </div>
+    <div class="ba-col after">
+      <div class="ba-tag">
+        <span>Depois · protótipo navegável</span>
+        <span class="vp-toggle"><button class="on" data-vp="desk">Desktop</button><button data-vp="mob">375px</button></span>
+      </div>
+      <div class="proto-frame"><iframe src="protos/login-after.html" loading="lazy" title="Protótipo login"></iframe></div>
+      <div class="ba-tag"><span class="open-proto"><a href="protos/login-after.html" target="_blank">abrir protótipo em tela cheia ↗</a></span></div>
+    </div>
+  </div>
+  <!--FINDINGS:auth-->
+</section>
+
+<!-- ============ INICIO ============ -->
+<section class="block page-block" id="inicio">
+  <div class="sec-kicker">Página 2 · tela de retorno diário</div>
+  <h2>Início</h2>
+  <p class="sec-sub">A página que todo mundo abre de manhã. Hoje tem boa fundação (saudação, KPIs, countdown, jornada),
+    mas fala com voz quebrada no meio do torneio e desperdiça seu momento-assinatura. A proposta funde o "próximo jogo"
+    num herói com countdown-placar, conserta o grid de KPIs no mobile (2×2) e dá tendência aos números.</p>
+  <div class="ba">
+    <div class="ba-col before">
+      <div class="ba-tag"><span>Antes · atual</span></div>
+      <div class="shots dual">
+        <div><img src="before/user_inicio__desk.png" alt="Início atual desktop" loading="lazy"></div>
+        <div><img src="before/user_inicio__mob.png" alt="Início atual mobile" loading="lazy"></div>
+      </div>
+    </div>
+    <div class="ba-col after">
+      <div class="ba-tag">
+        <span>Depois · protótipo navegável</span>
+        <span class="vp-toggle"><button class="on" data-vp="desk">Desktop</button><button data-vp="mob">375px</button></span>
+      </div>
+      <div class="proto-frame"><iframe src="protos/inicio-after.html" loading="lazy" title="Protótipo início"></iframe></div>
+      <div class="ba-tag"><span class="open-proto"><a href="protos/inicio-after.html" target="_blank">abrir protótipo em tela cheia ↗</a></span></div>
+    </div>
+  </div>
+  <!--FINDINGS:inicio-->
+</section>
+
+<!-- ============ PALPITES GRUPOS ============ -->
+<section class="block page-block" id="palpites">
+  <div class="sec-kicker">Página 3 · o core do produto</div>
+  <h2>Palpites · Grupos</h2>
+  <p class="sec-sub">É aqui que o usuário passa mais tempo "trabalhando". A proposta troca a parede de instruções por um
+    popover "como pontua", adiciona um <b>trilho de dias</b> com estado de preenchimento, inputs de placar maiores
+    (teclado numérico no mobile), barra de salvar fixa, e transforma o pós-jogo em emoção: card de acerto exato celebra,
+    erro mostra o "azar coletivo".</p>
+  <div class="ba">
+    <div class="ba-col before">
+      <div class="ba-tag"><span>Antes · atual</span></div>
+      <div class="shots dual">
+        <div><img src="before/user_palpites-grupos__desk.png" alt="Palpites grupos atual desktop" loading="lazy"></div>
+        <div><img src="before/user_palpites-grupos__mob.png" alt="Palpites grupos atual mobile" loading="lazy"></div>
+      </div>
+    </div>
+    <div class="ba-col after">
+      <div class="ba-tag">
+        <span>Depois · protótipo navegável</span>
+        <span class="vp-toggle"><button class="on" data-vp="desk">Desktop</button><button data-vp="mob">375px</button></span>
+      </div>
+      <div class="proto-frame"><iframe src="protos/palpites-grupos-after.html" loading="lazy" title="Protótipo palpites grupos"></iframe></div>
+      <div class="ba-tag"><span class="open-proto"><a href="protos/palpites-grupos-after.html" target="_blank">abrir protótipo em tela cheia ↗</a></span></div>
+    </div>
+  </div>
+  <!--FINDINGS:palpites-grupos-->
+</section>
+
+<!-- ============ MATA ============ -->
+<section class="block page-block" id="mata">
+  <div class="sec-kicker">Página 4 · a maior oportunidade de wow</div>
+  <h2>Mata-mata</h2>
+  <p class="sec-sub">Um bracket de Copa é a visualização mais icônica do futebol — e hoje a página o apresenta como
+    calendário + lista de cards. A proposta coloca o <b>chaveamento real como herói</b>: colunas Oitavas→Final com
+    conectores, seu palpite destacado em dourado, pendências pulsando, e no mobile vira navegação por rodada com
+    scroll-snap (a próxima rodada "espia" na borda).</p>
+  <div class="ba">
+    <div class="ba-col before">
+      <div class="ba-tag"><span>Antes · atual</span></div>
+      <div class="shots dual">
+        <div><img src="before/user_palpites-mata__desk.png" alt="Mata-mata atual desktop" loading="lazy"></div>
+        <div><img src="before/user_palpites-mata__mob.png" alt="Mata-mata atual mobile" loading="lazy"></div>
+      </div>
+    </div>
+    <div class="ba-col after">
+      <div class="ba-tag">
+        <span>Depois · protótipo navegável</span>
+        <span class="vp-toggle"><button class="on" data-vp="desk">Desktop</button><button data-vp="mob">375px</button></span>
+      </div>
+      <div class="proto-frame"><iframe src="protos/mata-after.html" loading="lazy" title="Protótipo mata-mata"></iframe></div>
+      <div class="ba-tag"><span class="open-proto"><a href="protos/mata-after.html" target="_blank">abrir protótipo em tela cheia ↗</a></span></div>
+    </div>
+  </div>
+  <!--FINDINGS:palpites-mata-->
+</section>
+
+<!-- ============ CAMPEAO ============ -->
+<section class="block page-block" id="campeao">
+  <div class="sec-kicker">Página 5 · a escolha emocional</div>
+  <h2>Campeão & Artilheiro</h2>
+  <p class="sec-sub">Escolher o campeão é a aposta mais pessoal do bolão — merece cerimônia, não um formulário.
+    A proposta: seu campeão vira um <b>pôster com as cores da nação</b>, a seleção é um mosaico de bandeiras com
+    votos da galera (pressão social!), eliminadas apagam, e o artilheiro mostra a corrida de gols ao vivo.</p>
+  <div class="ba">
+    <div class="ba-col before">
+      <div class="ba-tag"><span>Antes · atual</span></div>
+      <div class="shots dual">
+        <div><img src="before/user_campeao-artilheiro__desk.png" alt="Campeão atual desktop" loading="lazy"></div>
+        <div><img src="before/user_campeao-artilheiro__mob.png" alt="Campeão atual mobile" loading="lazy"></div>
+      </div>
+    </div>
+    <div class="ba-col after">
+      <div class="ba-tag">
+        <span>Depois · protótipo navegável</span>
+        <span class="vp-toggle"><button class="on" data-vp="desk">Desktop</button><button data-vp="mob">375px</button></span>
+      </div>
+      <div class="proto-frame"><iframe src="protos/campeao-after.html" loading="lazy" title="Protótipo campeão"></iframe></div>
+      <div class="ba-tag"><span class="open-proto"><a href="protos/campeao-after.html" target="_blank">abrir protótipo em tela cheia ↗</a></span></div>
+    </div>
+  </div>
+  <!--FINDINGS:campeao-->
+</section>
+
+<!-- ============ RANKING ============ -->
+<section class="block page-block" id="ranking">
+  <div class="sec-kicker">Página 6 · o coração social</div>
+  <h2>Ranking</h2>
+  <p class="sec-sub">A página mais aberta depois de cada rodada — e a mais compartilhável. A proposta dá drama de verdade ao
+    pódio (1º elevado, glow dourado, streak de liderança), cria a <b>linha "você" sticky</b> com distância até o próximo
+    objetivo, indicadores ▲▼ de movimento do dia, e a assinatura social: <b>card de compartilhamento</b> gerado em canvas,
+    pronto pro WhatsApp.</p>
+  <div class="ba">
+    <div class="ba-col before">
+      <div class="ba-tag"><span>Antes · atual</span></div>
+      <div class="shots dual">
+        <div><img src="before/user_ranking__desk.png" alt="Ranking atual desktop" loading="lazy"></div>
+        <div><img src="before/user_ranking__mob.png" alt="Ranking atual mobile" loading="lazy"></div>
+      </div>
+    </div>
+    <div class="ba-col after">
+      <div class="ba-tag">
+        <span>Depois · protótipo navegável</span>
+        <span class="vp-toggle"><button class="on" data-vp="desk">Desktop</button><button data-vp="mob">375px</button></span>
+      </div>
+      <div class="proto-frame"><iframe src="protos/ranking-after.html" loading="lazy" title="Protótipo ranking"></iframe></div>
+      <div class="ba-tag"><span class="open-proto"><a href="protos/ranking-after.html" target="_blank">abrir protótipo em tela cheia ↗</a></span></div>
+    </div>
+  </div>
+  <!--FINDINGS:ranking-->
+</section>
+
+<!-- ============ HISTORICO ============ -->
+<section class="block page-block" id="historico">
+  <div class="sec-kicker">Página 7 · dado mais rico, página mais pesada</div>
+  <h2>Histórico & Raio-X</h2>
+  <p class="sec-sub">Hoje um único dia gera <b>15.748px de página no desktop e 32.562px no mobile</b> — cada jogo despeja os 62
+    palpites expandidos. A proposta inverte: o placar vira <b>momento de scoreboard</b> (bandeiras grandes, gols, seu acerto),
+    o raio-x abre com uma <b>barra de consenso</b> ("21 foram de 2×0…") e os 62 palpites colapsam em tiers expansíveis.
+    Página 10× mais curta, 10× mais legível.</p>
+  <div class="ba">
+    <div class="ba-col before">
+      <div class="ba-tag"><span>Antes · atual (recorte do topo — a página segue por 32k px)</span></div>
+      <div class="shots dual">
+        <div><img src="before/user_historico__desk.png" alt="Histórico atual desktop" loading="lazy" style="max-height:900px;object-fit:cover;object-position:top;"></div>
+        <div><img src="before/user_historico__mob.png" alt="Histórico atual mobile" loading="lazy" style="max-height:900px;object-fit:cover;object-position:top;"></div>
+      </div>
+    </div>
+    <div class="ba-col after">
+      <div class="ba-tag">
+        <span>Depois · protótipo navegável</span>
+        <span class="vp-toggle"><button class="on" data-vp="desk">Desktop</button><button data-vp="mob">375px</button></span>
+      </div>
+      <div class="proto-frame"><iframe src="protos/historico-after.html" loading="lazy" title="Protótipo histórico"></iframe></div>
+      <div class="ba-tag"><span class="open-proto"><a href="protos/historico-after.html" target="_blank">abrir protótipo em tela cheia ↗</a></span></div>
+    </div>
+  </div>
+  <!--FINDINGS:historico-->
+</section>
+
+<!-- ============ GRUPOS ============ -->
+<section class="block page-block" id="grupos">
+  <div class="sec-kicker">Página 8 · classificação real</div>
+  <h2>Grupos & Melhores 3ºs</h2>
+  <p class="sec-sub">O formato de 2026 (12 grupos + 8 melhores terceiros) tem um drama que o app esconde num popover.
+    A proposta: visão <b>"a Copa inteira numa tela"</b> (grid dos 12 grupos), codificação de status por símbolo+cor única,
+    e os Melhores 3ºs como página de verdade com a <b>linha de corte</b> tratada como o momento que é.</p>
+  <div class="ba">
+    <div class="ba-col before">
+      <div class="ba-tag"><span>Antes · atual</span></div>
+      <div class="shots dual">
+        <div><img src="before/user_grupos__desk.png" alt="Grupos atual desktop" loading="lazy"></div>
+        <div><img src="before/user_terceiros__mob.png" alt="Terceiros atual mobile" loading="lazy"></div>
+      </div>
+    </div>
+    <div class="ba-col after">
+      <div class="ba-tag">
+        <span>Depois · protótipo navegável</span>
+        <span class="vp-toggle"><button class="on" data-vp="desk">Desktop</button><button data-vp="mob">375px</button></span>
+      </div>
+      <div class="proto-frame"><iframe src="protos/grupos-after.html" loading="lazy" title="Protótipo grupos"></iframe></div>
+      <div class="ba-tag"><span class="open-proto"><a href="protos/grupos-after.html" target="_blank">abrir protótipo em tela cheia ↗</a></span></div>
+    </div>
+  </div>
+  <!--FINDINGS:grupos-->
+</section>
+
+<!-- ============ OUTRAS ============ -->
+<section class="block page-block" id="outras">
+  <div class="sec-kicker">Páginas 9–10 · regras & admin</div>
+  <h2>Regras e Admin</h2>
+  <!--FINDINGS:regras-->
+  <!--FINDINGS:admin-->
+</section>
+
+<!-- ============ MOBILE ============ -->
+<section class="block" id="mobile">
+  <div class="sec-kicker">Auditoria transversal · mobile primeiro de verdade</div>
+  <h2>Mobile</h2>
+  <!--FINDINGS:mobile-->
+</section>
+
+<!-- ============ A11Y + SISTEMA ============ -->
+<section class="block" id="a11y">
+  <div class="sec-kicker">Auditoria transversal · acessibilidade & coerência</div>
+  <h2>A11y & Design System</h2>
+  <!--FINDINGS:a11y-->
+  <!--FINDINGS:dsys-->
+</section>
+
+<!-- ============ MOTION + WOW ============ -->
+<section class="block" id="wow">
+  <div class="sec-kicker">Auditoria transversal · movimento & assinaturas</div>
+  <h2>Motion & Momentos-assinatura</h2>
+  <!--FINDINGS:motion-->
+  <!--FINDINGS:wow-->
+</section>
+
+<!-- ============ ROADMAP ============ -->
+<section class="block" id="roadmap">
+  <div class="sec-kicker">Plano de execução · sem big-bang</div>
+  <h2>Roadmap</h2>
+  <div class="rule"></div>
+  <p class="sec-sub">Três ondas incrementais — cada uma shippável sozinha, sem big-bang, sem dependência nova
+  (só a fonte Anton via Google Fonts). A Copa está em andamento: as ondas 1–2 são seguras de aplicar entre rodadas;
+  a onda 3 pode entrar jogo a jogo.</p>
+  <div class="road" style="margin-top:18px;">
+    <div class="panel">
+      <div class="ph">Onda 1 · Conserta (1–2 dias)</div>
+      <p style="margin-bottom:8px;color:var(--mute);font-size:12.5px;">Bugs visíveis e voz quebrada — só S, zero risco.</p>
+      <ul>
+        <li><b>P0:</b> coluna Artilheiro truncando tudo para "A…" no ranking desktop.</li>
+        <li><b>P0/P1 mobile:</b> buracos no grid de KPIs (Início, Palpites, Histórico) → 2×2; alvos de 23px no calendário.</li>
+        <li>Headline do Início <b>consciente da fase</b>; CTAs viram "Revisar palpites" quando já palpitou; deadline dinâmico no quick link.</li>
+        <li>Datas nos "Próximos jogos"; badge mentiroso do admin ("Resultados 0"); caminho "Criar conta" no login.</li>
+        <li>A11y estrutural: <code>&lt;main&gt;</code> + skip link, <code>aria-live</code> nos toasts, h2 nas seções, tabela do ranking sem <code>role="button"</code> nas linhas.</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <div class="ph">Onda 2 · Sistema (3–5 dias)</div>
+      <p style="margin-bottom:8px;color:var(--mute);font-size:12.5px;">A direção "Luz de Estádio" aplicada ao app inteiro.</p>
+      <ul>
+        <li><b>Tipografia-placar:</b> Anton nos h1 e números-herói; <code>tabular-nums</code> nas tabelas.</li>
+        <li><b>Headers floodlight</b> em todas as páginas + hairline dourada; aurora restrita ao login.</li>
+        <li><b>Movimento:</b> entrada orquestrada, count-ups, skeletons, tick do countdown, View Transitions cross-document (e fim do loader forçado de 400ms).</li>
+        <li><b>Mobile app-feel:</b> tab bar inferior (5 itens), savebar sticky nos palpites, day-rail com estado, safe-area.</li>
+        <li><b>Saneamento de tokens:</b> migrar os ~40 hexes órfãos e 3 raios de pílula para os tokens (que hoje têm uso zero), 1 verde só, renomear .kpi.green/.btn-green.</li>
+        <li>Regras: TOC sticky + medida de 70ch + matriz com heat; Histórico: tiers colapsados + barra de consenso.</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <div class="ph">Onda 3 · Assinaturas (incremental)</div>
+      <p style="margin-bottom:8px;color:var(--mute);font-size:12.5px;">Os momentos que um júri lembra — um por rodada.</p>
+      <ul>
+        <li><b>Chave de verdade</b> no mata-mata (conectores + campeão como clímax + scroll-snap por rodada no mobile).</li>
+        <li><b>Share-card canvas</b> no ranking e no resumo do dia (o loop do WhatsApp).</li>
+        <li><b>Cerimônia do campeão</b> (pôster com cores da nação + tracker vivo/eliminado) e fotos dos artilheiros via API-Football.</li>
+        <li><b>Celebração do placar exato</b> (confete dourado pontual) e pódio com count-up + cerimônia no fim da Copa.</li>
+        <li><b>Modo ao-vivo</b> do Início (pontos projetados) e, pós-final, o recap "Sua Copa 2026" estilo wrapped.</li>
+        <li>Simulador interativo de pontuação nas Regras (o motor já está na página).</li>
+      </ul>
+    </div>
+  </div>
+  <div class="panel" style="margin-top:16px; border-color:rgba(106,169,255,.35);">
+    <h4 style="color:var(--blue)">Guard-rails de execução</h4>
+    <p>Nada aqui muda schema, RLS ou lógica de pontuação — é tudo camada de apresentação (CSS/JS de render).
+    Antes de cada deploy: <code>npm test</code> + gates de paridade + <code>test:render</code>, como de costume.
+    Toda animação nasce atrás do <code>prefers-reduced-motion</code> global existente. Protótipos deste relatório
+    são a referência visual; a implementação reusa os renderers atuais (template literals) sem reescrever páginas.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="rule"></div>
+  Relatório gerado em 10/06/2026 · Metodologia: captura Playwright das 31 telas em estado demo "Copa em andamento"
+  (desktop 1440px, mobile 375px@2x) · 15 agentes de auditoria (10 por página + 5 transversais) com contraprova
+  adversarial dos achados P0/P1 · sonda automatizada de overflow/touch-targets em 360/375/430px ·
+  protótipos em HTML/CSS vanilla fiéis à stack do projeto (zero dependências novas).
+</footer>
+
+</div>
+
+<script>
+  // viewport toggle dos protótipos
+  document.querySelectorAll('.vp-toggle').forEach(t => {
+    t.addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b) return;
+      t.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+      const frame = t.closest('.ba-col').querySelector('.proto-frame');
+      frame.classList.toggle('mob', b.dataset.vp === 'mob');
+    });
+  });
+  // count-up demo (replay on view)
+  const cu = document.querySelector('.m-count');
+  function runCount() {
+    const target = +cu.dataset.target, t0 = performance.now();
+    const ease = t => 1 - Math.pow(1 - t, 3);
+    (function tick(now) {
+      const p = Math.min(1, (now - t0) / 900);
+      cu.textContent = Math.round(target * ease(p));
+      if (p < 1) requestAnimationFrame(tick);
+    })(t0);
+  }
+  new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { runCount(); } }), { threshold: .5 }).observe(cu);
+</script>
+</body>
+</html>
