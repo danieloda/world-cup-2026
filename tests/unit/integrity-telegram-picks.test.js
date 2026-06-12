@@ -198,6 +198,17 @@ describe('bloco de ranking — derivado do content lacrado (scoring SSOT)', () =
   it('lanterna aparece com pelotão de 4+ e fundo de tabela real', () => {
     expect(all).toContain('🐢 Lanterna: Dani (0 pts) — todo campeão já foi lanterna um dia');
   });
+
+  it('empate além do pódio aparece como "+N empatados" (pódio não mente)', () => {
+    // U5 também fez 0×0 no jogo 3 → 1 pt, empatado com o 3º (Carlos).
+    const tied = {
+      ...content,
+      predictions: [...content.predictions,
+        { user_id: U5, match_id: 3, pred_home: 0, pred_away: 0, pred_pen_winner: null, updated_at: '2026-06-08T12:00:00Z' }],
+    };
+    const all3 = buildPicksMessages({ ...base, content: tied }).join('\n');
+    expect(all3).toContain('🥉 Carlos 1 pt · +1 empatado com 1 pt');
+  });
 });
 
 describe('extras do lacre', () => {
@@ -213,6 +224,28 @@ describe('extras do lacre', () => {
 
   it('sem gêmeos na fixture base (ninguém com palpites idênticos em tudo)', () => {
     expect(all).not.toContain('👯');
+  });
+
+  it('gêmeos em massa (3+ grupos) é norma, não notícia → linha suprimida', () => {
+    const U6 = '66666666-aaaa-4bbb-8ccc-666666666666';
+    const U7 = '77777777-aaaa-4bbb-8ccc-777777777777';
+    const crowded = {
+      ...content,
+      predictions: [
+        ...content.predictions.map((p) => (
+          // Bruno copia a Ana nos jogos novos (1º grupo de gêmeos)
+          p.user_id === U2 && (p.match_id === 1 || p.match_id === 2)
+            ? { ...p, pred_home: p.match_id === 1 ? 2 : 1, pred_away: p.match_id === 1 ? 1 : 0 }
+            : p
+        )),
+        // U6 copia Carlos e U7 copia Dani → 3 grupos no total
+        { user_id: U6, match_id: 1, pred_home: 0, pred_away: 0, pred_pen_winner: null, updated_at: '2026-06-10T12:00:00Z' },
+        { user_id: U6, match_id: 2, pred_home: 2, pred_away: 1, pred_pen_winner: null, updated_at: '2026-06-10T12:00:00Z' },
+        { user_id: U7, match_id: 1, pred_home: 3, pred_away: 1, pred_pen_winner: null, updated_at: '2026-06-10T12:00:00Z' },
+        { user_id: U7, match_id: 2, pred_home: 4, pred_away: 2, pred_pen_winner: null, updated_at: '2026-06-10T12:00:00Z' },
+      ],
+    };
+    expect(buildPicksMessages({ ...base, content: crowded }).join('\n')).not.toContain('👯');
   });
 
   it('bloco de extras tem cabeçalho próprio', () => {

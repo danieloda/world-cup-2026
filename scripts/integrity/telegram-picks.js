@@ -203,16 +203,21 @@ function rankingBlock({ content, newLocked, byId, predsByMatch, nameOf }) {
   if (table.length < 2 || !table.some(([, p]) => p > 0)) return null;
 
   const medals = ['🥇', '🥈', '🥉'];
-  const lines = [
-    '📈 <b>Olho no ranking</b>',
-    table.slice(0, 3)
-      .map(([uid, p], i) => `${medals[i]} ${esc(nameOf(uid))} ${pts(p)}`)
-      .join(' · '),
-  ];
+  let topLine = table.slice(0, 3)
+    .map(([uid, p], i) => `${medals[i]} ${esc(nameOf(uid))} ${pts(p)}`)
+    .join(' · ');
+  // Empate além do pódio: com poucos jogos, meio pelotão divide o 3º lugar —
+  // esconder isso faria o pódio parecer mais exclusivo do que é.
+  if (table.length > 3) {
+    const third = table[2][1];
+    const extra = table.slice(3).filter(([, p]) => p === third).length;
+    if (extra > 0) topLine += ` · +${extra} empatado${extra === 1 ? '' : 's'} com ${pts(third)}`;
+  }
+  const lines = ['📈 <b>Olho no ranking</b>', topLine];
 
   const [[u1, p1], [u2, p2]] = table;
   const gap = p1 - p2;
-  const gapTxt = gap === 0 ? 'empatados na ponta!' : `${pts(gap)} de diferença`;
+  const gapTxt = gap === 0 ? 'empatados na ponta' : `${pts(gap)} de diferença`;
   const duel = [];
   let comparable = 0;
   for (const id of newLocked) {
@@ -233,7 +238,10 @@ function rankingBlock({ content, newLocked, byId, predsByMatch, nameOf }) {
       : `${duel.length} jogos deste lacre`;
     lines.push(`⚔️ Duelo do topo: ${esc(nameOf(u1))} × ${esc(nameOf(u2))} (${gapTxt}) palpitaram diferente em ${where} — até ${pts(swing)} de swing${swing > gap ? '. A liderança está em jogo!' : ''}`);
   } else if (comparable > 0) {
-    lines.push(`🤝 Duelo do topo: ${esc(nameOf(u1))} e ${esc(nameOf(u2))} palpitaram IGUAL nos jogos deste lacre — ${gapTxt} segue intacta`);
+    const tail = gap === 0
+      ? 'seguem colados, empatados na ponta'
+      : `${pts(gap)} de diferença segue intacta`;
+    lines.push(`🤝 Duelo do topo: ${esc(nameOf(u1))} e ${esc(nameOf(u2))} palpitaram IGUAL nos jogos deste lacre — ${tail}`);
   }
 
   // Lanterna — tradição de bolão. Só com pelotão de verdade (4+) e quando
@@ -274,7 +282,10 @@ function twinsLine({ newLocked, predsByMatch, nameOf }) {
   }
   const twins = [...groups.values()].filter((g) => g.length >= 2).map(nameList)
     .sort((a, b) => a.localeCompare(b, 'pt-BR'));
-  if (!twins.length) return null;
+  // Só é notícia quando é RARO: com poucos jogos e muita gente, colisão de
+  // placares é a norma (visto no lacre #7: 15 grupos de "gêmeos" em 75) — aí
+  // a linha vira spam, não graça.
+  if (!twins.length || twins.length > 2) return null;
   return `👯 Gêmeos do lacre: ${esc(twins.join('; '))} cravaram exatamente os mesmos placares em todos os jogos`;
 }
 
