@@ -251,6 +251,9 @@ export function renderRankChart(mount, { series, matches, meId }) {
     }
 
     function move(e) {
+      // Mesmo guard do journey-chart: touch órfão após redraw (SVG desanexado,
+      // rect zerado) produziria k=NaN/∞ e tooltip de jogo inexistente.
+      if (!svg.getBoundingClientRect().width) return;
       const { x: cx } = pointXY(e);
       const k = stepAt(cx);
       const gi = geo.steps[k];

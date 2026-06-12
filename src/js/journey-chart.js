@@ -290,6 +290,11 @@ export function renderJourneyChart(mount, { series, matches, meId }) {
     function move(e) {
       const { x: cx } = pointXY(e);
       const r = svg.getBoundingClientRect();
+      // Redraw no meio do gesto (resize da barra do Safari ao rolar) desanexa
+      // o SVG, mas o touch segue entregue ao nó velho (implicit capture):
+      // rect zerado → xv = ∞ → com 1 só dia (K=1) k vira NaN → dayKeys[NaN]
+      // → k.split quebra. Gesto órfão não tem tooltip a mostrar.
+      if (!r.width) return;
       const xv = (cx - r.left) / r.width * geo.width;
       const k = clamp(Math.round((xv - geo.PADl) / Math.max(1, geo.width - geo.PADl - geo.PADr) * (geo.K - 1)), 0, Math.max(0, geo.K - 1));
       const gi = geo.steps[k];
