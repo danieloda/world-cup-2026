@@ -361,6 +361,13 @@
   ],
   "Bosnia & Herzegovina": [
     [
+      "2026-06-12",
+      "Canada",
+      false,
+      "1-1",
+      "World Cup"
+    ],
+    [
       "2026-06-06",
       "Panama",
       false,
@@ -421,13 +428,6 @@
       "Austria",
       true,
       "1-2",
-      "Eliminatórias"
-    ],
-    [
-      "2025-09-06",
-      "San Marino",
-      false,
-      "6-0",
       "Eliminatórias"
     ]
   ],
@@ -505,6 +505,13 @@
   ],
   "Canada": [
     [
+      "2026-06-12",
+      "Bosnia & Herzegovina",
+      true,
+      "1-1",
+      "World Cup"
+    ],
+    [
       "2026-06-05",
       "Rep. Of Ireland",
       true,
@@ -565,13 +572,6 @@
       "Australia",
       true,
       "0-1",
-      "Amistoso"
-    ],
-    [
-      "2025-09-09",
-      "Wales",
-      false,
-      "1-0",
       "Amistoso"
     ]
   ],
@@ -699,7 +699,7 @@
     ],
     [
       "2025-10-09",
-      "Czech Republic",
+      "Czechia",
       false,
       "0-0",
       "Eliminatórias"
@@ -2161,6 +2161,13 @@
   ],
   "Paraguay": [
     [
+      "2026-06-13",
+      "USA",
+      false,
+      "1-4",
+      "World Cup"
+    ],
+    [
       "2026-06-05",
       "Nicaragua",
       true,
@@ -2221,13 +2228,6 @@
       "Ecuador",
       true,
       "0-0",
-      "Eliminatórias"
-    ],
-    [
-      "2025-06-11",
-      "Brazil",
-      false,
-      "0-1",
       "Eliminatórias"
     ]
   ],
@@ -2666,7 +2666,7 @@
   "South Korea": [
     [
       "2026-06-12",
-      "Czech Republic",
+      "Czechia",
       true,
       "2-1",
       "World Cup"
@@ -3025,6 +3025,13 @@
   ],
   "USA": [
     [
+      "2026-06-13",
+      "Paraguay",
+      true,
+      "4-1",
+      "World Cup"
+    ],
+    [
       "2026-06-06",
       "Germany",
       true,
@@ -3085,13 +3092,6 @@
       "Japan",
       true,
       "2-0",
-      "Amistoso"
-    ],
-    [
-      "2025-09-06",
-      "South Korea",
-      true,
-      "0-2",
       "Amistoso"
     ]
   ],
