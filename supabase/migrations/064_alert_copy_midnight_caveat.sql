@@ -14,16 +14,16 @@
 -- de novo é no-op: as strings antigas já não existem) e auto-auditável (avisa se
 -- alguma forma conhecida não casar).
 --
--- Mudanças de copy (antigo → novo), por função:
+-- Mudanças de copy (antigo → novo). Em prod, 2 funções vivas casam (verificado:
+-- só elas têm a frase no prosrc):
 --   cron_alert_group_completeness (055):
 --     "Cada jogo trava às 23h59 da véspera."
 --   → "Cada jogo trava às 23h59 da véspera (jogos de meia-noite, 1 dia antes)."
 --   alert_match_status_changed (053, aviso de adiamento):
 --     "(trava 23h59 da véspera)."
 --   → "(trava 23h59 da véspera; jogos de meia-noite, 1 dia antes)."
---   alert_ko_phase_opens (042):
---     "Cada jogo trava 23h59 da véspera. 👇"
---   → "Cada jogo trava 23h59 da véspera (jogos de meia-noite, 1 dia antes). 👇"
+-- O replace da forma "...23h59 da véspera. 👇" fica por completude mas é no-op:
+-- pertencia à alert_ko_phase_opens, DROPADA na 053 (não existe mais em prod).
 --
 -- O prazo exato de CADA jogo já é mostrado no app pelo countdown "Bloqueia em…"
 -- (fonte autoritativa); esta copy é só o lembrete genérico.
