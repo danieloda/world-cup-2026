@@ -35,11 +35,15 @@ declare
   out text;
 begin
   for fn in
+    -- Filtra pelo CORPO (prosrc) e só funções normais (prokind='f'): pg_get_functiondef
+    -- estoura em agregados/janela (ex.: array_agg), então não pode ir no WHERE de
+    -- todo o schema. Aqui ela só roda no loop, nas funções já filtradas.
     select p.oid::regprocedure
     from pg_proc p
     join pg_namespace n on n.oid = p.pronamespace
     where n.nspname = 'public'
-      and pg_get_functiondef(p.oid) like '%23h59 da véspera%'
+      and p.prokind = 'f'
+      and p.prosrc like '%23h59 da véspera%'
   loop
     src := pg_get_functiondef(fn);
     out := src;
