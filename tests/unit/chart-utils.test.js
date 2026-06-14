@@ -6,7 +6,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   computePositions, buildTimeline, stageBands, buildColorMap,
-  ME_COLOR, PALETTE, clamp, pointXY,
+  ME_COLOR, PALETTE, clamp, pointXY, firstMeaningfulGame,
 } from '../../src/js/chart-utils.js';
 import { stageLabel } from '../../src/js/util.js';
 
@@ -59,6 +59,49 @@ describe('computePositions — ranking a cada jogo', () => {
   it('bordas: lista vazia e usuário único', () => {
     expect(computePositions([])).toEqual([]);
     expect(computePositions([{ userId: 'a', values: [0, 3, 9] }])).toEqual([[1, 1]]);
+  });
+});
+
+describe('firstMeaningfulGame — onde as estatísticas começam (filtro de ruído)', () => {
+  // 10 jogadores, 10 jogos. Todos empatados em 0 nos jogos 0–2; no jogo 3 o
+  // usuário (idx 0) e mais 2 se separam (3 < metade do bolão). O corte FIXO de 6
+  // descartava esse jogo 3 — exatamente o "5º no 4º jogo" do bug.
+  it('REGRESSÃO: separação cedo (jogo 3) NÃO é descartada pelo teto de 6', () => {
+    const sep = [10, 10, 10, ...Array(7).fill(0)];   // 3 empatados em 10 no jogo 3
+    const series = sep.map((v4, i) => ({
+      userId: `u${i}`, values: [0, 0, 0, 0, v4, ...Array(6).fill(v4)],
+    }));
+    expect(firstMeaningfulGame(series, 0)).toBe(3);   // antes: 6 (perdia o pico)
+  });
+
+  it('empate persistente (todos idênticos sempre) → cai no teto antigo (6)', () => {
+    const series = Array.from({ length: 10 }, (_, i) => ({
+      userId: `u${i}`, values: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    }));
+    expect(firstMeaningfulGame(series, 0)).toBe(6);
+  });
+
+  it('SALVAGUARDA: separação tardia (jogo 8) nunca pula MAIS que o teto (6)', () => {
+    const sep = [10, ...Array(9).fill(0)];            // só o usuário sai, no jogo 8
+    const series = sep.map((v9, i) => ({
+      userId: `u${i}`, values: [0, 0, 0, 0, 0, 0, 0, 0, 0, v9, v9],
+    }));
+    expect(firstMeaningfulGame(series, 0)).toBe(6);
+  });
+
+  it('usuário distinto desde o 1º jogo → tudo conta (0)', () => {
+    const series = [
+      { userId: 'me', values: [0, 5, 9, 12] },
+      { userId: 'b', values: [0, 0, 9, 12] },
+      { userId: 'c', values: [0, 0, 0, 12] },
+      { userId: 'd', values: [0, 0, 0, 0] },
+    ];
+    expect(firstMeaningfulGame(series, 0)).toBe(0);
+  });
+
+  it('bordas: lista vazia e usuário único não explodem', () => {
+    expect(firstMeaningfulGame([], 0)).toBe(0);
+    expect(firstMeaningfulGame([{ userId: 'a', values: [0, 3, 9] }], 0)).toBe(0);
   });
 });
 

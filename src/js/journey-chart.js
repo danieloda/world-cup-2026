@@ -13,7 +13,7 @@
 import { escapeHtml, avatarHtml, flag, teamPt, stageLabel, formatBrShort } from './util.js';
 import {
   computePositions, buildTimeline, stageBands, buildColorMap, avatarSvgAt,
-  matchHeader, placeTip, pointXY, clamp, ME_COLOR,
+  matchHeader, placeTip, pointXY, clamp, ME_COLOR, firstMeaningfulGame,
 } from './chart-utils.js';
 
 /**
@@ -32,9 +32,10 @@ export function renderJourneyChart(mount, { series, matches, meId }) {
   const colorMap = buildColorMap(series, meId);
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // primeiros jogos = ruído de empate (todo mundo com ~0 pt) — estatísticas
-  // e anotações começam depois deles
-  const FROM_G = Math.min(6, Math.max(0, GAMES - 2));
+  // primeiros jogos = ruído de empate — estatísticas e anotações começam quando
+  // o usuário se separa do pelotão (adaptativo, não um corte fixo de 6, que
+  // descartava picos já decididos por pontos). Ver firstMeaningfulGame.
+  const FROM_G = firstMeaningfulGame(series, meIdx);
 
   let granKey = 'dia';     // 'dia' | 'jogo'
   let rival = null;        // userId ou null

@@ -39,6 +39,37 @@ export function computePositions(series) {
 }
 
 /**
+ * Janela de "ruído dos primeiros jogos": enquanto o usuário ainda está num bolo
+ * de empate grande (≥ metade do bolão com a mesma pontuação), a posição dele é
+ * só o desempate (ordem do ranking final), não algo conquistado. Devolve o
+ * índice do PRIMEIRO jogo em que ele já se separou do pelotão — daí pra frente
+ * as estatísticas (melhor/pior/arrancada/tombo) e as anotações do gráfico valem.
+ *
+ * Adaptativo, mas nunca pula MAIS que o teto antigo (6 jogos): só RELAXA o corte
+ * quando a separação acontece cedo. O corte fixo de 6 descartava picos já
+ * decididos por PONTOS (ex.: 5º no 4º jogo, com 20 pt — longe de qualquer empate).
+ *
+ * @param {Array<{values:number[]}>} series  séries do replay (values[g+1] = pts após o jogo g)
+ * @param {number} meIdx  índice da série do usuário
+ * @returns {number} índice (0-based) do 1º jogo "real"
+ */
+export function firstMeaningfulGame(series, meIdx) {
+  const N = series.length;
+  const me = series[meIdx];
+  const GAMES = (me?.values.length ?? 1) - 1;
+  const cap = Math.min(6, Math.max(0, GAMES - 2));   // teto antigo, vira só salvaguarda
+  if (N === 0 || !me) return cap;
+  const bigTie = Math.max(2, Math.floor(N / 2));     // "bolo de empate" = metade do bolão
+  for (let g = 0; g < GAMES; g++) {
+    const my = me.values[g + 1] ?? 0;
+    let tied = 0;
+    for (const s of series) if ((s.values[g + 1] ?? 0) === my) tied++;
+    if (tied < bigTie) return Math.min(g, cap);      // já saiu do pelotão → daqui conta
+  }
+  return cap;                                         // empate persistente → teto antigo
+}
+
+/**
  * Modelo de tempo a partir dos jogos reais (datas no fuso de Brasília):
  *  - dayOfGame[g]  → índice do dia
  *  - dayEnds[d]    → índice do ÚLTIMO jogo do dia d
