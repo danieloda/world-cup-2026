@@ -153,7 +153,11 @@ function ensureValidStatus() {
   if (!has(activeStatus)) activeStatus = has('finished') ? 'finished' : 'awaiting';
 }
 function visibleMatches() {
-  return dayMatches().filter(m => matchStatus(m) === activeStatus);
+  const list = dayMatches().filter(m => matchStatus(m) === activeStatus);
+  // Finalizadas: o jogo mais recente no topo (desc). Próximas partidas: o mais
+  // perto do apito no topo (asc) — senão o jogo mais distante abriria a lista.
+  const dir = activeStatus === 'awaiting' ? 1 : -1;
+  return list.sort((a, b) => dir * (new Date(a.match_date) - new Date(b.match_date)));
 }
 
 // Dias distintos (desc) da fase ativa, com contagem
