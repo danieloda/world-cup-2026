@@ -56,17 +56,21 @@ describe('agendamento — snapshot roda DEPOIS da trava do dia', () => {
 describe('critério de "travado" do snapshot == fórmula canônica do prazo', () => {
   // O snapshot tem cópia própria de predictionDeadline (não importa de src/ de
   // propósito — script standalone). Trava os marcadores da fórmula nas DUAS
-  // cópias: véspera 23h59 + offset BRT fixo. A paridade JS↔SQL da fórmula em
-  // si já é coberta por deadline-parity.test.js.
-  const FORMULA = /getUTCDate\(\) - 1, 23, 59/;
+  // cópias: véspera 23h59 + offset BRT fixo + exceção da meia-noite (jogo 00h BRT
+  // trava com o lote do dia anterior). A paridade JS↔SQL já é coberta por
+  // deadline-parity.test.js.
+  const FORMULA = /getUTCDate\(\) - daysBack, 23, 59/;
+  const MIDNIGHT = /getUTCHours\(\) === 0 \? 2 : 1/;
   const OFFSET = /3 \* 3600000/;
-  it('snapshot.js usa véspera 23h59 BRT e filtra por deadline <= agora', () => {
+  it('snapshot.js usa véspera 23h59 BRT (+ exceção meia-noite) e filtra por deadline <= agora', () => {
     expect(snapshotSrc).toMatch(FORMULA);
+    expect(snapshotSrc).toMatch(MIDNIGHT);
     expect(snapshotSrc).toMatch(OFFSET);
     expect(snapshotSrc).toMatch(/predictionDeadline\(m\.match_date\) <= now/);
   });
   it('util.js (a fonte espelhada) mantém a mesma fórmula', () => {
     expect(utilSrc).toMatch(FORMULA);
+    expect(utilSrc).toMatch(MIDNIGHT);
     expect(utilSrc).toMatch(OFFSET);
   });
   it('idempotência declarada no código: mesmo conteúdo → nenhum snapshot novo', () => {

@@ -64,12 +64,14 @@ const admin = createClient(SUPABASE_URL, SERVICE_KEY, {
   auth: { autoRefreshToken: false, persistSession: false },
 });
 
-// Deadline de palpite: véspera 23h59 BRT (UTC-3 fixo). IGUAL a src/js/util.js e
-// public.prediction_deadline (migration 023).
+// Deadline de palpite: véspera 23h59 BRT (UTC-3 fixo). Jogo à meia-noite (00h BRT)
+// trava com o lote do dia anterior (véspera da véspera). IGUAL a src/js/util.js e
+// public.prediction_deadline (migrations 023 + 063).
 const BRT_OFFSET_MS = 3 * 3600000;
 function predictionDeadline(matchDate) {
   const brt = new Date(new Date(matchDate).getTime() - BRT_OFFSET_MS);
-  const wall = Date.UTC(brt.getUTCFullYear(), brt.getUTCMonth(), brt.getUTCDate() - 1, 23, 59, 0);
+  const daysBack = brt.getUTCHours() === 0 ? 2 : 1;
+  const wall = Date.UTC(brt.getUTCFullYear(), brt.getUTCMonth(), brt.getUTCDate() - daysBack, 23, 59, 0);
   return new Date(wall + BRT_OFFSET_MS);
 }
 

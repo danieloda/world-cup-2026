@@ -599,16 +599,21 @@ const BRT_OFFSET_MS = 3 * 3600000;
 
 /**
  * Prazo do palpite: 23h59 (horário de Brasília) da VÉSPERA do jogo.
- * Ex.: jogo 15/jun 16h → fecha 14/jun 23h59. KEEP IN SYNC com
- * public.prediction_deadline() (migration 023).
+ * Ex.: jogo 15/jun 16h → fecha 14/jun 23h59.
+ * EXCEÇÃO: jogos à meia-noite (00h BRT) travam com o LOTE DO DIA ANTERIOR (um dia
+ * a mais cedo), senão o prazo ficaria a 1 min do apito e o lacre das 00:10 cairia
+ * depois dele. Ex.: jogo 20/jun 00:00 → fecha 18/jun 23:59. KEEP IN SYNC com
+ * public.prediction_deadline() (migrations 023 + 063).
  * @param {string|Date} matchDate
  * @returns {Date} instante em que o palpite trava
  */
 export function predictionDeadline(matchDate) {
   // Desloca para o relógio de Brasília lendo os campos UTC.
   const brt = new Date(new Date(matchDate).getTime() - BRT_OFFSET_MS);
-  // 23h59 do dia anterior, no relógio de Brasília...
-  const wallMs = Date.UTC(brt.getUTCFullYear(), brt.getUTCMonth(), brt.getUTCDate() - 1, 23, 59, 0);
+  // Jogo à meia-noite (00h BRT) → véspera da véspera; senão, véspera.
+  const daysBack = brt.getUTCHours() === 0 ? 2 : 1;
+  // 23h59 do dia da trava, no relógio de Brasília...
+  const wallMs = Date.UTC(brt.getUTCFullYear(), brt.getUTCMonth(), brt.getUTCDate() - daysBack, 23, 59, 0);
   // ...convertido de volta para o instante UTC real.
   return new Date(wallMs + BRT_OFFSET_MS);
 }
