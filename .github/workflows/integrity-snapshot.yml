@@ -12,8 +12,13 @@ name: Integrity Snapshot
 
 on:
   schedule:
-    # 03:09 UTC = 00:09 BRT — 10 min depois da trava do dia (deadlines são
-    # véspera 23h59 BRT), minimizando a janela trava→carimbo.
+    # BACKSTOP. O gatilho PRIMÁRIO é o pg_cron do Supabase às 00:10 BRT
+    # (migration 062), que chama workflow_dispatch via pg_net — o cron interno do
+    # GitHub é best-effort e vinha atrasando 4–8h (saía de madrugada, depois de
+    # jogos que travam após a meia-noite). Este schedule fica só como rede de
+    # segurança: se o pg_cron falhar, ainda carimba (atrasado, mas a corrente não
+    # quebra). Disparo dobrado é inofensivo (snapshot dedupa, publish tem guarda).
+    # 03:09 UTC = 00:09 BRT — 10 min depois da trava (deadlines véspera 23h59 BRT).
     - cron: '9 3 * * *'
   workflow_dispatch:
 
