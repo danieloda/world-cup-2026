@@ -24,21 +24,33 @@ const ICON = {
   chev: '<svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
 };
 
-// Tinta sutil das cores do time no placar (--ch/--ca). Times sem mapa caem num
-// neutro — o color-mix continua válido, só fica sem cor de marca.
-const TEAM_TINT = {
-  Brazil: '#009C3B', Argentina: '#6CACE4', France: '#0055A4', England: '#CF142B',
-  Spain: '#AA151B', Germany: '#888', Portugal: '#006600', Netherlands: '#AE6A32',
-  Croatia: '#C1272D', Italy: '#0066CC', Belgium: '#C8102E', Uruguay: '#5CBFEB',
-  Mexico: '#006847', 'United States': '#3C3B6E', Canada: '#FF0000', Japan: '#BC002D',
-  'South Korea': '#0047A0', Morocco: '#C1272D', Senegal: '#00853F', Ghana: '#006B3F',
-  Nigeria: '#008751', Switzerland: '#D52B1E', Denmark: '#C60C30', Poland: '#DC143C',
-  Colombia: '#FCD116', Ecuador: '#FFD100', Australia: '#00843D', 'Saudi Arabia': '#006C35',
-  Qatar: '#8A1538', Iran: '#239F40', Serbia: '#C6363C', Austria: '#ED2939',
-  Norway: '#BA0C2F', Sweden: '#FECC00', Scotland: '#005EB8', Haiti: '#00209F',
+// Tinta das cores da BANDEIRA no placar (--ch/--ca). Chaveada pelo CÓDIGO do flag
+// (mesma fonte do flag()), então independe da grafia do nome do país. Cor = tom
+// mais reconhecível da bandeira. Códigos sem mapa caem num neutro do tema.
+const CODE_TINT = {
+  // Anfitriões + Américas
+  us: '#3C3B6E', mx: '#006847', ca: '#D52B1E', br: '#009739', ar: '#75AADB',
+  uy: '#5CBFEB', co: '#FCD116', ec: '#FFD100', py: '#D52B1E', pe: '#D91023',
+  cl: '#0039A6', ve: '#FCD116', pa: '#DA121A', cr: '#002B7F', hn: '#0073CF',
+  jm: '#FED100', ht: '#00209F', cw: '#002B7F',
+  // Europa
+  fr: '#0055A4', es: '#C60B1E', de: '#DD0000', pt: '#006600', nl: '#FF6200',
+  hr: '#C1272D', it: '#008C45', be: '#FDDA24', ch: '#D52B1E', dk: '#C60C30',
+  pl: '#DC143C', no: '#BA0C2F', se: '#006AA7', at: '#ED2939', rs: '#C6363C',
+  cz: '#D7141A', tr: '#E30A17', ua: '#0057B7', gr: '#0D5EAF', hu: '#CD2A3E',
+  ro: '#002B7F', 'gb-eng': '#CE1124', 'gb-sct': '#005EB8', 'gb-wls': '#C8102E',
+  // África
+  ma: '#C1272D', sn: '#00853F', gh: '#006B3F', ng: '#008751', eg: '#CE1126',
+  tn: '#E70013', dz: '#006233', cm: '#007A5E', ci: '#FF8200', cv: '#003893',
+  za: '#007A4D', ml: '#14B53A', cd: '#007FFF', ao: '#CE1126',
+  // Ásia / Oceania
+  jp: '#BC002D', kr: '#CD2E3A', sa: '#006C35', qa: '#8A1538', ir: '#239F40',
+  au: '#00843D', nz: '#00247D', uz: '#0099B5', jo: '#007A3D', iq: '#CE1126',
+  ae: '#00732F',
 };
 function teamTint(team) {
-  return TEAM_TINT[team] || '#5b6472';
+  const code = (flag(team).match(/fi-([a-z-]+)/) || [])[1];
+  return CODE_TINT[code] || '#5b6472';
 }
 
 // ============================================================
@@ -404,10 +416,15 @@ function renderMatchCard(m) {
   return matchStatus(m) === 'finished' ? renderFinishedCard(m) : renderAwaitingCard(m);
 }
 
-// group → neutro · final → dourado · third → bronze · demais (r32..sf) → ko (amarelo)
-function stageCls(m) {
-  const s = m.stage;
-  return s === 'group' ? 'group' : s === 'final' ? 'final' : s === 'third' ? 'third' : 'ko';
+// Borda do card = SEU resultado (mesma linguagem de cor do calendário):
+// cravou → amarelo · pontuou → verde · não pontuou → vermelho · aguardando/sem palpite → neutro
+function resultCls(m) {
+  if (!m.finished) return 'r-none';
+  const mybet = (predsByMatch.get(m.id) ?? []).find(b => b.user_id === profile.id);
+  if (!mybet) return 'r-none';
+  const pts = mybet.points_earned ?? 0;
+  const isExact = mybet.pred_home === m.actual_home && mybet.pred_away === m.actual_away;
+  return isExact ? 'r-exact' : pts > 0 ? 'r-partial' : 'r-miss';
 }
 function stageDisp(m) {
   return m.stage === 'group' ? `Grupo ${m.group_name}` : stageLabel(m.stage);
@@ -415,10 +432,6 @@ function stageDisp(m) {
 // "1.5" / "2" / "5" — sem zeros à toa (multiplicador do bônus de artilheiro)
 function fmtMult(stage) {
   return String(stageMultiplier(stage)).replace(/\.0$/, '');
-}
-// Total de gols de um palpite (chave de ordenação nas "próximas partidas")
-function predGoals(p) {
-  return (p.pred_home ?? 0) + (p.pred_away ?? 0);
 }
 
 // Bônus de artilheiro que ESTE usuário ganhou NESTA partida (ou null se não pontuou aqui).
@@ -464,12 +477,11 @@ function mybandHtml(m) {
   if (!mybet) return `<div class="myline"><span class="myband miss">Você não palpitou neste jogo</span></div>`;
   const pts = mybet.points_earned ?? 0;
   const isExact = mybet.pred_home === m.actual_home && mybet.pred_away === m.actual_away;
-  const isDraw = m.actual_home === m.actual_away;
   const lvl = isExact ? 'exact' : pts > 0 ? 'partial' : 'miss';
   const pred = `${mybet.pred_home}–${mybet.pred_away}`;
   const verb = isExact ? 'cravou' : 'palpitou';
   const tag = isExact ? '<span class="rk">placar exato</span>'
-    : pts > 0 ? `<span class="rk">${isDraw ? 'acertou o empate' : 'acertou o vencedor'}</span>`
+    : pts > 0 ? '<span class="rk">acerto parcial</span>'
     : '';
   const sc = scorerHitFor(mybet, m);
   const ball = sc ? ` <span class="rk rk-ball">${ICON.ball} +${sc.bonus}</span>` : '';
@@ -488,11 +500,13 @@ function consensusHtml(m, bets, finished) {
   const top = [...freq.entries()].sort((a, b) => b[1] - a[1]).slice(0, finished ? 2 : 3);
   const pills = top.map(([k, n], i) => {
     const [h, a] = k.split('-');
-    return `<span class="cpill ${i === 0 ? 'lead' : ''}"><span class="sb">${h}–${a}</span> <span class="n"><b>${n}</b>${i === 0 ? ' palpites' : ''}</span></span>`;
+    const unit = i === 0 ? '<span class="u"> palpites</span>' : '';  // some no mobile (fica só o número)
+    return `<span class="cpill ${i === 0 ? 'lead' : ''}"><span class="sb">${h}–${a}</span> <span class="n"><b>${n}</b>${unit}</span></span>`;
   }).join('');
   const mybet = bets.find(b => b.user_id === profile.id);
   const you = mybet ? `<span class="you">você <span class="sb">${mybet.pred_home}–${mybet.pred_away}</span></span>` : '';
-  return `<div class="consensus"><span class="ttl">Mais palpitados</span>${pills}${you}</div>`;
+  // pills + "você" agrupados em .cpills → no mobile o título sobe e os tokens quebram alinhados
+  return `<div class="consensus"><span class="ttl">Mais palpitados</span><div class="cpills">${pills}${you}</div></div>`;
 }
 
 // ----- Raio-X: tiers (cravaram / acertaram vencedor / não pontuaram) -----
@@ -503,10 +517,12 @@ function tiersHtml(m, bets) {
     const isExact = b.pred_home === m.actual_home && b.pred_away === m.actual_away;
     levels[isExact ? 'exact' : pts > 0 ? 'partial' : 'miss'].push(b);
   }
-  const isDraw = m.actual_home === m.actual_away;
+  // Modelo ADITIVO: no tier parcial cada um pontua por motivos diferentes (gols de um
+  // time, vencedor, saldo) — então um rótulo único tipo "acertaram o vencedor/empate"
+  // mentiria pra metade do grupo. Fica neutro; o placar+pontos de cada subgrupo conta o porquê.
   const out = [];
   if (levels.exact.length)   out.push(tierHtml(m, 'exact',   'Cravaram o placar', levels.exact, true));
-  if (levels.partial.length) out.push(tierHtml(m, 'partial', isDraw ? 'Acertaram o empate' : 'Acertaram o vencedor', levels.partial, false));
+  if (levels.partial.length) out.push(tierHtml(m, 'partial', 'Acerto parcial', levels.partial, false));
   if (levels.miss.length)    out.push(tierHtml(m, 'miss',    'Não pontuaram', levels.miss, false));
   return `<div class="tiers">${out.join('')}</div>`;
 }
@@ -578,7 +594,7 @@ function renderFinishedCard(m) {
          ${tiersHtml(m, bets)}
        </div>`
     : `<div class="card-body"><div class="bets-empty">Nenhum palpite registrado pra este jogo.</div></div>`;
-  return `<article class="rcard ${stageCls(m)}">${boardHtml(m, mybandHtml(m))}${body}</article>`;
+  return `<article class="rcard ${resultCls(m)}">${boardHtml(m, mybandHtml(m))}${body}</article>`;
 }
 
 // ----- Próxima partida (aguardando): palpites de todos, SEM pontos -----
@@ -589,36 +605,18 @@ function renderAwaitingCard(m) {
   const pill = `<div class="myline"><span class="pill ${live ? 'live' : 'locked'}">${live ? '<span class="ld"></span>' : ''}${pillTxt}</span></div>`;
 
   const bets = predsByMatch.get(m.id) ?? [];
-  let body;
-  if (!bets.length) {
-    body = `<div class="card-body"><div class="bets-empty">Nenhum palpite registrado pra este jogo.</div></div>`;
-  } else {
-    const mybet = bets.find(b => b.user_id === profile.id);
-    const others = [...bets]
-      .filter(b => b.user_id !== profile.id)
-      .sort((a, b) => predGoals(b) - predGoals(a)
-        || (b.pred_home ?? 0) - (a.pred_home ?? 0)
-        || (a.profiles?.full_name || '').localeCompare(b.profiles?.full_name || ''));
-    body = `
-      <div class="card-body">
-        ${consensusHtml(m, bets, false)}
-        ${mybet ? awaitingRow(mybet) : ''}
-        <details class="allbets">
-          <summary><span>Ver os ${bets.length} palpites</span>${ICON.chev}</summary>
-          ${others.map(awaitingRow).join('')}
-        </details>
-      </div>`;
-  }
-  return `<article class="rcard ${stageCls(m)} awaiting">${boardHtml(m, pill)}${body}</article>`;
-}
-function awaitingRow(b) {
-  const isMe = b.user_id === profile.id;
-  const name = isMe ? 'Você' : (b.profiles?.full_name || '?');
-  return `
-    <div class="abrow ${isMe ? 'me' : ''}">
-      <span class="player"><span class="av">${avatarHtml(b.profiles)}</span><span class="nm">${escapeHtml(name)}</span></span>
-      <span class="pred">${b.pred_home}<span class="x">–</span>${b.pred_away}</span>
-    </div>`;
+  // Sem resultado ainda → sem tiers; mas agrupa por placar (igual às Finalizadas),
+  // ordenado pelo mais palpitado. groupedPeople já faz isso (pts=0 → ordena por nº).
+  const body = bets.length
+    ? `<div class="card-body">
+         ${consensusHtml(m, bets, false)}
+         <details class="allbets">
+           <summary><span>Ver os ${bets.length} palpite${bets.length === 1 ? '' : 's'}</span>${ICON.chev}</summary>
+           <div class="people">${groupedPeople(m, bets)}</div>
+         </details>
+       </div>`
+    : `<div class="card-body"><div class="bets-empty">Nenhum palpite registrado pra este jogo.</div></div>`;
+  return `<article class="rcard ${resultCls(m)} awaiting">${boardHtml(m, pill)}${body}</article>`;
 }
 
 // ============================================================

@@ -7,6 +7,7 @@ import {
   groundShort,
   roundLabelPt,
   getInitials,
+  avatarHtml,
   escapeHtml,
   greeting,
   firstName,
@@ -20,6 +21,9 @@ import {
   daysToKickoffLabel,
   brDayWindowUtc,
   oddsToProbs,
+  renderDateCalendar,
+  dayPredictionStatus,
+  localDateKey,
 } from '../../src/js/util.js';
 
 describe('flag', () => {
@@ -632,5 +636,96 @@ describe('loadTopScorers', () => {
     stubFetch(async () => ({ ok: true, json: async () => ({}) }));
     const { loadTopScorers } = await import('../../src/js/util.js');
     expect(await loadTopScorers()).toEqual({ updated_at: null, scorers: [] });
+  });
+});
+
+describe('avatarHtml', () => {
+  it('com avatar_url → <img> com src e alt do nome', () => {
+    const h = avatarHtml({ avatar_url: 'https://x/p.png', full_name: 'Ana Braga' });
+    expect(h).toContain('<img');
+    expect(h).toContain('https://x/p.png');
+    expect(h).toContain('Ana Braga');
+  });
+  it('com avatar_url e sem nome → alt cai no email', () => {
+    const h = avatarHtml({ avatar_url: 'https://x/p.png', email: 'ana@x.com' });
+    expect(h).toContain('ana@x.com');
+  });
+  it('sem url → iniciais do nome', () => {
+    expect(avatarHtml({ full_name: 'Pedro Rocha' })).toBe('PR');
+  });
+  it('sem url e só email → iniciais do email', () => {
+    expect(avatarHtml({ email: 'ze@x.com' })).toBe('Z');
+  });
+  it('sem perfil → fallback "?"', () => {
+    expect(avatarHtml()).toBe('?');
+  });
+});
+
+describe('dayPredictionStatus', () => {
+  const now = Date.now();
+  const H = 3600e3;
+  it('jogado + completo → past', () => expect(dayPredictionStatus(4, 4, now + 1e6, true)).toBe('past'));
+  it('jogado + incompleto → locked', () => expect(dayPredictionStatus(2, 4, now + 1e6, true)).toBe('locked'));
+  it('prazo passou + incompleto → locked', () => expect(dayPredictionStatus(1, 4, now - 1000)).toBe('locked'));
+  it('prazo passou + completo → past', () => expect(dayPredictionStatus(4, 4, now - 1000)).toBe('past'));
+  it('tudo palpitado (futuro) → done', () => expect(dayPredictionStatus(4, 4, now + 1e6)).toBe('done'));
+  it('sem jogos (total 0) → done', () => expect(dayPredictionStatus(0, 0, now + 1e6)).toBe('done'));
+  it('sem prazo e incompleto → pending', () => expect(dayPredictionStatus(1, 4, null)).toBe('pending'));
+  it('faltam <48h → urgent', () => expect(dayPredictionStatus(1, 4, now + 24 * H)).toBe('urgent'));
+  it('faltam <1 semana → soon', () => expect(dayPredictionStatus(1, 4, now + 100 * H)).toBe('soon'));
+  it('falta >1 semana → pending', () => expect(dayPredictionStatus(1, 4, now + 300 * H)).toBe('pending'));
+  it('aceita Date além de epoch ms', () => expect(dayPredictionStatus(1, 4, new Date(now + 24 * H))).toBe('urgent'));
+});
+
+describe('renderDateCalendar', () => {
+  it('sem datas → string vazia', () => {
+    expect(renderDateCalendar({ dates: [] })).toBe('');
+    expect(renderDateCalendar()).toBe('');
+  });
+
+  it('monta grade, cores por status, dia ativo, info/título e legenda', () => {
+    // inclui HOJE (sem meta) → cobre o ramo `.today` + `meta[key] || {}` + defaults
+    const today = localDateKey(new Date());
+    const dates = [...new Set(['2026-06-12', '2026-06-13', '2026-06-15', '2026-06-18', today])];
+    const meta = {
+      '2026-06-12': { status: 'done', total: 4, done: 4, title: '12 jun', info: 'Grupos A–B' },
+      '2026-06-13': { status: 'urgent', total: 3, done: 0 },
+      '2026-06-15': { status: 'soon', total: 4, done: 2, info: 'ao vivo' },
+      '2026-06-18': { status: 'locked', total: 3, done: 0 },
+    };
+    const html = renderDateCalendar({ dates, meta, activeDate: '2026-06-15' });
+    expect(html).toContain('class="cal"');
+    expect(html).toContain('today');
+    expect(html).toContain('st-done');
+    expect(html).toContain('st-urgent');
+    expect(html).toContain('st-soon');
+    expect(html).toContain('active');       // dia selecionado
+    expect(html).toContain('cal-off');      // dias do mês sem jogo
+    expect(html).toContain('Grupos A–B');   // info
+    expect(html).toContain('ao vivo');
+    expect(html).toContain('cal-legend');
+  });
+
+  it('usa status calculado quando meta não traz status explícito', () => {
+    const html = renderDateCalendar({
+      dates: ['2026-06-20'],
+      meta: { '2026-06-20': { total: 4, done: 4, deadline: Date.now() + 1e6 } }, // → done
+    });
+    expect(html).toContain('st-done');
+  });
+
+  it('legendLabels renomeia os rótulos sem trocar as cores', () => {
+    const dates = ['2026-06-12', '2026-06-13'];
+    const meta = {
+      '2026-06-12': { status: 'done', total: 1, done: 1 },
+      '2026-06-13': { status: 'urgent', total: 1, done: 0 },
+    };
+    const custom = renderDateCalendar({ dates, meta, legendLabels: { done: 'Você pontuou', urgent: 'Zerou o dia' } });
+    expect(custom).toContain('Você pontuou');
+    expect(custom).toContain('Zerou o dia');
+    expect(custom).not.toContain('Palpitado');   // rótulo padrão do 'done' some
+
+    const padrao = renderDateCalendar({ dates, meta });
+    expect(padrao).toContain('Palpitado');        // fallback s.label
   });
 });

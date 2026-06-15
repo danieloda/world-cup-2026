@@ -71,9 +71,14 @@ describe('historico — render autenticado (regressão TDZ)', () => {
     const pb = document.getElementById('pageBody');
     expect(pb).toBeTruthy();
     const html = pb.innerHTML;
-    expect(html).toContain('class="tier');         // Raio-X montou
-    expect(html).toContain('Cravaram o placar');    // tier exato (você cravou 3–1)
-    expect(html).toContain('Raio-X');               // cabeçalho do card
-    expect(html).toContain('class="board"');        // placar/momento
+    expect(html).toContain('class="tier');          // Raio-X montou
+    expect(html).toContain('Cravaram o placar');     // tier exato (você cravou 3–1)
+    expect(html).toContain('Acerto parcial');        // tier parcial com rótulo NEUTRO
+    expect(html).toContain('Raio-X');                // cabeçalho do card
+    expect(html).toContain('class="board"');         // placar/momento
+    expect(html).toContain('rcard r-exact');         // borda pela cor do SEU resultado
+    // rótulos enganosos do modelo aditivo não voltam
+    expect(html).not.toContain('Acertaram o empate');
+    expect(html).not.toContain('acertou o vencedor');
   });
 });

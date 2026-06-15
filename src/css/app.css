@@ -3007,11 +3007,16 @@ body.raiox-modal-open { overflow: hidden; }
   box-shadow: var(--shadow-material);
   transition: border-color .14s ease;
 }
-.rcard.group { border-top-color: var(--text-mute); }
-.rcard.ko    { border-top-color: var(--accent); }
-.rcard.final { border-top-color: var(--medal-gold); }
-.rcard.third { border-top-color: var(--medal-bronze); }
+/* Borda superior = SEU resultado (mesma linguagem de cor do calendário) */
+.rcard { border-top-width: 4px; }
+.rcard.r-exact   { border-top-color: var(--accent); }      /* cravou → amarelo */
+.rcard.r-partial { border-top-color: var(--positive); }    /* pontuou → verde */
+.rcard.r-miss    { border-top-color: var(--red); }         /* não pontuou → vermelho */
+.rcard.r-none    { border-top-color: var(--text-mute); }   /* aguardando / sem palpite */
 .rcard:hover { border-color: var(--line-strong); }
+.rcard.r-exact:hover   { border-top-color: var(--accent); }
+.rcard.r-partial:hover { border-top-color: var(--positive); }
+.rcard.r-miss:hover    { border-top-color: var(--red); }
 
 /* ---- Placar central: o "momento", com leve tinta das cores dos times ---- */
 .board {
@@ -3029,8 +3034,8 @@ body.raiox-modal-open { overflow: hidden; }
 .bteam { display: flex; flex-direction: column; align-items: center; gap: 7px; font-size: 14px; font-weight: 800; letter-spacing: -.01em; }
 .bteam .fi { width: 38px; height: 28px; border-radius: 5px; box-shadow: 0 5px 14px rgba(0,0,0,.45); }
 .bteam .bt-n { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.bscore { font-size: 46px; font-weight: 900; letter-spacing: -.04em; line-height: 1; font-variant-numeric: tabular-nums; }
-.bscore .x { color: var(--text-mute); margin: 0 8px; font-weight: 800; }
+.bscore { font-size: 56px; font-weight: 900; letter-spacing: -.04em; line-height: 1; font-variant-numeric: tabular-nums; text-shadow: 0 2px 10px rgba(0,0,0,.35); }
+.bscore .x { color: var(--text-mute); margin: 0 10px; font-weight: 800; font-size: .62em; vertical-align: .06em; }
 .bscore.bs-vs { font-size: 28px; color: var(--text-mute); letter-spacing: .12em; }
 .bpen { font-size: 10.5px; font-weight: 700; color: var(--text-mute); letter-spacing: .04em; margin-top: 8px; }
 .board .scorers { display: flex; align-items: center; justify-content: center; gap: 6px 12px; flex-wrap: wrap; font-size: 12px; color: var(--text-dim); margin-top: 11px; }
@@ -3045,7 +3050,8 @@ body.raiox-modal-open { overflow: hidden; }
 .myband .rk { background: rgba(0,0,0,.18); border-radius: 999px; padding: 2px 9px; font-size: 11px; font-weight: 700; }
 .myband .rk.rk-ball { display: inline-flex; align-items: center; gap: 3px; }
 .myband .rk.rk-ball svg { width: 12px; height: 12px; }
-.myband.exact { background: linear-gradient(135deg, #34e07a, var(--positive)); color: #04140a; box-shadow: 0 8px 22px -10px rgba(29,185,84,.7); }
+/* cravou = amarelo · pontuou = verde · não pontuou = vermelho (mesma linguagem da borda/tiers) */
+.myband.exact { background: linear-gradient(135deg, var(--accent-bright), var(--accent)); color: #1a1400; box-shadow: 0 8px 22px -10px rgba(244,196,48,.6); }
 .myband.partial { background: var(--positive-dim); color: var(--positive); }
 .myband.miss { background: var(--red-dim); color: var(--red); }
 
@@ -3065,7 +3071,8 @@ body.raiox-modal-open { overflow: hidden; }
 /* ---- Consenso: PLACAR em destaque (token), contagem secundária ---- */
 .consensus { display: flex; align-items: center; gap: 8px 14px; flex-wrap: wrap; font-size: 12.5px; color: var(--text-dim);
   background: rgba(255,255,255,.025); border: 1px solid var(--line); border-radius: 8px; padding: 10px 13px; margin-bottom: 14px; }
-.consensus .ttl { font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--text-mute); }
+.consensus .ttl { font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--text-mute); flex: 0 0 auto; }
+.cpills { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; flex: 1 1 auto; min-width: 0; }
 .cpill { display: inline-flex; align-items: center; gap: 7px; }
 .cpill .sb { font-family: var(--font-mono); font-weight: 900; font-size: 15px; line-height: 1; color: var(--text); letter-spacing: .04em;
   background: rgba(255,255,255,.07); border: 1px solid var(--line-strong); border-radius: 7px; padding: 4px 9px; }
@@ -3132,11 +3139,17 @@ details.allbets > summary::-webkit-details-marker { display: none; }
 details.allbets > summary .chev { margin-left: auto; color: var(--text-mute); transition: transform .2s ease; }
 details.allbets[open] > summary { margin-bottom: 4px; }
 details.allbets[open] > summary .chev { transform: rotate(180deg); }
+/* Próximas partidas: lista expandida agrupada por placar (reusa .pgroup) */
+.allbets .people { display: flex; flex-direction: column; gap: 12px; padding: 8px 2px 2px; }
 
 @media (max-width: 680px) {
-  .bscore { font-size: 38px; }
-  .bteam .fi { width: 32px; height: 24px; }
-  .consensus .you { margin-left: 0; width: 100%; }
+  .bscore { font-size: 46px; }
+  .bteam .fi { width: 34px; height: 25px; }
+  /* Consenso: título sobe pra própria linha; tokens quebram alinhados embaixo */
+  .consensus { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .cpills { width: 100%; gap: 6px 8px; }
+  .consensus .you { margin-left: 0; }
+  .cpill .u { display: none; }   /* "28 palpites" → "28" */
 }
 
 /* ===== Pódio (Ranking top 3) ===== */
