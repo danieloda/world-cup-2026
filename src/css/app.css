@@ -5517,6 +5517,8 @@ input[type="number"].score-input {
 .rc-hdot.hot { filter: drop-shadow(0 0 5px var(--glow)) drop-shadow(0 0 10px var(--glow)); }
 
 .rc-end { font-size: 12.5px; font-weight: 700; font-family: var(--font); }
+/* conector fino fim-da-linha → rótulo (só aparece quando o rótulo é deslocado) */
+.rc-lead { fill: none; stroke-width: 1.2; opacity: .5; stroke-linecap: round; stroke-linejoin: round; }
 
 .rc-hdot { pointer-events: none; }
 .rc-cross { stroke: rgba(255,255,255,.35); stroke-width: 1; stroke-dasharray: 3 3; }

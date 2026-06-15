@@ -161,20 +161,30 @@ export function renderRankChart(mount, { series, matches, meId }) {
       }
       const c = colorOf(i);
       foc += `<polyline class="rc-foc${s.userId === meId ? ' me' : ''}" data-i="${i}" stroke="${c}" style="--glow:${c}" points="${lineOf(i)}"/>`;
-      endLabels.push({ i, y: yAt(finalPos(i)), color: c });
+      endLabels.push({ i, y0: yAt(finalPos(i)), color: c });
     });
-    // rótulos de ponta FORA do clip (senão o 1º corta o avatar) + anti-colisão
-    endLabels.sort((a, b) => a.y - b.y);
-    let prevY = PADt - 14;
+    // rótulos de ponta FORA do clip (senão o 1º corta o avatar) + anti-colisão.
+    // Quando o foco junta muita gente (seleção larga), os fins de linha ficam
+    // mais perto que a altura de um rótulo: o anti-colisão afasta o rótulo do
+    // seu ponto. Pra não perder o vínculo, puxamos um CONECTOR fino do fim da
+    // linha (y0) até o avatar — ele tem comprimento zero (some) quando alinhado.
+    endLabels.sort((a, b) => a.y0 - b.y0);
+    const LBX = x1 + (narrow ? 14 : 24);   // centro do avatar do rótulo
+    const rowLbl = narrow ? 23 : 26;       // respiro vertical por rótulo
+    let prevY = PADt - rowLbl, lastY = PADt;   // 1º rótulo cai no próprio ponto (sem conector espúrio)
     for (const l of endLabels) {
-      l.y = Math.max(l.y, prevY + 24);
-      prevY = l.y;
+      const ly = Math.max(l.y0, prevY + rowLbl);
+      prevY = ly; lastY = ly;
       const s = series[l.i];
       const nm = s.userId === meId ? 'Você' : s.name;
-      lbls += avatarSvgAt(s, l.color, x1 + 14, l.y, 9, `rk${l.i}`);
-      lbls += `<text class="rc-end" x="${x1 + 28}" y="${(l.y + 4).toFixed(1)}" fill="${l.color}">${finalPos(l.i)}º ${escapeHtml(clip(nm, narrow ? 8 : 15))}</text>`;
+      if (ly - l.y0 > 1) {
+        const stub = x1 + (narrow ? 5 : 8);
+        lbls += `<path class="rc-lead" stroke="${l.color}" d="M${x1.toFixed(1)} ${l.y0.toFixed(1)} L${stub.toFixed(1)} ${l.y0.toFixed(1)} L${(LBX - 9).toFixed(1)} ${ly.toFixed(1)}"/>`;
+      }
+      lbls += avatarSvgAt(s, l.color, LBX, ly, 9, `rk${l.i}`);
+      lbls += `<text class="rc-end" x="${(LBX + 14).toFixed(1)}" y="${(ly + 4).toFixed(1)}" fill="${l.color}">${finalPos(l.i)}º ${escapeHtml(clip(nm, narrow ? 8 : 15))}</text>`;
     }
-    const svgH = Math.max(height, (endLabels[endLabels.length - 1]?.y ?? 0) + 18);
+    const svgH = Math.max(height, lastY + 18);
 
     host.innerHTML = `
       <svg class="rc-svg" width="${width}" height="${svgH}" viewBox="0 0 ${width} ${svgH}" role="img"
