@@ -74,6 +74,7 @@ const TEAM_ALIASES = {
   'Cape Verde Islands': 'Cape Verde',
   'Korea Republic': 'South Korea',
   'Republic of Korea': 'South Korea',
+  'Czechia': 'Czech Republic',   // API-Football renomeou Czech Republic → Czechia
   'United States': 'USA',
 };
 
