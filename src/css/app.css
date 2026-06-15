@@ -3121,6 +3121,11 @@ body.raiox-modal-open { overflow: hidden; }
 .people.flat .pp { flex: 0 0 auto; }
 .pp.me { border-color: rgba(244,196,48,.55); color: var(--accent-bright); background: var(--accent-dim); }
 .pp.me .av { background: var(--accent); color: #000; }
+/* posição atual no ranking, ao lado do nome (pódio = ouro/prata/bronze, igual ao /ranking) */
+.pp .pos { flex: 0 0 auto; font-size: 10px; font-weight: 900; font-variant-numeric: tabular-nums; line-height: 1; padding: 2px 6px; border-radius: 999px; background: rgba(255,255,255,.08); color: var(--text-mute); }
+.pp .pos.p1 { background: linear-gradient(135deg, #ffd966, var(--accent)); color: #2a2000; box-shadow: 0 0 0 1px rgba(255,210,80,.45), 0 2px 9px -2px rgba(244,196,48,.7); }
+.pp .pos.p2 { background: linear-gradient(135deg, #eef1f6, #b9c2cf); color: #1a1d24; box-shadow: 0 0 0 1px rgba(220,228,238,.5), 0 2px 9px -3px rgba(185,194,207,.6); }
+.pp .pos.p3 { background: linear-gradient(135deg, #e8a87a, #c87f4a); color: #2a1408; box-shadow: 0 0 0 1px rgba(220,150,90,.5), 0 2px 9px -3px rgba(200,127,74,.6); }
 
 /* ---- Próximas partidas: linha de palpite (sem pontos) + "ver todos" ---- */
 .abrow { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; padding: 7px 8px; border-radius: 8px; font-size: 13px; }

@@ -7,6 +7,7 @@ import {
   isLive, avatarHtml, localDateKey, renderDateCalendar, firstName, heroMeta,
 } from '../util.js';
 import { scorerBonus, stageMultiplier } from '../scoring.js';
+import { sortLeaderboard, assignRanksAndPrizes } from '../prize.js';
 import { KPI } from '../kpi-icons.js';
 import { startAutoRefresh } from '../auto-refresh.js';
 
@@ -61,6 +62,7 @@ let revealedMatches = [];          // jogos revelados (lacre publicado OU já co
 let predsByMatch = new Map();      // match_id -> [{...prediction, profiles}]
 let goalsByMatch = new Map();      // match_id -> [{...goal, players}]
 let scorerPickByUser = new Map();  // user_id -> { playerId, name }  (artilheiro escolhido)
+let posByUser = new Map();         // user_id -> posição atual no ranking do bolão (1-based)
 let activeStage = 'group';         // ABA 1 (fase): 'group' | 'ko'
 let activeDay = null;              // ABA 2 (dia): 'YYYY-MM-DD' (sempre um dia específico)
 let activeStatus = 'finished';     // FILTRO: 'finished' | 'awaiting'
@@ -97,7 +99,7 @@ try {
 // Data
 // ============================================================
 async function loadData() {
-  const [statsRes, matchesRes] = await Promise.all([
+  const [statsRes, matchesRes, leaderRes] = await Promise.all([
     supabase.from('v_pool_stats').select('*').single(),
     // Um jogo entra no Histórico quando os palpites de todos estão REVELADOS:
     // lacre do dia publicado no GitHub OU jogo já começado (fallback). A view
@@ -105,11 +107,17 @@ async function loadData() {
     // (predictions_select_own_or_revealed) — página e banco nunca divergem.
     supabase.from('v_revealed_matches').select('*')
       .order('match_date', { ascending: false }),
+    // Posição atual no ranking — mesma view/desempate do /ranking (SSOT em prize.js).
+    supabase.from('v_leaderboard').select('user_id, total_pts, exact_count, winner_sg_count'),
   ]);
 
   if (matchesRes.error) throw matchesRes.error;
   stats = statsRes.data ?? { finished_matches: 0, total_matches: 104, pct_played: 0, paid_users: 0 };
   revealedMatches = matchesRes.data ?? [];
+
+  // user_id -> posição (competição padrão 1,2,2,4…), idêntico ao /ranking.
+  const ranked = assignRanksAndPrizes(sortLeaderboard(leaderRes.data ?? []), []);
+  for (const u of ranked) posByUser.set(u.user_id, u.pos);
 
   if (revealedMatches.length === 0) return;
 
@@ -552,12 +560,18 @@ function sortMeFirst(list) {
     (b.user_id === profile.id) - (a.user_id === profile.id)
     || (a.profiles?.full_name || '').localeCompare(b.profiles?.full_name || ''));
 }
+// Badge da posição atual no ranking, ao lado do nome. Pódio (1–3) = ouro/prata/bronze.
+function posBadge(userId) {
+  const pos = posByUser.get(userId);
+  if (!pos) return '';
+  return `<span class="pos${pos <= 3 ? ` p${pos}` : ''}">${pos}º</span>`;
+}
 function personChip(m, b) {
   const isMe = b.user_id === profile.id;
   const name = isMe ? 'Você' : (b.profiles?.full_name || '?');
   const sc = scorerHitFor(b, m);
   const ball = sc ? `<span class="ball">${ICON.ball}+${sc.bonus}</span>` : '';
-  return `<span class="pp ${isMe ? 'me' : ''}"><span class="av">${avatarHtml(b.profiles)}</span><span class="nm">${escapeHtml(name)}</span>${ball}</span>`;
+  return `<span class="pp ${isMe ? 'me' : ''}"><span class="av">${avatarHtml(b.profiles)}</span><span class="nm">${escapeHtml(name)}</span>${posBadge(b.user_id)}${ball}</span>`;
 }
 // Tier de placar único (cravaram): grade simples de chips
 function flatPeople(m, list) {

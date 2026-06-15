@@ -23,6 +23,11 @@ const fx = vi.hoisted(() => ({
   ],
   goals: [{ match_id: 1, player_id: 10, goals: 2, players: { full_name: 'Vini', team: 'Brazil' } }],
   scorers: [{ user_id: 'me', player_id: 10, players: { full_name: 'Vini', team: 'Brazil' } }],
+  leaderboard: [
+    { user_id: 'me', total_pts: 30, exact_count: 2, winner_sg_count: 1 }, // 1º
+    { user_id: 'u2', total_pts: 20, exact_count: 1, winner_sg_count: 1 }, // 2º
+    { user_id: 'u3', total_pts: 10, exact_count: 0, winner_sg_count: 0 }, // 3º
+  ],
 }));
 
 vi.mock('../../src/js/auth.js', () => ({
@@ -45,6 +50,7 @@ vi.mock('../../src/js/supabase.js', () => {
     player_goals: { data: fx.goals, error: null },
     top_scorer_picks: { data: fx.scorers, error: null },
     predictions: { data: fx.preds, error: null },
+    v_leaderboard: { data: fx.leaderboard, error: null },
   };
   const makeQ = (result) => {
     const q = {
@@ -77,6 +83,10 @@ describe('historico — render autenticado (regressão TDZ)', () => {
     expect(html).toContain('Raio-X');                // cabeçalho do card
     expect(html).toContain('class="board"');         // placar/momento
     expect(html).toContain('rcard r-exact');         // borda pela cor do SEU resultado
+    // posições do ranking ao lado dos nomes (pódio com medalha)
+    expect(html).toContain('class="pos p1"');         // você = 1º → ouro
+    expect(html).toContain('class="pos p2"');         // 2º → prata
+    expect(html).toContain('1º');
     // rótulos enganosos do modelo aditivo não voltam
     expect(html).not.toContain('Acertaram o empate');
     expect(html).not.toContain('acertou o vencedor');
