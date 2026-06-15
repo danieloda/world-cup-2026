@@ -7,6 +7,7 @@ import { describe, it, expect } from 'vitest';
 import {
   computePositions, buildTimeline, stageBands, buildColorMap,
   ME_COLOR, PALETTE, clamp, pointXY, firstMeaningfulGame,
+  matchHeader, placeTip, avatarSvgAt,
 } from '../../src/js/chart-utils.js';
 import { stageLabel } from '../../src/js/util.js';
 
@@ -103,6 +104,14 @@ describe('firstMeaningfulGame — onde as estatísticas começam (filtro de ruí
     expect(firstMeaningfulGame([], 0)).toBe(0);
     expect(firstMeaningfulGame([{ userId: 'a', values: [0, 3, 9] }], 0)).toBe(0);
   });
+
+  it('valores ausentes (null) contam como 0, sem quebrar', () => {
+    const series = [
+      { userId: 'a', values: [0, null, 9] },
+      { userId: 'b', values: [0, 0, 5] },
+    ];
+    expect(firstMeaningfulGame(series, 0)).toBe(0);  // null→0; separa no 2º jogo
+  });
 });
 
 describe('buildTimeline — dias/semanas pelo relógio de Brasília', () => {
@@ -159,6 +168,10 @@ describe('stageBands — faixas de fase do fundo do gráfico', () => {
     expect(one).toEqual([{ x: 0, w: 300, label: stageLabel('group') }]);
     expect(stageBands(MATCHES, [], xAt, 0, 400)).toEqual([]);
   });
+  it('partida sem stage cai no rótulo padrão "group"', () => {
+    const bands = stageBands([{ stage: 'group' }, {}], [0, 1], xAt, 0, 200);
+    expect(bands).toEqual([{ x: 0, w: 200, label: stageLabel('group') }]);
+  });
 });
 
 describe('buildColorMap / helpers', () => {
@@ -180,5 +193,81 @@ describe('buildColorMap / helpers', () => {
     expect(clamp(99, 0, 10)).toBe(10);
     expect(pointXY({ clientX: 3, clientY: 4 })).toEqual({ x: 3, y: 4 });
     expect(pointXY({ touches: [{ clientX: 7, clientY: 8 }] })).toEqual({ x: 7, y: 8 });
+  });
+});
+
+describe('matchHeader — cabeçalho do tooltip', () => {
+  it('grupo + com placar: rótulo "Grupo X" e o placar formatado', () => {
+    const html = matchHeader({
+      stage: 'group', group_name: 'C',
+      actual_home: 2, actual_away: 0,
+      match_date: '2026-06-15T18:00:00Z',
+      team_home: 'Brazil', team_away: 'Mexico',
+    });
+    expect(html).toContain('Grupo C');
+    expect(html).toContain('2');
+    expect(html).toContain('–');   // separador de placar (não o "×")
+    expect(html).toContain('Brasil');
+  });
+
+  it('mata-mata + sem placar: usa stageLabel e a marca "×"', () => {
+    const html = matchHeader({
+      stage: 'r16', group_name: null,
+      actual_home: null, actual_away: null,
+      match_date: '2026-07-01T18:00:00Z',
+      team_home: 'France', team_away: 'Spain',
+    });
+    expect(html).toContain(stageLabel('r16'));
+    expect(html).toContain('×');
+  });
+
+  it('grupo sem group_name não quebra (fallback vazio)', () => {
+    const html = matchHeader({
+      stage: 'group', group_name: null,
+      actual_home: 0, actual_away: 0,
+      match_date: '2026-06-20T15:00:00Z',
+      team_home: 'Japan', team_away: 'Egypt',
+    });
+    expect(html).toContain('Grupo ');  // rótulo presente, sufixo vazio
+  });
+});
+
+describe('placeTip — posicionamento do tooltip', () => {
+  // jsdom não faz layout: offsetWidth=0 (cai no fallback 180) e getBoundingClientRect
+  // é stubado p/ exercitar os dois ramos (cabe / estoura a borda direita).
+  const mkTip = () => document.createElement('div');
+  const mkHost = (width) => {
+    const h = document.createElement('div');
+    h.getBoundingClientRect = () => ({ left: 0, width, top: 0, right: width, bottom: 0, height: 0 });
+    return h;
+  };
+
+  it('cabe: fica à direita do cursor', () => {
+    const tip = mkTip();
+    placeTip(mkHost(1000), tip, 10);  // 10+14 + 180 = 204 <= 1000
+    expect(tip.style.left).toBe('24px');
+    expect(tip.style.top).toBe('8px');
+  });
+
+  it('estoura a borda: vira para a esquerda do cursor (com piso de 4px)', () => {
+    const tip = mkTip();
+    placeTip(mkHost(100), tip, 10);   // 24 + 180 > 100 → 10-180-14 < 0 → max(4, ...)
+    expect(tip.style.left).toBe('4px');
+  });
+});
+
+describe('avatarSvgAt — avatar na ponta da linha', () => {
+  it('com foto: recorta a imagem em círculo (clipPath + image)', () => {
+    const svg = avatarSvgAt({ name: 'Ana', avatar_url: 'http://x/a"b.png' }, '#f4c430', 10, 20, 8, 'u1');
+    expect(svg).toContain('<clipPath id="avc-u1">');
+    expect(svg).toContain('<image href="http://x/a&quot;b.png"');  // escAttr nas aspas
+    expect(svg).toContain('stroke="#f4c430"');
+  });
+
+  it('sem foto: cai nas iniciais', () => {
+    const svg = avatarSvgAt({ name: 'Bruno Lima' }, '#fff', 10, 20, 8, 'u2');
+    expect(svg).toContain('<text');
+    expect(svg).not.toContain('<image');
+    expect(svg).toContain('stroke="#fff"');
   });
 });

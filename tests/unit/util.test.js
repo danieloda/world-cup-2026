@@ -586,3 +586,51 @@ describe('seleções B (reserva) — bandeira e nome do país', () => {
     expect(flag('Unknown')).toBe('<span class="fi fi-xx"></span>');
   });
 });
+
+describe('loadTopScorers', () => {
+  // O loader cacheia em escopo de módulo; resetModules + import dinâmico dão uma
+  // instância nova (cache zerado) a cada teste, sem vazar estado entre eles.
+  beforeEach(() => { vi.resetModules(); });
+  afterEach(() => { vi.unstubAllGlobals(); });
+
+  const stubFetch = (impl) => vi.stubGlobal('fetch', vi.fn(impl));
+
+  it('carrega e normaliza topscorers.json', async () => {
+    stubFetch(async () => ({ ok: true, json: async () => ({
+      updated_at: '2026-06-15T00:00:00Z', season: 2026,
+      scorers: [{ api_id: 978, name: 'K. Havertz', team: 'Germany', goals: 2, assists: 0 }],
+    }) }));
+    const { loadTopScorers } = await import('../../src/js/util.js');
+    const res = await loadTopScorers();
+    expect(res.updated_at).toBe('2026-06-15T00:00:00Z');
+    expect(res.scorers).toHaveLength(1);
+    expect(res.scorers[0].api_id).toBe(978);
+  });
+
+  it('cacheia — não refaz o fetch na 2ª chamada', async () => {
+    const fetchMock = vi.fn(async () => ({ ok: true, json: async () => ({ updated_at: 'x', scorers: [] }) }));
+    vi.stubGlobal('fetch', fetchMock);
+    const { loadTopScorers } = await import('../../src/js/util.js');
+    await loadTopScorers();
+    await loadTopScorers();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('HTTP não-ok → degrada para vazio', async () => {
+    stubFetch(async () => ({ ok: false, status: 500 }));
+    const { loadTopScorers } = await import('../../src/js/util.js');
+    expect(await loadTopScorers()).toEqual({ updated_at: null, scorers: [] });
+  });
+
+  it('fetch rejeitando → degrada para vazio', async () => {
+    stubFetch(async () => { throw new Error('network'); });
+    const { loadTopScorers } = await import('../../src/js/util.js');
+    expect((await loadTopScorers()).scorers).toEqual([]);
+  });
+
+  it('campos ausentes no JSON → fallback null/[]', async () => {
+    stubFetch(async () => ({ ok: true, json: async () => ({}) }));
+    const { loadTopScorers } = await import('../../src/js/util.js');
+    expect(await loadTopScorers()).toEqual({ updated_at: null, scorers: [] });
+  });
+});
