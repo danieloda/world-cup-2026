@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Protótipos — Ranking menos poluído</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-page: #0c0c0c;
+    --bg-main: #161616;
+    --card: #202022;
+    --card-hover: #2b2b2d;
+    --card-elev: #262628;
+    --line: rgba(255,255,255,.10);
+    --line-strong: #3c3c40;
+    --text: #fff;
+    --text-dim: #b3b3b3;
+    --text-mute: #a3a3a3;
+    --accent: #f4c430;
+    --accent-bright: #ffd54a;
+    --accent-dim: rgba(244,196,48,.15);
+    --red: #f15e6c;
+    --positive: #1DB954;
+    --font: 'Figtree', system-ui, -apple-system, sans-serif;
+  }
+  * { box-sizing: border-box; min-width: 0; margin: 0; padding: 0; }
+  :focus-visible { outline: 2px solid var(--accent-bright); outline-offset: 2px; border-radius: 6px; }
+  html, body { background: var(--bg-page); color: var(--text); font-family: var(--font); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 28px 20px 100px; }
+
+  .intro h1 { font-size: 28px; font-weight: 800; letter-spacing: -.01em; }
+  .intro p { color: var(--text-dim); max-width: 820px; margin-top: 8px; }
+  .intro .note { font-size: 13px; color: var(--text-mute); margin-top: 10px; }
+  .intro .note b { color: var(--accent); }
+  .intro code { background: var(--card); border: 1px solid var(--line); border-radius: 5px; padding: 1px 6px; font-size: 12.5px; }
+
+  nav.toc { position: sticky; top: 0; z-index: 30; background: rgba(12,12,12,.92); backdrop-filter: blur(8px); margin: 18px -20px 26px; padding: 10px 20px; border-bottom: 1px solid var(--line); display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  nav.toc a { font-size: 13px; font-weight: 600; color: var(--text-dim); background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; text-decoration: none; }
+  nav.toc a:hover { background: var(--card-hover); color: var(--text); }
+  nav.toc .pill { font-size: 12px; color: var(--text-mute); margin-left: auto; }
+
+  section.proto { margin-bottom: 52px; scroll-margin-top: 70px; }
+  .proto-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
+  .proto-head .tag { font-size: 12px; font-weight: 800; letter-spacing: .08em; color: var(--bg-page); background: var(--accent); border-radius: 6px; padding: 2px 8px; }
+  .proto-head .tag.alt { background: var(--card-elev); color: var(--text-dim); border: 1px solid var(--line-strong); }
+  .proto-head h2 { font-size: 21px; font-weight: 800; }
+  .proto-sub { color: var(--text-dim); font-size: 14px; max-width: 860px; margin-bottom: 14px; }
+  .proto-sub b { color: var(--text); }
+  .proto-sub .win { color: var(--positive); font-weight: 700; }
+  .proto-sub .meh { color: var(--red); font-weight: 700; }
+  .panel { background: var(--bg-main); border: 1px solid var(--line); border-radius: 14px; padding: 18px; }
+
+  /* ===== controles do bump (espelho do app) ===== */
+  .bump-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+  .chip-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: 13px; font-weight: 600; color: var(--text-dim); background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; transition: background .18s, color .18s, border-color .18s; }
+  .chip:hover { background: var(--card-hover); color: var(--text); }
+  .chip.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent-bright); }
+  .chip svg.ic { width: 13px; height: 13px; vertical-align: -2px; margin-right: 2px; }
+  .chip .avh { width: 20px; height: 20px; font-size: 8px; border-width: 1.5px; margin: -2px 2px -2px -4px; }
+  .chip .cpts { color: var(--text-mute); font-weight: 600; }
+  .chip.active .cpts { color: inherit; opacity: .75; }
+
+  .seg { display: inline-flex; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 3px; gap: 2px; }
+  .seg button { font-size: 13px; font-weight: 700; color: var(--text-dim); padding: 6px 13px; border-radius: 8px; transition: background .18s, color .18s; }
+  .seg button:hover { color: var(--text); }
+  .seg button.on { background: var(--accent); color: #161616; }
+  .seg button:disabled { opacity: .38; cursor: not-allowed; }
+
+  .bump-plot { position: relative; width: 100%; overflow: hidden; }
+  .bump-svg { display: block; max-width: 100%; touch-action: none; }
+  .bump-svg text { font-family: var(--font); }
+  .bump-svg .ylbl, .bump-svg .xlbl { font-size: 12px; fill: var(--text-mute); }
+  .bump-svg .band { fill: rgba(255,255,255,.025); }
+  .bump-svg .band-lbl { font-size: 10.5px; font-weight: 700; letter-spacing: .07em; fill: #8a8a8e; text-transform: uppercase; }
+  /* grade */
+  .bump-svg .grid { stroke: rgba(255,255,255,.055); stroke-width: 1; }
+  .bump-svg .grid.v { stroke-dasharray: 2 4; }
+  .bump-svg .zebra { fill: rgba(255,255,255,.018); }
+  /* linhas */
+  .bump-svg .ctx { stroke: #2a2a2d; stroke-width: 1.1; fill: none; }
+  .bump-svg .ctx.faint { stroke: #1f1f22; }
+  .bump-svg .foc { stroke-width: 2.6; fill: none; stroke-linejoin: round; stroke-linecap: round; transition: stroke-width .2s; }
+  .bump-svg .foc.thick { stroke-width: 3.2; }
+  .bump-svg .foc.meline { filter: drop-shadow(0 0 5px rgba(244,196,48,.4)); }
+  .bump-svg .end { font-size: 12.5px; font-weight: 700; }
+  .bump-svg .cross { stroke: rgba(255,255,255,.30); stroke-dasharray: 3 3; }
+  .bump-note { font-size: 12.5px; color: var(--text-mute); margin-top: 10px; }
+
+  /* legenda */
+  .legend { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
+  .leg { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 3px 13px 3px 3px; font: inherit; font-size: 13.5px; color: var(--text-dim); transition: opacity .15s, border-color .15s, color .15s; }
+  .leg:hover { color: var(--text); border-color: var(--line-strong); }
+  .leg .avh { width: 26px; height: 26px; font-size: 10px; }
+  .leg .nm { font-weight: 600; }
+  .leg .pt { font-weight: 700; color: var(--text-mute); font-size: 12.5px; }
+  .leg-all { padding: 3px 13px; color: var(--text-mute); }
+
+  .avh { display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--card-elev); border: 2px solid currentColor; font-size: 11px; font-weight: 800; flex: none; box-sizing: border-box; }
+
+  /* tooltip */
+  .tipbox { position: fixed; z-index: 99; background: rgba(10,10,10,.96); border: 1px solid var(--line-strong); border-radius: 10px; padding: 8px 11px; font-size: 12.5px; pointer-events: none; box-shadow: 0 8px 28px rgba(0,0,0,.55); max-width: 280px; }
+  .tipbox b { font-size: 13px; }
+  .tipbox .tr { display: flex; align-items: center; gap: 7px; padding: 2px 0; }
+  .tipbox .tr .tp { font-weight: 800; width: 26px; text-align: right; flex: none; font-variant-numeric: tabular-nums; }
+  .tipbox .tr .tn { flex: 1; font-weight: 600; }
+  .tipbox .tr .tv { font-weight: 700; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+
+  .verdict { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap: 14px; margin-top: 40px; }
+  .vcard { background: var(--bg-main); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+  .vcard h4 { font-size: 15px; font-weight: 800; margin-bottom: 8px; }
+  .vcard ul { list-style: none; display: grid; gap: 6px; }
+  .vcard li { font-size: 13px; color: var(--text-dim); padding-left: 18px; position: relative; }
+  .vcard li.y::before { content: '✓'; color: var(--positive); position: absolute; left: 0; font-weight: 800; }
+  .vcard li.n::before { content: '✕'; color: var(--red); position: absolute; left: 0; font-weight: 800; }
+  .vcard.rec { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent-dim); }
+  .vcard.rec h4::after { content: 'RECOMENDADO'; font-size: 10px; font-weight: 800; letter-spacing: .08em; color: var(--bg-page); background: var(--accent); border-radius: 5px; padding: 2px 6px; margin-left: 8px; vertical-align: 1px; }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="intro">
+    <h1>Ranking menos poluído — 3 caminhos</h1>
+    <p>O problema da tela atual: o eixo Y é a <b>posição absoluta (1º…77º)</b>, então com 6px por posição os 10 selecionados
+       ficam espremidos nos ~13% de cima e o resto é espaguete cinza. As três opções abaixo atacam isso de jeitos diferentes.
+       Mesmos dados nos três (seed fixa, 77 jogadores). <b>Você</b> (amarelo) está cravado em <b>~20º</b> pra reproduzir o seu print.</p>
+    <p class="note">Passe o mouse pra ver as posições. Simule o começo da Copa com <code>?jogos=N</code> na URL (ex.: <code>?jogos=13</code>).
+       Decida pela <b>sensação visual</b> — eu implemento a escolhida no <b>rank-chart.js</b> de verdade.</p>
+  </div>
+
+  <nav class="toc">
+    <a href="#a">A · Zoom no foco</a>
+    <a href="#b">B · Grade + zebra</a>
+    <a href="#c">C · Pódio enxuto (zoom + grade)</a>
+    <span class="pill">protótipo — dados fictícios</span>
+  </nav>
+
+  <section class="proto" id="a">
+    <div class="proto-head"><span class="tag">A</span><h2>Zoom no foco</h2></div>
+    <p class="proto-sub">O eixo Y deixa de ir de 1º a 77º e passa a <b>enquadrar só a faixa dos selecionados</b> — as 10 linhas se
+       <span class="win">abrem pra ocupar a altura inteira</span>. Some o espaguete cinza, entram linhas-guia horizontais.
+       Quando Você (20º) entra, a janela estica pra incluir — você vê a distância real até o pódio.</p>
+    <div class="panel" id="mountA"></div>
+  </section>
+
+  <section class="proto" id="b">
+    <div class="proto-head"><span class="tag alt">B</span><h2>Grade + zebra (escala cheia)</h2></div>
+    <p class="proto-sub">Mantém o eixo de 1º a 77º (você enxerga o campo inteiro de uma vez) mas adiciona <b>grade horizontal + faixas
+       zebradas a cada 5 posições</b> pra dar referência, e apaga o espaguete pra quase-invisível. <span class="meh">O topo continua apertado</span>
+       — é a opção conservadora, mexe pouco.</p>
+    <div class="panel" id="mountB"></div>
+  </section>
+
+  <section class="proto" id="c">
+    <div class="proto-head"><span class="tag">C</span><h2>Pódio enxuto — zoom + grade + menos linhas</h2></div>
+    <p class="proto-sub">As duas ideias juntas e no talo: abre com <b>Pódio + Você (4 linhas)</b> em vez de Top 10, eixo enquadrado no foco,
+       grade horizontal, linhas mais grossas. <span class="win">A leitura mais limpa possível</span> — Top 10 continua a um clique.</p>
+    <div class="panel" id="mountC"></div>
+  </section>
+
+  <div class="verdict">
+    <div class="vcard">
+      <h4>A · Zoom no foco</h4>
+      <ul>
+        <li class="y">Resolve o aperto de vez (linhas ocupam a altura toda)</li>
+        <li class="y">Some o espaguete — foco total</li>
+        <li class="y">Mostra a distância real Você → pódio</li>
+        <li class="n">Eixo Y "respira" ao trocar seleção (reescala)</li>
+      </ul>
+    </div>
+    <div class="vcard">
+      <h4>B · Grade + zebra</h4>
+      <ul>
+        <li class="y">Mudança mínima, baixo risco</li>
+        <li class="y">Vê o campo inteiro (77) de relance</li>
+        <li class="n">Topo segue espremido — não resolve o aperto</li>
+        <li class="n">Grade pode poluir mais, não menos</li>
+      </ul>
+    </div>
+    <div class="vcard rec">
+      <h4>C · Pódio enxuto</h4>
+      <ul>
+        <li class="y">Combina as suas duas ideias (espaço + menos linhas + grade)</li>
+        <li class="y">Abre limpo; Top 10 a um clique</li>
+        <li class="y">Linhas grossas, fácil seguir</li>
+        <li class="n">Mais mudanças no código que B</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+// ============================================================
+// Dados demo: 77 jogadores × 88 jogos, seed fixa (igual ao app)
+// ============================================================
+function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const rnd = mulberry32(20260615);
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+const FIRST = ['Ana','Bruno','Camila','Daniel','Eduardo','Fernanda','Gustavo','Helena','Igor','Júlia','Lucas','Larissa','Marcelo','Mariana','Nathan','Otávio','Patrícia','Pedro','Rafael','Renata','Sofia','Thiago','Vinícius','Aline','Beatriz','Caio','Diego','Elisa','Fábio','Gabriela','Akemi','Sussumu','Zeppa','Gigio','Fabiana','Diniz','Luriza','Meirelles','Trevisan'];
+const LAST = ['Silva','Santos','Oliveira','Costa','Pereira','Almeida','Cardoso','Teixeira','Gomes','Martins','Araújo','Ferreira','Ribeiro','Carvalho','Nunes','Moraes','Lima','Barbosa','Rodrigues','Sousa'];
+const TEAMS = ['Brasil','Argentina','França','Inglaterra','Espanha','Alemanha','Portugal','Holanda','México','EUA','Japão','Marrocos','Croácia','Uruguai','Colômbia','Bélgica'];
+const STAGES = [
+  { until: 24, label: 'Grupos · Rodada 1', short: 'R1' },
+  { until: 48, label: 'Grupos · Rodada 2', short: 'R2' },
+  { until: 72, label: 'Grupos · Rodada 3', short: 'R3' },
+  { until: 88, label: '16-avos de final', short: '16-avos' },
+];
+
+const N = 77;
+const GAMES = clamp(+new URLSearchParams(location.search).get('jogos') || 88, 2, 88);
+
+const players = [];
+const seen = new Set();
+for (let i = 0; i < N; i++) {
+  let name;
+  do { name = FIRST[Math.floor(rnd() * FIRST.length)] + ' ' + LAST[Math.floor(rnd() * LAST.length)]; } while (seen.has(name));
+  seen.add(name);
+  players.push({ id: 'p' + i, name, me: false, skill: 0.25 + rnd() * 0.6 });
+}
+
+const matches = [];
+for (let g = 0; g < GAMES; g++) {
+  const h = TEAMS[Math.floor(rnd() * TEAMS.length)];
+  let a; do { a = TEAMS[Math.floor(rnd() * TEAMS.length)]; } while (a === h);
+  matches.push({ home: h, away: a, sh: Math.floor(rnd() * 4), sa: Math.floor(rnd() * 3) });
+}
+
+const cum = players.map(() => [0]);
+for (let g = 0; g < GAMES; g++) {
+  for (let i = 0; i < N; i++) {
+    const sk = players[i].skill, r = rnd();
+    let pts = 0;
+    if (r < 0.05 + 0.07 * sk) pts = 18;
+    else if (r < 0.16 + 0.12 * sk) pts = 12;
+    else if (r < 0.34 + 0.16 * sk) pts = 10;
+    else if (r < 0.58) pts = 5;
+    cum[i].push(cum[i][g] + pts);
+  }
+}
+
+const pos = players.map(() => new Array(GAMES));
+for (let s = 0; s < GAMES; s++) {
+  const col = players.map((_, i) => ({ i, pts: cum[i][s + 1] }));
+  col.sort((a, b) => b.pts - a.pts || a.i - b.i);
+  col.forEach((e, r) => { pos[e.i][s] = r + 1; });
+}
+const finalOrder = players.map((_, i) => i).sort((a, b) => pos[a][GAMES - 1] - pos[b][GAMES - 1]);
+
+// "Você" = o jogador que terminou em ~20º (reproduz o print: Top 10 + Você lá embaixo)
+const MY_INDEX = finalOrder[Math.min(19, N - 1)];
+players[MY_INDEX].name = 'Você';
+players[MY_INDEX].me = true;
+
+// ---- modelo de tempo (dias → semanas) ----
+const rnd2 = mulberry32(7);
+const dayEnds = [];
+{
+  let g = -1;
+  while (g < GAMES - 1) {
+    const knockout = g + 1 >= 72;
+    const take = knockout ? 2 + Math.floor(rnd2() * 2) : 4 + Math.floor(rnd2() * 3);
+    let next = Math.min(GAMES - 1, g + take);
+    const phaseEnd = STAGES.find(st => g + 1 < st.until).until - 1;
+    if (next > phaseEnd) next = phaseEnd;
+    g = next; dayEnds.push(g);
+  }
+}
+const DAY0 = { d: 11, m: 6 };
+const dayLabel = (k) => { let d = DAY0.d + k, m = DAY0.m; while (d > 30) { d -= 30; m++; } return `${d}/${m}`; };
+const gameDay = new Array(GAMES);
+{ let k = 0; for (let g = 0; g < GAMES; g++) { while (g > dayEnds[k]) k++; gameDay[g] = k; } }
+const gameDate = (g) => dayLabel(gameDay[g]);
+const weekEnds = [];
+{ for (let k = 0; k < dayEnds.length; k++) weekEnds[Math.floor(k / 7)] = dayEnds[k]; }
+const weekRange = (w) => `${dayLabel(w * 7)}–${dayLabel(Math.min(dayEnds.length - 1, w * 7 + 6))}`;
+
+const STAGES_until = STAGES.map(s => s.until);
+const stageOf = (g) => STAGES.find(st => g < st.until);
+function phaseBands(steps, xAt, x0, x1) {
+  const bands = [];
+  let from = 0;
+  STAGES.forEach((st, si) => {
+    const lastIdx = steps.findLastIndex(g => g <= st.until - 1);
+    if (lastIdx < 0) return;
+    const right = lastIdx === steps.length - 1 ? x1 : (xAt(lastIdx) + xAt(lastIdx + 1)) / 2;
+    bands.push({ x: from === 0 ? x0 : bands[bands.length - 1].x + bands[bands.length - 1].w, label: st.label.replace('Grupos · ', ''), short: st.short });
+    const b = bands[bands.length - 1];
+    b.w = right - b.x;
+    from = right;
+  });
+  return bands;
+}
+
+const ME_COLOR = '#f4c430';
+const PALETTE = ['#1DB954','#4aa3ff','#f15e6c','#b07cff','#ff9f43','#2dd4bf','#ff6fb5','#9ccc65','#7e9cff','#ffa94d','#5ad1c9','#c98cff','#67b7ff','#ff7a7a','#74c0fc','#63e6be','#e599f7'];
+const colorOf = (i) => players[i].me ? ME_COLOR : PALETTE[finalOrder.indexOf(i) % PALETTE.length];
+const initials = (n) => n.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+function avatarSvgAt(i, cx, cy, r) {
+  const c = colorOf(i);
+  return `<g><circle cx="${cx}" cy="${cy}" r="${r}" fill="var(--card-elev)" stroke="${c}" stroke-width="2"/>
+    <text x="${cx}" y="${cy + 3}" text-anchor="middle" fill="${c}" style="font-size:${Math.round(r * .85)}px;font-weight:800">${initials(players[i].name)}</text></g>`;
+}
+const avatarHtmlOf = (i) => `<span class="avh" style="color:${colorOf(i)}">${initials(players[i].name)}</span>`;
+
+const tip = document.createElement('div');
+tip.className = 'tipbox'; tip.hidden = true;
+document.body.appendChild(tip);
+function showTip(html, x, y) { tip.innerHTML = html; tip.hidden = false; const w = tip.offsetWidth, vw = innerWidth; tip.style.left = Math.min(vw - w - 8, x + 14) + 'px'; tip.style.top = (y + 14) + 'px'; }
+function hideTip() { tip.hidden = true; }
+
+const IC = {
+  trophy: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4z"/><path d="M7 6H4a3 3 0 0 0 3 3M17 6h3a3 3 0 0 1-3 3"/></svg>',
+  list: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>',
+};
+
+// ============================================================
+// Bump configurável — uma função, três modos
+//   opts: {
+//     yMode: 'absolute' | 'focus',   // escala do eixo Y
+//     grid: bool,                    // linhas-guia horizontais
+//     zebra: bool,                   // faixas zebradas (só faz sentido em absolute)
+//     dropContext: bool,             // remove o espaguete cinza
+//     thick: bool,                   // linhas mais grossas
+//     defaultPreset: 'podio'|'top10'
+//   }
+// ============================================================
+function makeBump(mountId, opts) {
+  const mount = document.getElementById(mountId);
+  const canWeek = weekEnds.length >= 2;
+  let granKey = canWeek ? 'semana' : 'jogo';
+  let showAllLeg = false;
+
+  const presetSet = (p) => new Set([MY_INDEX, ...finalOrder.slice(0, p === 'podio' ? 3 : 10)]);
+  const setsEq = (a, b) => a.size === b.size && [...a].every(x => b.has(x));
+  let selected = presetSet(opts.defaultPreset);
+
+  const lastWeek = weekEnds.length - 1;
+  const curWeekStart = lastWeek === 0 ? 0 : weekEnds[lastWeek - 1] + 1;
+  const curWeekSteps = [];
+  for (let g = curWeekStart; g < GAMES; g++) curWeekSteps.push(g);
+
+  mount.innerHTML = `
+    <div class="bump-top">
+      <div class="chip-row preset" role="group" aria-label="Seleção rápida">
+        <button class="chip" data-p="podio">${IC.trophy}Pódio + Você</button>
+        <button class="chip" data-p="top10">${IC.list}Top 10</button>
+      </div>
+      <div class="seg gran" role="group" aria-label="Granularidade do tempo">
+        <button data-g="semana" ${canWeek ? '' : 'disabled'}>Por semana</button>
+        <button data-g="jogo">Jogos da semana</button>
+      </div>
+    </div>
+    <div class="bump-plot"></div>
+    <div class="legend"></div>
+    <p class="bump-note"></p>
+  `;
+
+  function draw() {
+    const steps = granKey === 'jogo' ? curWeekSteps : weekEnds;
+    const K = steps.length;
+    const host = mount.querySelector('.bump-plot');
+    const width = Math.max(300, host.clientWidth || 860);
+    const narrow = width < 520;
+    const PADl = 40, PADr = narrow ? 108 : 172, PADt = 30, PADb = 30;
+
+    // --- faixa do eixo Y ---
+    let rLo = 1, rHi = N;
+    if (opts.yMode === 'focus' && selected.size) {
+      rLo = Infinity; rHi = -Infinity;
+      for (const i of selected) for (const gi of steps) { const p = pos[i][gi]; if (p < rLo) rLo = p; if (p > rHi) rHi = p; }
+      rLo = Math.max(1, rLo - 1);
+      rHi = Math.min(N, rHi + 1);
+      if (rHi - rLo < 3) rHi = Math.min(N, rLo + 3); // piso de altura
+    }
+    const span = Math.max(1, rHi - rLo);
+    // em focus as linhas têm espaço de sobra; em absolute respeitamos o teto de altura
+    const PLOT_MAX = 440;
+    const rowH = opts.yMode === 'focus'
+      ? clamp(Math.floor(PLOT_MAX / span), 14, 40)
+      : clamp(Math.floor(PLOT_MAX / (N - 1)), 6, 34);
+    const plotH = span * rowH;
+    const height = PADt + plotH + PADb;
+    const x0 = PADl + 6, x1 = width - PADr;
+    const xAt = (k) => K <= 1 ? x1 : x0 + (x1 - x0) * (k / (K - 1));
+    const yAt = (p) => PADt + (p - rLo) * rowH;
+
+    let g = '';
+
+    // zebra (faixas a cada 5 posições) — só em escala absoluta
+    if (opts.zebra) {
+      for (let p = rLo; p <= rHi; p += 10) {
+        const yTop = yAt(p), yBot = yAt(Math.min(rHi, p + 5));
+        g += `<rect class="zebra" x="${x0}" y="${yTop.toFixed(1)}" width="${(x1 - x0).toFixed(1)}" height="${(yBot - yTop).toFixed(1)}"/>`;
+      }
+    }
+
+    // faixas de fase + rótulos
+    phaseBands(steps, xAt, x0, x1).forEach((b, bi) => {
+      if (bi % 2 === 1) g += `<rect class="band" x="${b.x.toFixed(1)}" y="${(PADt - 18).toFixed(1)}" width="${b.w.toFixed(1)}" height="${(plotH + 18).toFixed(1)}"/>`;
+      const bl = narrow ? b.short : b.label;
+      if (b.w > (narrow ? 30 : 64)) g += `<text class="band-lbl" x="${(b.x + b.w / 2).toFixed(1)}" y="${(PADt - 7).toFixed(1)}" text-anchor="middle">${bl}</text>`;
+    });
+
+    // eixo Y + grade
+    const labelStep = opts.yMode === 'focus'
+      ? Math.max(1, Math.ceil(span / 12))
+      : Math.max(1, Math.ceil((N - 1) / 14));
+    for (let p = rLo; p <= rHi; p += labelStep) {
+      if (opts.grid) g += `<line class="grid" x1="${x0}" y1="${yAt(p).toFixed(1)}" x2="${x1}" y2="${yAt(p).toFixed(1)}"/>`;
+      g += `<text class="ylbl" x="${(PADl - 4)}" y="${(yAt(p) + 4).toFixed(1)}" text-anchor="end">${p}º</text>`;
+    }
+
+    // eixo X (+ grade vertical opcional)
+    const nx = granKey === 'semana' ? K : (narrow ? 3 : Math.min(6, K));
+    for (let k0 = 0; k0 < nx; k0++) {
+      const k = nx === 1 ? K - 1 : Math.round(k0 * (K - 1) / (nx - 1));
+      const anchor = k0 === 0 ? 'start' : k0 === nx - 1 ? 'end' : 'middle';
+      const lbl = granKey === 'jogo' ? (narrow ? `J${steps[k] + 1}` : `Jogo ${steps[k] + 1}`) : (narrow ? `S${k + 1}` : `Semana ${k + 1}`);
+      if (opts.grid && opts.gridV) g += `<line class="grid v" x1="${xAt(k).toFixed(1)}" y1="${PADt}" x2="${xAt(k).toFixed(1)}" y2="${(PADt + plotH).toFixed(1)}"/>`;
+      g += `<text class="xlbl" x="${xAt(k).toFixed(1)}" y="${(height - 9).toFixed(1)}" text-anchor="${anchor}">${lbl}</text>`;
+    }
+
+    // linhas
+    let ctx = '', foc = '', lbls = '';
+    const endLabels = [];
+    const lineOf = (i) => steps.map((gi, k) => `${xAt(k).toFixed(1)},${yAt(pos[i][gi]).toFixed(1)}`).join(' ');
+    players.forEach((_, i) => {
+      if (!selected.has(i)) {
+        if (!opts.dropContext) ctx += `<polyline class="ctx${opts.faintContext ? ' faint' : ''}" points="${lineOf(i)}"/>`;
+        return;
+      }
+      const c = colorOf(i);
+      foc += `<polyline class="foc${opts.thick ? ' thick' : ''}${players[i].me ? ' meline' : ''}" stroke="${c}" points="${lineOf(i)}"/>`;
+      endLabels.push({ i, y: yAt(pos[i][GAMES - 1]), color: c, pos: pos[i][GAMES - 1] });
+    });
+    endLabels.sort((a, b) => a.y - b.y);
+    let prevY = PADt - 14;
+    for (const l of endLabels) {
+      l.y = Math.max(l.y, prevY + 24); prevY = l.y;
+      const nm = narrow && players[l.i].name.length > 8 ? players[l.i].name.slice(0, 7) + '…' : players[l.i].name;
+      lbls += avatarSvgAt(l.i, x1 + 14, l.y, 9);
+      lbls += `<text class="end" x="${x1 + 28}" y="${(l.y + 4).toFixed(1)}" fill="${l.color}">${l.pos}º ${nm}</text>`;
+    }
+    const svgH = Math.max(height, (endLabels[endLabels.length - 1]?.y ?? 0) + 18);
+
+    host.innerHTML = `
+      <svg class="bump-svg" width="${width}" height="${svgH}" viewBox="0 0 ${width} ${svgH}" role="img" aria-label="Evolução da posição">
+        <defs><clipPath id="clip-${mountId}"><rect x="0" y="${PADt - 3}" width="${width}" height="${plotH + 6}"/></clipPath></defs>
+        ${g}
+        <g clip-path="url(#clip-${mountId})">${ctx}${foc}</g>
+        ${lbls}
+        <line class="cross" x1="0" x2="0" y1="${PADt}" y2="${(PADt + plotH).toFixed(1)}" hidden/>
+        <g class="hdots"></g>
+        <rect class="hit" x="${x0}" y="${PADt}" width="${Math.max(0, x1 - x0)}" height="${plotH}" fill="transparent"/>
+      </svg>`;
+
+    // legenda
+    const baseIds = showAllLeg ? finalOrder : [...new Set([...finalOrder.slice(0, 14), MY_INDEX, ...selected])];
+    mount.querySelector('.legend').innerHTML = baseIds.map(i => {
+      const on = selected.has(i);
+      return `<button class="leg ${on ? 'active' : ''}" data-i="${i}" aria-pressed="${on}" style="${on ? `border-color:${colorOf(i)}` : ''}">
+        ${avatarHtmlOf(i)}<span class="nm" style="${on ? `color:${colorOf(i)}` : ''}">${pos[i][GAMES - 1]}º ${players[i].name}</span><span class="pt">${cum[i][GAMES]} pts</span></button>`;
+    }).join('') + `<button class="leg leg-all" data-action="toggle-all">${showAllLeg ? '− menos' : `+ todos (${N})`}</button>`;
+
+    mount.querySelectorAll('.preset .chip').forEach(b => b.classList.toggle('active', setsEq(selected, presetSet(b.dataset.p))));
+    mount.querySelectorAll('.gran button').forEach(b => b.classList.toggle('on', b.dataset.g === granKey));
+    mount.querySelector('.bump-note').textContent =
+      selected.size === 0 ? 'Ninguém selecionado — use Pódio + Você / Top 10 pra recomeçar.'
+      : opts.yMode === 'focus' ? 'O eixo se ajusta aos selecionados — clique num nome pra ligar/desligar; os botões de cima resetam.'
+      : 'Clique num nome pra ligar/desligar a linha; os botões de cima resetam a seleção.';
+
+    mount.querySelectorAll('.leg[data-i]').forEach(b => b.addEventListener('click', () => {
+      const i = +b.dataset.i;
+      if (selected.has(i)) selected.delete(i); else selected.add(i);
+      draw();
+    }));
+    mount.querySelector('[data-action="toggle-all"]').addEventListener('click', () => { showAllLeg = !showAllLeg; draw(); });
+
+    attachHover(host, { steps, K, xAt, yAt, x0, x1 });
+  }
+
+  function attachHover(host, geo) {
+    const svg = host.querySelector('.bump-svg');
+    const hit = svg.querySelector('.hit');
+    const cross = svg.querySelector('.cross');
+    const hdots = svg.querySelector('.hdots');
+    const W = svg.viewBox.baseVal.width;
+    function move(e) {
+      const cx = e.touches ? e.touches[0].clientX : e.clientX;
+      const cy = e.touches ? e.touches[0].clientY : e.clientY;
+      const r = svg.getBoundingClientRect();
+      if (!r.width) return;
+      const xv = (cx - r.left) / r.width * W;
+      const k = clamp(Math.round((xv - geo.x0) / Math.max(1, geo.x1 - geo.x0) * (geo.K - 1)), 0, geo.K - 1);
+      const gi = geo.steps[k];
+      cross.removeAttribute('hidden');
+      cross.setAttribute('x1', geo.xAt(k)); cross.setAttribute('x2', geo.xAt(k));
+      while (hdots.firstChild) hdots.removeChild(hdots.firstChild);
+      const rows = [...selected].map(i => ({ i, p: pos[i][gi], pts: cum[i][gi + 1] })).sort((a, b) => a.p - b.p);
+      for (const rw of rows) {
+        const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        c.setAttribute('cx', geo.xAt(k)); c.setAttribute('cy', geo.yAt(rw.p));
+        c.setAttribute('r', players[rw.i].me ? 5 : 4); c.setAttribute('fill', colorOf(rw.i));
+        hdots.appendChild(c);
+      }
+      const header = granKey === 'jogo'
+        ? `<b>Jogo ${gi + 1}</b> · ${stageOf(gi).short}`
+        : `<b>Semana ${k + 1}</b> · ${weekRange(k)}`;
+      showTip(header + rows.map(rw => `<div class="tr"><span class="tp" style="color:${colorOf(rw.i)}">${rw.p}º</span><span class="tn" style="color:${colorOf(rw.i)}">${players[rw.i].name}</span><span class="tv">${rw.pts}</span></div>`).join(''), cx, cy);
+    }
+    function leave() { cross.setAttribute('hidden', ''); while (hdots.firstChild) hdots.removeChild(hdots.firstChild); hideTip(); }
+    hit.addEventListener('mousemove', move);
+    hit.addEventListener('mouseleave', leave);
+    hit.addEventListener('touchstart', move, { passive: true });
+    hit.addEventListener('touchmove', move, { passive: true });
+    hit.addEventListener('touchend', leave);
+  }
+
+  mount.querySelectorAll('.preset .chip').forEach(b => b.addEventListener('click', () => { selected = presetSet(b.dataset.p); draw(); }));
+  mount.querySelectorAll('.gran button').forEach(b => b.addEventListener('click', () => { if (b.disabled) return; granKey = b.dataset.g; draw(); }));
+  let raf = 0;
+  window.addEventListener('resize', () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(draw); });
+  draw();
+}
+
+// A — Zoom no foco: eixo enquadra os selecionados, sem espaguete, grade horizontal
+makeBump('mountA', { yMode: 'focus', grid: true, dropContext: true, defaultPreset: 'top10' });
+// B — Grade + zebra: escala cheia 1º..77º, grade + zebra, espaguete apagado
+makeBump('mountB', { yMode: 'absolute', grid: true, gridV: false, zebra: true, faintContext: true, defaultPreset: 'top10' });
+// C — Pódio enxuto: zoom + grade + linhas grossas, abre com Pódio + Você
+makeBump('mountC', { yMode: 'focus', grid: true, dropContext: true, thick: true, defaultPreset: 'podio' });
+</script>
+</body>
+</html>

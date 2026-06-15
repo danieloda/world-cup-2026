@@ -6,8 +6,9 @@
  *   - ADICIONA ~10 usuários voláteis, cada um com pico de pontuação numa fase
  *     diferente (ás dos grupos, ás das oitavas, rei da final + campeão, artilheiro,
  *     etc.) pra FORÇAR muitas viradas de posição ao longo da Copa.
- *   - valida no DOM (bump focado, 2026-06): SVG renderiza; pelotão = contexto
- *     cinza + foco colorido (padrão Pódio+Você); legenda expandida mostra, por
+ *   - valida no DOM (bump focado · zoom no foco 2026-06): SVG renderiza; foco
+ *     colorido com eixo Y enquadrado nos selecionados (o espaguete cinza some
+ *     com seleção ativa; padrão Pódio+Você); grade horizontal; legenda mostra, por
  *     série, o MESMO total do v_leaderboard (invariante "fim da série ==
  *     tabela"); muitas trocas de posição (geometria das polylines); zooms
  *     "Por semana"/"Jogos da semana"; seleção livre via legenda + presets como
@@ -152,15 +153,16 @@ try {
   await page.waitForSelector('#rankChart .rc-svg', { timeout: 15000 });
   await page.locator('#rankChart').screenshot({ path: join(shotsDir, 'rank-chart-game.png') }).catch(() => {});
 
-  // (1) pelotão completo: contexto cinza + foco colorido == usuários pagos.
-  //     Padrão = Pódio + Você (3 ou 4 linhas focadas, conforme "Você" ∈ top 3).
+  // (1) zoom no foco: com seleção ativa o pelotão cinza some (o eixo Y enquadra
+  //     só os selecionados). Padrão = Pódio + Você (3 ou 4 linhas, conforme
+  //     "Você" ∈ top 3). Contexto cinza só reaparece quando nada está selecionado.
   const ctxCount = await page.locator('#rankChart polyline.rc-ctx').count();
   const focCount = await page.locator('#rankChart polyline.rc-foc').count();
-  check('SVG: contexto + foco == 1 linha por usuário pago', ctxCount + focCount === N,
-    `ctx=${ctxCount} foc=${focCount} N=${N}`);
   const top3 = lb.slice(0, 3).map(u => u.user_id);
   const expFoc = top3.includes(me.user_id) ? 3 : 4;
-  check(`foco padrão = Pódio + Você (${expFoc} linhas)`, focCount === expFoc, `foc=${focCount}`);
+  check('SVG (zoom no foco): espaguete cinza some com seleção ativa', ctxCount === 0, `ctx=${ctxCount}`);
+  check(`foco padrão = Pódio + Você (${expFoc} linhas)`, focCount === expFoc, `foc=${focCount} N=${N}`);
+  check('SVG: grade horizontal presente', await page.locator('#rankChart line.rc-grid').count() > 0);
 
   // (2) legenda EXPANDIDA: pts de cada série == v_leaderboard.total_pts
   //     (invariante central do gráfico)
@@ -181,9 +183,13 @@ try {
   const leaderUid = lb[0].user_id;
   check('legenda: topo == líder do v_leaderboard', legend[0]?.uid === leaderUid);
 
-  // (3) MUITAS viradas: lê a geometria de TODAS as polylines (ctx+foc) e conta
-  //     trocas de posição por coluna (zoom padrão "Por semana")
-  const polys = await page.$$eval('#rankChart polyline.rc-ctx, #rankChart polyline.rc-foc', els =>
+  // (3) MUITAS viradas: como o zoom no foco descartou o contexto cinza, a
+  //     volatilidade se lê no recorte — seleciona Top 10 (10+ linhas focadas) e
+  //     conta trocas de posição por coluna na geometria das polylines.
+  await page.click('#rankChart .rc-chip[data-p="top10"]');
+  await page.waitForFunction(() =>
+    document.querySelectorAll('#rankChart polyline.rc-foc').length >= 10, null, { timeout: 5000 }).catch(() => {});
+  const polys = await page.$$eval('#rankChart polyline.rc-foc', els =>
     els.map(e => e.getAttribute('points').trim().split(/\s+/).map(pt => Number(pt.split(',')[1]))));
   const S = polys[0]?.length || 0;
   const sameLen = polys.every(p => p.length === S);
@@ -195,9 +201,12 @@ try {
     if (prevRank) for (let li = 0; li < rank.length; li++) if (rank[li] !== prevRank[li]) changeEvents++;
     prevRank = rank;
   }
-  check('SVG: todas as polylines têm o mesmo nº de colunas', sameLen && S > 1, `cols=${S}`);
-  check(`gráfico: MUITAS viradas de posição (${changeEvents} eventos em ${S} colunas)`, changeEvents >= 30,
-    `linhas=${polys.length}`);
+  check('SVG: todas as polylines focadas têm o mesmo nº de colunas', sameLen && S > 1, `cols=${S}`);
+  check(`gráfico: viradas de posição no foco (${changeEvents} eventos · ${S} colunas · ${polys.length} linhas)`,
+    changeEvents >= 15, `linhas=${polys.length}`);
+  await page.click('#rankChart .rc-chip[data-p="podio"]');  // volta ao padrão p/ os próximos checks
+  await page.waitForFunction((n) =>
+    document.querySelectorAll('#rankChart polyline.rc-foc').length === n, expFoc, { timeout: 5000 }).catch(() => {});
 
   // (4) linha "Você" com glow + legenda "Você"
   check('linha "Você" destacada (classe .me)', await page.locator('#rankChart polyline.rc-foc.me').count() === 1);
@@ -210,7 +219,9 @@ try {
   await page.locator('#rankChart').screenshot({ path: join(shotsDir, 'rank-chart-week.png') }).catch(() => {});
   await page.click('#rankChart .rc-seg button[data-g="jogo"]');
   await page.waitForSelector('#rankChart .rc-seg button[data-g="jogo"].on', { timeout: 5000 });
-  check('zoom "Jogos da semana": mantém N linhas', await page.locator('#rankChart polyline.rc-ctx, #rankChart polyline.rc-foc').count() === N);
+  check('zoom "Jogos da semana": mantém o foco (sem espaguete)',
+    await page.locator('#rankChart polyline.rc-foc').count() === expFoc
+    && await page.locator('#rankChart polyline.rc-ctx').count() === 0);
   const xGame = await page.$$eval('#rankChart .rc-xlbl', els => els.map(e => e.textContent.trim()));
   check('zoom "Jogos da semana": rótulos X são "Jogo N"', xGame.some(t => /^Jogo \d+$/.test(t)), `x=[${xGame.slice(0, 3).join(', ')}]`);
   await page.locator('#rankChart').screenshot({ path: join(shotsDir, 'rank-chart-games.png') }).catch(() => {});
@@ -247,6 +258,18 @@ try {
   check('hover: tooltip aparece com standings do foco', tip.hidden === false && tip.rows > 0, `linhas no tip=${tip.rows}`);
   check('hover (jogos da semana): header mostra o confronto', tip.hasMatch);
   await page.locator('#rankChart').screenshot({ path: join(shotsDir, 'rank-chart-hover.png') }).catch(() => {});
+
+  // (7-neon) a linha sob o cursor acende em neon (.hot); as outras do foco apagam
+  //   (.dim). Mira no topo do plot, onde a linha do líder (rank rLo) está cravada.
+  await page.mouse.move(box.x + box.width * 0.5, box.y + 3, { steps: 4 });
+  await page.waitForFunction(() => document.querySelector('#rankChart polyline.rc-foc.hot'), null, { timeout: 3000 }).catch(() => {});
+  const hotN = await page.locator('#rankChart polyline.rc-foc.hot').count();
+  const dimN = await page.locator('#rankChart polyline.rc-foc.dim').count();
+  check('hover neon: a linha sob o cursor acende (.hot) e as outras apagam (.dim)',
+    hotN === 1 && dimN === expFoc - 1, `hot=${hotN} dim=${dimN} expFoc=${expFoc}`);
+  await page.mouse.move(box.x - 50, box.y - 50);  // sai do gráfico → reseta o neon
+  check('hover neon: sair do gráfico apaga o neon',
+    await page.locator('#rankChart polyline.rc-foc.hot').count() === 0);
 
   // (7b) "Sua jornada" no Início: linha + KPIs com partida real + dropdown
   await page.goto(`${BASE}/inicio.html`);

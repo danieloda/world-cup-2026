@@ -97,12 +97,32 @@ export function renderRankChart(mount, { series, matches, meId }) {
     const width = Math.max(280, host.clientWidth || mount.clientWidth || 900);
     const narrow = width < 520;
     const PADl = 40, PADr = narrow ? 108 : 172, PADt = 30, PADb = 30;
-    const rowH = N <= 1 ? 34 : clamp(Math.floor(420 / (N - 1)), 6, 34);
-    const plotH = (N <= 1 ? 1 : N - 1) * rowH;
+
+    // Eixo Y "zoom no foco": em vez de espremer todo mundo numa escala 1º..Nº
+    // (com N≈77 são 6px por posição e o pódio vira um nó), enquadramos só a
+    // faixa de posições que os SELECIONADOS percorrem na janela visível — as
+    // linhas se abrem pra ocupar a altura toda. Sem seleção, cai na escala cheia.
+    let rLo = 1, rHi = N;
+    const focusY = selected.size > 0;
+    if (focusY) {
+      rLo = Infinity; rHi = -Infinity;
+      series.forEach((s, i) => {
+        if (!selected.has(s.userId)) return;
+        for (const gi of steps) { const p = pos[i][gi]; if (p < rLo) rLo = p; if (p > rHi) rHi = p; }
+      });
+      rLo = Math.max(1, rLo - 1);
+      rHi = Math.min(N, rHi + 1);
+      if (rHi - rLo < 3) rHi = Math.min(N, rLo + 3);   // piso de altura
+    }
+    const span = Math.max(1, rHi - rLo);
+    const rowH = focusY
+      ? clamp(Math.floor(440 / span), 10, 38)
+      : (N <= 1 ? 34 : clamp(Math.floor(420 / (N - 1)), 6, 34));
+    const plotH = focusY ? span * rowH : (N <= 1 ? 1 : N - 1) * rowH;
     const height = PADt + plotH + PADb;
     const x0 = PADl + 6, x1 = width - PADr;
     const xAt = (k) => K <= 1 ? x1 : x0 + (x1 - x0) * (k / (K - 1));
-    const yAt = (p) => PADt + (p - 1) * rowH;
+    const yAt = (p) => PADt + (p - rLo) * rowH;
 
     let g = '';
     // faixas de fase (alternadas) + rótulos
@@ -110,9 +130,11 @@ export function renderRankChart(mount, { series, matches, meId }) {
       if (bi % 2 === 1) g += `<rect class="rc-band" x="${b.x.toFixed(1)}" y="${PADt - 18}" width="${b.w.toFixed(1)}" height="${plotH + 18}"/>`;
       if (b.w > (narrow ? 34 : 64)) g += `<text class="rc-band-lbl" x="${(b.x + b.w / 2).toFixed(1)}" y="${PADt - 7}" text-anchor="middle">${escapeHtml(b.label)}</text>`;
     });
-    // eixo Y
-    const yStep = Math.max(1, Math.ceil((N - 1) / 14));
-    for (let p = 1; p <= N; p += yStep) {
+    // eixo Y + grade horizontal (linha-guia em cada rótulo)
+    const yLo = focusY ? rLo : 1, yHi = focusY ? rHi : N;
+    const yStep = focusY ? Math.max(1, Math.ceil(span / 12)) : Math.max(1, Math.ceil((N - 1) / 14));
+    for (let p = yLo; p <= yHi; p += yStep) {
+      g += `<line class="rc-grid" x1="${x0}" y1="${yAt(p).toFixed(1)}" x2="${x1}" y2="${yAt(p).toFixed(1)}"/>`;
       g += `<text class="rc-ylbl" x="${PADl - 2}" y="${(yAt(p) + 4).toFixed(1)}" text-anchor="end">${p}º</text>`;
     }
     // eixo X: semanas mostram todas; jogos, esparso e ancorado nas pontas
@@ -131,9 +153,14 @@ export function renderRankChart(mount, { series, matches, meId }) {
     const endLabels = [];
     const lineOf = (i) => steps.map((gi, k) => `${xAt(k).toFixed(1)},${yAt(pos[i][gi]).toFixed(1)}`).join(' ');
     series.forEach((s, i) => {
-      if (!selected.has(s.userId)) { ctx += `<polyline class="rc-ctx" points="${lineOf(i)}"/>`; return; }
+      if (!selected.has(s.userId)) {
+        // Com foco ativo o pelotão cinza some — o eixo já enquadra quem importa.
+        // Sem ninguém selecionado, mostramos o contexto pra não ficar vazio.
+        if (!focusY) ctx += `<polyline class="rc-ctx" points="${lineOf(i)}"/>`;
+        return;
+      }
       const c = colorOf(i);
-      foc += `<polyline class="rc-foc${s.userId === meId ? ' me' : ''}" stroke="${c}" points="${lineOf(i)}"/>`;
+      foc += `<polyline class="rc-foc${s.userId === meId ? ' me' : ''}" data-i="${i}" stroke="${c}" style="--glow:${c}" points="${lineOf(i)}"/>`;
       endLabels.push({ i, y: yAt(finalPos(i)), color: c });
     });
     // rótulos de ponta FORA do clip (senão o 1º corta o avatar) + anti-colisão
@@ -165,7 +192,7 @@ export function renderRankChart(mount, { series, matches, meId }) {
 
     renderLegend();
     renderNote();
-    attachHover(host, { steps, K, xAt, yAt, x0, x1 });
+    attachHover(host, { steps, K, xAt, yAt, x0, x1, rowH });
   }
 
   // ---------------------------------------------------------
@@ -243,6 +270,17 @@ export function renderRankChart(mount, { series, matches, meId }) {
     const tip = host.querySelector('.rc-tip');
     if (!svg || !hit) return;
 
+    // Neon no hover: a linha sob o cursor acende (glow na própria cor) e as
+    // outras do foco apagam um pouco, pra ela saltar. setHot(-1) reseta.
+    const focLines = svg.querySelectorAll('.rc-foc');
+    function setHot(i) {
+      focLines.forEach(pl => {
+        const on = +pl.dataset.i === i && i >= 0;
+        pl.classList.toggle('hot', on);
+        pl.classList.toggle('dim', i >= 0 && !on);
+      });
+    }
+
     function stepAt(clientX) {
       const r = svg.getBoundingClientRect();
       const xv = (clientX - r.left) / r.width * (svg.viewBox.baseVal.width || r.width);
@@ -253,8 +291,9 @@ export function renderRankChart(mount, { series, matches, meId }) {
     function move(e) {
       // Mesmo guard do journey-chart: touch órfão após redraw (SVG desanexado,
       // rect zerado) produziria k=NaN/∞ e tooltip de jogo inexistente.
-      if (!svg.getBoundingClientRect().width) return;
-      const { x: cx } = pointXY(e);
+      const box = svg.getBoundingClientRect();
+      if (!box.width) return;
+      const { x: cx, y: cy } = pointXY(e);
       const k = stepAt(cx);
       const gi = geo.steps[k];
       const xpx = geo.xAt(k);
@@ -262,6 +301,18 @@ export function renderRankChart(mount, { series, matches, meId }) {
       cross.removeAttribute('hidden');
       cross.setAttribute('x1', xpx.toFixed(1));
       cross.setAttribute('x2', xpx.toFixed(1));
+
+      // linha sob o cursor = a mais próxima em Y nesta etapa (dentro de ~1 linha)
+      const vh = svg.viewBox.baseVal.height || box.height;
+      const yv = (cy - box.top) / box.height * vh;
+      let hotI = -1, hotD = Infinity;
+      series.forEach((s, i) => {
+        if (!selected.has(s.userId)) return;
+        const d = Math.abs(geo.yAt(pos[i][gi]) - yv);
+        if (d < hotD) { hotD = d; hotI = i; }
+      });
+      if (hotD > geo.rowH * 1.1 + 6) hotI = -1;   // longe de tudo → ninguém aceso
+      setHot(hotI);
 
       while (hover.firstChild) hover.removeChild(hover.firstChild);
       const rows = [];
@@ -271,9 +322,10 @@ export function renderRankChart(mount, { series, matches, meId }) {
         const c = document.createElementNS(SVG_NS, 'circle');
         c.setAttribute('cx', xpx.toFixed(1));
         c.setAttribute('cy', geo.yAt(pos[i][gi]).toFixed(1));
-        c.setAttribute('r', s.userId === meId ? 5 : 4);
+        c.setAttribute('r', i === hotI ? 6 : (s.userId === meId ? 5 : 4));
         c.setAttribute('fill', colorOf(i));
-        c.setAttribute('class', 'rc-hdot');
+        c.setAttribute('class', i === hotI ? 'rc-hdot hot' : 'rc-hdot');
+        if (i === hotI) c.style.setProperty('--glow', colorOf(i));
         hover.appendChild(c);
       });
       rows.sort((a, b) => a.pos - b.pos);
@@ -282,7 +334,7 @@ export function renderRankChart(mount, { series, matches, meId }) {
         ? matchHeader(matches[gi])
         : `<div class="rc-tip-h">Semana ${k + 1} · ${tl.weekRange(k)}</div>`;
       tip.innerHTML = header + rows.map(r => `
-        <div class="rc-tip-r">
+        <div class="rc-tip-r${r.i === hotI ? ' hot' : ''}">
           <span class="rc-tip-pos" style="color:${colorOf(r.i)}">${r.pos}º</span>
           ${avatarChip(r.s, 'sm')}
           <span class="rc-tip-nm" style="color:${colorOf(r.i)}">${escapeHtml(r.s.userId === meId ? 'Você' : r.s.name)}</span>
@@ -295,6 +347,7 @@ export function renderRankChart(mount, { series, matches, meId }) {
     function leave() {
       cross.setAttribute('hidden', '');
       while (hover.firstChild) hover.removeChild(hover.firstChild);
+      setHot(-1);
       tip.hidden = true;
     }
 
