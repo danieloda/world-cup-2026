@@ -12,8 +12,9 @@ name: Refresh Odds
 
 on:
   schedule:
-    # 06:00 UTC = 03:00 BRT, todo dia
-    - cron: '0 6 * * *'
+    # A cada 2h (no minuto :30): odds pré-jogo (1 chamada por jogo futuro) não
+    # oscilam rápido o bastante pra valer menos que isso.
+    - cron: '30 */2 * * *'
   workflow_dispatch:        # botão "Run workflow" no GitHub UI
 
 concurrency:

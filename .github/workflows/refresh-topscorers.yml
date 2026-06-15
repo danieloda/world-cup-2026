@@ -11,9 +11,9 @@ name: Refresh Top Scorers
 
 on:
   schedule:
-    # A cada 3h: cobre as janelas pós-jogo durante o torneio. O commit só
-    # acontece quando o JSON muda, então fora de dias de jogo não há deploy.
-    - cron: '0 */3 * * *'
+    # A cada 15 min: artilharia ao vivo, 1 chamada à API. Commit só quando muda
+    # (gol) → fora de jogo não há deploy.
+    - cron: '*/15 * * * *'
   workflow_dispatch:        # botão "Run workflow" no GitHub UI
 
 concurrency:

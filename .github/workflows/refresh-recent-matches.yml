@@ -11,8 +11,9 @@ name: Refresh Recent Matches
 
 on:
   schedule:
-    # 08:00 UTC = 05:00 BRT — depois que os jogos da véspera já terminaram
-    - cron: '0 8 * * *'
+    # A cada 3h (no minuto :15): forma/H2H só muda quando um jogo termina. É o
+    # mais caro (~1 chamada por seleção, ~48/run), por isso não mais frequente.
+    - cron: '15 */3 * * *'
   workflow_dispatch:        # botão "Run workflow" no GitHub UI
     inputs:
       team:

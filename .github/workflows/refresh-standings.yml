@@ -11,9 +11,9 @@ name: Refresh Standings
 
 on:
   schedule:
-    # A cada 3h: cobre as janelas pós-jogo durante o torneio. O commit só
-    # acontece quando o JSON muda, então fora de dias de jogo não há deploy.
-    - cron: '20 */3 * * *'
+    # A cada 10 min: standings é 1 chamada à API (plano PRO 7.5k/dia → sobra
+    # muito). O commit só acontece quando o JSON muda → fora de jogo não há deploy.
+    - cron: '*/10 * * * *'
   workflow_dispatch:        # botão "Run workflow" no GitHub UI
 
 concurrency:

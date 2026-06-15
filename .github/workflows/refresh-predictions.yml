@@ -14,8 +14,8 @@ name: Refresh Predictions
 
 on:
   schedule:
-    # 06:10 UTC = 03:10 BRT — logo depois do refresh-odds (06:00), pra não competir
-    - cron: '10 6 * * *'
+    # 2×/dia (06:00 e 18:00 UTC): previsão pré-jogo é quase estática.
+    - cron: '0 6,18 * * *'
   workflow_dispatch:        # botão "Run workflow" no GitHub UI
 
 concurrency:
