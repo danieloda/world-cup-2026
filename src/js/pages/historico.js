@@ -6,9 +6,8 @@ import {
   flag, escapeHtml, teamPt, formatBrShort, formatTime, stageLabel,
   isLive, avatarHtml, localDateKey, renderDateCalendar, firstName, heroMeta,
 } from '../util.js';
-import { scorerBonus, stageMultiplier, scoreBreakdown } from '../scoring.js';
+import { scorerBonus, stageMultiplier } from '../scoring.js';
 import { KPI } from '../kpi-icons.js';
-import { initTooltips } from '../tooltip.js';
 import { startAutoRefresh } from '../auto-refresh.js';
 
 // ============================================================
@@ -17,9 +16,30 @@ import { startAutoRefresh } from '../auto-refresh.js';
 const ICON = {
   ball: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7l4 3-1.6 5h-4.8L8 10z"/></svg>',
   eye: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>',
-  info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>',
   flag: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h14v16l-7-3-7 3z"/></svg>',
+  info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+  arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>',
+  x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>',
+  chev: '<svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
 };
+
+// Tinta sutil das cores do time no placar (--ch/--ca). Times sem mapa caem num
+// neutro — o color-mix continua válido, só fica sem cor de marca.
+const TEAM_TINT = {
+  Brazil: '#009C3B', Argentina: '#6CACE4', France: '#0055A4', England: '#CF142B',
+  Spain: '#AA151B', Germany: '#888', Portugal: '#006600', Netherlands: '#AE6A32',
+  Croatia: '#C1272D', Italy: '#0066CC', Belgium: '#C8102E', Uruguay: '#5CBFEB',
+  Mexico: '#006847', 'United States': '#3C3B6E', Canada: '#FF0000', Japan: '#BC002D',
+  'South Korea': '#0047A0', Morocco: '#C1272D', Senegal: '#00853F', Ghana: '#006B3F',
+  Nigeria: '#008751', Switzerland: '#D52B1E', Denmark: '#C60C30', Poland: '#DC143C',
+  Colombia: '#FCD116', Ecuador: '#FFD100', Australia: '#00843D', 'Saudi Arabia': '#006C35',
+  Qatar: '#8A1538', Iran: '#239F40', Serbia: '#C6363C', Austria: '#ED2939',
+  Norway: '#BA0C2F', Sweden: '#FECC00', Scotland: '#005EB8', Haiti: '#00209F',
+};
+function teamTint(team) {
+  return TEAM_TINT[team] || '#5b6472';
+}
 
 // ============================================================
 // Estado
@@ -130,7 +150,7 @@ function inStage(m, stage) {
   return stage === 'group' ? m.stage === 'group' : m.stage !== 'group';
 }
 function dayKey(m) {
-  // Chave de dia no fuso de Brasília (mesmo de formatBrShort/formatBrDate), pra
+  // Chave de dia no fuso de Brasília (mesmo de formatBrShort/formatTime), pra
   // que a aba de dia e a data do card nunca divirjam num jogo perto da meia-noite.
   return localDateKey(m.match_date);
 }
@@ -203,85 +223,10 @@ function renderPage() {
       ])}</div>
     </section>
 
-    <div class="hist-note">
-      ${ICON.info}
-      <span>Os palpites de todos ficam visíveis quando o lacre do dia é publicado — em <b>Próximas partidas</b> sem pontos, e em <b>Finalizadas</b> já pontuados.</span>
-    </div>
-
     ${renderStageTabs()}
 
     <div id="tabBody">
       ${renderTabBody()}
-    </div>
-  `;
-}
-
-// ============================================================
-// Prévia (pré-Copa) — ilustração desfocada, dados fictícios
-// ============================================================
-function renderPreview() {
-  // Exemplos 100% fictícios só para mostrar o formato da tela. Ninguém vê palpite
-  // de ninguém antes do lacre publicado — por isso fica borrado e marcado como "Prévia".
-  const demos = [
-    {
-      home: 'Brazil', away: 'Croatia', sh: 2, sa: 1, stage: 'Grupo C',
-      bets: [
-        { name: 'Você',  ph: 2, pa: 1, pts: 7, cls: 'win-exact',   pcls: 'exact',   rcls: 'exact',   rlbl: 'Placar exato',  me: true },
-        { name: 'Ana',   ph: 2, pa: 0, pts: 5, cls: 'win-partial', pcls: 'partial', rcls: 'partial', rlbl: 'Acerto parcial' },
-        { name: 'Bruno', ph: 1, pa: 1, pts: 1, cls: 'win-partial', pcls: 'partial', rcls: 'partial', rlbl: 'Acerto parcial' },
-        { name: 'Carla', ph: 0, pa: 2, pts: 0, cls: 'miss',        pcls: 'zero',    rcls: 'miss',    rlbl: 'Não pontuou' },
-      ],
-    },
-    {
-      home: 'Argentina', away: 'France', sh: 1, sa: 1, stage: 'Grupo D',
-      bets: [
-        { name: 'Diego', ph: 1, pa: 1, pts: 7, cls: 'win-exact',   pcls: 'exact',   rcls: 'exact',   rlbl: 'Placar exato' },
-        { name: 'Elis',  ph: 0, pa: 0, pts: 5, cls: 'win-partial', pcls: 'partial', rcls: 'partial', rlbl: 'Acerto parcial' },
-        { name: 'Você',  ph: 2, pa: 1, pts: 1, cls: 'win-partial', pcls: 'partial', rcls: 'partial', rlbl: 'Acerto parcial', me: true },
-      ],
-    },
-  ];
-
-  const resIcon = c => c === 'exact' ? KPI.exact : c === 'partial' ? KPI.partial : KPI.miss;
-
-  const cards = demos.map(d => `
-    <div class="history-card group">
-      <div class="history-head">
-        <div class="hh-meta">${d.stage} · 16:00</div>
-        <div class="hh-score">${d.sh}<i>–</i>${d.sa}</div>
-      </div>
-      <div class="history-fixture">
-        <span class="hh-team home">${flag(d.home)}<span class="tn">${escapeHtml(teamPt(d.home))}</span></span>
-        <span class="hh-rule"></span>
-        <span class="hh-team away">${flag(d.away)}<span class="tn">${escapeHtml(teamPt(d.away))}</span></span>
-      </div>
-      <div class="history-bets">
-        <div class="hb-head"><span class="c">#</span><span>Jogador</span><span class="c">Palpite</span><span class="hb-h-res">Resultado</span><span class="r">Pts</span></div>
-        ${d.bets.map((b, i) => `
-          <div class="hb-row ${b.cls} ${b.me ? 'me' : ''} ${i === 0 ? 'top' : ''}">
-            <span class="hb-rank">${i + 1}</span>
-            <span class="hb-player"><span class="av-mini">${avatarHtml({ full_name: b.name })}</span><span class="nm">${escapeHtml(b.name)}</span></span>
-            <span class="pred">${b.ph}<span class="x">–</span>${b.pa}</span>
-            <span class="hb-res ${b.rcls}">${resIcon(b.rcls)}<span class="w">${b.rlbl}</span></span>
-            <span class="hb-ptswrap"><span class="pts ${b.pcls}">${b.pts > 0 ? '+' + b.pts : '0'}</span></span>
-          </div>
-        `).join('')}
-      </div>
-    </div>
-  `).join('');
-
-  return `
-    <div class="preview-wrap">
-      <div class="preview-blurred" aria-hidden="true">
-        <div class="history-list">${cards}</div>
-      </div>
-      <div class="preview-overlay">
-        <span class="preview-badge">${ICON.eye} Prévia</span>
-        <h3>É assim que vai ficar</h3>
-        <p>Quando a Copa começar, cada jogo mostra aqui o <strong>palpite de todos os participantes</strong>,
-           com os pontos de cada um. Os nomes e placares acima são <strong>só de exemplo</strong> — nada aqui é real ainda.</p>
-        <a class="btn btn-green" href="palpites-grupos.html">Fazer meus palpites →</a>
-      </div>
     </div>
   `;
 }
@@ -320,8 +265,10 @@ function renderTabBody() {
 }
 
 // Calendário "Por data" — o MESMO componente das telas de palpite (renderDateCalendar).
-// Dias passados ficam neutros (regra: nada verde no passado); o dia em andamento
-// recebe destaque ('soon') via override de status no meta.
+// No Histórico a cor do dia conta o SEU desempenho:
+//   âmbar (soon)   → dia em andamento (algum jogo sem resultado)
+//   verde (done)   → dia encerrado em que você pontuou
+//   vermelho (urg) → dia encerrado em que você zerou
 function renderDayCalendar() {
   const days = stageDays();
   const dates = days.map(([k]) => k);
@@ -330,17 +277,33 @@ function renderDayCalendar() {
     const dayM = stageMatches().filter(m => dayKey(m) === k);
     const finished = dayM.filter(m => m.finished).length;
     const live = dayM.some(m => isLive(m));
+    const allDone = finished >= count;
+    const status = !allDone ? 'soon' : (myDayPoints(dayM) > 0 ? 'done' : 'urgent');
     const d = new Date(k + 'T12:00:00');
     meta[k] = {
       total: count,
       done: finished,
-      played: finished >= count,   // dia todo encerrado → 'past' (neutro)
       title: formatBrShort(d),
       info: live ? 'ao vivo' : '',
-      status: live ? 'soon' : undefined,
+      status,
     };
   }
-  return `<div class="hist-cal-wrap" id="dayTabs">${renderDateCalendar({ dates, meta, activeDate: activeDay })}</div>`;
+  const legendLabels = { done: 'Você pontuou', urgent: 'Zerou o dia', soon: 'Em andamento' };
+  return `<div class="hist-cal-wrap" id="dayTabs">${renderDateCalendar({ dates, meta, activeDate: activeDay, legendLabels })}</div>`;
+}
+
+// Pontos que VOCÊ fez nos jogos encerrados do dia (palpite + bônus de artilheiro).
+function myDayPoints(dayM) {
+  let pts = 0;
+  for (const m of dayM) {
+    if (!m.finished) continue;
+    const mybet = (predsByMatch.get(m.id) ?? []).find(b => b.user_id === profile.id);
+    if (!mybet) continue;
+    pts += (mybet.points_earned ?? 0);
+    const sc = scorerHitFor(mybet, m);
+    if (sc) pts += sc.bonus;
+  }
+  return pts;
 }
 
 function renderStatusChips() {
@@ -435,7 +398,7 @@ function renderEmptyFilter() {
 }
 
 // ============================================================
-// Card de jogo (editorial / tabela)
+// Card de jogo — placar (momento) + sua faixa + consenso + Raio-X (tiers)
 // ============================================================
 function renderMatchCard(m) {
   return matchStatus(m) === 'finished' ? renderFinishedCard(m) : renderAwaitingCard(m);
@@ -446,42 +409,19 @@ function stageCls(m) {
   const s = m.stage;
   return s === 'group' ? 'group' : s === 'final' ? 'final' : s === 'third' ? 'third' : 'ko';
 }
-
 function stageDisp(m) {
   return m.stage === 'group' ? `Grupo ${m.group_name}` : stageLabel(m.stage);
 }
-
-function fixtureHtml(m) {
-  return `
-    <div class="history-fixture">
-      <span class="hh-team home">${flag(m.team_home)}<span class="tn">${escapeHtml(teamPt(m.team_home))}</span></span>
-      <span class="hh-rule"></span>
-      <span class="hh-team away">${flag(m.team_away)}<span class="tn">${escapeHtml(teamPt(m.team_away))}</span></span>
-    </div>
-  `;
+// "1.5" / "2" / "5" — sem zeros à toa (multiplicador do bônus de artilheiro)
+function fmtMult(stage) {
+  return String(stageMultiplier(stage)).replace(/\.0$/, '');
 }
-
-function cardHead(m, rightHtml) {
-  // Fases de peso (×>1) valem mais no bônus de artilheiro — sinaliza no topo do card.
-  // Chip (sem "· " no texto): quebrando de linha ele desce inteiro, sem dot órfão.
-  const mult = stageMultiplier(m.stage);
-  const multBadge = mult > 1 ? ` <span class="hh-mult">Artilheiro ×${fmtMult(m.stage)}</span>` : '';
-  return `
-    <div class="history-head">
-      <div class="hh-meta"><span class="nw">${stageDisp(m)} · ${formatTime(m.match_date)}</span>${multBadge}</div>
-      ${rightHtml}
-    </div>
-    ${fixtureHtml(m)}
-  `;
-}
-
-// Total de gols de um palpite (chave de ordenação)
+// Total de gols de um palpite (chave de ordenação nas "próximas partidas")
 function predGoals(p) {
   return (p.pred_home ?? 0) + (p.pred_away ?? 0);
 }
 
 // Bônus de artilheiro que ESTE usuário ganhou NESTA partida (ou null se não pontuou aqui).
-// Cruza o artilheiro escolhido com os gols marcados no jogo.
 function scorerHitFor(bet, m) {
   const pick = scorerPickByUser.get(bet.user_id);
   if (!pick) return null;
@@ -491,181 +431,245 @@ function scorerHitFor(bet, m) {
   return { goals: n, bonus: scorerBonus(n, m.stage), name: pick.name, team: pick.team };
 }
 
-// "1.5" / "2" / "5" — sem zeros à toa (multiplicador do bônus de artilheiro)
-function fmtMult(stage) {
-  return String(stageMultiplier(stage)).replace(/\.0$/, '');
-}
-
-// ----- Conteúdo dos popovers (tooltip estilizado, montado em hover) -----
-// Cada gatilho carrega seu HTML num <template hidden> irmão; ver initTooltips().
-function tipShell(kicker, tier, tierCls, rowsHtml, totalCls, totalTxt) {
-  return `
-    <div class="tip-head">
-      <span class="tip-kicker">${escapeHtml(kicker)}</span>
-      <span class="tip-tier ${tierCls}">${escapeHtml(tier)}</span>
-    </div>
-    <div class="tip-rows">${rowsHtml}</div>
-    <div class="tip-total">
-      <span class="tip-total-lbl">Total no jogo</span>
-      <span class="tip-total-sum ${totalCls}">${totalTxt}</span>
-    </div>`;
-}
-
-// Palpite: modelo ADITIVO — cada acerto soma; o "peso" é o valor da fase (não há ×N único).
-function betTipHtml(bet, m, pts, isExact) {
-  const tier = isExact ? ['Placar exato', 'exact']
-    : pts > 0 ? ['Acerto parcial', 'partial']
-    : ['Não pontuou', 'zero'];
-  const { parts } = scoreBreakdown(
-    bet.pred_home, bet.pred_away, bet.pred_pen_winner,
-    m.actual_home, m.actual_away, m.pen_winner, m.stage,
-  );
-  const rows = parts.length > 0
-    ? parts.map(p => `
-        <div class="tip-row">
-          <span class="tip-row-lbl">${escapeHtml(p.label)}</span>
-          <span class="tip-row-val add"><span class="op">+</span>${p.pts}</span>
-        </div>`).join('')
-    : `<div class="tip-row miss-row"><span class="tip-row-lbl">Errou gols, resultado e saldo</span></div>`;
-  return tipShell(stageDisp(m), tier[0], tier[1], rows, tier[1], pts > 0 ? `+${pts}` : '0');
-}
-
-// Artilheiro: bônus MULTIPLICATIVO — gols × 2 × peso da fase.
-function scorerTipHtml(sc, m) {
+// ----- Placar central (com leve tinta das cores dos times) -----
+function boardHtml(m, inner) {
+  const finished = m.finished;
   const mult = stageMultiplier(m.stage);
-  const golLbl = `Gols na partida${sc.goals > 1 ? ` (${sc.goals})` : ''}`;
-  let rows = `
-    <div class="tip-player">${flag(sc.team)} <span>${escapeHtml(sc.name)}</span></div>
-    <div class="tip-row">
-      <span class="tip-row-lbl">${golLbl}</span>
-      <span class="tip-row-val">${sc.goals}</span>
-    </div>
-    <div class="tip-row">
-      <span class="tip-row-lbl">Pontos por gol</span>
-      <span class="tip-row-val"><span class="op">×</span>2</span>
+  const multBadge = mult > 1 ? `<span class="mult">Artilheiro ×${fmtMult(m.stage)}</span>` : '';
+  const score = finished
+    ? `<span class="bscore">${m.actual_home}<span class="x">–</span>${m.actual_away}</span>`
+    : `<span class="bscore bs-vs">vs</span>`;
+  const pen = (finished && m.pen_winner)
+    ? `<div class="bpen">Pênaltis: ${escapeHtml(m.pen_winner === 'home' ? teamPt(m.team_home) : teamPt(m.team_away))}</div>` : '';
+  const goals = goalsByMatch.get(m.id) ?? [];
+  const scorers = (finished && goals.length)
+    ? `<div class="scorers">${goals.map(g => `<span class="sc">${flag(g.players.team)} ${escapeHtml(g.players.full_name)} <b>${g.goals}</b></span>`).join('')}</div>` : '';
+  return `
+    <div class="board" style="--ch:${teamTint(m.team_home)};--ca:${teamTint(m.team_away)}">
+      <div class="board-meta"><span class="m">${stageDisp(m)} · ${formatTime(m.match_date)}</span>${multBadge}</div>
+      <div class="board-row">
+        <span class="bteam">${flag(m.team_home)}<span class="bt-n">${escapeHtml(teamPt(m.team_home))}</span></span>
+        ${score}
+        <span class="bteam">${flag(m.team_away)}<span class="bt-n">${escapeHtml(teamPt(m.team_away))}</span></span>
+      </div>
+      ${pen}
+      ${scorers}
+      ${inner}
     </div>`;
-  if (mult > 1) {
-    rows += `
-    <div class="tip-row">
-      <span class="tip-row-lbl">Peso · ${escapeHtml(stageLabel(m.stage))}</span>
-      <span class="tip-row-val mult"><span class="op">×</span>${fmtMult(m.stage)}</span>
-    </div>`;
-  }
-  return tipShell('Bônus de artilheiro', 'Seu artilheiro', 'scorer', rows, 'scorer', `+${sc.bonus}`);
 }
 
-// ----- Finalizada: resultado + pontos + gols -----
-function renderFinishedCard(m) {
-  // Ordena: pontos desc → total de gols desc → mandante desc → nome
-  const bets = [...(predsByMatch.get(m.id) ?? [])].sort((a, b) =>
-    (b.points_earned ?? 0) - (a.points_earned ?? 0)
-    || predGoals(b) - predGoals(a)
-    || (b.pred_home ?? 0) - (a.pred_home ?? 0)
-    || (a.profiles?.full_name || '').localeCompare(b.profiles?.full_name || '')
-  );
-  const goals = goalsByMatch.get(m.id) ?? [];
-  const penInfo = m.pen_winner
-    ? `<small>pen: ${m.pen_winner === 'home' ? teamPt(m.team_home) : teamPt(m.team_away)}</small>` : '';
-  const score = `<div class="hh-score">${m.actual_home}<i>–</i>${m.actual_away}${penInfo}</div>`;
+// ----- Faixa "seu resultado" (sempre logo abaixo do placar) -----
+function mybandHtml(m) {
+  const mybet = (predsByMatch.get(m.id) ?? []).find(b => b.user_id === profile.id);
+  if (!mybet) return `<div class="myline"><span class="myband miss">Você não palpitou neste jogo</span></div>`;
+  const pts = mybet.points_earned ?? 0;
+  const isExact = mybet.pred_home === m.actual_home && mybet.pred_away === m.actual_away;
+  const isDraw = m.actual_home === m.actual_away;
+  const lvl = isExact ? 'exact' : pts > 0 ? 'partial' : 'miss';
+  const pred = `${mybet.pred_home}–${mybet.pred_away}`;
+  const verb = isExact ? 'cravou' : 'palpitou';
+  const tag = isExact ? '<span class="rk">placar exato</span>'
+    : pts > 0 ? `<span class="rk">${isDraw ? 'acertou o empate' : 'acertou o vencedor'}</span>`
+    : '';
+  const sc = scorerHitFor(mybet, m);
+  const ball = sc ? ` <span class="rk rk-ball">${ICON.ball} +${sc.bonus}</span>` : '';
+  const ptsTxt = pts > 0 ? `+${pts}` : '0 pts';
+  return `<div class="myline"><span class="myband ${lvl}">Você ${verb} ${pred} <span class="pts">${ptsTxt}</span> ${tag}${ball}</span></div>`;
+}
 
+// ----- Consenso: placares mais palpitados (token) + o SEU palpite -----
+function consensusHtml(m, bets, finished) {
+  if (!bets.length) return '';
+  const freq = new Map();
+  for (const b of bets) {
+    const k = `${b.pred_home}-${b.pred_away}`;
+    freq.set(k, (freq.get(k) ?? 0) + 1);
+  }
+  const top = [...freq.entries()].sort((a, b) => b[1] - a[1]).slice(0, finished ? 2 : 3);
+  const pills = top.map(([k, n], i) => {
+    const [h, a] = k.split('-');
+    return `<span class="cpill ${i === 0 ? 'lead' : ''}"><span class="sb">${h}–${a}</span> <span class="n"><b>${n}</b>${i === 0 ? ' palpites' : ''}</span></span>`;
+  }).join('');
+  const mybet = bets.find(b => b.user_id === profile.id);
+  const you = mybet ? `<span class="you">você <span class="sb">${mybet.pred_home}–${mybet.pred_away}</span></span>` : '';
+  return `<div class="consensus"><span class="ttl">Mais palpitados</span>${pills}${you}</div>`;
+}
+
+// ----- Raio-X: tiers (cravaram / acertaram vencedor / não pontuaram) -----
+function tiersHtml(m, bets) {
+  const levels = { exact: [], partial: [], miss: [] };
+  for (const b of bets) {
+    const pts = b.points_earned ?? 0;
+    const isExact = b.pred_home === m.actual_home && b.pred_away === m.actual_away;
+    levels[isExact ? 'exact' : pts > 0 ? 'partial' : 'miss'].push(b);
+  }
+  const isDraw = m.actual_home === m.actual_away;
+  const out = [];
+  if (levels.exact.length)   out.push(tierHtml(m, 'exact',   'Cravaram o placar', levels.exact, true));
+  if (levels.partial.length) out.push(tierHtml(m, 'partial', isDraw ? 'Acertaram o empate' : 'Acertaram o vencedor', levels.partial, false));
+  if (levels.miss.length)    out.push(tierHtml(m, 'miss',    'Não pontuaram', levels.miss, false));
+  return `<div class="tiers">${out.join('')}</div>`;
+}
+
+const TIER_ICON = { exact: () => ICON.check, partial: () => ICON.arrow, miss: () => ICON.x };
+
+function tierHtml(m, level, label, list, flat) {
+  const hasMe = list.some(b => b.user_id === profile.id);
+  const ptsList = list.map(b => b.points_earned ?? 0);
+  const min = Math.min(...ptsList), max = Math.max(...ptsList);
+  const ptsLabel = level === 'miss' ? '0' : (min === max ? `+${max}` : `+${min} a +${max}`);
+  const body = flat ? flatPeople(m, list) : groupedPeople(m, list);
   return `
-    <div class="history-card ${stageCls(m)}">
-      ${cardHead(m, score)}
+    <details class="tier t-${level}${hasMe ? ' has-me' : ''}"${hasMe ? ' open' : ''}>
+      <summary>
+        <span class="t-ic">${TIER_ICON[level]()}</span>
+        <span>${label}</span><span class="t-cnt">${list.length}</span>
+        <span class="t-pts">${ptsLabel}</span>
+        ${ICON.chev}
+      </summary>
+      <div class="people${flat ? ' flat' : ''}">${body}</div>
+    </details>`;
+}
 
-      ${renderBetsList(m, bets, true)}
+// "Você" sempre primeiro; depois ordem alfabética
+function sortMeFirst(list) {
+  return [...list].sort((a, b) =>
+    (b.user_id === profile.id) - (a.user_id === profile.id)
+    || (a.profiles?.full_name || '').localeCompare(b.profiles?.full_name || ''));
+}
+function personChip(m, b) {
+  const isMe = b.user_id === profile.id;
+  const name = isMe ? 'Você' : (b.profiles?.full_name || '?');
+  const sc = scorerHitFor(b, m);
+  const ball = sc ? `<span class="ball">${ICON.ball}+${sc.bonus}</span>` : '';
+  return `<span class="pp ${isMe ? 'me' : ''}"><span class="av">${avatarHtml(b.profiles)}</span><span class="nm">${escapeHtml(name)}</span>${ball}</span>`;
+}
+// Tier de placar único (cravaram): grade simples de chips
+function flatPeople(m, list) {
+  return sortMeFirst(list).map(b => personChip(m, b)).join('');
+}
+// Tiers parcial/zerou: subgrupos por placar, ORDENADOS POR PONTOS desc (freq desempata)
+function groupedPeople(m, list) {
+  const groups = new Map(); // "h-a" -> { home, away, pts, bets:[] }
+  for (const b of list) {
+    const key = `${b.pred_home}-${b.pred_away}`;
+    if (!groups.has(key)) groups.set(key, { home: b.pred_home, away: b.pred_away, pts: b.points_earned ?? 0, bets: [] });
+    groups.get(key).bets.push(b);
+  }
+  const arr = [...groups.values()].sort((a, b) => b.pts - a.pts || b.bets.length - a.bets.length);
+  return arr.map(g => {
+    const ptsBadge = g.pts > 0 ? `<span class="gp">+${g.pts}</span>` : '';
+    const n = g.bets.length;
+    const chips = sortMeFirst(g.bets).map(b => personChip(m, b)).join('');
+    return `
+      <div class="pgroup">
+        <div class="pgroup-h"><span class="sb">${g.home}–${g.away}</span>${ptsBadge}<span class="cnt">${n} ${n === 1 ? 'pessoa' : 'pessoas'}</span></div>
+        <div class="pgroup-people">${chips}</div>
+      </div>`;
+  }).join('');
+}
 
-      ${goals.length > 0 ? `
-        <div class="history-scorers">
-          <span class="label">${ICON.ball} Gols</span>
-          ${goals.map(g => `<span class="scorer"><span class="fl">${flag(g.players.team)}</span> ${escapeHtml(g.players.full_name)} <span class="num">${g.goals}</span></span>`).join('')}
-        </div>
-      ` : ''}
-    </div>
-  `;
+// ----- Finalizada -----
+function renderFinishedCard(m) {
+  const bets = predsByMatch.get(m.id) ?? [];
+  const body = bets.length
+    ? `<div class="card-body">
+         <div class="rx-h">Raio-X dos <span class="n">${bets.length} palpite${bets.length === 1 ? '' : 's'}</span></div>
+         ${consensusHtml(m, bets, true)}
+         ${tiersHtml(m, bets)}
+       </div>`
+    : `<div class="card-body"><div class="bets-empty">Nenhum palpite registrado pra este jogo.</div></div>`;
+  return `<article class="rcard ${stageCls(m)}">${boardHtml(m, mybandHtml(m))}${body}</article>`;
 }
 
 // ----- Próxima partida (aguardando): palpites de todos, SEM pontos -----
 function renderAwaitingCard(m) {
   const live = isLive(m);
   const started = new Date(m.match_date) <= new Date();
-  // Ordena por total de gols desc → mandante desc → nome ("Você" fica destacado pelo estilo)
-  const bets = [...(predsByMatch.get(m.id) ?? [])].sort((a, b) =>
-    predGoals(b) - predGoals(a)
-    || (b.pred_home ?? 0) - (a.pred_home ?? 0)
-    || (a.profiles?.full_name || '').localeCompare(b.profiles?.full_name || '')
-  );
-  // Revelado pelo lacre mas ainda sem apito → "Lacrado": deixa claro que os
-  // palpites estão visíveis porque ninguém pode mais editar (não por jogo rolando).
   const pillTxt = live ? 'Ao vivo' : started ? 'Aguardando resultado' : 'Lacrado · aguarda o apito';
-  const status = `<div class="hh-status"><span class="pill ${live ? 'live' : 'locked'}">${pillTxt}</span></div>`;
+  const pill = `<div class="myline"><span class="pill ${live ? 'live' : 'locked'}">${live ? '<span class="ld"></span>' : ''}${pillTxt}</span></div>`;
 
+  const bets = predsByMatch.get(m.id) ?? [];
+  let body;
+  if (!bets.length) {
+    body = `<div class="card-body"><div class="bets-empty">Nenhum palpite registrado pra este jogo.</div></div>`;
+  } else {
+    const mybet = bets.find(b => b.user_id === profile.id);
+    const others = [...bets]
+      .filter(b => b.user_id !== profile.id)
+      .sort((a, b) => predGoals(b) - predGoals(a)
+        || (b.pred_home ?? 0) - (a.pred_home ?? 0)
+        || (a.profiles?.full_name || '').localeCompare(b.profiles?.full_name || ''));
+    body = `
+      <div class="card-body">
+        ${consensusHtml(m, bets, false)}
+        ${mybet ? awaitingRow(mybet) : ''}
+        <details class="allbets">
+          <summary><span>Ver os ${bets.length} palpites</span>${ICON.chev}</summary>
+          ${others.map(awaitingRow).join('')}
+        </details>
+      </div>`;
+  }
+  return `<article class="rcard ${stageCls(m)} awaiting">${boardHtml(m, pill)}${body}</article>`;
+}
+function awaitingRow(b) {
+  const isMe = b.user_id === profile.id;
+  const name = isMe ? 'Você' : (b.profiles?.full_name || '?');
   return `
-    <div class="history-card ${stageCls(m)} awaiting">
-      ${cardHead(m, status)}
-
-      ${renderBetsList(m, bets, false)}
-    </div>
-  `;
+    <div class="abrow ${isMe ? 'me' : ''}">
+      <span class="player"><span class="av">${avatarHtml(b.profiles)}</span><span class="nm">${escapeHtml(name)}</span></span>
+      <span class="pred">${b.pred_home}<span class="x">–</span>${b.pred_away}</span>
+    </div>`;
 }
 
-// ----- Lista de palpites (tabela editorial) -----
-function renderBetsList(m, bets, finished) {
-  if (bets.length === 0) {
-    return `<div class="history-bets-empty">Nenhum palpite registrado pra este jogo.</div>`;
-  }
-  if (!finished) {
-    return `
-      <div class="history-bets awaiting">
-        ${bets.map(renderAwaitingRow).join('')}
+// ============================================================
+// Prévia (pré-Copa) — ilustração desfocada, dados fictícios
+// ============================================================
+function renderPreview() {
+  const chip = (av, name, me = false) =>
+    `<span class="pp ${me ? 'me' : ''}"><span class="av">${av}</span><span class="nm">${name}</span></span>`;
+  const card = `
+    <article class="rcard group">
+      <div class="board" style="--ch:#009C3B;--ca:#C1272D">
+        <div class="board-meta"><span class="m">Grupo C · 16:00</span></div>
+        <div class="board-row">
+          <span class="bteam">${flag('Brazil')}<span class="bt-n">Brasil</span></span>
+          <span class="bscore">2<span class="x">–</span>1</span>
+          <span class="bteam">${flag('Croatia')}<span class="bt-n">Croácia</span></span>
+        </div>
+        <div class="myline"><span class="myband exact">Você cravou 2–1 <span class="pts">+7</span> <span class="rk">placar exato</span></span></div>
       </div>
-    `;
-  }
+      <div class="card-body">
+        <div class="rx-h">Raio-X dos <span class="n">62 palpites</span></div>
+        <div class="consensus"><span class="ttl">Mais palpitados</span>
+          <span class="cpill lead"><span class="sb">2–1</span> <span class="n"><b>19</b> palpites</span></span>
+          <span class="cpill"><span class="sb">2–0</span> <span class="n"><b>12</b></span></span>
+          <span class="you">você <span class="sb">2–1</span></span>
+        </div>
+        <div class="tiers">
+          <details class="tier t-exact has-me" open>
+            <summary><span class="t-ic">${ICON.check}</span><span>Cravaram o placar</span><span class="t-cnt">4</span><span class="t-pts">+7</span>${ICON.chev}</summary>
+            <div class="people flat">${chip('VC', 'Você', true)}${chip('AN', 'Ana')}${chip('BR', 'Bruno')}${chip('CA', 'Carla')}</div>
+          </details>
+          <details class="tier t-partial">
+            <summary><span class="t-ic">${ICON.arrow}</span><span>Acertaram o vencedor</span><span class="t-cnt">36</span><span class="t-pts">+3 a +4</span>${ICON.chev}</summary>
+            <div class="people"></div>
+          </details>
+        </div>
+      </div>
+    </article>`;
   return `
-    <div class="history-bets">
-      <div class="hb-head"><span class="c">#</span><span>Jogador</span><span class="c">Palpite</span><span class="hb-h-res">Resultado</span><span class="r">Pts</span></div>
-      ${bets.map((b, i) => renderBetRow(b, m, i + 1)).join('')}
-    </div>
-  `;
-}
-
-function renderAwaitingRow(bet) {
-  const isMe = bet.user_id === profile.id;
-  const name = isMe ? 'Você' : (bet.profiles?.full_name || '?');
-  return `
-    <div class="hb-row ${isMe ? 'me' : ''}">
-      <span class="hb-rank">—</span>
-      <span class="hb-player"><span class="av-mini">${avatarHtml(bet.profiles)}</span><span class="nm">${escapeHtml(name)}</span></span>
-      <span class="pred">${bet.pred_home}<span class="x">–</span>${bet.pred_away}</span>
-    </div>
-  `;
-}
-
-function renderBetRow(bet, m, rank) {
-  const isMe = bet.user_id === profile.id;
-  const name = isMe ? 'Você' : (bet.profiles?.full_name || '?');
-
-  const pts = bet.points_earned ?? 0;
-  const isExact = bet.pred_home === m.actual_home && bet.pred_away === m.actual_away;
-  const rowClass = isExact ? 'win-exact' : pts > 0 ? 'win-partial' : 'miss';
-  const ptsClass = isExact ? 'exact' : pts > 0 ? 'partial' : 'zero';
-  const resClass = isExact ? 'exact' : pts > 0 ? 'partial' : 'miss';
-  const resIcon  = isExact ? KPI.exact : pts > 0 ? KPI.partial : KPI.miss;
-  const resLabel = isExact ? 'Placar exato' : pts > 0 ? 'Acerto parcial' : 'Não pontuou';
-
-  // Bônus de artilheiro: chip discreto quando o artilheiro DESTA pessoa marcou no jogo.
-  // O <template class="tip-src"> tem que ser o irmão IMEDIATO do gatilho [data-tip].
-  const sc = scorerHitFor(bet, m);
-  const scorerChip = sc
-    ? `<span class="hb-scorer" data-tip>${ICON.ball}+${sc.bonus}</span><template class="tip-src">${scorerTipHtml(sc, m)}</template>`
-    : '';
-
-  return `
-    <div class="hb-row ${rowClass} ${isMe ? 'me' : ''} ${rank === 1 ? 'top' : ''}">
-      <span class="hb-rank">${rank}</span>
-      <span class="hb-player"><span class="av-mini">${avatarHtml(bet.profiles)}</span><span class="nm">${escapeHtml(name)}</span></span>
-      <span class="pred">${bet.pred_home}<span class="x">–</span>${bet.pred_away}</span>
-      <span class="hb-res ${resClass}">${resIcon}<span class="w">${resLabel}</span></span>
-      <span class="hb-ptswrap"><span class="pts ${ptsClass}" data-tip>${pts > 0 ? '+' + pts : '0'}</span><template class="tip-src">${betTipHtml(bet, m, pts, isExact)}</template>${scorerChip}</span>
+    <div class="preview-wrap">
+      <div class="preview-blurred" aria-hidden="true">
+        <div class="history-list">${card}</div>
+      </div>
+      <div class="preview-overlay">
+        <span class="preview-badge">${ICON.eye} Prévia</span>
+        <h3>É assim que vai ficar</h3>
+        <p>Quando a Copa começar, cada jogo mostra aqui o <strong>palpite de todos os participantes</strong>,
+           agrupados por acerto. Os nomes e placares acima são <strong>só de exemplo</strong> — nada aqui é real ainda.</p>
+        <a class="btn btn-green" href="palpites-grupos.html">Fazer meus palpites →</a>
+      </div>
     </div>
   `;
 }
@@ -694,8 +698,6 @@ function attachEventListeners() {
       if (dayCell.dataset.date !== activeDay) {
         activeDay = dayCell.dataset.date;
         ensureValidStatus();  // mantém o status atual se houver jogos; senão troca
-        // re-render do corpo: move o destaque do calendário + recontagem dos chips
-        // + Resumo do dia + lista, tudo coerente com o novo dia.
         document.getElementById('tabBody').innerHTML = renderTabBody();
       }
       return;
@@ -711,9 +713,4 @@ function attachEventListeners() {
       return;
     }
   });
-
-  initTooltips();
 }
-
-// Tooltip flutuante (pontos / artilheiro) vem do módulo compartilhado ../tooltip.js —
-// mesmo contrato: gatilho [data-tip] + <template class="tip-src"> irmão com o HTML.

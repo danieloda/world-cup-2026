@@ -443,7 +443,7 @@ export function dayPredictionStatus(done, total, deadline, played = false) {
  * @param meta        { [yyyy-mm-dd]: { info, title, done, total, deadline } }
  * @param activeDate  yyyy-mm-dd atualmente selecionado
  */
-export function renderDateCalendar({ dates, meta = {}, activeDate } = {}) {
+export function renderDateCalendar({ dates, meta = {}, activeDate, legendLabels = {} } = {}) {
   if (!dates || !dates.length) return '';
   const set = new Set(dates);
   const sorted = [...dates].sort();
@@ -515,8 +515,10 @@ export function renderDateCalendar({ dates, meta = {}, activeDate } = {}) {
       </div>`;
   }).join('');
 
+  // Páginas podem renomear os rótulos da legenda sem mudar as cores (ex.: o
+  // Histórico reusa st-done/urgent/soon com significado de desempenho).
   const legend = CAL_STATUSES.filter(s => present.has(s.id)).map(s =>
-    `<span class="cal-leg st-${s.id}"><i></i>${s.label}</span>`
+    `<span class="cal-leg st-${s.id}"><i></i>${legendLabels[s.id] || s.label}</span>`
   ).join('');
 
   return `
