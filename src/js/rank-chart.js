@@ -80,8 +80,8 @@ export function renderRankChart(mount, { series, matches, meId }) {
         <button class="rc-chip" data-p="podio">${IC.trophy}Pódio + Você</button>
         <button class="rc-chip" data-p="top10">${IC.list}Top 10</button>
       </div>
-      <div class="rc-seg" role="group" aria-label="Granularidade do tempo">
-        <button data-g="semana" ${canWeek ? '' : 'disabled title="Disponível a partir da 2ª semana da Copa"'}>Por semana</button>
+      <div class="rc-seg" role="group" aria-label="Visão do tempo">
+        <button data-g="semana">Por semana</button>
         <button data-g="jogo">Jogos da semana</button>
       </div>
     </div>
@@ -99,10 +99,26 @@ export function renderRankChart(mount, { series, matches, meId }) {
   function draw() {
     const body = mount.querySelector('.rc-body');
     const width = Math.max(280, body.clientWidth || mount.clientWidth || 900);
-    if (width < NARROW) drawMobile(body);
+    const narrow = width < NARROW;
+    updateControls(narrow);
+    if (narrow) drawMobile(body);
     else drawDesktop(body, width);
     renderLegend();
     renderNote();
+  }
+
+  // O toggle de tempo muda de SIGNIFICADO conforme o layout:
+  //  • desktop: "Por semana" / "Jogos da semana" = zoom do eixo X do gráfico.
+  //  • mobile : "Por semana" / "Último jogo"     = base da EVOLUÇÃO (▲/▼) — a
+  //    sparkline mostra a jornada inteira; o que muda é de onde se mede o delta.
+  // Sem 2ª semana ainda, "Por semana" não faz sentido → some o toggle inteiro
+  // (só existe uma visão), o que também tira o botão "morto" do mobile.
+  function updateControls(narrow) {
+    const seg = mount.querySelector('.rc-seg');
+    if (!seg) return;
+    seg.style.display = canWeek ? '' : 'none';
+    const bJogo = seg.querySelector('[data-g="jogo"]');
+    if (bJogo) bJogo.textContent = narrow ? 'Último jogo' : 'Jogos da semana';
   }
 
   // ===== DESKTOP: gráfico enxuto + painel vivo (= rótulos = hover) =====
@@ -115,7 +131,7 @@ export function renderRankChart(mount, { series, matches, meId }) {
     const panW = width < 720 ? 210 : 248;
     const chartW = Math.max(220, width - panW - 16);
     const H = dynH(n);
-    const PADl = 32, PADr = 12, PADt = 16, PADb = 22;
+    const PADl = 32, PADr = 12, PADt = 32, PADb = 22;  // PADt folgado: o rótulo de fase ("GRUPOS") respira acima das linhas
     const plotH = H - PADt - PADb;
 
     // faixa de posições do foco (zoom no foco)
@@ -133,8 +149,8 @@ export function renderRankChart(mount, { series, matches, meId }) {
 
     let g = '';
     stageBands(matches, steps, xAt, x0, x1).forEach((b, bi) => {
-      if (bi % 2 === 1) g += `<rect class="rc-band" x="${b.x.toFixed(1)}" y="${PADt - 14}" width="${b.w.toFixed(1)}" height="${plotH + 14}"/>`;
-      if (b.w > 64) g += `<text class="rc-band-lbl" x="${(b.x + b.w / 2).toFixed(1)}" y="${PADt - 5}" text-anchor="middle">${escapeHtml(b.label)}</text>`;
+      if (bi % 2 === 1) g += `<rect class="rc-band" x="${b.x.toFixed(1)}" y="4" width="${b.w.toFixed(1)}" height="${(plotH + PADt - 4).toFixed(1)}"/>`;
+      if (b.w > 64) g += `<text class="rc-band-lbl" x="${(b.x + b.w / 2).toFixed(1)}" y="15" text-anchor="middle">${escapeHtml(b.label)}</text>`;
     });
     const yStep = Math.max(1, Math.ceil(span / 6));
     for (let p = rLo; p <= rHi; p += yStep) {
@@ -288,8 +304,14 @@ export function renderRankChart(mount, { series, matches, meId }) {
   // ===== MOBILE: lista de sparklines (uma trajetória por jogador) =====
   function drawMobile(body) {
     const ids = [...selected].map(uid => byId.get(uid)).filter(i => i != null).sort((a, b) => finalPos(a) - finalPos(b));
-    const steps = granKey === 'jogo' ? curWeekSteps : tl.weekEnds;
-    const K = steps.length;
+    // A sparkline mostra a JORNADA INTEIRA (todos os jogos). O toggle só muda a
+    // base da EVOLUÇÃO (▲/▼): "Por semana" = vs o fim da semana passada;
+    // "Último jogo" = vs o jogo anterior. (Decisão 2026-06-15.)
+    const allSteps = Array.from({ length: GAMES }, (_, g) => g);
+    const K = allSteps.length;
+    const dFrom = granKey === 'semana' && lastWeek >= 1
+      ? tl.weekEnds[lastWeek - 1]
+      : Math.max(0, GAMES - 2);
 
     body.className = 'rc-body rc-sparks';
     body.style.gridTemplateColumns = '';
@@ -298,13 +320,13 @@ export function renderRankChart(mount, { series, matches, meId }) {
     body.innerHTML = ids.map(i => {
       const c = colorOf(i);
       const nm = series[i].userId === meId ? 'Você' : series[i].name;
-      const ps = steps.map(gi => pos[i][gi]);
+      const ps = allSteps.map(gi => pos[i][gi]);
       const lo = Math.min(...ps), hi = Math.max(...ps);
       const W = 92, Hs = 30, pad = 3;
       const xA = (k) => K <= 1 ? W / 2 : pad + (W - 2 * pad) * k / (K - 1);
       const yA = (p) => hi === lo ? Hs / 2 : pad + (Hs - 2 * pad) * (p - lo) / (hi - lo);  // 1º no topo
       const pts = ps.map((p, k) => `${xA(k).toFixed(1)},${yA(p).toFixed(1)}`).join(' ');
-      const now = ps[K - 1], then = ps[0];
+      const now = pos[i][GAMES - 1], then = pos[i][dFrom];
       const d = then - now;                       // subiu = positivo
       const sparkC = series[i].userId === meId ? c : d > 0 ? 'var(--positive)' : d < 0 ? 'var(--red)' : '#8a8a8e';
       const dCls = d > 0 ? 'up' : d < 0 ? 'dn' : 'eq';
@@ -325,11 +347,11 @@ export function renderRankChart(mount, { series, matches, meId }) {
 
   // ---------------------------------------------------------
   function renderLegend() {
-    const topIds = series.slice(0, 14).map(s => s.userId);
-    if (meIdx >= 0) topIds.push(meId);
+    // Colapsada por padrão: só os SELECIONADOS (o que está no gráfico) + o botão
+    // pra expandir o elenco inteiro. Quem quiser trocar, expande e escolhe.
     const ids = showAllLeg
       ? series.map(s => s.userId)
-      : [...new Set([...topIds, ...selected])];
+      : [...selected];
     mount.querySelector('.rc-legend').innerHTML = ids
       .map(uid => byId.get(uid)).filter(i => i != null).sort((a, b) => a - b)
       .map(i => {
@@ -374,8 +396,8 @@ export function renderRankChart(mount, { series, matches, meId }) {
         ? 'Ninguém selecionado — clique num nome abaixo ou use Pódio + Você / Top 10 pra recomeçar.'
         : narrow
         ? (granKey === 'semana'
-            ? 'Uma mini-trajetória por jogador, semana a semana. ▲/▼ = posições que subiu/caiu. Toque num nome abaixo pra ligar/desligar.'
-            : `Mini-trajetória de cada um na semana atual (${tl.weekRange(lastWeek)}). ▲/▼ = subiu/caiu. Toque num nome pra ligar/desligar.`)
+            ? 'Trajetória de cada um na Copa. ▲/▼ = posições ganhas/perdidas desde a semana passada. Toque num nome pra ligar/desligar.'
+            : 'Trajetória de cada um na Copa. ▲/▼ = o que mexeu no último jogo. Toque num nome pra ligar/desligar.')
         : granKey === 'semana'
         ? 'Uma etapa por semana. Passe o mouse: o painel à direita vira o jogo apontado. Clique num nome pra ligar/desligar.'
         : `Jogo a jogo da semana atual (${tl.weekRange(lastWeek)}) — passe o mouse pra ver cada partida no painel.`;
