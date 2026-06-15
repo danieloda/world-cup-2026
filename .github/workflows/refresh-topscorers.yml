@@ -1,0 +1,67 @@
+name: Refresh Top Scorers
+
+# Atualiza src/assets/data/topscorers.json com a artilharia oficial da Copa 2026
+# (via API-Football) e commita o arquivo de volta no main — o Netlify redeploya
+# no push, então a "Corrida da Chuteira de Ouro" fica sempre fresca.
+#
+# Pré-requisitos (Settings → Secrets and variables → Actions):
+#   Secrets:
+#     - API_FOOTBALL_KEY
+# (Não usa Supabase — topscorers.json é arquivo estático servido pelo Netlify.)
+
+on:
+  schedule:
+    # A cada 3h: cobre as janelas pós-jogo durante o torneio. O commit só
+    # acontece quando o JSON muda, então fora de dias de jogo não há deploy.
+    - cron: '0 */3 * * *'
+  workflow_dispatch:        # botão "Run workflow" no GitHub UI
+
+concurrency:
+  group: refresh-topscorers
+  cancel-in-progress: false
+
+# Necessário para o passo de commit & push de volta no repo
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    name: Fetch top scorers & commit
+    runs-on: ubuntu-latest
+    # Não roda em forks (sem o secret da API)
+    if: ${{ github.repository_owner == 'danieloda' }}
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          # Node 22 p/ alinhar com os outros jobs de dados
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Fetch top scorers
+        env:
+          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
+        run: node scripts/data/fetch-topscorers.js
+
+      - name: Commit & push if changed
+        run: |
+          if git diff --quiet -- src/assets/data/topscorers.json; then
+            echo "Sem mudanças em topscorers.json — nada a commitar."
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/assets/data/topscorers.json
+          # NÃO usar [skip ci]: o Netlify honra [skip ci]/[skip netlify] e PULA o
+          # deploy — prod ficaria travado na artilharia antiga. Push via
+          # GITHUB_TOKEN já não dispara o CI do GitHub, então não há loop.
+          git commit -m "data: refresh top scorers (auto)"
+          git push

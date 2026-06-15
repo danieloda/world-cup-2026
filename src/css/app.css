@@ -6592,3 +6592,81 @@ input[type="number"].score-input {
 /* 4.3 — ícone SVG nos quick-links (substitui emoji; herda a cor mute do label) */
 .kpi-label .kpi-ic { display: inline-flex; vertical-align: -2px; margin-right: 5px; }
 .kpi-label .kpi-ic svg { width: 13px; height: 13px; }
+
+/* ============================================================
+   Corrida da Chuteira de Ouro — artilharia ao vivo (js/scorer-race.js)
+   Pódio dos 3 + lista; faixa "seu artilheiro" linkada ao palpite.
+   ============================================================ */
+.ar { margin-bottom: 8px; }
+
+/* Faixa "seu artilheiro" — gancho com o palpite do usuário */
+.ar-mypick {
+  display: flex; align-items: center; gap: 16px;
+  padding: 15px 18px; margin-bottom: 22px;
+  background: linear-gradient(135deg, rgba(244, 196, 48, .14), rgba(244, 196, 48, .02));
+  border: 1px solid rgba(244, 196, 48, .30);
+  border-radius: 12px;
+}
+.ar-mypick-ic {
+  width: 42px; height: 42px; border-radius: 11px; flex: none;
+  display: grid; place-items: center; font-size: 22px;
+  background: var(--accent-dim);
+}
+.ar-mypick-body { min-width: 0; }
+.ar-mypick-label { font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--accent); font-weight: 800; margin-bottom: 3px; }
+.ar-mypick-name { font-size: 18px; font-weight: 800; letter-spacing: -.01em; display: flex; align-items: center; gap: 9px; }
+.ar-mypick-name .fi { width: 26px; height: 18px; border-radius: 3px; flex: none; }
+.ar-mypick-name small { font-size: 12px; color: var(--text-dim); font-weight: 600; }
+.ar-mypick-stat { margin-left: auto; text-align: right; white-space: nowrap; }
+.ar-mypick-stat b { font-size: 30px; font-weight: 900; color: var(--accent); letter-spacing: -.03em; }
+.ar-mypick-stat .u { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: .1em; margin-left: 4px; }
+.ar-mypick-stat .rk { display: block; font-size: 12px; font-weight: 700; color: var(--positive); margin-top: 2px; }
+
+/* Pódio dos 3 primeiros */
+.ar-podium { display: grid; grid-template-columns: 1fr 1.16fr 1fr; gap: 12px; align-items: end; margin-bottom: 14px; }
+.ar-pod {
+  background: linear-gradient(160deg, #1f1f1f, #0d0d0d);
+  border: 1px solid var(--line); border-radius: 14px;
+  padding: 20px 14px 16px; text-align: center; position: relative;
+}
+.ar-pod-medal {
+  position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
+  width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center;
+  font-size: 13px; font-weight: 900; color: #1a1a1a;
+  border: 3px solid var(--bg-main);
+}
+.ar-pod.p1 { padding-top: 28px; border-color: rgba(244, 196, 48, .45); box-shadow: 0 0 0 1px rgba(244, 196, 48, .20), 0 14px 34px rgba(244, 196, 48, .08); }
+.ar-pod.p1 .ar-pod-medal { background: var(--accent); box-shadow: 0 0 14px rgba(244, 196, 48, .6); }
+.ar-pod.p2 .ar-pod-medal { background: #c8ccd2; }
+.ar-pod.p3 .ar-pod-medal { background: var(--medal-bronze); color: #fff; }
+.ar-pod-flag .fi { width: 44px; height: 31px; border-radius: 4px; box-shadow: 0 3px 9px rgba(0, 0, 0, .45); }
+.ar-pod-name { font-weight: 800; font-size: 15px; margin-top: 11px; letter-spacing: -.01em; }
+.ar-pod-team { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+.ar-pod-goals { font-size: 32px; font-weight: 900; color: var(--accent); letter-spacing: -.03em; margin-top: 9px; line-height: 1; }
+.ar-pod-goals .u { font-size: 10px; color: var(--text-mute); font-weight: 700; text-transform: uppercase; letter-spacing: .1em; display: block; margin-top: 3px; }
+.ar-pod.is-mine { outline: 2px solid var(--accent); outline-offset: 0; }
+.ar-pod .ar-mine-tag { position: absolute; bottom: -9px; left: 50%; transform: translateX(-50%); }
+
+/* Lista do 4º em diante */
+.ar-list { list-style: none; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.ar-row { display: flex; align-items: center; gap: 12px; padding: 11px 14px; }
+.ar-row + .ar-row { border-top: 1px solid var(--line); }
+.ar-row:nth-child(even) { background: rgba(255, 255, 255, .02); }
+.ar-rank { width: 20px; text-align: center; font-weight: 800; color: var(--text-mute); font-size: 13px; font-variant-numeric: tabular-nums; flex: none; }
+.ar-row .fi { width: 27px; height: 19px; border-radius: 3px; flex: none; }
+.ar-pl { min-width: 0; flex: 1; display: flex; align-items: center; gap: 8px; }
+.ar-pl-txt { min-width: 0; }
+.ar-pl-name { font-weight: 700; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ar-pl-team { font-size: 11px; color: var(--text-dim); }
+.ar-g { font-weight: 900; font-size: 16px; color: var(--accent); font-variant-numeric: tabular-nums; flex: none; }
+.ar-g .u { font-size: 10px; color: var(--text-mute); font-weight: 700; text-transform: uppercase; letter-spacing: .06em; margin-left: 3px; }
+.ar-a { font-size: 12px; color: var(--text-dim); min-width: 46px; text-align: right; flex: none; font-variant-numeric: tabular-nums; }
+.ar-row.is-mine { background: rgba(244, 196, 48, .10); box-shadow: inset 0 0 0 1px rgba(244, 196, 48, .35); }
+.ar-mine-tag { font-size: 9px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: #1a1a1a; background: var(--accent); padding: 2px 6px; border-radius: 5px; white-space: nowrap; }
+
+@media (max-width: 420px) {
+  /* pódio aperta em telas bem estreitas: nomes menores, pódio ainda 3-up */
+  .ar-pod { padding: 18px 8px 14px; }
+  .ar-pod-name { font-size: 13px; }
+  .ar-pod-goals { font-size: 26px; }
+}

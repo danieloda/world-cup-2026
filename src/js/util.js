@@ -699,6 +699,28 @@ export async function loadQualifiers() {
 }
 
 // ============================================================
+// Top scorers loader (artilharia — "Corrida da Chuteira de Ouro")
+// ============================================================
+// Carrega assets/data/topscorers.json (gerado por scripts/data/fetch-topscorers.js,
+// atualizado pela action Refresh Top Scorers) e devolve { updated_at, season,
+// scorers:[{ api_id, name, team, goals, assists, minutes }] }. `api_id` casa com
+// players.api_player_id (linkagem do palpite de artilheiro). Cacheado em memória.
+let _topScorersCache = null;
+export async function loadTopScorers() {
+  if (_topScorersCache) return _topScorersCache;
+  try {
+    const res = await fetch('assets/data/topscorers.json', { cache: 'no-cache' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    _topScorersCache = { updated_at: data.updated_at ?? null, scorers: data.scorers ?? [] };
+    return _topScorersCache;
+  } catch (err) {
+    console.warn('[loadTopScorers] failed:', err);
+    return { updated_at: null, scorers: [] };
+  }
+}
+
+// ============================================================
 // Odds → probabilidade implícita (alimenta a barra 1X2 do Raio-X)
 // ============================================================
 // Converte odds decimais (casa/empate/fora) em probabilidades que somam 100%.
