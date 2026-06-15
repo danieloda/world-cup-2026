@@ -721,6 +721,13 @@
   ],
   "Curaçao": [
     [
+      "2026-06-14",
+      "Germany",
+      false,
+      "1-7",
+      "World Cup"
+    ],
+    [
       "2026-06-07",
       "Aruba",
       true,
@@ -781,13 +788,6 @@
       "Bermuda",
       true,
       "3-2",
-      "Eliminatórias"
-    ],
-    [
-      "2025-09-06",
-      "Trinidad and Tobago",
-      false,
-      "0-0",
       "Eliminatórias"
     ]
   ],
@@ -865,6 +865,13 @@
   ],
   "Ecuador": [
     [
+      "2026-06-14",
+      "Ivory Coast",
+      false,
+      "0-1",
+      "World Cup"
+    ],
+    [
       "2026-06-07",
       "Guatemala",
       true,
@@ -925,13 +932,6 @@
       "Argentina",
       true,
       "1-0",
-      "Eliminatórias"
-    ],
-    [
-      "2025-09-04",
-      "Paraguay",
-      false,
-      "0-0",
       "Eliminatórias"
     ]
   ],
@@ -1153,6 +1153,13 @@
   ],
   "Germany": [
     [
+      "2026-06-14",
+      "Curaçao",
+      true,
+      "7-1",
+      "World Cup"
+    ],
+    [
       "2026-06-06",
       "USA",
       false,
@@ -1213,13 +1220,6 @@
       "Northern Ireland",
       true,
       "3-1",
-      "Eliminatórias"
-    ],
-    [
-      "2025-09-04",
-      "Slovakia",
-      false,
-      "0-2",
       "Eliminatórias"
     ]
   ],
@@ -1513,6 +1513,13 @@
   ],
   "Ivory Coast": [
     [
+      "2026-06-14",
+      "Ecuador",
+      true,
+      "1-0",
+      "World Cup"
+    ],
+    [
       "2026-06-08",
       "Philadelphia Union II",
       false,
@@ -1574,16 +1581,16 @@
       true,
       "1-0",
       "Copa Africana"
-    ],
-    [
-      "2025-11-18",
-      "Oman",
-      false,
-      "2-0",
-      "Amistoso"
     ]
   ],
   "Japan": [
+    [
+      "2026-06-14",
+      "Netherlands",
+      false,
+      "2-2",
+      "World Cup"
+    ],
     [
       "2026-05-31",
       "Iceland",
@@ -1646,13 +1653,6 @@
       false,
       "0-0",
       "Amistoso"
-    ],
-    [
-      "2025-07-15",
-      "South Korea",
-      false,
-      "1-0",
-      "EAFF E-1 Football Championship"
     ]
   ],
   "Jordan": [
@@ -1873,6 +1873,13 @@
   ],
   "Netherlands": [
     [
+      "2026-06-14",
+      "Japan",
+      true,
+      "2-2",
+      "World Cup"
+    ],
+    [
       "2026-06-08",
       "Uzbekistan",
       true,
@@ -1933,13 +1940,6 @@
       "Lithuania",
       false,
       "3-2",
-      "Eliminatórias"
-    ],
-    [
-      "2025-09-04",
-      "Poland",
-      true,
-      "1-1",
       "Eliminatórias"
     ]
   ],
@@ -2809,6 +2809,13 @@
   ],
   "Sweden": [
     [
+      "2026-06-15",
+      "Tunisia",
+      true,
+      "5-1",
+      "World Cup"
+    ],
+    [
       "2026-06-04",
       "Greece",
       true,
@@ -2869,13 +2876,6 @@
       "Kosovo",
       false,
       "0-2",
-      "Eliminatórias"
-    ],
-    [
-      "2025-09-05",
-      "Slovenia",
-      false,
-      "2-2",
       "Eliminatórias"
     ]
   ],
@@ -2953,6 +2953,13 @@
   ],
   "Tunisia": [
     [
+      "2026-06-15",
+      "Sweden",
+      false,
+      "1-5",
+      "World Cup"
+    ],
+    [
       "2026-06-06",
       "Belgium",
       false,
@@ -3013,13 +3020,6 @@
       "Qatar",
       false,
       "3-0",
-      "Arab Cup"
-    ],
-    [
-      "2025-12-04",
-      "Palestine",
-      false,
-      "2-2",
       "Arab Cup"
     ]
   ],
