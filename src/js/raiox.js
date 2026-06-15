@@ -135,6 +135,84 @@ function renderPredictionsRadar(pred, homeTeam, awayTeam) {
     </div>`;
 }
 
+// ----- Placar provável (mercado Exact Score, de-margined) -----
+// `pred.scorelines` = [{ score:'1-0', prob }] (já ordenado desc no servidor).
+// O placar está na ótica casa-fora do confronto do bolão (home-away).
+function renderScorelinesBlock(pred) {
+  const list = pred?.scorelines;
+  if (!list?.length) return '';
+  const max = Math.max(...list.map(s => pct(s.prob)), 1);
+  const rows = list.map((s, i) => {
+    const w = Math.round((pct(s.prob) / max) * 100);
+    const sc = String(s.score).replace('-', '–');
+    return `<div class="rx-scorow${i === 0 ? ' is-top' : ''}">
+      <span class="rx-sc">${escapeHtml(sc)}</span>
+      <span class="rx-sctrack"><span class="rx-scfill" style="width:${w}%"></span></span>
+      <span class="rx-scpc">${Math.round(pct(s.prob))}%</span>
+    </div>`;
+  }).join('');
+  const top = String(list[0].score).replace('-', '–');
+  return `
+    <div class="rx-sub-label">Placar provável</div>
+    <div class="rx-scores" role="img" aria-label="Placares mais prováveis pelo mercado">${rows}</div>
+    <div class="rx-sc-tip">💡 Mais provável: <b>${escapeHtml(top)}</b></div>`;
+}
+
+// ----- Perfil de gols (over/under, ambas marcam, distribuição, gols/time) -----
+// `pred.goals` = { overUnder:{line,over,under}, btts:{yes,no},
+//                  totalGoals:[{goals,prob}], teamGoals:{home,away} }.
+function renderGoalsBlock(homeTeam, awayTeam, pred) {
+  const g = pred?.goals;
+  if (!g) return '';
+
+  const cards = [];
+  if (g.overUnder) {
+    const over = Math.round(pct(g.overUnder.over)), under = Math.round(pct(g.overUnder.under));
+    cards.push(`<div class="rx-gcard">
+      <div class="rx-gl">Jogo com muitos gols?</div>
+      <div class="rx-duobar"><span class="yes" style="flex:${over}">Muitos ${over}%</span><span class="no" style="flex:${under}">Poucos ${under}%</span></div>
+    </div>`);
+  }
+  if (g.btts) {
+    const yes = Math.round(pct(g.btts.yes)), no = Math.round(pct(g.btts.no));
+    cards.push(`<div class="rx-gcard">
+      <div class="rx-gl">Os dois times marcam?</div>
+      <div class="rx-duobar"><span class="yes" style="flex:${yes}">Sim ${yes}%</span><span class="no" style="flex:${no}">Não ${no}%</span></div>
+    </div>`);
+  }
+  const grid = cards.length ? `<div class="rx-goals-grid">${cards.join('')}</div>` : '';
+
+  let dist = '';
+  if (g.totalGoals?.length) {
+    const max = Math.max(...g.totalGoals.map(t => pct(t.prob)), 1);
+    const peak = g.totalGoals.reduce((a, b) => pct(b.prob) > pct(a.prob) ? b : a);
+    const cols = g.totalGoals.map(t => `<div class="rx-dcol${t === peak ? ' peak' : ''}">
+      <span class="rx-dbar" style="height:${Math.round((pct(t.prob) / max) * 100)}%"></span>
+      <span class="rx-dv">${Math.round(pct(t.prob))}%</span><span class="rx-dn">${escapeHtml(String(t.goals))}</span>
+    </div>`).join('');
+    dist = `<div class="rx-gcard"><div class="rx-gl">Total de gols no jogo</div><div class="rx-dist">${cols}</div></div>`;
+  }
+
+  let team = '';
+  if (g.teamGoals && (g.teamGoals.home || g.teamGoals.away)) {
+    const row = (t, side, tg) => {
+      if (!tg) return '';
+      const stack = (tg.dist || []).map(d => `<i style="flex:${pct(d.prob)}"></i>`).join('');
+      const exp = Number(tg.exp);
+      return `<div class="rx-tgr ${side}">
+        <span class="rx-tn"><span class="flag">${flag(t)}</span>${escapeHtml(teamPt(t))}</span>
+        <span class="rx-ministack">${stack}</span>
+        <span class="rx-xg">${Number.isFinite(exp) ? exp.toFixed(1) : '–'}</span>
+      </div>`;
+    };
+    team = `<div class="rx-gcard"><div class="rx-gl">Gols esperados de cada seleção</div>
+      <div class="rx-teamgoals">${row(homeTeam, 'home', g.teamGoals.home)}${row(awayTeam, 'away', g.teamGoals.away)}</div></div>`;
+  }
+
+  if (!grid && !dist && !team) return '';
+  return `<div class="rx-sub-label">Perfil de gols</div><div class="rx-goals">${grid}${dist}${team}</div>`;
+}
+
 // Previsão — duas metades independentes:
 //   • barra 1X2  → probabilidade implícita das ODDS (de-margined; ver oddsToProbs
 //                  em util.js e buildForecast em palpites-grupos.js). Aparece em
@@ -147,7 +225,8 @@ export function renderPredictionsBlock(homeTeam, awayTeam, pred, { label = true 
   const pH = pct(pred?.pHome), pD = pct(pred?.pDraw), pA = pct(pred?.pAway);
   const hasBar = (pH + pD + pA) > 0;
   const hasRadar = !!pred?.radar?.axes?.length;
-  if (!hasBar && !hasRadar) return '';
+  const hasMarkets = !!(pred?.scorelines?.length || pred?.goals);
+  if (!hasBar && !hasRadar && !hasMarkets) return '';
 
   const homePt = teamPt(homeTeam);
   const awayPt = teamPt(awayTeam);
@@ -174,6 +253,8 @@ export function renderPredictionsBlock(homeTeam, awayTeam, pred, { label = true 
     <div class="rx-pred">
       ${bar}
       ${hasRadar ? renderPredictionsRadar(pred, homeTeam, awayTeam) : ''}
+      ${renderScorelinesBlock(pred)}
+      ${renderGoalsBlock(homeTeam, awayTeam, pred)}
     </div>
   `;
 }
@@ -236,6 +317,44 @@ export function renderRecentBlock(team, recentByTeam) {
       <ol class="rx-recent-list">${rows}</ol>
     </div>
   `;
+}
+
+// ----- Tendências de gols (derivadas da forma recente; 0 chamadas de API) -----
+// Resume os últimos jogos pra ajudar na escolha do PLACAR: média de gols pró/
+// contra, % de jogos sem sofrer (clean sheet) e % com ambas marcando. `score`
+// vem na ótica do time ("gols dele - gols do adversário").
+function teamTendencies(team, recentByTeam) {
+  const rec = recentByTeam?.get?.(team);
+  if (!rec || !rec.length) return null;
+  const list = rec.slice(0, 10);
+  let gf = 0, ga = 0, cs = 0, bt = 0, n = 0;
+  for (const r of list) {
+    const [a, b] = String(r.score).split('-').map(x => parseInt(x, 10));
+    if (Number.isNaN(a) || Number.isNaN(b)) continue;
+    n++; gf += a; ga += b;
+    if (b === 0) cs++;
+    if (a > 0 && b > 0) bt++;
+  }
+  if (!n) return null;
+  return { gf: gf / n, ga: ga / n, cs: Math.round(cs / n * 100), bt: Math.round(bt / n * 100) };
+}
+
+function renderTendencies(homeTeam, awayTeam, recentByTeam) {
+  const h = teamTendencies(homeTeam, recentByTeam);
+  const a = teamTendencies(awayTeam, recentByTeam);
+  if (!h && !a) return '';
+  const card = (team, t) => {
+    if (!t) return '';
+    return `<div class="rx-tcard">
+      <div class="rx-tcard-h"><span class="flag">${flag(team)}</span><span class="rx-tcard-n">${escapeHtml(teamPt(team))}</span></div>
+      <div class="rx-trow"><span class="k">Gols que faz / jogo</span><span class="vv">${t.gf.toFixed(1)}</span></div>
+      <div class="rx-trow"><span class="k">Gols que leva / jogo</span><span class="vv">${t.ga.toFixed(1)}</span></div>
+      <div class="rx-trow"><span class="k">Jogos sem levar gol</span><span class="vv">${t.cs}%</span></div>
+      <div class="rx-trow"><span class="k">Jogos com os 2 marcando</span><span class="vv">${t.bt}%</span></div>
+    </div>`;
+  };
+  return `<div class="rx-sub-label">Tendências dos últimos jogos</div>
+    <div class="rx-tend">${card(homeTeam, h)}${card(awayTeam, a)}</div>`;
 }
 
 // homeTeam é o lado "casa" do confronto do bolão; o summary do h2h é sempre
@@ -518,6 +637,64 @@ export function renderQualifiersBlock(homeTeam, awayTeam, qualifiers, { label = 
 }
 
 // ============================================================
+// Grupo ao vivo — classificação oficial do grupo da Copa
+// ============================================================
+// `standings` é o assets/data/standings.json carregado: { updated_at, groups }.
+// Só faz sentido quando AS DUAS seleções estão no MESMO grupo (jogo de fase de
+// grupos) — no mata-mata não há grupo comum e o bloco some. Entra NO TOPO da aba
+// Eliminatórias, acima da campanha classificatória (que continua igual).
+
+// Acha o grupo (key + rows) que contém os dois times; null se não houver.
+function findLiveGroup(standings, homeTeam, awayTeam) {
+  const groups = standings?.groups;
+  if (!groups) return null;
+  for (const [key, rows] of Object.entries(groups)) {
+    if (!Array.isArray(rows)) continue;
+    const names = new Set(rows.map(r => r.team));
+    if (names.has(homeTeam) && names.has(awayTeam)) return { key, rows };
+  }
+  return null;
+}
+
+// "WWDL" (API: mais recente à direita) → chips coloridos dos últimos 5. W→V verde,
+// D→E amarelo, L→D vermelho (vocabulário do app).
+const FORM_CHIP = { W: ['w', 'V'], D: ['d', 'E'], L: ['l', 'D'] };
+function formChips(form) {
+  if (!form) return '<span class="rx-glive-noform">—</span>';
+  return String(form).slice(-5).split('').map(c => {
+    const m = FORM_CHIP[c.toUpperCase()];
+    return m ? `<span class="rx-formdot ${m[0]}">${m[1]}</span>` : '';
+  }).join('');
+}
+
+function renderGroupBlock(homeTeam, awayTeam, standings, { label = false } = {}) {
+  const grp = findLiveGroup(standings, homeTeam, awayTeam);
+  if (!grp) return '';
+  // Gating: antes de qualquer jogo do grupo tudo é zero → não mostra nada (igual
+  // às demais seções; sem dado real, sem seção).
+  if (!grp.rows.some(r => (r.played || 0) > 0)) return '';
+
+  const rows = grp.rows.map(r => {
+    const side = r.team === homeTeam ? 'home' : r.team === awayTeam ? 'away' : '';
+    return `<tr${side ? ` class="rx-glive-${side}"` : ''}>
+      <td class="rx-glive-pos">${r.rank}</td>
+      <td class="rx-glive-tm"><span class="flag">${flag(r.team)}</span><span class="rx-glive-name">${escapeHtml(teamPt(r.team))}</span></td>
+      <td class="rx-glive-pts">${r.points}</td>
+      <td>${r.played}</td>
+      <td>${r.gd > 0 ? '+' : ''}${r.gd}</td>
+      <td class="rx-glive-form">${formChips(r.form)}</td>
+    </tr>`;
+  }).join('');
+
+  return `
+    ${label ? `<div class="ctx-section-label">Grupo ${grp.key} <span class="ctx-section-sub">classificação ao vivo</span></div>` : `<div class="rx-sub-label">Grupo ${grp.key} <span class="ctx-section-sub">classificação ao vivo</span></div>`}
+    <table class="rx-glive" role="table">
+      <thead><tr><th>#</th><th class="l">Seleção</th><th>Pts</th><th>J</th><th>SG</th><th>Últimos</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+// ============================================================
 // API pública
 // ============================================================
 export function hasRaioX(homeTeam, awayTeam, data) {
@@ -613,16 +790,21 @@ function rxSummary(home, away, data) {
 // Seções (abas) — só as que têm dado; label interno desligado (a aba já nomeia).
 const RX_TAB_ABBR = { qual: 'Elim.' }; // rótulo curto em telas estreitas
 function rxSections(home, away, data) {
-  const { recentByTeam, h2h, predictions, qualifiers } = data;
+  const { recentByTeam, h2h, predictions, qualifiers, standings } = data;
   const out = [];
   if (predictions)
     out.push({ key: 'pred', label: 'Previsão', html: renderPredictionsBlock(home, away, predictions, { label: false }) });
   if (recentByTeam.has(home) || recentByTeam.has(away))
-    out.push({ key: 'form', label: 'Forma', html: `<div class="rx-recent">${renderRecentBlock(home, recentByTeam)}${renderRecentBlock(away, recentByTeam)}</div>` });
+    out.push({ key: 'form', label: 'Forma', html: `${renderTendencies(home, away, recentByTeam)}<div class="rx-recent">${renderRecentBlock(home, recentByTeam)}${renderRecentBlock(away, recentByTeam)}</div>` });
   if (h2h?.fixtures?.length)
     out.push({ key: 'h2h', label: 'Confronto', html: renderH2HBlock(home, away, h2h) });
-  if (qualHas(qualifiers, home) || qualHas(qualifiers, away))
-    out.push({ key: 'qual', label: 'Eliminatórias', html: renderQualifiersBlock(home, away, qualifiers, { label: false }) });
+  // Eliminatórias: tabela do grupo AO VIVO (quando os dois times estão no mesmo
+  // grupo e já houve jogo) NO TOPO + a campanha classificatória de sempre embaixo.
+  const groupHtml = renderGroupBlock(home, away, standings);
+  const qualHtml = (qualHas(qualifiers, home) || qualHas(qualifiers, away))
+    ? renderQualifiersBlock(home, away, qualifiers, { label: false }) : '';
+  if (groupHtml || qualHtml)
+    out.push({ key: 'qual', label: 'Eliminatórias', html: groupHtml + qualHtml });
   return out.filter(s => s.html);
 }
 

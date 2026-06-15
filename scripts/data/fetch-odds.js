@@ -1,16 +1,20 @@
 #!/usr/bin/env node
 /**
- * Fetch pre-match "Match Winner" (1X2) odds from API-Football (Betano)
- * para todas as partidas de fase de grupos do SBC 2026.
+ * Fetch pre-match odds da Betano (API-Football) para as partidas de fase de
+ * grupos do SBC 2026 — o 1X2 (barra de quem vence) MAIS os mercados extras que
+ * alimentam o Raio-X enriquecido (placar provável, over/under, ambas marcam,
+ * gols por seleção).
  *
  * Etapas:
  *   1) Garante que public.matches.api_fixture_id está populado (linkage com
  *      o id da API-Football) — busca por (team_home, team_away) em fixtures.json.
  *   2) Para cada jogo ainda não terminado e com api_fixture_id, chama
- *      GET /odds?fixture={id}&bet=1&bookmaker=32 e faz upsert em match_odds.
+ *      GET /odds?fixture={id}&bookmaker=32 (Betano, TODOS os mercados numa só
+ *      chamada), extrai o 1X2 + normaliza os mercados extras
+ *      (scripts/lib/normalize-odds-markets.js) e faz upsert em match_odds.
  *
  * Idempotente — pode rodar quantas vezes quiser. Custo: ~72 requests (fase de
- * grupos) → bem abaixo do limite de 7500/dia do plano Pro.
+ * grupos) → mesmo de antes (1 request por jogo), bem abaixo do limite do plano.
  *
  * Usage: node scripts/fetch-odds.js
  */
@@ -20,6 +24,7 @@ import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { config } from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
+import { normalizeOddsMarkets } from '../lib/normalize-odds-markets.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 config({ path: join(__dirname, '..', '..', '.env') });
@@ -99,17 +104,20 @@ async function linkFixtureIds() {
 // 2) Fetch odds e upsert em match_odds
 // ------------------------------------------------------------
 async function fetchFixtureOdds(apiFixtureId) {
-  const url = `${API_BASE}/odds?fixture=${apiFixtureId}&bet=${BET_ID}&bookmaker=${BOOKMAKER_ID}`;
+  // SEM &bet= : a mesma chamada traz TODOS os mercados da Betano (1X2 + placar
+  // exato + over/under + ambas marcam + gols por time). 1 request por jogo, igual
+  // ao custo de antes. Mantemos &bookmaker=32 pra resposta enxuta (só Betano).
+  const url = `${API_BASE}/odds?fixture=${apiFixtureId}&bookmaker=${BOOKMAKER_ID}`;
   const res = await fetch(url, { headers: { 'x-apisports-key': API_KEY } });
   if (!res.ok) throw new Error(`API HTTP ${res.status} para fixture ${apiFixtureId}`);
   const data = await res.json();
 
   if (data.results === 0) return null;
 
-  // Resposta: response[0].bookmakers[0].bets[0].values[]
+  // Resposta: response[0].bookmakers[0].bets[].values[]
   const entry = data.response[0];
   const bm = entry?.bookmakers?.find(b => b.id === BOOKMAKER_ID) ?? entry?.bookmakers?.[0];
-  const bet = bm?.bets?.find(b => b.id === BET_ID);
+  const bet = bm?.bets?.find(b => b.id === BET_ID);   // 1X2 (Match Winner)
   const values = bet?.values ?? [];
 
   const pick = (label) => {
@@ -123,8 +131,13 @@ async function fetchFixtureOdds(apiFixtureId) {
 
   if (odd_home == null || odd_draw == null || odd_away == null) return null;
 
+  // Mercados extras normalizados (placar provável + perfil de gols). Pode ser
+  // null se a Betano não cobrir nenhum deles ainda — aí o front mostra só a barra.
+  const markets = normalizeOddsMarkets(bm?.bets);
+
   return {
     odd_home, odd_draw, odd_away,
+    markets,
     bookmaker_id: bm.id,
     bookmaker_name: bm.name,
     api_updated_at: entry.update ?? null,
@@ -160,6 +173,7 @@ async function fetchAllOdds() {
           odd_home: odds.odd_home,
           odd_draw: odds.odd_draw,
           odd_away: odds.odd_away,
+          markets: odds.markets,
           bookmaker_id: odds.bookmaker_id,
           bookmaker_name: odds.bookmaker_name,
           api_updated_at: odds.api_updated_at,
@@ -167,7 +181,8 @@ async function fetchAllOdds() {
         }, { onConflict: 'match_id' });
       if (upErr) throw upErr;
 
-      console.log(`  [ok] #${m.id} ${m.team_home} ${odds.odd_home} · ${odds.odd_draw} · ${odds.odd_away} ${m.team_away}`);
+      const mk = odds.markets ? ` +mkt(${Object.keys(odds.markets).join(',')})` : '';
+      console.log(`  [ok] #${m.id} ${m.team_home} ${odds.odd_home} · ${odds.odd_draw} · ${odds.odd_away} ${m.team_away}${mk}`);
       ok++;
     } catch (e) {
       console.error(`  [erro] #${m.id}:`, e.message);

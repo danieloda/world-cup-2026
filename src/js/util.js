@@ -721,6 +721,29 @@ export async function loadTopScorers() {
 }
 
 // ============================================================
+// Standings loader (classificação ao vivo dos grupos da Copa)
+// ============================================================
+// Carrega assets/data/standings.json (gerado por scripts/data/fetch-standings.js,
+// atualizado pela action Refresh Standings) e devolve { updated_at, groups }, onde
+// groups = { 'A': [{ rank, team, played, win, draw, lose, gf, ga, gd, points, form }] }.
+// `team` já vem canônico (casa com data-team / FLAGS / TEAM_PT). Alimenta o bloco
+// "Grupo ao vivo" do Raio-X. Cacheado em memória; degrada p/ groups vazio.
+let _standingsCache = null;
+export async function loadStandings() {
+  if (_standingsCache) return _standingsCache;
+  try {
+    const res = await fetch('assets/data/standings.json', { cache: 'no-cache' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    _standingsCache = { updated_at: data.updated_at ?? null, groups: data.groups ?? {} };
+    return _standingsCache;
+  } catch (err) {
+    console.warn('[loadStandings] failed:', err);
+    return { updated_at: null, groups: {} };
+  }
+}
+
+// ============================================================
 // Odds → probabilidade implícita (alimenta a barra 1X2 do Raio-X)
 // ============================================================
 // Converte odds decimais (casa/empate/fora) em probabilidades que somam 100%.

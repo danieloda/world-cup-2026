@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Protótipo — Raio-X enriquecido (aditivo)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.5.0/css/flag-icons.min.css">
+<style>
+  :root {
+    --bg-page: #0c0c0c;
+    --bg-main: #161616;
+    --card: #202022;
+    --card-hover: #2b2b2d;
+    --card-elev: #262628;
+    --line: rgba(255,255,255,.10);
+    --line-strong: #3c3c40;
+    --text: #fff;
+    --text-dim: #b3b3b3;
+    --text-mute: #a3a3a3;
+    --accent: #f4c430;
+    --accent-bright: #ffd54a;
+    --accent-dim: rgba(244,196,48,.15);
+    --red: #f15e6c;
+    --red-dim: rgba(241,94,108,.15);
+    --positive: #1DB954;
+    --positive-dim: rgba(29,185,84,.15);
+    --font: 'Figtree', system-ui, -apple-system, sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; min-width: 0; margin: 0; padding: 0; }
+  :focus-visible { outline: 2px solid var(--accent-bright); outline-offset: 2px; border-radius: 6px; }
+  html, body { background: var(--bg-page); color: var(--text); font-family: var(--font); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+  .fi { display:inline-block; width:1.33em; height:1em; background-size:cover; background-position:center; vertical-align:middle; border-radius:2px; }
+  .wrap { max-width: 1060px; margin: 0 auto; padding: 28px 20px 120px; }
+
+  .intro h1 { font-size: 28px; font-weight: 800; letter-spacing: -.01em; }
+  .intro .lead { color: var(--text-dim); max-width: 880px; margin-top: 8px; }
+  .intro .note { font-size: 13px; color: var(--text-mute); margin-top: 12px; max-width: 880px; }
+  .intro code, .mono { font-family: var(--font-mono); background: var(--card); border: 1px solid var(--line); border-radius: 5px; padding: 1px 6px; font-size: 12.5px; }
+
+  .keyidea { margin-top: 18px; background: linear-gradient(180deg, rgba(29,185,84,.08), rgba(29,185,84,0)); border: 1px solid var(--line-strong); border-left: 3px solid var(--positive); border-radius: 12px; padding: 14px 16px; }
+  .keyidea b { color: #45d27a; }
+  .keyidea p { color: var(--text-dim); font-size: 14px; }
+  .keyidea p + p { margin-top: 6px; }
+  .keyidea .legend { display:flex; gap: 16px; flex-wrap: wrap; margin-top: 10px; font-size: 12.5px; }
+  .keyidea .legend span { display:inline-flex; align-items:center; gap:6px; }
+  .badge { font-size: 9.5px; font-weight: 800; letter-spacing:.05em; border-radius: 4px; padding: 1px 6px; vertical-align: middle; }
+  .badge.new { background: var(--positive); color: #04210f; }
+  .badge.keep { background: var(--card-elev); color: var(--text-dim); border: 1px solid var(--line-strong); }
+
+  nav.toc { position: sticky; top: 0; z-index: 30; background: rgba(12,12,12,.92); backdrop-filter: blur(8px); margin: 22px -20px 26px; padding: 10px 20px; border-bottom: 1px solid var(--line); display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  nav.toc a { font-size: 13px; font-weight: 600; color: var(--text-dim); background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; }
+  nav.toc a:hover { background: var(--card-hover); color: var(--text); }
+  nav.toc .pill { font-size: 12px; color: var(--text-mute); margin-left: auto; }
+
+  section.proto { margin-bottom: 46px; scroll-margin-top: 74px; }
+  .proto-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+  .proto-head .tag { font-size: 12px; font-weight: 800; letter-spacing: .06em; color: var(--bg-page); background: var(--accent); border-radius: 6px; padding: 2px 8px; }
+  .proto-head .tag.t1 { background: var(--positive); color: #04210f; }
+  .proto-head .tag.t2 { background: var(--card-elev); color: var(--text-dim); border: 1px solid var(--line-strong); }
+  .proto-head h2 { font-size: 21px; font-weight: 800; }
+  .proto-why { color: var(--text-dim); font-size: 14px; max-width: 880px; margin-bottom: 6px; }
+  .proto-why b { color: var(--text); }
+  .meta { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--text-mute); margin: 8px 0 16px; }
+  .meta div b { color: var(--text-dim); font-weight: 700; }
+  .meta .ok { color: var(--positive); font-weight: 700; }
+  .meta .ref { opacity: .7; }
+
+  /* moldura estreita do Raio-X */
+  .frame { background: var(--bg-main); border: 1px solid var(--line); border-radius: 16px; padding: 16px; max-width: 560px; }
+  .frame.wide { max-width: 720px; }
+  .frame-cap { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--text-mute); margin: 0 2px 10px; display: flex; align-items: center; gap: 6px; }
+  .frame-cap::before { content: "🔍"; }
+
+  /* marcação NOVO / MANTIDO dentro das molduras */
+  .block { position: relative; }
+  .block + .block { margin-top: 16px; padding-top: 18px; border-top: 1px dashed var(--line-strong); }
+  .flag-new, .flag-keep { position: absolute; top: -9px; right: 0; font-size: 9.5px; font-weight: 800; letter-spacing:.05em; border-radius: 4px; padding: 1px 7px; }
+  .flag-new { background: var(--positive); color: #04210f; }
+  .flag-keep { background: var(--card-elev); color: var(--text-dim); border: 1px solid var(--line-strong); }
+
+  .sec-label { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--text-mute); font-weight: 700; margin: 4px 2px 8px; }
+  .sec-label .sub { color: var(--text-mute); font-weight: 500; text-transform: none; letter-spacing: 0; }
+
+  /* legenda em linguagem simples embaixo de cada bloco */
+  .hint { font-size: 12px; line-height: 1.45; color: var(--text-mute); margin-top: 9px; padding-left: 9px; border-left: 2px solid var(--line-strong); }
+  .hint b { color: var(--text-dim); font-weight: 700; }
+
+  /* barra 1X2 */
+  .bar1x2-head { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--text-dim); margin-bottom: 5px; }
+  .bar1x2-head .t { display: inline-flex; align-items: center; gap: 5px; font-weight: 600; }
+  .bar1x2 { display: flex; height: 30px; border-radius: 8px; overflow: hidden; font-size: 12.5px; font-weight: 700; }
+  .bar1x2 span { display: flex; align-items: center; justify-content: center; }
+  .seg.home { background: var(--positive); color: #07140b; }
+  .seg.draw { background: var(--accent); color: #2a2103; }
+  .seg.away { background: var(--red); color: #2a0508; }
+
+  /* radar de força */
+  .radar-wrap { display:flex; flex-direction: column; align-items: center; gap: 10px; }
+  .radar-svg { width: 100%; max-width: 300px; height: auto; }
+  .radar-ring { fill: none; stroke: rgba(255,255,255,.08); }
+  .radar-spoke { stroke: rgba(255,255,255,.08); }
+  .radar-axis { font: 700 9px/1 var(--font); fill: var(--text-mute); letter-spacing: .02em; }
+  .radar-area { fill-opacity: .22; stroke-width: 2; }
+  .radar-area.home { fill: var(--positive); stroke: var(--positive); }
+  .radar-area.away { fill: var(--red); stroke: var(--red); }
+  .radar-dot { stroke: #161616; stroke-width: .6; }
+  .radar-dot.home { fill: var(--positive); } .radar-dot.away { fill: var(--red); }
+  .radar-legend { display:flex; gap: 16px; font-size: 12px; font-weight: 600; }
+  .radar-legend span { display:inline-flex; align-items:center; gap: 6px; }
+  .radar-legend i { width: 11px; height: 11px; border-radius: 3px; display:inline-block; }
+  .axisdefs { list-style:none; margin-top: 10px; display:grid; grid-template-columns: 1fr 1fr; gap: 4px 14px; font-size: 11.5px; }
+  @media (max-width:520px){ .axisdefs { grid-template-columns: 1fr; } }
+  .axisdefs li { color: var(--text-mute); }
+  .axisdefs b { color: var(--text-dim); }
+
+  /* Placar provável */
+  .scoregrid { display: flex; flex-direction: column; gap: 7px; }
+  .scorow { display: grid; grid-template-columns: 50px 1fr 38px; align-items: center; gap: 10px; }
+  .scorow .sc { font-family: var(--font-mono); font-size: 15px; font-weight: 700; letter-spacing: .03em; }
+  .scorow .track { height: 18px; background: var(--card); border-radius: 6px; overflow: hidden; }
+  .scorow .fill { height: 100%; border-radius: 6px; background: linear-gradient(90deg, var(--accent), var(--accent-bright)); }
+  .scorow.is-top .fill { background: linear-gradient(90deg, var(--positive), #45d27a); }
+  .scorow .pc { text-align: right; font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .pill-tip { display:inline-flex; align-items:center; gap:6px; margin-top:12px; font-size:12px; color: var(--text-mute); background: var(--card); border:1px solid var(--line); border-radius: 8px; padding: 7px 10px; }
+  .pill-tip b { color: var(--accent); }
+
+  /* Perfil de gols */
+  .goals-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 520px){ .goals-grid { grid-template-columns: 1fr; } }
+  .gcard { background: var(--card); border: 1px solid var(--line); border-radius: 11px; padding: 12px 13px; }
+  .gcard .gl { font-size: 11px; letter-spacing:.04em; text-transform: uppercase; color: var(--text-mute); font-weight: 700; margin-bottom: 8px; }
+  .duobar { display:flex; height: 26px; border-radius: 7px; overflow: hidden; font-size: 12px; font-weight: 700; }
+  .duobar span { display:flex; align-items:center; justify-content:center; text-align:center; }
+  .duobar .yes { background: var(--positive); color: #04210f; }
+  .duobar .no  { background: var(--card-elev); color: var(--text-dim); }
+  .dist { display:flex; align-items: flex-end; gap: 6px; height: 84px; margin-top: 4px; }
+  .dcol { flex: 1; display:flex; flex-direction: column; align-items:center; gap: 4px; justify-content: flex-end; height: 100%; }
+  .dcol .bar { width: 100%; max-width: 30px; background: linear-gradient(180deg, var(--accent-bright), var(--accent)); border-radius: 5px 5px 0 0; }
+  .dcol.peak .bar { background: linear-gradient(180deg, #45d27a, var(--positive)); }
+  .dcol .n { font-size: 10px; color: var(--text-mute); }
+  .dcol .v { font-size: 10.5px; font-weight: 700; color: var(--text-dim); }
+  .teamgoals { display:flex; flex-direction: column; gap: 9px; }
+  .tgr { display: grid; grid-template-columns: 92px 1fr 30px; align-items:center; gap: 9px; }
+  .tgr .tn { display:inline-flex; align-items:center; gap:6px; font-size: 12.5px; font-weight: 600; }
+  .tgr .xg { font-family: var(--font-mono); font-weight: 700; color: var(--accent-bright); text-align:right; font-size: 13px; }
+  .tgr .ministack { display:flex; height: 16px; border-radius: 5px; overflow:hidden; background: var(--card-elev); }
+  .tgr .ministack i { display:block; }
+  .tgr.home .ministack i { background: color-mix(in srgb, var(--positive) 70%, transparent); }
+  .tgr.away .ministack i { background: color-mix(in srgb, var(--red) 70%, transparent); }
+
+  /* Tabela do grupo */
+  .gtable { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .gtable th { text-align: center; font-size: 10.5px; letter-spacing: .04em; text-transform: uppercase; color: var(--text-mute); font-weight: 700; padding: 6px 4px; border-bottom: 1px solid var(--line); }
+  .gtable th.l { text-align: left; }
+  .gtable td { padding: 8px 4px; text-align: center; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+  .gtable td.l { text-align: left; }
+  .gtable .pos { color: var(--text-mute); width: 20px; }
+  .gtable .tm { display:inline-flex; align-items:center; gap:7px; font-weight:600; }
+  .gtable .tm .fi { width: 20px; height: 14px; }
+  .gtable .pts { font-weight: 800; color: var(--accent-bright); }
+  .gtable tr.in1 td { background: var(--positive-dim); box-shadow: inset 3px 0 0 var(--positive); }
+  .gtable tr.in2 td { background: var(--red-dim); box-shadow: inset 3px 0 0 var(--red); }
+  .formdot { display:inline-block; width: 15px; height: 15px; line-height: 15px; border-radius: 4px; font-size: 9px; font-weight: 800; color: #0c0c0c; margin-left: 1px; }
+  .formdot.w { background: var(--positive); }
+  .formdot.d { background: var(--accent); }
+  .formdot.l { background: var(--red); color:#fff; }
+
+  /* tendências de gols (resumo da Forma) */
+  .tend { display:grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media (max-width:520px){ .tend { grid-template-columns: 1fr; } }
+  .tcard { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px 11px; }
+  .tcard .th { display:flex; align-items:center; gap: 6px; font-weight: 700; font-size: 12.5px; margin-bottom: 8px; }
+  .trow { display:grid; grid-template-columns: 1fr auto; gap: 8px; padding: 4px 0; font-size: 12px; }
+  .trow .k { color: var(--text-dim); }
+  .trow .vv { font-weight: 700; font-variant-numeric: tabular-nums; }
+
+  /* ===== lista de jogos recentes — MANTIDA (espelho de .rx-recent* do app) ===== */
+  .rx-recent { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 520px){ .rx-recent { grid-template-columns: 1fr; } }
+  .rx-recent-col { background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.015)); border: 1px solid var(--line); border-radius: 12px; padding: 11px 12px; }
+  .rx-recent-head { display: flex; align-items: center; gap: 8px; padding-bottom: 9px; margin-bottom: 8px; border-bottom: 1px solid var(--line); }
+  .rx-recent-head .fi { width: 24px; height: 17px; border-radius: 3px; flex: none; box-shadow: 0 1px 3px rgba(0,0,0,.5); }
+  .rx-recent-name { font: 800 13px/1 var(--font); color: var(--text); }
+  .rx-recent-tally { margin-left: auto; display: inline-flex; gap: 7px; flex: none; }
+  .rx-recent-tally .t { display: inline-flex; align-items: baseline; gap: 1px; font: 800 12px/1 var(--font); }
+  .rx-recent-tally .t i { font: 700 8px/1 var(--font); font-style: normal; opacity: .85; }
+  .rx-recent-tally .t.v { color: var(--positive); }
+  .rx-recent-tally .t.e { color: var(--text-mute); }
+  .rx-recent-tally .t.d { color: var(--red); }
+  .rx-recent-list { list-style: none; display: flex; flex-direction: column; }
+  .rx-recent-list li { display: grid; grid-template-columns: 17px 34px 1fr auto; align-items: center; gap: 8px; padding: 5px 2px; }
+  .rx-recent-list li + li { border-top: 1px solid rgba(255,255,255,.04); }
+  .rx-recent-list li.rx-year { display: flex; align-items: center; gap: 8px; padding: 9px 2px 5px; border-top: none; }
+  .rx-recent-list li.rx-year:first-child { padding-top: 0; }
+  .rx-recent-list li.rx-year + li { border-top: none; }
+  .rx-recent-list li.rx-year span { font: 800 9px/1 var(--font); letter-spacing: .14em; color: var(--text-mute); flex: none; }
+  .rx-recent-list li.rx-year::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line-strong), transparent); }
+  .rx-r { display: grid; place-items: center; width: 17px; height: 17px; border-radius: 4px; font: 800 9px/1 var(--font); color: #0c0c0c; }
+  .rx-r.v { background: var(--positive); }
+  .rx-r.e { background: rgba(255,255,255,.18); color: var(--text); }
+  .rx-r.d { background: var(--red); color: #fff; }
+  .rx-when { font: 600 10px/1.2 var(--font); color: var(--text-mute); }
+  .rx-opp { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+  .rx-opp-wrap { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+  .rx-loc { font: 800 8px/1 var(--font); width: 14px; height: 14px; border-radius: 3px; flex: none; display: grid; place-items: center; }
+  .rx-loc.home { color: var(--accent); background: var(--accent-dim); }
+  .rx-loc.away { color: var(--text-mute); background: rgba(255,255,255,.06); }
+  .rx-opp .fi { width: 18px; height: 13px; border-radius: 2px; flex: none; }
+  .rx-opp-name { font: 600 12px/1.2 var(--font); color: var(--text-dim); }
+  .rx-comp { padding-left: 20px; font: 700 8px/1.2 var(--font); letter-spacing: .05em; text-transform: uppercase; color: var(--text-mute); opacity: .72; }
+  .rx-score { font: 800 12px/1 var(--font); color: var(--text); justify-self: end; }
+
+  /* H2H (mantido) — resumo simplificado */
+  .ctx-balance { display:flex; height: 28px; border-radius: 7px; overflow: hidden; font-size: 12px; font-weight: 700; margin: 8px 0; }
+  .ctx-balance span { display:flex; align-items:center; justify-content:center; }
+  .ctx-balance .v { background: var(--positive); color:#04210f; }
+  .ctx-balance .e { background: var(--card-elev); color: var(--text-dim); }
+  .ctx-balance .a { background: var(--red); color:#2a0508; }
+
+  /* Montagem: abas */
+  .tabs { display:flex; gap: 4px; border-bottom: 1px solid var(--line); margin-bottom: 14px; flex-wrap: wrap; }
+  .tab { font-size: 13px; font-weight: 600; color: var(--text-dim); padding: 8px 10px; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+  .tab[aria-selected="true"] { color: var(--text); border-bottom-color: var(--accent); }
+  .tab .nu { font-size: 9px; font-weight: 800; color: var(--bg-page); background: var(--positive); border-radius: 4px; padding: 0 4px; margin-left: 5px; vertical-align: middle; }
+  .tabpanel { display:none; }
+  .tabpanel.on { display:block; }
+  .stack > * + * { margin-top: 18px; }
+
+  .summary { display:flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 14px; }
+  .sx { flex: 1 0 auto; min-width: 116px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 9px 11px; }
+  .sx.isnew { box-shadow: inset 0 0 0 1px var(--positive-dim); }
+  .sx .sl { font-size: 10px; letter-spacing:.05em; text-transform: uppercase; color: var(--text-mute); font-weight: 700; margin-bottom: 6px; }
+  .sx .sv { font-size: 14px; font-weight: 700; display:flex; align-items:center; gap:6px; }
+  .sx .sv.sm { font-size: 13px; }
+  .sx .pc { color: var(--accent-bright); }
+
+  .src { font-size: 11px; color: var(--text-mute); margin-top: 14px; text-align: right; }
+
+  .roadmap { display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width:640px){ .roadmap { grid-template-columns: 1fr; } }
+  .rm { background: var(--card); border: 1px solid var(--line); border-radius: 11px; padding: 13px 14px; }
+  .rm h4 { font-size: 14px; margin-bottom: 6px; }
+  .rm p { font-size: 12.5px; color: var(--text-dim); }
+  .rm .st { font-size: 11px; font-weight: 700; border-radius: 5px; padding: 1px 7px; margin-bottom: 8px; display: inline-block; }
+  .rm .st.no { background: var(--red-dim); color: var(--red); }
+  .rm .st.soon { background: var(--accent-dim); color: var(--accent); }
+  .rm .st.live { background: var(--positive-dim); color: var(--positive); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="intro">
+    <h1>Raio-X enriquecido — protótipo <span style="color:var(--positive)">aditivo</span></h1>
+    <p class="lead">O Raio-X de hoje responde <b style="color:#fff">“quem ganha?”</b>. O palpite do bolão é um <b style="color:#fff">PLACAR EXATO</b> — então a maior parte do valor não-explorado está em ajudar a escolher os <b style="color:#fff">gols</b>. As melhorias abaixo <b style="color:#45d27a">somam</b> a isso.</p>
+
+    <div class="keyidea">
+      <p><b>Princípio:</b> nada do Raio-X atual é removido. As seções de hoje — <b>Previsão (barra de quem vence + radar de força)</b>, <b>Forma com a lista dos últimos 10 jogos</b>, <b>Confronto direto</b> e <b>Eliminatórias</b> — ficam <b>intactas</b>. Os módulos novos entram <b>por cima</b>.</p>
+      <p><b>Nesta versão:</b> (1) o <b>radar de força</b> voltou ao protótipo — é a seção 6, mantida; (2) cada dado ganhou uma <b>explicação em linguagem simples</b> embaixo — sem jargão de site de aposta. As referências técnicas (nomes de mercado) ficam só nas linhas cinzas “ref.”, pra implementação.</p>
+      <p class="legend"><span><span class="badge new">NOVO</span> módulo novo</span><span><span class="badge keep">MANTIDO</span> já existe, preservado</span></p>
+    </div>
+  </div>
+
+  <nav class="toc">
+    <a href="#placar">1 · Placar provável</a>
+    <a href="#gols">2 · Perfil de gols</a>
+    <a href="#forma">3 · Forma+</a>
+    <a href="#grupo">4 · Grupo ao vivo</a>
+    <a href="#radar">5 · Radar (mantido)</a>
+    <a href="#montagem">★ Montagem</a>
+    <span class="pill">dados reais · Bélgica × Egito</span>
+  </nav>
+
+  <!-- ============================================================ 1 -->
+  <section class="proto" id="placar">
+    <div class="proto-head"><span class="tag t1">PLACAR</span><h2>1 · Placar provável <span class="badge new">NOVO</span></h2></div>
+    <p class="proto-why">Os placares mais prováveis do jogo. Atalho mais direto pra cravar o palpite. Entra <b>dentro da aba Previsão</b>, abaixo da barra de quem vence.</p>
+    <div class="meta"><div><b>Custo:</b> <span class="ok">0 chamadas extras</span> (vem junto)</div><div class="ref"><b>ref.:</b> mercado “Exact Score” [10] · Betano</div></div>
+    <div class="frame">
+      <div class="frame-cap">Raio-X · Bélgica × Egito</div>
+      <div class="sec-label">Placar provável</div>
+      <div class="scoregrid">
+        <div class="scorow is-top"><span class="sc">1–0</span><div class="track"><div class="fill" style="width:100%"></div></div><span class="pc">27%</span></div>
+        <div class="scorow"><span class="sc">2–0</span><div class="track"><div class="fill" style="width:81%"></div></div><span class="pc">22%</span></div>
+        <div class="scorow"><span class="sc">2–1</span><div class="track"><div class="fill" style="width:74%"></div></div><span class="pc">20%</span></div>
+        <div class="scorow"><span class="sc">3–0</span><div class="track"><div class="fill" style="width:52%"></div></div><span class="pc">14%</span></div>
+        <div class="scorow"><span class="sc">3–1</span><div class="track"><div class="fill" style="width:44%"></div></div><span class="pc">12%</span></div>
+        <div class="scorow"><span class="sc">3–2</span><div class="track"><div class="fill" style="width:22%"></div></div><span class="pc">6%</span></div>
+      </div>
+      <div class="pill-tip">💡 Palpite mais seguro pelo mercado: <b>&nbsp;Bélgica 1–0&nbsp;</b></div>
+      <p class="hint">Cada linha é um <b>resultado final possível</b> (o primeiro número é a Bélgica, o segundo o Egito). A <b>porcentagem</b> é a chance estimada de o jogo terminar exatamente assim — quanto maior a barra, mais provável. Os números saem das cotações das casas de apostas.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ 2 -->
+  <section class="proto" id="gols">
+    <div class="proto-head"><span class="tag t1">PLACAR</span><h2>2 · Perfil de gols <span class="badge new">NOVO</span></h2></div>
+    <p class="proto-why">Tudo que orienta <b>quantos gols</b> esperar. Entra na aba Previsão.</p>
+    <div class="meta"><div><b>Custo:</b> <span class="ok">0 chamadas extras</span></div><div class="ref"><b>ref.:</b> Over/Under [5] · Both Teams Score [8] · Exact Goals [38] · gols/time [40][41]</div></div>
+    <div class="frame">
+      <div class="frame-cap">Raio-X · Bélgica × Egito</div>
+      <div class="sec-label">Perfil de gols</div>
+
+      <div class="goals-grid">
+        <div class="gcard">
+          <div class="gl">Jogo com muitos gols?</div>
+          <div class="duobar"><span class="yes" style="flex:65">Muitos (3+)&nbsp;65%</span><span class="no" style="flex:35">Poucos&nbsp;35%</span></div>
+        </div>
+        <div class="gcard">
+          <div class="gl">Os dois times marcam?</div>
+          <div class="duobar"><span class="no" style="flex:51">Não&nbsp;51%</span><span class="yes" style="flex:49">Sim&nbsp;49%</span></div>
+        </div>
+      </div>
+      <p class="hint"><b>Muitos gols</b> = chance de o jogo ter 3 gols ou mais no total (os dois times somados). <b>Os dois marcam</b> = chance de Bélgica e Egito marcarem pelo menos 1 gol cada.</p>
+
+      <div class="gcard" style="margin-top:14px">
+        <div class="gl">Distribuição do total de gols no jogo</div>
+        <div class="dist">
+          <div class="dcol"><div class="bar" style="height:22%"></div><div class="v">10%</div><div class="n">0</div></div>
+          <div class="dcol"><div class="bar" style="height:42%"></div><div class="v">19%</div><div class="n">1</div></div>
+          <div class="dcol peak"><div class="bar" style="height:56%"></div><div class="v">25%</div><div class="n">2</div></div>
+          <div class="dcol"><div class="bar" style="height:49%"></div><div class="v">22%</div><div class="n">3</div></div>
+          <div class="dcol"><div class="bar" style="height:33%"></div><div class="v">15%</div><div class="n">4</div></div>
+          <div class="dcol"><div class="bar" style="height:18%"></div><div class="v">8%</div><div class="n">5+</div></div>
+        </div>
+      </div>
+      <p class="hint">Cada coluna é a chance de o jogo terminar com aquela <b>quantidade total de gols</b> (Bélgica + Egito juntos). O número embaixo é o total de gols; a coluna <b style="color:#45d27a">verde</b> é o resultado mais provável. Aqui, o mais provável é <b>2 gols no jogo inteiro</b>.</p>
+
+      <div class="gcard" style="margin-top:14px">
+        <div class="gl">Gols esperados de cada seleção</div>
+        <div class="teamgoals">
+          <div class="tgr home"><span class="tn"><span class="fi fi-be"></span>Bélgica</span>
+            <span class="ministack"><i style="flex:18"></i><i style="flex:28"></i><i style="flex:26"></i><i style="flex:16"></i><i style="flex:13"></i></span>
+            <span class="xg">1.8</span></div>
+          <div class="tgr away"><span class="tn"><span class="fi fi-eg"></span>Egito</span>
+            <span class="ministack"><i style="flex:39"></i><i style="flex:34"></i><i style="flex:16"></i><i style="flex:5"></i><i style="flex:6"></i></span>
+            <span class="xg">1.0</span></div>
+        </div>
+      </div>
+      <p class="hint">Aqui é <b>por time</b> (diferente do gráfico acima, que é o jogo todo). O número à direita é quantos gols cada seleção <b>tende a marcar, em média</b>. A barrinha mostra como essa chance se reparte entre 0, 1, 2, 3 e 4+ gols. Juntando os dois, o placar “médio” do mercado fica perto de <b>Bélgica 2 – 1 Egito</b>.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ 3 -->
+  <section class="proto" id="forma">
+    <div class="proto-head"><span class="tag t2">CONTEXTO</span><h2>3 · Forma — tendências <span class="badge new">NOVO</span> + lista de 10 jogos <span class="badge keep">MANTIDA</span></h2></div>
+    <p class="proto-why">A lista dos <b>últimos 10 jogos</b> que já existe <b>continua igual</b>. Em cima dela, um resumo <b>novo</b> de tendências, calculado dos mesmos jogos. Nada some.</p>
+    <div class="meta"><div><b>Custo:</b> <span class="ok">0 API — só cálculo</span></div><div class="ref"><b>ref.:</b> recent.json (já temos)</div></div>
+    <div class="frame">
+      <div class="frame-cap">Raio-X · Bélgica × Egito</div>
+
+      <div class="block">
+        <span class="flag-new">NOVO</span>
+        <div class="sec-label">Tendências dos últimos jogos</div>
+        <div class="tend">
+          <div class="tcard">
+            <div class="th"><span class="fi fi-be"></span>Bélgica</div>
+            <div class="trow"><span class="k">Gols que faz por jogo</span><span class="vv">2.2</span></div>
+            <div class="trow"><span class="k">Gols que leva por jogo</span><span class="vv">0.8</span></div>
+            <div class="trow"><span class="k">Jogos sem levar gol</span><span class="vv">60%</span></div>
+            <div class="trow"><span class="k">Jogos com os 2 marcando</span><span class="vv">40%</span></div>
+          </div>
+          <div class="tcard">
+            <div class="th"><span class="fi fi-eg"></span>Egito</div>
+            <div class="trow"><span class="k">Gols que faz por jogo</span><span class="vv">1.3</span></div>
+            <div class="trow"><span class="k">Gols que leva por jogo</span><span class="vv">1.0</span></div>
+            <div class="trow"><span class="k">Jogos sem levar gol</span><span class="vv">40%</span></div>
+            <div class="trow"><span class="k">Jogos com os 2 marcando</span><span class="vv">60%</span></div>
+          </div>
+        </div>
+        <p class="hint">Médias dos jogos recentes, pra ajudar no placar: <b>“gols que faz”</b> e <b>“gols que leva”</b> são as médias por partida; <b>“sem levar gol”</b> é a fatia de jogos em que a defesa não foi vazada; <b>“os 2 marcando”</b> é quantas vezes ambos os times balançaram a rede.</p>
+      </div>
+
+      <div class="block">
+        <span class="flag-keep">MANTIDO — igual ao app hoje</span>
+        <div class="sec-label">Forma recente <span class="sub">últimos 10 jogos</span></div>
+        <div class="rx-recent">
+          <div class="rx-recent-col">
+            <div class="rx-recent-head">
+              <span class="fi fi-be"></span><span class="rx-recent-name">Bélgica</span>
+              <span class="rx-recent-tally"><span class="t v">4<i>V</i></span><span class="t e">1<i>E</i></span><span class="t d">1<i>D</i></span></span>
+            </div>
+            <ol class="rx-recent-list">
+              <li class="rx-year"><span>2026</span></li>
+              <li><span class="rx-r v">V</span><span class="rx-when">09/06</span><span class="rx-opp-wrap"><span class="rx-opp"><span class="rx-loc home">C</span><span class="fi fi-xk"></span><span class="rx-opp-name">Kosovo</span></span><span class="rx-comp">Amistoso</span></span><span class="rx-score">3-0</span></li>
+              <li><span class="rx-r e">E</span><span class="rx-when">04/06</span><span class="rx-opp-wrap"><span class="rx-opp"><span class="rx-loc away">F</span><span class="fi fi-si"></span><span class="rx-opp-name">Eslovênia</span></span><span class="rx-comp">Amistoso</span></span><span class="rx-score">1-1</span></li>
+              <li class="rx-year"><span>2025</span></li>
+              <li><span class="rx-r v">V</span><span class="rx-when">18/11</span><span class="rx-opp-wrap"><span class="rx-opp"><span class="rx-loc home">C</span><span class="fi fi-gb-wls"></span><span class="rx-opp-name">País de Gales</span></span><span class="rx-comp">Elim. da Copa</span></span><span class="rx-score">2-0</span></li>
+              <li><span class="rx-r v">V</span><span class="rx-when">15/11</span><span class="rx-opp-wrap"><span class="rx-opp"><span class="rx-loc away">F</span><span class="fi fi-kz"></span><span class="rx-opp-name">Cazaquistão</span></span><span class="rx-comp">Elim. da Copa</span></span><span class="rx-score">1-0</span></li>
+              <li><span class="rx-r d">D</span><span class="rx-when">14/10</span><span class="rx-opp-wrap"><span class="rx-opp"><span class="rx-loc away">F</span><span class="fi fi-fr"></span><span class="rx-opp-name">França</span></span><span class="rx-comp">Liga das Nações</span></span><span class="rx-score">1-2</span></li>
+              <li><span class="rx-r v">V</span><span class="rx-when">11/10</span><span class="rx-opp-wrap"><span class="rx-opp"><span class="rx-loc home">C</span><span class="fi fi-mk"></span><span class="rx-opp-name">Macedônia</span></span><span class="rx-comp">Elim. da Copa</span></span><span class="rx-score">2-1</span></li>
+            </ol>
+          </div>
+          <div class="rx-recent-col">
+            <div class="rx-recent-head">
+              <span class="fi fi-eg"></span><span class="rx-recent-name">Egito</span>
+              <span class="rx-recent-tally"><span class="t v">3<i>V</i></span><span class="t e">2<i>E</i></span><span class="t d">1<i>D</i></span></span>
+            </div>
+            <ol class="rx-recent-list">
+              <li class="rx-year"><span>2026</span></li>
+              <li><span class="rx-r v">V</span><span class="rx-when">10/06</span><span class="rx-opp-wrap"><span class="rx-opp"><span class="rx-loc home">C</span><span class="fi fi-tn"></span><span class="rx-opp-name">Tunísia</span></span><span class="rx-comp">Amistoso</span></span><span class="rx-score">2-1</span></li>
+              <li><span class="rx-r e">E</span><span class="rx-when">05/06</span><span class="rx-opp-wrap"><span class="rx-opp"><span class="rx-loc away">F</span><span class="fi fi-sn"></span><span class="rx-opp-name">Senegal</span></span><span class="rx-comp">Amistoso</span></span><span class="rx-score">0-0</span></li>
+              <li class="rx-year"><span>2025</span></li>
+              <li><span class="rx-r v">V</span><span class="rx-when">16/11</span><span class="rx-opp-wrap"><span class="rx-opp"><span class="rx-loc home">C</span><span class="fi fi-dj"></span><span class="rx-opp-name">Djibuti</span></span><span class="rx-comp">Elim. da Copa</span></span><span class="rx-score">3-0</span></li>
+              <li><span class="rx-r d">D</span><span class="rx-when">13/11</span><span class="rx-opp-wrap"><span class="rx-opp"><span class="rx-loc away">F</span><span class="fi fi-ma"></span><span class="rx-opp-name">Marrocos</span></span><span class="rx-comp">Amistoso</span></span><span class="rx-score">1-2</span></li>
+              <li><span class="rx-r v">V</span><span class="rx-when">14/10</span><span class="rx-opp-wrap"><span class="rx-opp"><span class="rx-loc home">C</span><span class="fi fi-gn"></span><span class="rx-opp-name">Guiné</span></span><span class="rx-comp">Elim. da Copa</span></span><span class="rx-score">1-0</span></li>
+              <li><span class="rx-r e">E</span><span class="rx-when">10/10</span><span class="rx-opp-wrap"><span class="rx-opp"><span class="rx-loc away">F</span><span class="fi fi-bf"></span><span class="rx-opp-name">Burkina Faso</span></span><span class="rx-comp">Elim. da Copa</span></span><span class="rx-score">1-1</span></li>
+            </ol>
+          </div>
+        </div>
+        <p class="hint">Lista atual do app: <b>V/E/D</b> = vitória, empate ou derrota; <b>C/F</b> = jogou em casa ou fora; ao lado, o adversário, a competição e o placar. O contador no topo soma vitórias, empates e derrotas.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ 4 -->
+  <section class="proto" id="grupo">
+    <div class="proto-head"><span class="tag t2">CONTEXTO</span><h2>4 · Grupo ao vivo <span class="badge new">NOVO</span> + Eliminatórias <span class="badge keep">MANTIDA</span></h2></div>
+    <p class="proto-why">Durante o torneio, a <b>classificação real do grupo</b> entra <b>no topo</b> da aba Eliminatórias — a campanha classificatória que já existe <b>continua embaixo</b>. Antes da 1ª rodada o grupo está zerado e some por gating; a partir da rodada 2 a tabela aparece.</p>
+    <div class="meta"><div><b>Custo:</b> <span class="ok">1 chamada p/ todos os grupos</span></div><div class="ref"><b>ref.:</b> /standings?league=1&amp;season=2026 — verificado ao vivo</div></div>
+    <div class="frame">
+      <div class="frame-cap">Raio-X · contexto do Grupo G</div>
+
+      <div class="block">
+        <span class="flag-new">NOVO</span>
+        <div class="sec-label">Grupo G <span class="sub">classificação ao vivo · após a 2ª rodada</span></div>
+        <table class="gtable">
+          <thead><tr><th>#</th><th class="l">Seleção</th><th>Pts</th><th>J</th><th>SG</th><th>Últimos</th></tr></thead>
+          <tbody>
+            <tr class="in1"><td class="pos">1</td><td class="l"><span class="tm"><span class="fi fi-be"></span>Bélgica</span></td><td class="pts">4</td><td>2</td><td>+2</td><td><span class="formdot w">V</span><span class="formdot d">E</span></td></tr>
+            <tr class="in2"><td class="pos">2</td><td class="l"><span class="tm"><span class="fi fi-eg"></span>Egito</span></td><td class="pts">4</td><td>2</td><td>+1</td><td><span class="formdot d">E</span><span class="formdot w">V</span></td></tr>
+            <tr><td class="pos">3</td><td class="l"><span class="tm"><span class="fi fi-ir"></span>Irã</span></td><td>3</td><td>2</td><td>0</td><td><span class="formdot w">V</span><span class="formdot l">D</span></td></tr>
+            <tr><td class="pos">4</td><td class="l"><span class="tm"><span class="fi fi-nz"></span>Nova Zelândia</span></td><td>0</td><td>2</td><td>−3</td><td><span class="formdot l">D</span><span class="formdot l">D</span></td></tr>
+          </tbody>
+        </table>
+        <p class="hint"><b>Pts</b> = pontos · <b>J</b> = jogos disputados · <b>SG</b> = saldo de gols (gols feitos menos sofridos) · <b>Últimos</b> = resultados recentes (<span style="color:var(--positive);font-weight:700">V</span> vitória, <span style="color:var(--accent);font-weight:700">E</span> empate, <span style="color:var(--red);font-weight:700">D</span> derrota). As duas linhas coloridas são os times deste jogo (<span style="color:var(--positive);font-weight:700">Bélgica</span> / <span style="color:var(--red);font-weight:700">Egito</span>); o fundo verde marca a <b>zona de classificação</b>.</p>
+      </div>
+
+      <div class="block">
+        <span class="flag-keep">MANTIDO — igual ao app hoje</span>
+        <div class="sec-label">Como chegaram à Copa <span class="sub">campanha classificatória</span></div>
+        <div style="font-size:12.5px;color:var(--text-dim);background:var(--card);border:1px solid var(--line);border-radius:9px;padding:10px 12px;display:flex;flex-direction:column;gap:6px">
+          <span><span class="fi fi-be"></span> <b style="color:var(--text)">Bélgica</b> · <b style="color:var(--accent-bright)">1º</b> Grupo J (Europa) · 22 pts · 8J 7V 1E 0D · classificada</span>
+          <span><span class="fi fi-eg"></span> <b style="color:var(--text)">Egito</b> · <b style="color:var(--accent-bright)">1º</b> Grupo A (África) · 23 pts · 10J 7V 2E 1D · classificada</span>
+        </div>
+        <p class="hint">As tabelas completas das eliminatórias de cada continente continuam aqui embaixo, <b>exatamente como hoje</b>. A novidade é só a tabela do grupo da Copa, que entra acima.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ 5 RADAR -->
+  <section class="proto" id="radar">
+    <div class="proto-head"><span class="tag t2">CONTEXTO</span><h2>5 · Radar de força <span class="badge keep">MANTIDO</span></h2></div>
+    <p class="proto-why">O radar (pentágono) que <b>já existe</b> na aba Previsão — comparação visual da força das duas seleções. Continua igual; aqui só deixei a <b>legenda de cada eixo</b> bem explicada. <span style="color:var(--text-mute)">Hoje ele depende de um dado da API que ainda está travado, então aparece sozinho quando liberar (mesma regra de sempre).</span></p>
+    <div class="meta"><div><b>Custo:</b> <span class="ok">já implementado</span></div><div class="ref"><b>ref.:</b> /predictions → teams.X.last_5 (form/ataque/defesa)</div></div>
+    <div class="frame">
+      <div class="frame-cap">Raio-X · Bélgica × Egito</div>
+      <div class="sec-label">Comparação de força</div>
+      <div class="radar-wrap">
+        <svg viewBox="0 0 248 208" class="radar-svg" role="img" aria-label="Radar de força comparando Bélgica e Egito">
+          <g class="radar-grid">
+            <polygon class="radar-ring" points="120,38 188.5,87.8 162.3,168.2 77.7,168.2 51.5,87.8"/>
+            <polygon class="radar-ring" points="120,56 171.3,93.3 151.8,153.7 88.2,153.7 68.7,93.3"/>
+            <polygon class="radar-ring" points="120,74 154.2,98.9 141.2,139.1 98.8,139.1 85.8,98.9"/>
+            <polygon class="radar-ring" points="120,92 137.1,104.4 130.6,124.6 109.4,124.6 102.9,104.4"/>
+            <line class="radar-spoke" x1="120" y1="110" x2="120" y2="38"/>
+            <line class="radar-spoke" x1="120" y1="110" x2="188.5" y2="87.8"/>
+            <line class="radar-spoke" x1="120" y1="110" x2="162.3" y2="168.2"/>
+            <line class="radar-spoke" x1="120" y1="110" x2="77.7" y2="168.2"/>
+            <line class="radar-spoke" x1="120" y1="110" x2="51.5" y2="87.8"/>
+          </g>
+          <text class="radar-axis" x="120" y="28" text-anchor="middle">Forma</text>
+          <text class="radar-axis" x="200" y="84" text-anchor="start">Ataque</text>
+          <text class="radar-axis" x="170" y="184" text-anchor="start">Defesa</text>
+          <text class="radar-axis" x="70" y="184" text-anchor="end">Gols pró</text>
+          <text class="radar-axis" x="40" y="84" text-anchor="end">Solidez</text>
+          <!-- Egito (vermelho) embaixo -->
+          <polygon class="radar-area away" points="120,66.8 157.7,97.8 145.4,145 100.9,136.2 77.6,96.2"/>
+          <circle class="radar-dot away" cx="120" cy="66.8" r="2.4"/><circle class="radar-dot away" cx="157.7" cy="97.8" r="2.4"/><circle class="radar-dot away" cx="145.4" cy="145" r="2.4"/><circle class="radar-dot away" cx="100.9" cy="136.2" r="2.4"/><circle class="radar-dot away" cx="77.6" cy="96.2" r="2.4"/>
+          <!-- Bélgica (verde) por cima -->
+          <polygon class="radar-area home" points="120,56 174.8,92.2 149.6,150.8 92.5,147.9 66.6,92.6"/>
+          <circle class="radar-dot home" cx="120" cy="56" r="2.4"/><circle class="radar-dot home" cx="174.8" cy="92.2" r="2.4"/><circle class="radar-dot home" cx="149.6" cy="150.8" r="2.4"/><circle class="radar-dot home" cx="92.5" cy="147.9" r="2.4"/><circle class="radar-dot home" cx="66.6" cy="92.6" r="2.4"/>
+        </svg>
+        <div class="radar-legend">
+          <span><i style="background:var(--positive)"></i>Bélgica</span>
+          <span><i style="background:var(--red)"></i>Egito</span>
+        </div>
+      </div>
+      <ul class="axisdefs">
+        <li><b>Forma</b> — desempenho nos últimos 5 jogos</li>
+        <li><b>Ataque</b> — poder ofensivo</li>
+        <li><b>Defesa</b> — solidez na marcação</li>
+        <li><b>Gols pró</b> — média de gols marcados</li>
+        <li><b>Solidez</b> — o quanto evita sofrer gols</li>
+      </ul>
+      <p class="hint">Cada ponta é um quesito. <b>Quanto mais a área se estica para fora, melhor</b> a seleção naquele ponto. A área <span style="color:#45d27a;font-weight:700">verde</span> é a Bélgica e a <span style="color:var(--red);font-weight:700">vermelha</span> o Egito — onde uma cobre a outra, é o time mais forte ali.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ MONTAGEM -->
+  <section class="proto" id="montagem">
+    <div class="proto-head"><span class="tag">★ MONTAGEM</span><h2>Como o Raio-X fica montado</h2></div>
+    <p class="proto-why">A faixa de cima mantém os atalhos de hoje e <b>ganha</b> “Placar provável”. As abas: <b>Previsão</b> (barra de quem vence + radar mantidos, ganha Placar e Perfil de gols), <b>Forma</b> (tendências + lista de 10 mantida), <b>Confronto</b> (igual) e <b>Grupo</b> (tabela ao vivo + Eliminatórias mantida). Clique nas abas:</p>
+
+    <div class="frame wide">
+      <div class="frame-cap">Raio-X · Bélgica × Egito</div>
+
+      <div class="summary">
+        <div class="sx"><div class="sl">Favorito</div><div class="sv"><span class="fi fi-be"></span>Bélgica <span class="pc">58%</span></div></div>
+        <div class="sx isnew"><div class="sl">Placar provável ✦</div><div class="sv sm">1–0 <span class="pc">27%</span></div></div>
+        <div class="sx"><div class="sl">Forma · últ. 5</div><div class="sv sm" style="gap:3px"><span class="formdot w">V</span><span class="formdot w">V</span><span class="formdot d">E</span><span class="formdot w">V</span><span class="formdot l">D</span></div></div>
+        <div class="sx"><div class="sl">Confronto · 2</div><div class="sv sm"><span class="fi fi-be"></span> 1·0·1 <span class="fi fi-eg"></span></div></div>
+        <div class="sx"><div class="sl">Eliminatórias</div><div class="sv sm">1º&nbsp;/&nbsp;1º</div></div>
+      </div>
+
+      <div class="tabs" role="tablist">
+        <button class="tab" role="tab" aria-selected="true" data-tab="t-prev">Previsão <span class="nu">+2</span></button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="t-forma">Forma <span class="nu">+</span></button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="t-conf">Confronto</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="t-grupo">Grupo <span class="nu">novo</span></button>
+      </div>
+
+      <div class="tabpanel on" id="t-prev">
+        <div class="stack">
+          <div class="block"><span class="flag-keep">MANTIDO</span>
+            <div class="sec-label">Quem vence</div>
+            <div class="bar1x2-head"><span class="t"><span class="fi fi-be"></span>Bélgica</span><span class="t">empate</span><span class="t">Egito<span class="fi fi-eg"></span></span></div>
+            <div class="bar1x2"><span class="seg home" style="flex:58">58%</span><span class="seg draw" style="flex:25">25%</span><span class="seg away" style="flex:17">17%</span></div>
+            <p class="hint">As três fatias somam 100%: chance de <b style="color:#45d27a">vitória da Bélgica</b>, <b style="color:var(--accent)">empate</b> e <b style="color:var(--red)">vitória do Egito</b>.</p>
+          </div>
+          <div class="block"><span class="flag-keep">MANTIDO</span>
+            <div class="sec-label">Comparação de força (radar)</div>
+            <div class="radar-wrap">
+              <svg viewBox="0 0 248 208" class="radar-svg" style="max-width:240px" role="img" aria-label="Radar de força">
+                <g class="radar-grid">
+                  <polygon class="radar-ring" points="120,38 188.5,87.8 162.3,168.2 77.7,168.2 51.5,87.8"/>
+                  <polygon class="radar-ring" points="120,74 154.2,98.9 141.2,139.1 98.8,139.1 85.8,98.9"/>
+                  <line class="radar-spoke" x1="120" y1="110" x2="120" y2="38"/><line class="radar-spoke" x1="120" y1="110" x2="188.5" y2="87.8"/><line class="radar-spoke" x1="120" y1="110" x2="162.3" y2="168.2"/><line class="radar-spoke" x1="120" y1="110" x2="77.7" y2="168.2"/><line class="radar-spoke" x1="120" y1="110" x2="51.5" y2="87.8"/>
+                </g>
+                <text class="radar-axis" x="120" y="28" text-anchor="middle">Forma</text><text class="radar-axis" x="200" y="84" text-anchor="start">Ataque</text><text class="radar-axis" x="170" y="184" text-anchor="start">Defesa</text><text class="radar-axis" x="70" y="184" text-anchor="end">Gols pró</text><text class="radar-axis" x="40" y="84" text-anchor="end">Solidez</text>
+                <polygon class="radar-area away" points="120,66.8 157.7,97.8 145.4,145 100.9,136.2 77.6,96.2"/>
+                <polygon class="radar-area home" points="120,56 174.8,92.2 149.6,150.8 92.5,147.9 66.6,92.6"/>
+              </svg>
+              <div class="radar-legend"><span><i style="background:var(--positive)"></i>Bélgica</span><span><i style="background:var(--red)"></i>Egito</span></div>
+            </div>
+            <p class="hint">Quanto mais para fora, mais forte naquele quesito. Verde = Bélgica, vermelho = Egito.</p>
+          </div>
+          <div class="block"><span class="flag-new">NOVO</span>
+            <div class="sec-label">Placar provável</div>
+            <div class="scoregrid">
+              <div class="scorow is-top"><span class="sc">1–0</span><div class="track"><div class="fill" style="width:100%"></div></div><span class="pc">27%</span></div>
+              <div class="scorow"><span class="sc">2–0</span><div class="track"><div class="fill" style="width:81%"></div></div><span class="pc">22%</span></div>
+              <div class="scorow"><span class="sc">2–1</span><div class="track"><div class="fill" style="width:74%"></div></div><span class="pc">20%</span></div>
+            </div>
+            <p class="hint">Chance de cada resultado final exato. Maior barra = mais provável.</p>
+          </div>
+          <div class="block"><span class="flag-new">NOVO</span>
+            <div class="sec-label">Perfil de gols</div>
+            <div class="goals-grid">
+              <div class="gcard"><div class="gl">Jogo com muitos gols?</div><div class="duobar"><span class="yes" style="flex:65">Muitos&nbsp;65%</span><span class="no" style="flex:35">Poucos&nbsp;35%</span></div></div>
+              <div class="gcard"><div class="gl">Os dois marcam?</div><div class="duobar"><span class="no" style="flex:51">Não&nbsp;51%</span><span class="yes" style="flex:49">Sim&nbsp;49%</span></div></div>
+            </div>
+            <p class="hint">“Muitos” = 3+ gols no jogo. “Os dois marcam” = ambos fazem ao menos 1 gol.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="tabpanel" id="t-forma">
+        <div class="stack">
+          <div class="block"><span class="flag-new">NOVO</span>
+            <div class="sec-label">Tendências</div>
+            <div class="tend">
+              <div class="tcard"><div class="th"><span class="fi fi-be"></span>Bélgica</div><div class="trow"><span class="k">Gols que faz / jogo</span><span class="vv">2.2</span></div><div class="trow"><span class="k">Gols que leva / jogo</span><span class="vv">0.8</span></div><div class="trow"><span class="k">Jogos sem levar gol</span><span class="vv">60%</span></div></div>
+              <div class="tcard"><div class="th"><span class="fi fi-eg"></span>Egito</div><div class="trow"><span class="k">Gols que faz / jogo</span><span class="vv">1.3</span></div><div class="trow"><span class="k">Gols que leva / jogo</span><span class="vv">1.0</span></div><div class="trow"><span class="k">Jogos sem levar gol</span><span class="vv">40%</span></div></div>
+            </div>
+          </div>
+          <div class="block"><span class="flag-keep">MANTIDO — lista de 10 jogos</span>
+            <div class="sec-label">Forma recente <span class="sub">últimos 10 jogos</span></div>
+            <div class="rx-recent">
+              <div class="rx-recent-col">
+                <div class="rx-recent-head"><span class="fi fi-be"></span><span class="rx-recent-name">Bélgica</span><span class="rx-recent-tally"><span class="t v">4<i>V</i></span><span class="t e">1<i>E</i></span><span class="t d">1<i>D</i></span></span></div>
+                <ol class="rx-recent-list">
+                  <li><span class="rx-r v">V</span><span class="rx-when">09/06</span><span class="rx-opp-wrap"><span class="rx-opp"><span class="rx-loc home">C</span><span class="fi fi-xk"></span><span class="rx-opp-name">Kosovo</span></span><span class="rx-comp">Amistoso</span></span><span class="rx-score">3-0</span></li>
+                  <li><span class="rx-r e">E</span><span class="rx-when">04/06</span><span class="rx-opp-wrap"><span class="rx-opp"><span class="rx-loc away">F</span><span class="fi fi-si"></span><span class="rx-opp-name">Eslovênia</span></span><span class="rx-comp">Amistoso</span></span><span class="rx-score">1-1</span></li>
+                  <li><span class="rx-r v">V</span><span class="rx-when">18/11</span><span class="rx-opp-wrap"><span class="rx-opp"><span class="rx-loc home">C</span><span class="fi fi-gb-wls"></span><span class="rx-opp-name">País de Gales</span></span><span class="rx-comp">Elim. da Copa</span></span><span class="rx-score">2-0</span></li>
+                </ol>
+              </div>
+              <div class="rx-recent-col">
+                <div class="rx-recent-head"><span class="fi fi-eg"></span><span class="rx-recent-name">Egito</span><span class="rx-recent-tally"><span class="t v">3<i>V</i></span><span class="t e">2<i>E</i></span><span class="t d">1<i>D</i></span></span></div>
+                <ol class="rx-recent-list">
+                  <li><span class="rx-r v">V</span><span class="rx-when">10/06</span><span class="rx-opp-wrap"><span class="rx-opp"><span class="rx-loc home">C</span><span class="fi fi-tn"></span><span class="rx-opp-name">Tunísia</span></span><span class="rx-comp">Amistoso</span></span><span class="rx-score">2-1</span></li>
+                  <li><span class="rx-r e">E</span><span class="rx-when">05/06</span><span class="rx-opp-wrap"><span class="rx-opp"><span class="rx-loc away">F</span><span class="fi fi-sn"></span><span class="rx-opp-name">Senegal</span></span><span class="rx-comp">Amistoso</span></span><span class="rx-score">0-0</span></li>
+                  <li><span class="rx-r v">V</span><span class="rx-when">16/11</span><span class="rx-opp-wrap"><span class="rx-opp"><span class="rx-loc home">C</span><span class="fi fi-dj"></span><span class="rx-opp-name">Djibuti</span></span><span class="rx-comp">Elim. da Copa</span></span><span class="rx-score">3-0</span></li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tabpanel" id="t-conf">
+        <span class="badge keep">MANTIDO — igual ao app hoje</span>
+        <div class="sec-label" style="margin-top:10px">Confronto direto <span class="sub">2 jogos</span></div>
+        <div class="ctx-balance"><span class="v" style="flex:1">1</span><span class="e" style="flex:0.01"></span><span class="a" style="flex:1">1</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-dim)"><span><b style="color:var(--text)">1</b> Bélgica</span><span><b style="color:var(--text)">0</b> empates</span><span><b style="color:var(--text)">1</b> Egito</span></div>
+        <p class="hint">Histórico de jogos passados entre as duas seleções: quantos cada uma venceu e quantos terminaram empatados, + a lista dos confrontos. Igual ao app hoje.</p>
+      </div>
+
+      <div class="tabpanel" id="t-grupo">
+        <div class="stack">
+          <div class="block"><span class="flag-new">NOVO</span>
+            <div class="sec-label">Grupo G <span class="sub">ao vivo</span></div>
+            <table class="gtable">
+              <thead><tr><th>#</th><th class="l">Seleção</th><th>Pts</th><th>J</th><th>SG</th><th>Últimos</th></tr></thead>
+              <tbody>
+                <tr class="in1"><td class="pos">1</td><td class="l"><span class="tm"><span class="fi fi-be"></span>Bélgica</span></td><td class="pts">4</td><td>2</td><td>+2</td><td><span class="formdot w">V</span><span class="formdot d">E</span></td></tr>
+                <tr class="in2"><td class="pos">2</td><td class="l"><span class="tm"><span class="fi fi-eg"></span>Egito</span></td><td class="pts">4</td><td>2</td><td>+1</td><td><span class="formdot d">E</span><span class="formdot w">V</span></td></tr>
+                <tr><td class="pos">3</td><td class="l"><span class="tm"><span class="fi fi-ir"></span>Irã</span></td><td>3</td><td>2</td><td>0</td><td><span class="formdot w">V</span><span class="formdot l">D</span></td></tr>
+                <tr><td class="pos">4</td><td class="l"><span class="tm"><span class="fi fi-nz"></span>Nova Zelândia</span></td><td>0</td><td>2</td><td>−3</td><td><span class="formdot l">D</span><span class="formdot l">D</span></td></tr>
+              </tbody>
+            </table>
+            <p class="hint"><b>Pts</b> pontos · <b>J</b> jogos · <b>SG</b> saldo de gols · <b>Últimos</b> resultados recentes. Fundo verde = zona de classificação.</p>
+          </div>
+          <div class="block"><span class="flag-keep">MANTIDO — Eliminatórias</span>
+            <div class="sec-label">Como chegaram à Copa</div>
+            <p style="font-size:12.5px;color:var(--text-dim)">As tabelas de campanha classificatória (Europa / África) continuam aqui embaixo, iguais ao app de hoje.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="src">Fonte: odds Betano · API-Football</div>
+    </div>
+  </section>
+
+  <!-- ============================================================ ROADMAP -->
+  <section class="proto" id="roadmap">
+    <div class="proto-head"><span class="tag t2">DEPOIS</span><h2>O que explorei e fica pra outra rodada</h2></div>
+    <p class="proto-why">Coisas que testei na API ao vivo mas que ainda não rendem antes do jogo — registradas pra não re-investigar:</p>
+    <div class="roadmap">
+      <div class="rm"><span class="st no">vazio agora</span><h4>Lesões / suspensões</h4><p>A API ainda não traz lesões da Copa. Quando trouxer, vira um aviso forte (“titular fora”).</p></div>
+      <div class="rm"><span class="st soon">só ~40min antes</span><h4>Escalações prováveis</h4><p>Só aparecem perto do apito. Mais úteis no “ao vivo” / resultados do que no palpite que fecha cedo.</p></div>
+      <div class="rm"><span class="st no">travado</span><h4>Radar de força (dados)</h4><p>A fonte do radar ainda está travada na API. O componente já existe; acende sozinho quando liberar.</p></div>
+      <div class="rm"><span class="st live">pós-jogo</span><h4>Notas / lances</h4><p>Notas dos jogadores, gols e cartões são ricos, mas só depois do jogo → material pro <b>histórico</b>.</p></div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const root = tab.closest('.frame');
+      root.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', String(t === tab)));
+      root.querySelectorAll('.tabpanel').forEach(p => p.classList.toggle('on', p.id === tab.dataset.tab));
+    });
+  });
+</script>
+</body>
+</html>

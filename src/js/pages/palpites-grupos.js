@@ -6,7 +6,7 @@ import { supabase } from '../supabase.js';
 import {
   flag, escapeHtml, formatBrDate, formatTime,
   isLocked, isLive, lockCountdownLabel, showToast, loadRecentMatches,
-  loadQualifiers, teamPt, groundShort, renderDateCalendar, predictionDeadline,
+  loadQualifiers, loadStandings, teamPt, groundShort, renderDateCalendar, predictionDeadline,
   localDateKey, oddsToProbs, brParts, heroMeta, wireHScroll, computeStandings,
 } from '../util.js';
 import { matchPoints, scoreBreakdown } from '../scoring.js';
@@ -28,10 +28,12 @@ let matches = [];                    // 72 group-stage matches, ordered by date
 let predsByMatch = new Map();        // match_id -> prediction row
 let goalsByMatch = new Map();        // match_id -> [{player, goals}]
 let oddsByMatch = new Map();         // match_id -> { odd_home, odd_draw, odd_away, bookmaker_name } — alimenta a barra 1X2 (prob. implícita); não mais exibida crua no card
+let marketsByMatch = new Map();      // match_id -> markets normalizados (placar provável + perfil de gols, ver raiox.js). Query separada p/ degradar sozinho se a coluna não existir
 let h2hByMatch = new Map();          // match_id -> { fixtures: [...], summary: {...}, api_team_home }
 let predictionsByMatch = new Map();  // match_id -> previsão normalizada (ver raiox.js / renderPredictionsBlock)
 let recentByTeam = new Map();        // team name -> [{ date, opponent, home, score, competition }] (forma recente)
 let qualifiers = null;               // assets/data/qualifiers.json — campanha de eliminatórias (Raio-X)
+let standings = null;                // assets/data/standings.json — classificação ao vivo dos grupos (Raio-X)
 let scorerPickId = null;             // player_id do artilheiro escolhido (bônus por gol)
 let activeGroup = 'all';             // 'all' | 'A'..'L'
 let groupBy = 'date';                // 'group' | 'date' — dimensão do filtro/agrupamento (padrão: por data)
@@ -48,6 +50,7 @@ function raioxData(m) {
     h2h: h2hByMatch.get(m.id) ?? null,
     predictions: buildForecast(m),
     qualifiers,
+    standings,
   };
 }
 
@@ -59,13 +62,22 @@ function raioxData(m) {
 function buildForecast(m) {
   const apiPred = predictionsByMatch.get(m.id) ?? null;   // { pHome,…, radar, comparison, source }
   const probs = oddsToProbs(oddsByMatch.get(m.id));       // das odds, ou null
-  if (!probs && !apiPred) return null;
+  const markets = marketsByMatch.get(m.id) ?? null;       // placar provável + perfil de gols (Betano)
+  if (!probs && !apiPred && !markets) return null;
   const bar = probs
     ? { pHome: probs.pHome, pDraw: probs.pDraw, pAway: probs.pAway, favored: probs.favored,
         source: oddsByMatch.get(m.id)?.bookmaker_name || 'Betano' }
-    : { pHome: apiPred.pHome, pDraw: apiPred.pDraw, pAway: apiPred.pAway, favored: apiPred.favored,
-        source: apiPred.source || 'API-Football' };
-  return { ...bar, radar: apiPred?.radar ?? null, comparison: apiPred?.comparison ?? null };
+    : apiPred
+    ? { pHome: apiPred.pHome, pDraw: apiPred.pDraw, pAway: apiPred.pAway, favored: apiPred.favored,
+        source: apiPred.source || 'API-Football' }
+    : { source: 'Betano' };
+  return {
+    ...bar,
+    radar: apiPred?.radar ?? null,
+    comparison: apiPred?.comparison ?? null,
+    scorelines: markets?.scorelines ?? null,
+    goals: markets?.goals ?? null,
+  };
 }
 
 // ============================================================
@@ -84,6 +96,7 @@ try {
   // nome do time; agora vai pro painel Raio-X. Guardado em var de módulo.
   recentByTeam = await loadRecentMatches();
   qualifiers = await loadQualifiers();
+  standings = await loadStandings();
 
   const pageBody = await renderShell({ active: 'palpites-g', profile, stats });
   pageBody.innerHTML = renderPage();
@@ -109,12 +122,16 @@ try {
 // Data
 // ============================================================
 async function loadData() {
-  const [statsRes, matchesRes, predsRes, goalsRes, oddsRes, h2hRes, forecastRes, scorerRes] = await Promise.all([
+  const [statsRes, matchesRes, predsRes, goalsRes, oddsRes, marketsRes, h2hRes, forecastRes, scorerRes] = await Promise.all([
     supabase.from('v_pool_stats').select('*').single(),
     supabase.from('matches').select('*').eq('stage', 'group').order('match_date'),
     supabase.from('predictions').select('*').eq('user_id', profile.id),
     supabase.from('player_goals').select('*, players(full_name, team)'),
     supabase.from('match_odds').select('match_id, odd_home, odd_draw, odd_away, bookmaker_name'),
+    // Mercados extras (placar provável + perfil de gols) numa query SEPARADA: se a
+    // coluna `markets` (migration 065) ainda não existe, só este res falha — a
+    // barra 1X2 acima segue intacta (degrada sozinho, sem derrubar as odds).
+    supabase.from('match_odds').select('match_id, markets'),
     supabase.from('match_h2h').select('match_id, fixtures, summary, api_team_home'),
     supabase.from('match_predictions').select('match_id, payload'),
     supabase.from('top_scorer_picks').select('player_id').eq('user_id', profile.id).maybeSingle(),
@@ -127,6 +144,9 @@ async function loadData() {
   matches = matchesRes.data ?? [];
   predsByMatch = new Map((predsRes.data ?? []).map(p => [p.match_id, p]));
   oddsByMatch = new Map((oddsRes.data ?? []).map(o => [o.match_id, o]));
+  // Degrada gracioso se a migration 065 não foi aplicada (marketsRes.error → data
+  // null → mapa vazio → sem os blocos novos, barra 1X2 inalterada).
+  marketsByMatch = new Map((marketsRes.data ?? []).map(o => [o.match_id, o.markets]));
   h2hByMatch  = new Map((h2hRes.data ?? []).map(h => [h.match_id, h]));
   // Previsão normalizada (match_predictions.payload) — só existe pra jogos que a
   // API trouxe dado útil; o front já não mostra nada pros demais. Degrada gracioso
