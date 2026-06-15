@@ -5496,13 +5496,25 @@ input[type="number"].score-input {
   fill: #8a8a8e; text-transform: uppercase; font-family: var(--font);
 }
 
+/* grade horizontal: referência de posição sem pesar o desenho */
+.rc-grid { stroke: rgba(255, 255, 255, .055); stroke-width: 1; }
+
 /* linhas: pelotão em cinza-contexto, foco colorido por cima */
 .rc-ctx { stroke: #2e2e31; stroke-width: 1.25; fill: none; }
 .rc-foc {
   stroke-width: 2.6; fill: none;
   stroke-linejoin: round; stroke-linecap: round;
+  transition: opacity .15s ease, stroke-width .15s ease;
 }
 .rc-foc.me { stroke-width: 3; filter: drop-shadow(0 0 5px rgba(244, 196, 48, .4)); }
+/* hover: a linha sob o cursor acende em neon (na própria cor, via --glow)
+   e as outras do foco apagam um pouco pra ela saltar */
+.rc-foc.dim { opacity: .3; }
+.rc-foc.hot {
+  stroke-width: 3.6;
+  filter: drop-shadow(0 0 4px var(--glow)) drop-shadow(0 0 9px var(--glow));
+}
+.rc-hdot.hot { filter: drop-shadow(0 0 5px var(--glow)) drop-shadow(0 0 10px var(--glow)); }
 
 .rc-end { font-size: 12.5px; font-weight: 700; font-family: var(--font); }
 
@@ -5532,7 +5544,8 @@ input[type="number"].score-input {
 .rc-tip-tm { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .rc-tip-sc { color: var(--accent); font-weight: 800; margin: 0 1px; }
 .rc-tip-sc .x { color: var(--text-mute); margin: 0 1px; }
-.rc-tip-r { display: grid; grid-template-columns: auto 26px 1fr auto; align-items: center; gap: 8px; padding: 3px 0; font-size: 13.5px; }
+.rc-tip-r { display: grid; grid-template-columns: auto 26px 1fr auto; align-items: center; gap: 8px; padding: 3px 0; font-size: 13.5px; border-radius: 6px; }
+.rc-tip-r.hot { background: rgba(255, 255, 255, .07); padding: 3px 6px; margin: 0 -6px; }
 .rc-tip-pos { font-size: 12px; font-weight: 800; width: 26px; font-variant-numeric: tabular-nums; }
 .rc-tip-nm { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .rc-tip-pt { color: var(--text); font-weight: 700; font-variant-numeric: tabular-nums; }
@@ -6670,3 +6683,37 @@ input[type="number"].score-input {
   .ar-pod-name { font-size: 13px; }
   .ar-pod-goals { font-size: 26px; }
 }
+
+/* ============================================================
+   Palpite × Realidade — ordem prevista vs oficial por grupo
+   (palpites-grupos.js · renderPalpiteVsRealidade)
+   ============================================================ */
+.pxr-card {
+  margin-top: 28px;
+  background: linear-gradient(160deg, #1f1f1f, #0d0d0d);
+  border: 1px solid var(--line); border-radius: 12px; overflow: hidden;
+  max-width: 540px;
+}
+.pxr-head { display: flex; align-items: center; justify-content: space-between; padding: 13px 16px; border-bottom: 1px solid var(--line); }
+.pxr-grp { font-weight: 800; font-size: 16px; letter-spacing: -.01em; }
+.pxr-score { font-size: 12px; font-weight: 800; color: var(--text-dim); }
+.pxr-score b { color: var(--accent); font-size: 15px; margin-left: 2px; }
+.pxr-colhead {
+  display: grid; grid-template-columns: 30px 1fr 26px 1fr; gap: 8px; padding: 8px 16px;
+  font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--text-mute);
+  font-weight: 800; border-bottom: 1px solid var(--line);
+}
+.pxr-colhead .r { text-align: right; }
+.pxr-row { display: grid; grid-template-columns: 30px 1fr 26px 1fr; gap: 8px; align-items: center; padding: 9px 16px; }
+.pxr-row + .pxr-row { border-top: 1px solid rgba(255, 255, 255, .05); }
+.pxr-row.hit { background: rgba(29, 185, 84, .06); }
+.pxr-pos { font-weight: 800; color: var(--text-mute); font-variant-numeric: tabular-nums; }
+.pxr-team { display: flex; align-items: center; gap: 7px; min-width: 0; font-weight: 700; font-size: 13.5px; }
+.pxr-team.r { justify-content: flex-end; }
+.pxr-team .fi { width: 22px; height: 15px; border-radius: 2px; flex: none; }
+.pxr-team .nm { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pxr-mark { text-align: center; font-size: 14px; font-weight: 900; }
+.pxr-row.hit .pxr-mark { color: var(--positive); }
+.pxr-row.miss .pxr-mark { color: var(--red); }
+.pxr-foot { padding: 11px 16px; font-size: 12px; color: var(--text-dim); border-top: 1px solid var(--line); background: rgba(255, 255, 255, .02); }
+.pxr-foot b { color: var(--accent); }

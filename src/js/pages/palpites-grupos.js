@@ -7,7 +7,7 @@ import {
   flag, escapeHtml, formatBrDate, formatTime,
   isLocked, isLive, lockCountdownLabel, showToast, loadRecentMatches,
   loadQualifiers, teamPt, groundShort, renderDateCalendar, predictionDeadline,
-  localDateKey, oddsToProbs, brParts, heroMeta, wireHScroll,
+  localDateKey, oddsToProbs, brParts, heroMeta, wireHScroll, computeStandings,
 } from '../util.js';
 import { matchPoints, scoreBreakdown } from '../scoring.js';
 import { matchScorerPts as matchScorerPtsCore, groupCardSummary } from '../card-results.js';
@@ -322,7 +322,54 @@ function renderGroupTableSection() {
       ${renderThirdsPop(standMode)}
     </div>
     ${renderGroupTable(standMode)}
+    ${renderPalpiteVsRealidade(activeGroup)}
   `;
+}
+
+// Palpite × Realidade — compara a ORDEM PREVISTA do usuário (projeção dos seus
+// palpites) com a ORDEM OFICIAL do grupo (mesma fonte da aba Oficial: resultados
+// reais via computeStandings), posição a posição. Gating: só aparece quando o
+// usuário projetou o grupo INTEIRO (6 jogos) e já há ≥1 resultado real — senão a
+// comparação seria injusta/vazia. Independe do toggle de lente.
+function renderPalpiteVsRealidade(group) {
+  const gm = matches.filter(m => m.group_name === group);
+  if (gm.length === 0) return '';
+  const predictedAll = gm.every(m => predsByMatch.has(m.id));
+  const realCount = gm.filter(m => m.finished).length;
+  if (!predictedAll || realCount === 0) return '';
+
+  const predOrder = computeStandings(gm, 'sim', predsByMatch).map(s => s.team);
+  const realOrder = computeStandings(gm, 'real', predsByMatch).map(s => s.team);
+
+  let hits = 0;
+  const rows = realOrder.map((realTeam, i) => {
+    const myTeam = predOrder[i];
+    const hit = myTeam === realTeam;
+    if (hit) hits++;
+    return `
+      <div class="pxr-row ${hit ? 'hit' : 'miss'}">
+        <span class="pxr-pos">${i + 1}º</span>
+        <span class="pxr-team"><span class="flag">${flag(myTeam)}</span><span class="nm">${escapeHtml(teamPt(myTeam))}</span></span>
+        <span class="pxr-mark" aria-label="${hit ? 'acertou' : 'errou'}">${hit ? '✓' : '✗'}</span>
+        <span class="pxr-team r"><span class="nm">${escapeHtml(teamPt(realTeam))}</span><span class="flag">${flag(realTeam)}</span></span>
+      </div>`;
+  }).join('');
+
+  // Quantos dos 2 classificados (1º/2º) o usuário cravou — métrica do bolão.
+  const advPred = new Set(predOrder.slice(0, 2));
+  const advReal = realOrder.slice(0, 2).filter(t => advPred.has(t)).length;
+  const liveTag = realCount === 6 ? 'grupo encerrado' : `parcial · ${realCount}/6 jogos`;
+
+  return `
+    <div class="pxr-card" id="pxr-${group}">
+      <div class="pxr-head">
+        <span class="pxr-grp">Palpite × Realidade</span>
+        <span class="pxr-score">posições <b>${hits}/4</b></span>
+      </div>
+      <div class="pxr-colhead"><span></span><span>Seu palpite</span><span></span><span class="r">Oficial</span></div>
+      ${rows}
+      <div class="pxr-foot">Classificados que você cravou: <b>${advReal}/2</b> · <span class="nw">${escapeHtml(liveTag)}</span></div>
+    </div>`;
 }
 
 function renderGroupTable(mode = 'sim') {
