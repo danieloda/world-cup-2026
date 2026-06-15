@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ranking v2 — dinâmico, rótulos=hover, mobile</title>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-page:#0c0c0c; --bg-main:#161616; --card:#202022; --card-hover:#2b2b2d; --card-elev:#262628;
+    --line:rgba(255,255,255,.10); --line-strong:#3c3c40; --text:#fff; --text-dim:#b3b3b3; --text-mute:#a3a3a3;
+    --accent:#f4c430; --accent-bright:#ffd54a; --accent-dim:rgba(244,196,48,.15);
+    --red:#f15e6c; --positive:#1DB954; --font:'Figtree',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;min-width:0;margin:0;padding:0}
+  :focus-visible{outline:2px solid var(--accent-bright);outline-offset:2px;border-radius:6px}
+  html,body{background:var(--bg-page);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  .wrap{max-width:1140px;margin:0 auto;padding:28px 20px 100px}
+  .intro h1{font-size:28px;font-weight:800;letter-spacing:-.01em}
+  .intro p{color:var(--text-dim);max-width:880px;margin-top:8px}
+  .intro .note{font-size:13px;color:var(--text-mute);margin-top:10px}
+  .intro b{color:var(--text)}
+  nav.toc{position:sticky;top:0;z-index:30;background:rgba(12,12,12,.92);backdrop-filter:blur(8px);margin:18px -20px 26px;padding:10px 20px;border-bottom:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  nav.toc a{font-size:13px;font-weight:600;color:var(--text-dim);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 12px;text-decoration:none}
+  nav.toc a:hover{background:var(--card-hover);color:var(--text)}
+  nav.toc .pill{font-size:12px;color:var(--text-mute);margin-left:auto}
+
+  section.proto{margin-bottom:54px;scroll-margin-top:70px}
+  .head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+  .head .tag{font-size:12px;font-weight:800;letter-spacing:.08em;color:var(--bg-page);background:var(--accent);border-radius:6px;padding:2px 8px}
+  .head .tag.alt{background:var(--card-elev);color:var(--text-dim);border:1px solid var(--line-strong)}
+  .head h2{font-size:21px;font-weight:800}
+  .sub{color:var(--text-dim);font-size:14px;max-width:880px;margin-bottom:14px}
+  .sub b{color:var(--text)} .sub .win{color:var(--positive);font-weight:700}
+  .panel{background:var(--bg-main);border:1px solid var(--line);border-radius:14px;padding:18px}
+
+  /* controles */
+  .ctl{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+  .chip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--text-dim);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 12px;transition:.15s}
+  .chip:hover{background:var(--card-hover);color:var(--text)}
+  .chip.on{background:var(--accent-dim);border-color:var(--accent);color:var(--accent-bright)}
+  .hint{font-size:12.5px;color:var(--text-mute);margin-top:10px}
+
+  /* avatar */
+  .av{display:inline-grid;place-items:center;border-radius:50%;background:var(--card-elev);border:2px solid currentColor;font-weight:800;flex:none;box-sizing:border-box;width:26px;height:26px;font-size:9.5px}
+  .av.sm{width:22px;height:22px;font-size:8.5px;border-width:1.5px}
+
+  /* ===== chart (svg) ===== */
+  .chart-svg{display:block;width:100%;touch-action:none}
+  .chart-svg text{font-family:var(--font)}
+  .chart-svg .yl{font-size:11px;fill:var(--text-mute)}
+  .chart-svg .xl{font-size:11px;fill:var(--text-mute)}
+  .chart-svg .grid{stroke:rgba(255,255,255,.05)}
+  .chart-svg .ln{fill:none;stroke-width:2.4;stroke-linejoin:round;stroke-linecap:round;transition:opacity .15s,stroke-width .15s}
+  .chart-svg .ln.dim{opacity:.28}
+  .chart-svg .ln.hot{stroke-width:3.4;filter:drop-shadow(0 0 4px var(--glow)) drop-shadow(0 0 9px var(--glow))}
+  .chart-svg .cross{stroke:rgba(255,255,255,.3);stroke-dasharray:3 3}
+  .chart-svg .end{font-size:12px;font-weight:700}
+  .chart-svg .endg{transition:opacity .16s}
+
+  /* ===== painel vivo (D-A) ===== */
+  .da-grid{display:grid;grid-template-columns:1fr 246px;gap:16px;align-items:start}
+  .da-chart{position:relative;min-width:0}
+  .pan{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .pan-h{padding:9px 12px;border-bottom:1px solid var(--line);font-size:12px;font-weight:700;color:var(--text-mute);text-transform:uppercase;letter-spacing:.04em;min-height:54px;display:flex;flex-direction:column;justify-content:center;gap:3px}
+  .pan-h .m{display:flex;align-items:center;gap:6px;text-transform:none;letter-spacing:0;color:var(--text);font-size:13px;font-weight:700}
+  .pan-h .m .sc{color:var(--accent);font-weight:800}
+  .pan-list{position:relative}
+  .pan-row{position:absolute;left:0;right:0;height:34px;display:grid;grid-template-columns:24px 24px 1fr auto;align-items:center;gap:8px;padding:0 10px;transition:top .34s cubic-bezier(.22,.9,.36,1),background .15s;border-radius:8px}
+  .pan-row .pp{font-size:12px;font-weight:800;color:var(--text-mute);text-align:right;font-variant-numeric:tabular-nums}
+  .pan-row .nm{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pan-row .pt{font-size:12.5px;font-weight:800;font-variant-numeric:tabular-nums}
+  .pan-row.hot{background:rgba(255,255,255,.07)}
+  .pan-foot{padding:7px 12px;border-top:1px solid var(--line);font-size:11.5px;color:var(--text-mute)}
+
+  /* ===== mobile frames ===== */
+  .phones{display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start}
+  .phone{width:330px;flex:none}
+  .phone .cap{font-size:12.5px;color:var(--text-mute);margin-bottom:8px;text-align:center}
+  .phone .scr{background:#101012;border:7px solid #000;border-radius:30px;padding:14px 12px;box-shadow:0 18px 50px rgba(0,0,0,.5);height:620px;overflow:hidden;position:relative}
+  .m-title{font-size:16px;font-weight:800;margin-bottom:2px}
+  .m-kick{font-size:11px;color:var(--text-mute);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px}
+  .m-tabs{display:flex;gap:6px;margin-bottom:12px}
+  .m-tab{font-size:12px;font-weight:700;color:var(--text-dim);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:5px 11px}
+  .m-tab.on{background:var(--accent-dim);border-color:var(--accent);color:var(--accent-bright)}
+
+  /* mobile race */
+  .mr-scrub{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+  .mr-play{width:34px;height:34px;border-radius:50%;background:var(--accent);color:#111;font-size:13px;font-weight:800;display:grid;place-items:center;flex:none}
+  .mr-range{flex:1;accent-color:var(--accent);height:4px}
+  .mr-when{font-size:11.5px;color:var(--text-dim);margin-bottom:10px;min-height:34px}
+  .mr-when b{color:var(--text)}
+  .mr-stage{position:relative}
+  .mr-row{position:absolute;left:0;right:0;height:42px;display:grid;grid-template-columns:26px 30px 1fr auto auto;align-items:center;gap:8px;transition:top .42s cubic-bezier(.22,.9,.36,1),opacity .3s}
+  .mr-pos{font-size:14px;font-weight:800;color:var(--text-mute);text-align:right;font-variant-numeric:tabular-nums}
+  .mr-nm{font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mr-pt{font-size:13px;font-weight:800;font-variant-numeric:tabular-nums}
+  .mr-d{font-size:11px;font-weight:800;width:26px;text-align:right}
+  .mr-d.up{color:var(--positive)} .mr-d.dn{color:var(--red)} .mr-d.eq{color:var(--text-mute)}
+  .mr-row.me{background:var(--accent-dim);border-radius:9px}
+
+  /* mobile sparklines */
+  .ms-row{display:grid;grid-template-columns:28px 1fr 84px auto;align-items:center;gap:9px;padding:9px 4px;border-bottom:1px solid var(--line)}
+  .ms-nm{font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ms-nm small{display:block;font-size:11px;color:var(--text-mute);font-weight:600}
+  .ms-pos{font-size:15px;font-weight:800;font-variant-numeric:tabular-nums}
+  .ms-d{font-size:11px;font-weight:800}
+  .ms-d.up{color:var(--positive)} .ms-d.dn{color:var(--red)} .ms-d.eq{color:var(--text-mute)}
+  .ms-row.me{background:var(--accent-dim);border-radius:10px;border-bottom-color:transparent;padding-left:8px;padding-right:8px}
+
+  /* mobile bump + sheet */
+  .mb-chart{position:relative}
+  .mb-sheet{position:absolute;left:8px;right:8px;bottom:8px;background:rgba(14,14,16,.97);border:1px solid var(--line-strong);border-radius:14px;padding:10px 12px;box-shadow:0 -8px 30px rgba(0,0,0,.5)}
+  .mb-sheet .sh{font-size:11px;font-weight:800;color:var(--text-mute);text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px}
+  .mb-sheet .r{display:grid;grid-template-columns:22px 22px 1fr auto;align-items:center;gap:7px;padding:2px 0;font-size:13px}
+  .mb-sheet .r .p{font-weight:800;font-variant-numeric:tabular-nums;color:var(--text-mute);font-size:11.5px;text-align:right}
+  .mb-grab{width:36px;height:4px;border-radius:2px;background:var(--line-strong);margin:0 auto 8px}
+
+  .verdict{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin-top:36px}
+  .vcard{background:var(--bg-main);border:1px solid var(--line);border-radius:12px;padding:16px}
+  .vcard h4{font-size:14px;font-weight:800;margin-bottom:8px}
+  .vcard ul{list-style:none;display:grid;gap:6px}
+  .vcard li{font-size:12.5px;color:var(--text-dim);padding-left:18px;position:relative}
+  .vcard li.y::before{content:'✓';color:var(--positive);position:absolute;left:0;font-weight:800}
+  .vcard li.n::before{content:'✕';color:var(--red);position:absolute;left:0;font-weight:800}
+  hr.sep{border:none;border-top:1px solid var(--line);margin:34px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="intro">
+    <h1>Ranking v2 — altura dinâmica · rótulos = hover · mobile</h1>
+    <p>As três mudanças pedidas, prototipadas: <b>(1)</b> o gráfico só cresce com <b>quantos jogadores estão selecionados</b>
+       (poucos → baixinho); <b>(2)</b> o <b>painel de nomes é o próprio hover</b> — passar o mouse numa linha torna a lista
+       dinâmica (posições/pontos daquele jogo) e acende a linha; <b>(3)</b> repensar o <b>mobile</b>.</p>
+    <p class="note">Dados fictícios (40 jogadores, jogo a jogo). <b>Você</b> (amarelo) está em ~20º. Mude a seleção pra ver a
+       altura mudar; passe o mouse no gráfico (desktop) ou arraste o controle (mobile). Escolha <b>1 desktop + 1 mobile</b>.</p>
+  </div>
+
+  <nav class="toc">
+    <a href="#da">Desktop A · Painel vivo</a>
+    <a href="#db">Desktop B · Rótulos na linha</a>
+    <a href="#ma">Mobile A · Corrida</a>
+    <a href="#mb">Mobile B · Sparklines</a>
+    <a href="#mc">Mobile C · Bump + ficha</a>
+    <span class="pill">protótipo — dados fictícios</span>
+  </nav>
+
+  <section class="proto" id="da">
+    <div class="head"><span class="tag">DESKTOP A</span><h2>Painel vivo (recomendado)</h2></div>
+    <p class="sub">O gráfico fica enxuto (altura ∝ nº de selecionados) e os nomes saem de cima das linhas pra um
+       <b>painel à direita</b>. Em repouso ele mostra a classificação final; ao passar o mouse, o painel <b>vira o hover</b>:
+       reordena pro jogo sob o cursor, mostra os pontos e <span class="win">destaca a linha apontada</span>. Sem tooltip flutuante.</p>
+    <div class="panel"><div id="daMount"></div></div>
+  </section>
+
+  <section class="proto" id="db">
+    <div class="head"><span class="tag alt">DESKTOP B</span><h2>Rótulos na linha que viram dinâmicos</h2></div>
+    <p class="sub">Mantém o nome <b>cravado na ponta de cada linha</b> (leitura direta), mas sem tooltip: ao passar o mouse,
+       os próprios rótulos <b>viram dinâmicos</b> — número e pontos mudam pro jogo sob o cursor e a linha apontada acende.
+       Também com altura dinâmica.</p>
+    <div class="panel"><div id="dbMount"></div></div>
+  </section>
+
+  <hr class="sep">
+  <div class="head"><h2>Mobile — 3 caminhos</h2></div>
+  <p class="sub">Linha-espaguete não cabe num celular. As três trocam o “seguir 40 linhas finas” por algo tátil.
+     Todas respeitam: poucos selecionados → compacto; e a leitura é por <b>toque/arraste</b>, não por mira fina.</p>
+
+  <div class="phones">
+    <div class="phone" id="ma">
+      <div class="cap"><b>Mobile A · Corrida</b> — arrasta o tempo, a lista ultrapassa</div>
+      <div class="scr"><div id="mA"></div></div>
+    </div>
+    <div class="phone" id="mb">
+      <div class="cap"><b>Mobile B · Sparklines</b> — uma linha mini por jogador</div>
+      <div class="scr"><div id="mB"></div></div>
+    </div>
+    <div class="phone" id="mc">
+      <div class="cap"><b>Mobile C · Bump + ficha</b> — gráfico pequeno, ficha embaixo</div>
+      <div class="scr"><div id="mC"></div></div>
+    </div>
+  </div>
+
+  <div class="verdict">
+    <div class="vcard"><h4>Desktop A · Painel vivo</h4><ul>
+      <li class="y">Hover nunca cobre as linhas (painel fixo)</li>
+      <li class="y">Rótulos = hover, de verdade</li>
+      <li class="y">Altura dinâmica fácil (nomes saíram do plot)</li>
+      <li class="n">Vínculo linha↔nome é por cor/realce, não espacial</li>
+    </ul></div>
+    <div class="vcard"><h4>Desktop B · Rótulos na linha</h4><ul>
+      <li class="y">Leitura direta (nome na ponta)</li>
+      <li class="y">Sem painel extra — mais largura pro gráfico</li>
+      <li class="n">Rótulos se mexem ao reordenar no hover</li>
+      <li class="n">Seleção larga reaperta as pontas</li>
+    </ul></div>
+    <div class="vcard"><h4>Mobile</h4><ul>
+      <li class="y"><b>A Corrida</b>: tátil, conta a virada, escala bem</li>
+      <li class="y"><b>B Sparklines</b>: tudo de relance, sem tangle</li>
+      <li class="y"><b>C Bump+ficha</b>: mantém o gráfico, ficha no toque</li>
+    </ul></div>
+  </div>
+</div>
+
+<script>
+'use strict';
+// ============== dados fictícios ==============
+function mb(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+const rnd=mb(20260615);
+const clamp=(v,lo,hi)=>Math.max(lo,Math.min(hi,v));
+const N=40, GAMES=13;
+const FIRST=['Akemi','Sussumu','João Paulo','Elda','Gigio','Zeppa','Fabiana','Diniz','Sergio','Luriza','Meirelles','Trevisan','Bingão','Luís H.','Pavie','Helena','Tita','Silvinho','Soneca','Chico','Gabriel','Bia','Caio','Nina','Diego','Elis','Fábio','Lulion','Mateus','Gobel','Marcus','Buchecha','Leco','Ana','Bruno','Igor','Júlia','Lucas','Rafa','Sofia'];
+const TEAMS=[['Suécia','🇸🇪'],['Tunísia','🇹🇳'],['Brasil','🇧🇷'],['Japão','🇯🇵'],['França','🇫🇷'],['México','🇲🇽'],['Espanha','🇪🇸'],['Croácia','🇭🇷'],['Marrocos','🇲🇦'],['EUA','🇺🇸'],['Portugal','🇵🇹'],['Holanda','🇳🇱']];
+const players=[];
+for(let i=0;i<N;i++) players.push({id:'p'+i,name:FIRST[i%FIRST.length],skill:.2+rnd()*.7});
+const matches=[];
+for(let g=0;g<GAMES;g++){const h=TEAMS[(g*2)%TEAMS.length];let a=TEAMS[(g*2+5)%TEAMS.length];if(a===h)a=TEAMS[(g+1)%TEAMS.length];matches.push({h,a,sh:Math.floor(rnd()*5),sa:Math.floor(rnd()*3),day:11+Math.floor(g/2)});}
+const cum=players.map(()=>[0]);
+for(let g=0;g<GAMES;g++)for(let i=0;i<N;i++){const sk=players[i].skill,r=rnd();let p=0;if(r<.05+.08*sk)p=18;else if(r<.2+.12*sk)p=12;else if(r<.4+.16*sk)p=10;else if(r<.62)p=5;cum[i].push(cum[i][g]+p);}
+const pos=players.map(()=>new Array(GAMES));
+for(let s=0;s<GAMES;s++){const c=players.map((_,i)=>({i,p:cum[i][s+1]}));c.sort((a,b)=>b.p-a.p||a.i-b.i);c.forEach((e,r)=>pos[e.i][s]=r+1);}
+const finalOrder=players.map((_,i)=>i).sort((a,b)=>pos[a][GAMES-1]-pos[b][GAMES-1]);
+const ME=finalOrder[19];                       // "Você" ~20º
+players[ME].name='Você'; players[ME].me=true;
+const ME_C='#f4c430';
+const PAL=['#1DB954','#4aa3ff','#f15e6c','#b07cff','#ff9f43','#2dd4bf','#ff6fb5','#9ccc65','#7e9cff','#ffa94d','#5ad1c9','#c98cff','#67b7ff','#ff7a7a','#74c0fc','#63e6be','#e599f7'];
+const colorOf=i=>players[i].me?ME_C:PAL[finalOrder.indexOf(i)%PAL.length];
+const initials=n=>n==='Você'?'V':n.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+const avatar=(i,cls='')=>`<span class="av ${cls}" style="color:${colorOf(i)}">${initials(players[i].name)}</span>`;
+const finalPos=i=>pos[i][GAMES-1];
+const matchLine=g=>{const m=matches[g];return `${m.h[1]} ${m.h[0]} <span class="sc">${m.sh}–${m.sa}</span> ${m.a[0]} ${m.a[1]}`;};
+
+const presets={podio:()=>new Set([ME,...finalOrder.slice(0,3)]),top10:()=>new Set([ME,...finalOrder.slice(0,10)]),todos:()=>new Set(finalOrder.slice(0,24))};
+
+// altura dinâmica: ∝ nº de selecionados
+const dynH=n=>clamp(Math.round(96+24*n),150,560);
+
+// ============== DESKTOP A — bump + painel vivo ==============
+(function(){
+  const mount=document.getElementById('daMount');
+  let sel=presets.podio(), hov=null;
+  mount.innerHTML=`
+    <div class="ctl">
+      <button class="chip" data-p="podio">🏆 Pódio + Você <b style="opacity:.6">(4)</b></button>
+      <button class="chip" data-p="top10">≣ Top 10 <b style="opacity:.6">(11)</b></button>
+      <button class="chip" data-p="todos">+ muitos <b style="opacity:.6">(24)</b></button>
+    </div>
+    <div class="da-grid">
+      <div class="da-chart" id="daChart"></div>
+      <div class="pan"><div class="pan-h" id="daH"></div><div class="pan-list" id="daL"></div><div class="pan-foot" id="daF"></div></div>
+    </div>
+    <p class="hint">Altura do gráfico muda com a seleção. Passe o mouse: o painel à direita vira o “hover”.</p>`;
+  const chart=mount.querySelector('#daChart');
+  mount.querySelectorAll('.chip').forEach(b=>b.addEventListener('click',()=>{sel=presets[b.dataset.p]();hov=null;draw();}));
+  let geo=null;
+  function draw(){
+    const ids=[...sel];
+    const n=ids.length;
+    const W=chart.clientWidth||640, H=dynH(n);
+    const PADl=30,PADr=14,PADt=16,PADb=22;
+    let rLo=Infinity,rHi=-Infinity;
+    ids.forEach(i=>{for(let g=0;g<GAMES;g++){const p=pos[i][g];if(p<rLo)rLo=p;if(p>rHi)rHi=p;}});
+    rLo=Math.max(1,rLo-1);rHi=rHi+1;
+    const span=Math.max(1,rHi-rLo);
+    const x0=PADl+4,x1=W-PADr,plotH=H-PADt-PADb;
+    const xAt=g=>x0+(x1-x0)*(g/(GAMES-1));
+    const yAt=p=>PADt+(p-rLo)/span*plotH;
+    geo={x0,x1,xAt,yAt,W,H,plotH,PADt};
+    let g='';
+    for(let p=rLo;p<=rHi;p+=Math.max(1,Math.ceil(span/6))){g+=`<line class="grid" x1="${x0}" y1="${yAt(p).toFixed(1)}" x2="${x1}" y2="${yAt(p).toFixed(1)}"/>`;g+=`<text class="yl" x="${PADl-6}" y="${(yAt(p)+4).toFixed(1)}" text-anchor="end">${p}º</text>`;}
+    for(let gi=0;gi<GAMES;gi+=Math.ceil(GAMES/5)){g+=`<text class="xl" x="${xAt(gi).toFixed(1)}" y="${(H-7).toFixed(1)}" text-anchor="middle">J${gi+1}</text>`;}
+    let lines='';
+    ids.forEach(i=>{const pts=pos[i].map((p,gi)=>`${xAt(gi).toFixed(1)},${yAt(p).toFixed(1)}`).join(' ');const cls='ln'+(hov!=null?(i===hov?' hot':' dim'):'');lines+=`<polyline class="${cls}" stroke="${colorOf(i)}" style="--glow:${colorOf(i)}" points="${pts}" data-i="${i}"/>`;});
+    chart.innerHTML=`<svg class="chart-svg" height="${H}" viewBox="0 0 ${W} ${H}">${g}${lines}<line class="cross" x1="0" y1="${PADt}" x2="0" y2="${PADt+plotH}" hidden/><g class="dots"></g><rect x="${x0}" y="${PADt}" width="${x1-x0}" height="${plotH}" fill="transparent" class="hit"/></svg>`;
+    bindHover();
+    renderPanel(hovGame());
+  }
+  let curGame=GAMES-1;
+  function hovGame(){return curGame;}
+  function bindHover(){
+    const svg=chart.querySelector('svg'),hit=chart.querySelector('.hit'),cross=chart.querySelector('.cross'),dots=chart.querySelector('.dots');
+    function move(e){
+      const r=svg.getBoundingClientRect();if(!r.width)return;
+      const cx=(e.touches?e.touches[0].clientX:e.clientX),cy=(e.touches?e.touches[0].clientY:e.clientY);
+      const xv=(cx-r.left)/r.width*geo.W, yv=(cy-r.top)/r.height*geo.H;
+      const gi=clamp(Math.round((xv-geo.x0)/(geo.x1-geo.x0)*(GAMES-1)),0,GAMES-1);
+      curGame=gi;
+      // linha mais próxima
+      let best=-1,bd=1e9;[...sel].forEach(i=>{const d=Math.abs(geo.yAt(pos[i][gi])-yv);if(d<bd){bd=d;best=i;}});
+      hov=best;
+      cross.removeAttribute('hidden');cross.setAttribute('x1',geo.xAt(gi));cross.setAttribute('x2',geo.xAt(gi));
+      svg.querySelectorAll('.ln').forEach(pl=>{const i=+pl.dataset.i;pl.classList.toggle('hot',i===hov);pl.classList.toggle('dim',i!==hov);});
+      dots.innerHTML=[...sel].map(i=>`<circle cx="${geo.xAt(gi).toFixed(1)}" cy="${geo.yAt(pos[i][gi]).toFixed(1)}" r="${i===hov?5:3.5}" fill="${colorOf(i)}"/>`).join('');
+      renderPanel(gi,true);
+    }
+    function leave(){hov=null;curGame=GAMES-1;cross.setAttribute('hidden','');dots.innerHTML='';svg.querySelectorAll('.ln').forEach(pl=>pl.classList.remove('hot','dim'));renderPanel(GAMES-1,false);}
+    hit.addEventListener('mousemove',move);hit.addEventListener('mouseleave',leave);
+    hit.addEventListener('touchmove',e=>{move(e);},{passive:true});hit.addEventListener('touchend',leave);
+  }
+  // painel persistente (reordena suave)
+  const rowEls=new Map();
+  function renderPanel(gi,hovering){
+    const H=mount.querySelector('#daH'),L=mount.querySelector('#daL'),F=mount.querySelector('#daF');
+    const ids=[...sel].sort((a,b)=>pos[a][gi]-pos[b][gi]);
+    H.innerHTML=hovering?`<div>Jogo ${gi+1} · ${matches[gi].day}/6</div><div class="m">${matchLine(gi)}</div>`:`<div>Classificação atual</div><div class="m" style="color:var(--text-mute);font-weight:600">passe o mouse no gráfico →</div>`;
+    L.style.height=(ids.length*34)+'px';
+    // cria/atualiza linhas persistentes
+    const present=new Set(ids);
+    [...rowEls.keys()].forEach(i=>{if(!present.has(i)){rowEls.get(i).remove();rowEls.delete(i);}});
+    ids.forEach((i,r)=>{
+      let el=rowEls.get(i);
+      if(!el){el=document.createElement('div');el.className='pan-row';L.appendChild(el);rowEls.set(i,el);el.style.top=(r*34)+'px';}
+      el.style.top=(r*34)+'px';
+      el.classList.toggle('hot',hovering&&i===hov);
+      el.style.color=colorOf(i);
+      el.innerHTML=`<span class="pp">${pos[i][gi]}º</span>${avatar(i,'sm')}<span class="nm" style="color:${i===hov&&hovering?colorOf(i):'var(--text)'}">${players[i].name}</span><span class="pt" style="color:${colorOf(i)}">${cum[i][gi+1]}</span>`;
+    });
+    F.textContent=`${ids.length} selecionados · altura do gráfico ${dynH(ids.length)}px`;
+  }
+  draw();
+  window.addEventListener('resize',draw);
+})();
+
+// ============== DESKTOP B — rótulos na linha, dinâmicos ==============
+(function(){
+  const mount=document.getElementById('dbMount');
+  let sel=presets.podio(),hov=null,curGame=GAMES-1,hovering=false;
+  mount.innerHTML=`
+    <div class="ctl">
+      <button class="chip" data-p="podio">🏆 Pódio + Você</button>
+      <button class="chip" data-p="top10">≣ Top 10</button>
+      <button class="chip" data-p="todos">+ muitos</button>
+    </div>
+    <div id="dbChart" style="position:relative"></div>
+    <p class="hint">Os nomes ficam na ponta da linha; ao passar o mouse, viram dinâmicos (posição/pontos do jogo) e a linha apontada acende.</p>`;
+  const chart=mount.querySelector('#dbChart');
+  mount.querySelectorAll('.chip').forEach(b=>b.addEventListener('click',()=>{sel=presets[b.dataset.p]();hov=null;hovering=false;curGame=GAMES-1;draw();}));
+  let geo=null;
+  function draw(){
+    const ids=[...sel],n=ids.length;
+    const W=chart.clientWidth||640,H=dynH(n);
+    const PADl=30,PADr=150,PADt=16,PADb=22;
+    let rLo=Infinity,rHi=-Infinity;ids.forEach(i=>{for(let g=0;g<GAMES;g++){const p=pos[i][g];if(p<rLo)rLo=p;if(p>rHi)rHi=p;}});
+    rLo=Math.max(1,rLo-1);rHi=rHi+1;const span=Math.max(1,rHi-rLo);
+    const x0=PADl+4,x1=W-PADr,plotH=H-PADt-PADb;
+    const xAt=g=>x0+(x1-x0)*(g/(GAMES-1)),yAt=p=>PADt+(p-rLo)/span*plotH;
+    geo={x0,x1,xAt,yAt,W,H,plotH,PADt,rLo,span};
+    let g='';
+    for(let p=rLo;p<=rHi;p+=Math.max(1,Math.ceil(span/6))){g+=`<line class="grid" x1="${x0}" y1="${yAt(p).toFixed(1)}" x2="${x1}" y2="${yAt(p).toFixed(1)}"/>`;g+=`<text class="yl" x="${PADl-6}" y="${(yAt(p)+4).toFixed(1)}" text-anchor="end">${p}º</text>`;}
+    let lines='';
+    ids.forEach(i=>{const pts=pos[i].map((p,gi)=>`${xAt(gi).toFixed(1)},${yAt(p).toFixed(1)}`).join(' ');const cls='ln'+(hovering?(i===hov?' hot':' dim'):'');lines+=`<polyline class="${cls}" stroke="${colorOf(i)}" style="--glow:${colorOf(i)}" points="${pts}" data-i="${i}"/>`;});
+    chart.innerHTML=`<svg class="chart-svg" height="${H}" viewBox="0 0 ${W} ${H}">${g}${lines}<line class="cross" x1="0" y1="${PADt}" x2="0" y2="${PADt+plotH}" hidden/><g class="dots"></g><g class="endg" id="dbEnd"></g><rect x="${x0}" y="${PADt}" width="${x1-x0}" height="${plotH}" fill="transparent" class="hit"/></svg>`;
+    renderEnds(curGame,hovering);bind();
+  }
+  function render_layout(gi){ // anti-colisão simples só pros rótulos
+    const ids=[...sel].map(i=>({i,y:geo.yAt(pos[i][gi])})).sort((a,b)=>a.y-b.y);
+    let prev=-1e9;ids.forEach(o=>{o.y=Math.max(o.y,prev+22);prev=o.y;});
+    return ids;
+  }
+  function renderEnds(gi,hovering){
+    const G=chart.querySelector('#dbEnd');if(!G)return;
+    const lay=render_layout(gi);
+    G.innerHTML=lay.map(o=>{const i=o.i,c=colorOf(i);const y=o.y;const dim=hovering&&i!==hov?.4:1;
+      return `<g opacity="${dim}"><circle cx="${geo.x1+12}" cy="${y.toFixed(1)}" r="9" fill="var(--card-elev)" stroke="${c}" stroke-width="2"/><text x="${geo.x1+12}" y="${(y+3).toFixed(1)}" text-anchor="middle" fill="${c}" style="font-size:8px;font-weight:800">${initials(players[i].name)}</text>`+
+      `<text class="end" x="${geo.x1+26}" y="${(y+4).toFixed(1)}" fill="${c}">${pos[i][gi]}º ${players[i].name} <tspan style="opacity:.7">${cum[i][gi+1]}pt</tspan></text></g>`;}).join('');
+  }
+  function bind(){
+    const svg=chart.querySelector('svg'),hit=chart.querySelector('.hit'),cross=chart.querySelector('.cross'),dots=chart.querySelector('.dots');
+    function move(e){const r=svg.getBoundingClientRect();if(!r.width)return;
+      const cx=(e.touches?e.touches[0].clientX:e.clientX),cy=(e.touches?e.touches[0].clientY:e.clientY);
+      const xv=(cx-r.left)/r.width*geo.W,yv=(cy-r.top)/r.height*geo.H;
+      const gi=clamp(Math.round((xv-geo.x0)/(geo.x1-geo.x0)*(GAMES-1)),0,GAMES-1);curGame=gi;hovering=true;
+      let best=-1,bd=1e9;[...sel].forEach(i=>{const d=Math.abs(geo.yAt(pos[i][gi])-yv);if(d<bd){bd=d;best=i;}});hov=best;
+      cross.removeAttribute('hidden');cross.setAttribute('x1',geo.xAt(gi));cross.setAttribute('x2',geo.xAt(gi));
+      svg.querySelectorAll('.ln').forEach(pl=>{const i=+pl.dataset.i;pl.classList.toggle('hot',i===hov);pl.classList.toggle('dim',i!==hov);});
+      dots.innerHTML=[...sel].map(i=>`<circle cx="${geo.xAt(gi).toFixed(1)}" cy="${geo.yAt(pos[i][gi]).toFixed(1)}" r="${i===hov?5:3.5}" fill="${colorOf(i)}"/>`).join('');
+      renderEnds(gi,true);
+    }
+    function leave(){hovering=false;hov=null;curGame=GAMES-1;cross.setAttribute('hidden','');dots.innerHTML='';svg.querySelectorAll('.ln').forEach(pl=>pl.classList.remove('hot','dim'));renderEnds(GAMES-1,false);}
+    hit.addEventListener('mousemove',move);hit.addEventListener('mouseleave',leave);hit.addEventListener('touchmove',e=>move(e),{passive:true});hit.addEventListener('touchend',leave);
+  }
+  draw();window.addEventListener('resize',draw);
+})();
+
+// ============== MOBILE A — corrida (scrub + lista) ==============
+(function(){
+  const mount=document.getElementById('mA');
+  let sel=[...presets.top10()],step=GAMES-1,playing=false,timer=null;
+  mount.innerHTML=`
+    <div class="m-title">Evolução do ranking</div><div class="m-kick">Top 10 + Você · arraste o tempo</div>
+    <div class="mr-scrub"><button class="mr-play" id="aPlay">▶</button><input class="mr-range" id="aR" type="range" min="0" max="${GAMES-1}" value="${GAMES-1}"></div>
+    <div class="mr-when" id="aW"></div>
+    <div class="mr-stage" id="aS" style="height:${sel.length*42}px"></div>`;
+  const stage=mount.querySelector('#aS'),when=mount.querySelector('#aW'),range=mount.querySelector('#aR'),play=mount.querySelector('#aPlay');
+  const rows=new Map();
+  sel.forEach(i=>{const el=document.createElement('div');el.className='mr-row'+(players[i].me?' me':'');el.innerHTML=`<span class="mr-pos"></span>${avatar(i)}<span class="mr-nm">${players[i].name}</span><span class="mr-pt"></span><span class="mr-d"></span>`;stage.appendChild(el);rows.set(i,el);});
+  function upd(){
+    const ord=[...sel].sort((a,b)=>pos[a][step]-pos[b][step]);
+    ord.forEach((i,r)=>{const el=rows.get(i);el.style.top=(r*42)+'px';
+      el.querySelector('.mr-pos').textContent=pos[i][step]+'º';
+      el.querySelector('.mr-pt').textContent=cum[i][step+1]+'pt';
+      const prev=step>0?pos[i][step-1]:pos[i][step],d=prev-pos[i][step],dl=el.querySelector('.mr-d');
+      dl.textContent=d>0?'▲'+d:d<0?'▼'+(-d):'–';dl.className='mr-d '+(d>0?'up':d<0?'dn':'eq');});
+    const m=matches[step];when.innerHTML=`<b>Jogo ${step+1}</b> de ${GAMES} · ${m.day}/6<br>${matchLine(step)}`;range.value=step;
+  }
+  function tick(){if(step>=GAMES-1){stop();return;}step++;upd();}
+  function go(){if(step>=GAMES-1)step=-1;playing=true;play.textContent='❚❚';timer=setInterval(tick,560);}
+  function stop(){playing=false;play.textContent='▶';clearInterval(timer);}
+  play.addEventListener('click',()=>playing?stop():go());
+  range.addEventListener('input',()=>{stop();step=+range.value;upd();});
+  upd();
+})();
+
+// ============== MOBILE B — sparklines ==============
+(function(){
+  const mount=document.getElementById('mB');
+  const sel=[...presets.top10()].sort((a,b)=>finalPos(a)-finalPos(b));
+  function spark(i){const lo=Math.min(...pos[i]),hi=Math.max(...pos[i]);const w=80,h=26;const yA=p=>hi===lo?h/2:3+(h-6)*(p-lo)/(hi-lo);const xA=s=>2+(w-4)*s/(GAMES-1);const pts=pos[i].map((p,s)=>`${xA(s).toFixed(1)},${yA(p).toFixed(1)}`).join(' ');const now=pos[i][GAMES-1],then=pos[i][GAMES-1-4];const c=players[i].me?ME_C:now<then?'var(--positive)':now>then?'var(--red)':'#8a8a8e';return `<svg width="${w}" height="${h}"><polyline fill="none" stroke="${c}" stroke-width="2" stroke-linejoin="round" points="${pts}"/><circle cx="${xA(GAMES-1)}" cy="${yA(now)}" r="2.6" fill="${c}"/></svg>`;}
+  mount.innerHTML=`<div class="m-title">Evolução do ranking</div><div class="m-kick">Top 10 + Você</div>`+
+    sel.map(i=>{const now=pos[i][GAMES-1],then=pos[i][GAMES-1-4],d=then-now;const dc=d>0?'up':d<0?'dn':'eq',dt=d>0?'▲ '+d:d<0?'▼ '+(-d):'–';
+      return `<div class="ms-row${players[i].me?' me':''}"><span class="ms-pos" style="color:${colorOf(i)}">${now}º</span><div><div class="ms-nm">${players[i].name}<small>${cum[i][GAMES]} pts</small></div></div>${spark(i)}<span class="ms-d ${dc}">${dt}</span></div>`;}).join('');
+})();
+
+// ============== MOBILE C — bump pequeno + ficha ==============
+(function(){
+  const mount=document.getElementById('mC');
+  let sel=[...presets.top10()],step=GAMES-1;
+  mount.innerHTML=`<div class="m-title">Evolução do ranking</div><div class="m-kick">arraste no gráfico</div>
+    <div class="mb-chart" id="cChart"></div>`;
+  const chart=mount.querySelector('#cChart');
+  function draw(){
+    const W=chart.clientWidth||300,H=430,PADl=24,PADr=10,PADt=10,PADb=18;
+    let rLo=Infinity,rHi=-Infinity;sel.forEach(i=>{for(let g=0;g<GAMES;g++){const p=pos[i][g];if(p<rLo)rLo=p;if(p>rHi)rHi=p;}});rLo=Math.max(1,rLo-1);rHi=rHi+1;const span=Math.max(1,rHi-rLo);
+    const x0=PADl,x1=W-PADr,plotH=H-PADt-PADb,xAt=g=>x0+(x1-x0)*g/(GAMES-1),yAt=p=>PADt+(p-rLo)/span*plotH;
+    let lines=sel.map(i=>`<polyline fill="none" stroke="${colorOf(i)}" stroke-width="2.2" points="${pos[i].map((p,g)=>`${xAt(g).toFixed(1)},${yAt(p).toFixed(1)}`).join(' ')}"/>`).join('');
+    const xc=xAt(step);
+    const dots=sel.map(i=>`<circle cx="${xc.toFixed(1)}" cy="${yAt(pos[i][step]).toFixed(1)}" r="3.2" fill="${colorOf(i)}"/>`).join('');
+    chart.innerHTML=`<svg class="chart-svg" height="${H}" viewBox="0 0 ${W} ${H}">${lines}<line stroke="rgba(255,255,255,.3)" stroke-dasharray="3 3" x1="${xc}" y1="${PADt}" x2="${xc}" y2="${PADt+plotH}"/>${dots}<rect x="${x0}" y="${PADt}" width="${x1-x0}" height="${plotH}" fill="transparent" class="hit"/></svg>`+sheet();
+    const svg=chart.querySelector('svg'),hit=chart.querySelector('.hit');
+    function move(e){const r=svg.getBoundingClientRect();const cx=(e.touches?e.touches[0].clientX:e.clientX);const xv=(cx-r.left)/r.width*W;step=clamp(Math.round((xv-x0)/(x1-x0)*(GAMES-1)),0,GAMES-1);draw();}
+    hit.addEventListener('mousemove',move);hit.addEventListener('touchmove',e=>move(e),{passive:true});
+  }
+  function sheet(){
+    const ord=[...sel].sort((a,b)=>pos[a][step]-pos[b][step]).slice(0,6);
+    const m=matches[step];
+    return `<div class="mb-sheet"><div class="mb-grab"></div><div class="sh">Jogo ${step+1} · ${m.day}/6 · ${matchLine(step)}</div>`+
+      ord.map(i=>`<div class="r" style="color:${colorOf(i)}"><span class="p">${pos[i][step]}º</span>${avatar(i,'sm')}<span style="color:var(--text);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${players[i].name}</span><span style="font-weight:800;color:${colorOf(i)}">${cum[i][step+1]}</span></div>`).join('')+
+      `<div style="font-size:11px;color:var(--text-mute);margin-top:6px">+ ${sel.length-6} abaixo</div></div>`;
+  }
+  draw();window.addEventListener('resize',draw);
+})();
+</script>
+</body>
+</html>

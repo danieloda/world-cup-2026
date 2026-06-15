@@ -6,14 +6,14 @@
  *   - ADICIONA ~10 usuários voláteis, cada um com pico de pontuação numa fase
  *     diferente (ás dos grupos, ás das oitavas, rei da final + campeão, artilheiro,
  *     etc.) pra FORÇAR muitas viradas de posição ao longo da Copa.
- *   - valida no DOM (bump focado · zoom no foco 2026-06): SVG renderiza; foco
- *     colorido com eixo Y enquadrado nos selecionados (o espaguete cinza some
- *     com seleção ativa; padrão Pódio+Você); grade horizontal; legenda mostra, por
- *     série, o MESMO total do v_leaderboard (invariante "fim da série ==
- *     tabela"); muitas trocas de posição (geometria das polylines); zooms
- *     "Por semana"/"Jogos da semana"; seleção livre via legenda + presets como
- *     reset; hover com tooltip de standings + confronto; linha "Você" com glow;
- *     card "Sua jornada" no Início (KPIs com partida real + linha + dropdown).
+ *   - valida no DOM (v2 · altura dinâmica + painel vivo 2026-06): SVG renderiza;
+ *     foco colorido com eixo enquadrado nos selecionados (sem espaguete cinza;
+ *     padrão Pódio+Você); grade horizontal; legenda mostra, por série, o MESMO
+ *     total do v_leaderboard (invariante "fim da série == tabela"); muitas trocas
+ *     de posição (geometria das polylines); zooms "Por semana"/"Jogos da semana";
+ *     seleção livre via legenda + presets como reset; HOVER = PAINEL vivo (rótulos
+ *     viram o jogo apontado: reordena + confronto + destaque) — sem tooltip
+ *     flutuante; linha "Você" com glow; card "Sua jornada" no Início.
  *
  * MUTA o DB: cria usuários (paid) + palpites e roda recompute. Limpa tudo no
  * finally (apaga os vol-*@testuser.com e recomputa), voltando ao baseline.
@@ -240,29 +240,25 @@ try {
   check('preset "Pódio + Você" reseta a seleção',
     await page.locator('#rankChart polyline.rc-foc').count() === expFoc);
 
-  // (7) hover: linha-guia + tooltip de standings + confronto (zoom por jogo)
+  // (7) hover: o PAINEL vivo (= rótulos = hover) vira o jogo apontado, sem
+  //     tooltip flutuante — reordena, mostra o confronto e destaca a linha.
   await page.locator('#rankChart').scrollIntoViewIfNeeded();  // o handler lê e.clientX real → chart precisa estar no viewport
   const hit = page.locator('#rankChart .rc-hit').first();
   const box = await hit.boundingBox();
   // move em 2 passos (com steps) p/ garantir que o mousemove dispare em headless
   await page.mouse.move(box.x + box.width * 0.3, box.y + box.height * 0.5);
   await page.mouse.move(box.x + box.width * 0.55, box.y + box.height * 0.5, { steps: 8 });
-  await page.waitForFunction(() => {
-    const t = document.querySelector('#rankChart .rc-tip');
-    return t && !t.hidden && t.querySelector('.rc-tip-r');
-  }, { timeout: 5000 }).catch(() => {});
-  const tip = await page.evaluate(() => {
-    const t = document.querySelector('#rankChart .rc-tip');
-    return {
-      hidden: t?.hidden, rows: t ? t.querySelectorAll('.rc-tip-r').length : 0,
-      hasMatch: !!t?.querySelector('.rc-tip-match'),
-      side: t?.classList.contains('rc-tip-side'),               // 1366px → calha lateral
-      tipping: !!document.querySelector('#rankChart .rc-svg.rc-tipping'),  // rótulos de ponta apagam
-    };
-  });
-  check('hover: tooltip aparece com standings do foco', tip.hidden === false && tip.rows > 0, `linhas no tip=${tip.rows}`);
-  check('hover (jogos da semana): header mostra o confronto', tip.hasMatch);
-  check('hover: card ANCORADO na calha (sai de cima das linhas) + rótulos apagam', tip.side === true && tip.tipping === true);
+  await page.waitForFunction(() =>
+    !!document.querySelector('#rankChart .rc-pan-h .rc-tip-match'), null, { timeout: 5000 }).catch(() => {});
+  const pan = await page.evaluate(() => ({
+    panel: !!document.querySelector('#rankChart .rc-panel'),
+    rows: document.querySelectorAll('#rankChart .rc-pan-row').length,
+    hasMatch: !!document.querySelector('#rankChart .rc-pan-h .rc-tip-match'),
+    hot: document.querySelectorAll('#rankChart .rc-pan-row.hot').length,
+  }));
+  check('hover: painel vivo com standings do foco (= rótulos = hover)', pan.panel && pan.rows === expFoc, `rows=${pan.rows} exp=${expFoc}`);
+  check('hover (jogos da semana): painel mostra o confronto', pan.hasMatch);
+  check('hover: linha apontada destacada no painel (.hot)', pan.hot === 1, `hot=${pan.hot}`);
   await page.locator('#rankChart').screenshot({ path: join(shotsDir, 'rank-chart-hover.png') }).catch(() => {});
 
   // (7-neon) a linha sob o cursor acende em neon (.hot); as outras do foco apagam

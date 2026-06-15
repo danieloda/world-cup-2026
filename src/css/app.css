@@ -5487,6 +5487,46 @@ input[type="number"].score-input {
 .rc-svg { display: block; max-width: 100%; touch-action: none; }
 .rc-loading { color: var(--text-mute); font-size: 13.5px; padding: 28px 6px; }
 
+/* ---- v2: corpo (desktop = gráfico + painel vivo · mobile = sparklines) ---- */
+.rc-body { width: 100%; }
+.rc-main { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: start; }
+.rc-chartwrap { position: relative; min-width: 0; }
+
+/* painel vivo (= rótulos = hover) */
+.rc-panel { background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.rc-pan-h {
+  padding: 9px 12px; border-bottom: 1px solid var(--line);
+  min-height: 52px; display: flex; flex-direction: column; justify-content: center; gap: 3px;
+}
+.rc-pan-k { font-size: 11.5px; font-weight: 700; color: var(--text-mute); text-transform: uppercase; letter-spacing: .04em; }
+.rc-pan-hint { font-size: 12.5px; font-weight: 600; color: var(--text-mute); }
+.rc-pan-h .rc-tip-match { margin: 0; padding: 0; border: 0; font-size: 13px; }
+.rc-pan-list { position: relative; }
+.rc-pan-row {
+  position: absolute; left: 0; right: 0; height: 34px;
+  display: grid; grid-template-columns: 28px 26px 1fr auto; align-items: center; gap: 8px;
+  padding: 0 10px; border-radius: 8px; border: 1px solid transparent;
+  transition: top .34s cubic-bezier(.22,.9,.36,1), background .15s ease;
+}
+.rc-pan-row.hot { background: rgba(255, 255, 255, .07); }
+.rc-pan-pos { font-size: 12px; font-weight: 800; color: var(--text-mute); text-align: right; font-variant-numeric: tabular-nums; }
+.rc-pan-nm { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rc-pan-pt { font-size: 12.5px; font-weight: 800; font-variant-numeric: tabular-nums; }
+
+/* mobile: sparklines (uma mini-trajetória por jogador) */
+.rc-sparks { display: flex; flex-direction: column; }
+.rc-spark-row {
+  display: grid; grid-template-columns: 30px 26px 1fr auto auto; align-items: center; gap: 9px;
+  padding: 9px 4px; border-bottom: 1px solid var(--line);
+}
+.rc-spark-row.me { background: var(--accent-dim); border-bottom-color: transparent; border-radius: 10px; padding-left: 8px; padding-right: 8px; }
+.rc-spark-pos { font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.rc-spark-nm { font-size: 13.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.rc-spark-nm small { display: block; font-size: 11px; color: var(--text-mute); font-weight: 600; }
+.rc-spark-svg { flex: none; }
+.rc-spark-d { font-size: 11.5px; font-weight: 800; white-space: nowrap; }
+.rc-spark-d.up { color: var(--positive); } .rc-spark-d.dn { color: var(--red); } .rc-spark-d.eq { color: var(--text-mute); }
+
 .rc-ylbl, .rc-xlbl { fill: var(--text-mute); font-size: 12px; font-family: var(--font); }
 
 /* faixas de fase no fundo do plot */
