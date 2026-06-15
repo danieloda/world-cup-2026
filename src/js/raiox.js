@@ -598,11 +598,18 @@ function renderCampaignBlock(team, qualifiers, role) {
     </div>`;
 }
 
-// Legenda compacta dos dois lados (verde = mandante, vermelho = visitante).
-function qualLegend(homeTeam, awayTeam) {
-  return `<div class="rx-qlegend">
-    <span class="rx-qleg home"><span class="flag">${flag(homeTeam)}</span>${escapeHtml(teamPt(homeTeam))}</span>
-    <span class="rx-qleg away"><span class="flag">${flag(awayTeam)}</span>${escapeHtml(teamPt(awayTeam))}</span>
+// Tem repescagem (bracket) este time? (mesma condição do renderPlayoffBlock.)
+function hasPlayoff(qualifiers, team) {
+  const rec = qualifiers?.teams?.[team];
+  return !!(rec?.playoff && qualifiers?.brackets?.[rec.playoff]);
+}
+
+// Nota pro lado que NÃO passou por repescagem — pareia a coluna com o bracket de
+// repescagem do outro lado, quando os dois grupos aparecem lado a lado.
+function renderNoPlayoffNote() {
+  return `<div class="rx-qnopo">
+    <span class="rx-qnopo-ic" aria-hidden="true">✓</span>
+    <span class="rx-qnopo-txt"><b>Sem repescagem</b><span>Classificou direto pela tabela</span></span>
   </div>`;
 }
 
@@ -612,20 +619,30 @@ export function renderQualifiersBlock(homeTeam, awayTeam, qualifiers, { label = 
   if (!okH && !okA) return '';
   const recH = qualifiers.teams[homeTeam], recA = qualifiers.teams[awayTeam];
 
-  // Mesma confederação (tabela) → mostra UMA vez, destacando os dois lados
-  // (verde = mandante, vermelho = visitante).
+  // Mesma confederação (tabela) → uma COLUNA por seleção: o grupo dela em cima e,
+  // embaixo, o caminho da repescagem (ou a nota "sem repescagem", quando o OUTRO
+  // lado teve repescagem — pra alinhar as colunas). Destaque verde = mandante,
+  // vermelho = visitante (mesma linguagem do resto do Raio-X; sem legenda).
   if (okH && okA && recH.format === 'table' && recA.format === 'table'
       && recH.confederation === recA.confederation) {
     const conf = qualifiers.confederations[recH.confederation];
     const focus = new Map([[homeTeam, 'home'], [awayTeam, 'away']]);
+    const focusSet = new Set([homeTeam, awayTeam]);
+    const focusGroups = conf.groups.filter(g => g.rows.some(r => focusSet.has(r.team)));
+    const groups = focusGroups.length ? focusGroups : conf.groups;
+    const anyPO = hasPlayoff(qualifiers, homeTeam) || hasPlayoff(qualifiers, awayTeam);
+
+    const cols = groups.map(g => {
+      const teamsHere = [homeTeam, awayTeam].filter(t => g.rows.some(r => r.team === t));
+      const po = anyPO
+        ? teamsHere.map(t => renderPlayoffBlock(t, qualifiers) || renderNoPlayoffNote()).join('')
+        : '';
+      return `<div class="rx-qcol">${renderQualGroupCard(g, focus, qualifiers)}${po}</div>`;
+    }).join('');
+
     return `
       ${label ? `<div class="ctx-section-label">Eliminatórias <span class="ctx-section-sub">${escapeHtml(conf.namePt)}</span></div>` : ''}
-      <div class="rx-qual">
-        ${qualLegend(homeTeam, awayTeam)}
-        ${renderConfederation(conf, focus, qualifiers)}
-        ${renderPlayoffBlock(homeTeam, qualifiers)}
-        ${renderPlayoffBlock(awayTeam, qualifiers)}
-      </div>`;
+      <div class="rx-qual"><div class="rx-qcols">${cols}</div></div>`;
   }
 
   return `
@@ -798,13 +815,14 @@ function rxSections(home, away, data) {
     out.push({ key: 'form', label: 'Forma', html: `${renderTendencies(home, away, recentByTeam)}<div class="rx-recent">${renderRecentBlock(home, recentByTeam)}${renderRecentBlock(away, recentByTeam)}</div>` });
   if (h2h?.fixtures?.length)
     out.push({ key: 'h2h', label: 'Confronto', html: renderH2HBlock(home, away, h2h) });
-  // Eliminatórias: tabela do grupo AO VIVO (quando os dois times estão no mesmo
-  // grupo e já houve jogo) NO TOPO + a campanha classificatória de sempre embaixo.
-  const groupHtml = renderGroupBlock(home, away, standings);
-  const qualHtml = (qualHas(qualifiers, home) || qualHas(qualifiers, away))
-    ? renderQualifiersBlock(home, away, qualifiers, { label: false }) : '';
-  if (groupHtml || qualHtml)
-    out.push({ key: 'qual', label: 'Eliminatórias', html: groupHtml + qualHtml });
+  // Grupo ao vivo (classificação oficial da Copa) — ABA PRÓPRIA. Só quando os dois
+  // times estão no mesmo grupo e já houve jogo (gating em renderGroupBlock).
+  const groupHtml = renderGroupBlock(home, away, standings, { label: false });
+  if (groupHtml)
+    out.push({ key: 'group', label: 'Grupo', html: groupHtml });
+  // Eliminatórias — campanha classificatória, aba SEPARADA.
+  if (qualHas(qualifiers, home) || qualHas(qualifiers, away))
+    out.push({ key: 'qual', label: 'Eliminatórias', html: renderQualifiersBlock(home, away, qualifiers, { label: false }) });
   return out.filter(s => s.html);
 }
 

@@ -60,7 +60,9 @@ const BRACKET_QUALIFIERS = [
 // m.team_home do banco), senão o lookup por nome no Raio-X falha e o time
 // não recebe a seção de eliminatórias nem o destaque na tabela.
 const NAME_ALIASES = {
-  'Türkiye': 'Turkey',
+  // API → canônico nosso (= nomes do DB / data-team). A Copa usa "Türkiye" (a
+  // migration 018 renomeou Turkey→Türkiye); a API às vezes devolve "Turkey".
+  'Turkey': 'Türkiye',
   'Cape Verde Islands': 'Cape Verde',
   'Congo DR': 'DR Congo',
 };

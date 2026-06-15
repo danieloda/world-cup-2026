@@ -392,7 +392,7 @@
             },
             {
               "rank": 2,
-              "team": "Turkey",
+              "team": "Türkiye",
               "played": 6,
               "win": 4,
               "draw": 1,
@@ -2418,7 +2418,7 @@
           "ties": [
             {
               "date": "2026-03-26",
-              "home": "Turkey",
+              "home": "Türkiye",
               "away": "Romania",
               "homeGoals": 1,
               "awayGoals": 0,
@@ -2524,7 +2524,7 @@
             {
               "date": "2026-03-31",
               "home": "Kosovo",
-              "away": "Turkey",
+              "away": "Türkiye",
               "homeGoals": 0,
               "awayGoals": 1,
               "homeWinner": false,
@@ -2606,7 +2606,7 @@
       "format": "table",
       "confederation": "AFC"
     },
-    "Turkey": {
+    "Türkiye": {
       "format": "table",
       "confederation": "UEFA",
       "playoff": "UEFA_PO"
