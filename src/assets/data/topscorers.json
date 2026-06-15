@@ -1,0 +1,166 @@
+{
+  "updated_at": "2026-06-15T17:15:32.527Z",
+  "season": 2026,
+  "scorers": [
+    {
+      "api_id": 138835,
+      "name": "F. Balogun",
+      "team": "USA",
+      "goals": 2,
+      "assists": 0,
+      "minutes": 72
+    },
+    {
+      "api_id": 265820,
+      "name": "Y. Ayari",
+      "team": "Sweden",
+      "goals": 2,
+      "assists": 0,
+      "minutes": 90
+    },
+    {
+      "api_id": 978,
+      "name": "K. Havertz",
+      "team": "Germany",
+      "goals": 2,
+      "assists": 0,
+      "minutes": 90
+    },
+    {
+      "api_id": 26475,
+      "name": "D. Undav",
+      "team": "Germany",
+      "goals": 1,
+      "assists": 2,
+      "minutes": 26
+    },
+    {
+      "api_id": 2864,
+      "name": "A. Isak",
+      "team": "Sweden",
+      "goals": 1,
+      "assists": 2,
+      "minutes": 89
+    },
+    {
+      "api_id": 280074,
+      "name": "N. Brown",
+      "team": "Germany",
+      "goals": 1,
+      "assists": 1,
+      "minutes": 73
+    },
+    {
+      "api_id": 2901,
+      "name": "Hwang In-Beom",
+      "team": "South Korea",
+      "goals": 1,
+      "assists": 1,
+      "minutes": 84
+    },
+    {
+      "api_id": 18979,
+      "name": "V. Gyökeres",
+      "team": "Sweden",
+      "goals": 1,
+      "assists": 1,
+      "minutes": 90
+    },
+    {
+      "api_id": 542768,
+      "name": "Ibrahim Sadeh",
+      "team": "Jordan",
+      "goals": 1,
+      "assists": 1,
+      "minutes": null
+    },
+    {
+      "api_id": 161921,
+      "name": "G. Reyna",
+      "team": "USA",
+      "goals": 1,
+      "assists": 0,
+      "minutes": 8
+    },
+    {
+      "api_id": 30484,
+      "name": "M. Svanberg",
+      "team": "Sweden",
+      "goals": 1,
+      "assists": 0,
+      "minutes": 13
+    },
+    {
+      "api_id": 2001,
+      "name": "C. Larin",
+      "team": "Canada",
+      "goals": 1,
+      "assists": 0,
+      "minutes": 14
+    },
+    {
+      "api_id": 34710,
+      "name": "Oh Hyeon-Gyu",
+      "team": "South Korea",
+      "goals": 1,
+      "assists": 0,
+      "minutes": 21
+    },
+    {
+      "api_id": 157997,
+      "name": "A. Diallo",
+      "team": "Ivory Coast",
+      "goals": 1,
+      "assists": 0,
+      "minutes": 34
+    },
+    {
+      "api_id": 106485,
+      "name": "Maurício",
+      "team": "Paraguay",
+      "goals": 1,
+      "assists": 0,
+      "minutes": 45
+    },
+    {
+      "api_id": 338014,
+      "name": "N. Irankunda",
+      "team": "Australia",
+      "goals": 1,
+      "assists": 0,
+      "minutes": 61
+    },
+    {
+      "api_id": 77037,
+      "name": "J. Lukić",
+      "team": "Bosnia & Herzegovina",
+      "goals": 1,
+      "assists": 0,
+      "minutes": 62
+    },
+    {
+      "api_id": 181812,
+      "name": "J. Musiala",
+      "team": "Germany",
+      "goals": 1,
+      "assists": 0,
+      "minutes": 64
+    },
+    {
+      "api_id": 37724,
+      "name": "C. Summerville",
+      "team": "Netherlands",
+      "goals": 1,
+      "assists": 0,
+      "minutes": 70
+    },
+    {
+      "api_id": 453073,
+      "name": "Akam Hashim",
+      "team": "Iraq",
+      "goals": 1,
+      "assists": 0,
+      "minutes": null
+    }
+  ]
+}

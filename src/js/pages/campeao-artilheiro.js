@@ -3,9 +3,10 @@ import { reportFatal } from '../error-reporter.js';
 import { renderShell } from '../sidebar.js';
 import { supabase } from '../supabase.js';
 import {
-  flag, escapeHtml, teamPt, showToast, brParts, heroMeta,
+  flag, escapeHtml, teamPt, showToast, brParts, heroMeta, loadTopScorers,
 } from '../util.js';
 import { matchPoints, championBonus } from '../scoring.js';
+import { renderScorerRace } from '../scorer-race.js';
 
 // ============================================================
 // Estado
@@ -18,6 +19,8 @@ let deadline = null;          // Date — quando trava
 let teamSearch = '';
 let finalMatch = null;        // { actual_home, actual_away, pen_winner, team_home, team_away, finished }
 let scorerGoals = [];         // [{ goals, match: { id, stage, round_label, team_home, team_away, actual_home, actual_away } }]
+let topScorers = [];          // artilharia oficial (assets/data/topscorers.json)
+let topScorersUpdatedAt = null;
 
 // Artilheiro two-step selection state
 let scorerStep = 'country';   // 'country' | 'player'
@@ -71,16 +74,20 @@ try {
 // Data
 // ============================================================
 async function loadData() {
-  const [statsRes, teamsRes, champRes, scorerRes, settingsRes, finalRes] = await Promise.all([
+  const [statsRes, teamsRes, champRes, scorerRes, settingsRes, finalRes, topRes] = await Promise.all([
     supabase.from('v_pool_stats').select('*').single(),
     supabase.from('matches').select('team_home, team_away').eq('stage', 'group'),
     supabase.from('champion_picks').select('*').eq('user_id', profile.id).maybeSingle(),
     supabase.from('top_scorer_picks').select('*, players(*)').eq('user_id', profile.id).maybeSingle(),
     supabase.from('settings').select('value').eq('key', 'deadline_champion_scorer').maybeSingle(),
     supabase.from('matches').select('team_home, team_away, actual_home, actual_away, pen_winner, finished').eq('stage', 'final').maybeSingle(),
+    loadTopScorers(),  // artilharia ao vivo (estático; degrada gracioso p/ vazio)
   ]);
 
   if (teamsRes.error) throw teamsRes.error;
+
+  topScorers = topRes?.scorers ?? [];
+  topScorersUpdatedAt = topRes?.updated_at ?? null;
 
   stats = statsRes.data ?? { finished_matches: 0, total_matches: 104, pct_played: 0, paid_users: 0 };
   finalMatch = finalRes.data ?? null;
@@ -225,7 +232,24 @@ function renderPage() {
       ${renderChampionCard(locked)}
       ${renderScorerCard(locked)}
     </div>
+
+    ${renderScorerRaceSection()}
   `;
+}
+
+// Corrida da Chuteira de Ouro — artilharia ao vivo, com o palpite do usuário
+// destacado. Some sozinha (gating) quando ainda não há artilheiros no torneio.
+function renderScorerRaceSection() {
+  const p = scorerPick?.players;
+  const pick = p
+    ? {
+        apiId: p.api_player_id ?? null,
+        name: p.full_name,
+        team: p.team,
+        localGoals: computeScorerBreakdown().totalGoals,
+      }
+    : null;
+  return renderScorerRace(topScorers, { pick, updatedAt: topScorersUpdatedAt });
 }
 
 function renderChampionCard(locked) {
