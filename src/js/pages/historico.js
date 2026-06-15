@@ -511,18 +511,17 @@ function tiersHtml(m, bets) {
   return `<div class="tiers">${out.join('')}</div>`;
 }
 
-const TIER_ICON = { exact: () => ICON.check, partial: () => ICON.arrow, miss: () => ICON.x };
-
 function tierHtml(m, level, label, list, flat) {
   const hasMe = list.some(b => b.user_id === profile.id);
   const ptsList = list.map(b => b.points_earned ?? 0);
   const min = Math.min(...ptsList), max = Math.max(...ptsList);
   const ptsLabel = level === 'miss' ? '0' : (min === max ? `+${max}` : `+${min} a +${max}`);
+  const ic = level === 'exact' ? ICON.check : level === 'partial' ? ICON.arrow : ICON.x;
   const body = flat ? flatPeople(m, list) : groupedPeople(m, list);
   return `
     <details class="tier t-${level}${hasMe ? ' has-me' : ''}"${hasMe ? ' open' : ''}>
       <summary>
-        <span class="t-ic">${TIER_ICON[level]()}</span>
+        <span class="t-ic">${ic}</span>
         <span>${label}</span><span class="t-cnt">${list.length}</span>
         <span class="t-pts">${ptsLabel}</span>
         ${ICON.chev}
