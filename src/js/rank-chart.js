@@ -128,8 +128,8 @@ export function renderRankChart(mount, { series, matches, meId }) {
     const K = steps.length;
     const n = ids.length;
 
-    const panW = width < 720 ? 210 : 248;
-    const chartW = Math.max(220, width - panW - 16);
+    const panW = width < 720 ? 250 : 296;   // mais largo: cabe Δ posição + Δ pontos no hover
+    const chartW = Math.max(200, width - panW - 16);
     const H = dynH(n);
     const PADl = 32, PADr = 12, PADt = 32, PADb = 22;  // PADt folgado: o rótulo de fase ("GRUPOS") respira acima das linhas
     const plotH = H - PADt - PADb;
@@ -213,23 +213,42 @@ export function renderRankChart(mount, { series, matches, meId }) {
   }
 
   function updatePanel(rows, ids, gi, hotI, hovering) {
+    const steps = granKey === 'jogo' ? curWeekSteps : tl.weekEnds;
+    const k = steps.indexOf(gi);
+    // ponto ANTERIOR no gráfico → base do "ganhou X pts / subiu N posições".
+    // No 1º ponto da semana (jogo) caímos no jogo anterior (gi-1) p/ ainda mostrar.
+    const prevGi = k > 0 ? steps[k - 1] : (granKey === 'jogo' && gi > 0 ? gi - 1 : -1);
     const order = [...ids].sort((a, b) => pos[a][gi] - pos[b][gi]);
-    order.forEach((i, r) => {
+    order.forEach((idx, r) => {
+      const i = idx;
       const el = rows.get(i);
       if (!el) return;
       el.style.top = `${r * PAN_ROW}px`;
       el.style.borderColor = colorOf(i);
       el.classList.toggle('hot', hovering && i === hotI);
       const nm = series[i].userId === meId ? 'Você' : series[i].name;
+      // movimento desde o último ponto (só no hover): Δ posição (▲/▼) + Δ pontos
+      let mv = '';
+      if (hovering && prevGi >= 0) {
+        const dPts = (series[i].values[gi + 1] ?? 0) - (series[i].values[prevGi + 1] ?? 0);
+        const dPos = pos[i][prevGi] - pos[i][gi];   // + = subiu
+        const mc = dPos > 0 ? 'var(--positive)' : dPos < 0 ? 'var(--red)' : 'var(--text-mute)';
+        const pt = dPos > 0 ? `▲${dPos}` : dPos < 0 ? `▼${-dPos}` : '–';
+        mv = `<span style="display:inline-flex;flex-direction:column;align-items:flex-end;line-height:1.04">
+          <span style="font-size:11px;font-weight:800;color:${mc};font-variant-numeric:tabular-nums">${pt}</span>
+          <span style="font-size:10px;font-weight:700;color:var(--text-mute);font-variant-numeric:tabular-nums">+${dPts}</span>
+        </span>`;
+      }
       el.innerHTML = `
         <span class="rc-pan-pos">${pos[i][gi]}º</span>
         ${avatarChip(series[i], 'sm')}
         <span class="rc-pan-nm" style="color:${i === hotI && hovering ? colorOf(i) : 'var(--text)'}">${escapeHtml(nm)}</span>
-        <span class="rc-pan-pt" style="color:${colorOf(i)}">${series[i].values[gi + 1] ?? 0}</span>`;
+        <span style="display:inline-flex;align-items:center;gap:8px;justify-content:flex-end;min-width:52px">
+          ${mv}<span class="rc-pan-pt" style="color:${colorOf(i)}">${series[i].values[gi + 1] ?? 0}</span>
+        </span>`;
     });
     const h = mount.querySelector('.rc-pan-h');
     if (h) {
-      const k = granKey === 'jogo' ? curWeekSteps.indexOf(gi) : tl.weekEnds.indexOf(gi);
       h.innerHTML = hovering
         ? (granKey === 'jogo'
             ? `<span class="rc-pan-k">Jogo ${gi + 1}</span>${matchHeader(matches[gi])}`
