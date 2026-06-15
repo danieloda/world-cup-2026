@@ -7,10 +7,8 @@ name: Verify Fixtures
 #
 # Pré-requisitos (Settings → Secrets and variables → Actions):
 #   Secrets:
-#     - API_FOOTBALL_KEY        (p/ o --refresh re-buscar da API)
-#     - SUPABASE_PUBLISHABLE_KEY
-#     - ADMIN_EMAIL
-#     - ADMIN_PASSWORD
+#     - API_FOOTBALL_KEY          (p/ o --refresh re-buscar da API)
+#     - SUPABASE_SERVICE_ROLE_KEY (lê matches sem login; bypassa RLS)
 #   Variables:
 #     - SUPABASE_URL
 
@@ -51,6 +49,5 @@ jobs:
           API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
-          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
-          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: node scripts/data/verify-fixtures.js --refresh
