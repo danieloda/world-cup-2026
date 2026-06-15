@@ -5517,8 +5517,9 @@ input[type="number"].score-input {
 .rc-hdot.hot { filter: drop-shadow(0 0 5px var(--glow)) drop-shadow(0 0 10px var(--glow)); }
 
 .rc-end { font-size: 12.5px; font-weight: 700; font-family: var(--font); }
-/* conector fino fim-da-linha → rótulo (só aparece quando o rótulo é deslocado) */
-.rc-lead { fill: none; stroke-width: 1.2; opacity: .5; stroke-linecap: round; stroke-linejoin: round; }
+/* rótulos de ponta apagam quando o card do hover ocupa a calha (ver .rc-tipping) */
+.rc-endgrp { transition: opacity .16s ease; }
+.rc-svg.rc-tipping .rc-endgrp { opacity: .12; }
 
 .rc-hdot { pointer-events: none; }
 .rc-cross { stroke: rgba(255,255,255,.35); stroke-width: 1; stroke-dasharray: 3 3; }
@@ -5534,6 +5535,19 @@ input[type="number"].score-input {
   border-radius: 10px; padding: 8px 10px;
   pointer-events: none; z-index: 5;
   box-shadow: 0 8px 24px rgba(0,0,0,.5);
+}
+/* ANCORADO fora das linhas: calha da direita no desktop (onde os rótulos de
+   ponta apagam) e barra embaixo no mobile (calha estreita demais). Não persegue
+   o cursor — a linha-guia + bolinhas fazem o vínculo com o jogo sob o ponteiro. */
+.rc-tip.rc-tip-side {
+  left: auto; right: 6px; top: 10px;
+  width: min(202px, 52%); min-width: 0; max-width: none;
+  max-height: calc(100% - 20px); overflow: hidden;
+}
+.rc-tip.rc-tip-bottom {
+  left: 8px; right: 8px; top: auto; bottom: 8px;
+  width: auto; min-width: 0; max-width: none;
+  max-height: calc(100% - 16px); overflow: hidden;
 }
 .rc-tip-h { font-size: 12.5px; font-weight: 700; color: var(--text-mute); margin-bottom: 7px; text-transform: uppercase; letter-spacing: .04em; }
 .rc-tip-when { font-size: 12px; font-weight: 700; color: var(--text-mute); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 5px; }

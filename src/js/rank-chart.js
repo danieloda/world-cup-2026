@@ -15,7 +15,7 @@
 import { escapeHtml, avatarHtml } from './util.js';
 import {
   computePositions, buildTimeline, stageBands, buildColorMap, avatarSvgAt,
-  matchHeader, placeTip, pointXY, clamp,
+  matchHeader, pointXY, clamp,
 } from './chart-utils.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
@@ -115,8 +115,22 @@ export function renderRankChart(mount, { series, matches, meId }) {
       if (rHi - rLo < 3) rHi = Math.min(N, rLo + 3);   // piso de altura
     }
     const span = Math.max(1, rHi - rLo);
+    // Altura por posição. No foco, garantimos que os rótulos de ponta vizinhos
+    // NÃO se sobreponham — assim cada nome/avatar fica CRAVADO no fim da sua
+    // linha (sem anti-colisão, sem conector). O piso vem da menor distância
+    // entre dois selecionados consecutivos: ranks colados (ex. Top 10) pedem
+    // ~24px por linha; seleção esparsa pode ser mais compacta.
+    let minGap = Infinity;
+    if (focusY) {
+      const fr = [];
+      series.forEach((s, i) => { if (selected.has(s.userId)) fr.push(finalPos(i)); });
+      fr.sort((a, b) => a - b);
+      for (let k = 1; k < fr.length; k++) minGap = Math.min(minGap, fr[k] - fr[k - 1]);
+    }
+    const LBLH = 24;   // altura mínima de um rótulo (avatar 18 + respiro)
+    const lblFloor = focusY && isFinite(minGap) ? Math.ceil(LBLH / minGap) : 0;
     const rowH = focusY
-      ? clamp(Math.floor(440 / span), 10, 38)
+      ? clamp(Math.max(Math.floor(440 / span), lblFloor), 10, 40)
       : (N <= 1 ? 34 : clamp(Math.floor(420 / (N - 1)), 6, 34));
     const plotH = focusY ? span * rowH : (N <= 1 ? 1 : N - 1) * rowH;
     const height = PADt + plotH + PADb;
@@ -163,24 +177,16 @@ export function renderRankChart(mount, { series, matches, meId }) {
       foc += `<polyline class="rc-foc${s.userId === meId ? ' me' : ''}" data-i="${i}" stroke="${c}" style="--glow:${c}" points="${lineOf(i)}"/>`;
       endLabels.push({ i, y0: yAt(finalPos(i)), color: c });
     });
-    // rótulos de ponta FORA do clip (senão o 1º corta o avatar) + anti-colisão.
-    // Quando o foco junta muita gente (seleção larga), os fins de linha ficam
-    // mais perto que a altura de um rótulo: o anti-colisão afasta o rótulo do
-    // seu ponto. Pra não perder o vínculo, puxamos um CONECTOR fino do fim da
-    // linha (y0) até o avatar — ele tem comprimento zero (some) quando alinhado.
-    endLabels.sort((a, b) => a.y0 - b.y0);
-    const LBX = x1 + (narrow ? 14 : 24);   // centro do avatar do rótulo
-    const rowLbl = narrow ? 23 : 26;       // respiro vertical por rótulo
-    let prevY = PADt - rowLbl, lastY = PADt;   // 1º rótulo cai no próprio ponto (sem conector espúrio)
+    // rótulos de ponta CRAVADOS no fim da linha (FORA do clip). O eixo já tem
+    // altura pra eles não colidirem (ver lblFloor) — então nada de anti-colisão
+    // nem conector: cada avatar/nome senta exatamente no ponto da sua linha.
+    const LBX = x1 + 14;   // centro do avatar do rótulo
+    let lastY = PADt;
     for (const l of endLabels) {
-      const ly = Math.max(l.y0, prevY + rowLbl);
-      prevY = ly; lastY = ly;
+      const ly = l.y0;
+      lastY = Math.max(lastY, ly);
       const s = series[l.i];
       const nm = s.userId === meId ? 'Você' : s.name;
-      if (ly - l.y0 > 1) {
-        const stub = x1 + (narrow ? 5 : 8);
-        lbls += `<path class="rc-lead" stroke="${l.color}" d="M${x1.toFixed(1)} ${l.y0.toFixed(1)} L${stub.toFixed(1)} ${l.y0.toFixed(1)} L${(LBX - 9).toFixed(1)} ${ly.toFixed(1)}"/>`;
-      }
       lbls += avatarSvgAt(s, l.color, LBX, ly, 9, `rk${l.i}`);
       lbls += `<text class="rc-end" x="${(LBX + 14).toFixed(1)}" y="${(ly + 4).toFixed(1)}" fill="${l.color}">${finalPos(l.i)}º ${escapeHtml(clip(nm, narrow ? 8 : 15))}</text>`;
     }
@@ -192,7 +198,7 @@ export function renderRankChart(mount, { series, matches, meId }) {
         <defs><clipPath id="rcclip"><rect x="0" y="${PADt - 3}" width="${width}" height="${plotH + 6}"/></clipPath></defs>
         ${g}
         <g clip-path="url(#rcclip)">${ctx}${foc}</g>
-        ${lbls}
+        <g class="rc-endgrp">${lbls}</g>
         <line class="rc-cross" x1="0" y1="${PADt}" x2="0" y2="${(PADt + plotH).toFixed(1)}" hidden/>
         <g class="rc-hover"></g>
         <rect class="rc-hit" x="${x0}" y="${PADt}" width="${Math.max(0, x1 - x0)}" height="${plotH}" fill="transparent"/>
@@ -202,7 +208,7 @@ export function renderRankChart(mount, { series, matches, meId }) {
 
     renderLegend();
     renderNote();
-    attachHover(host, { steps, K, xAt, yAt, x0, x1, rowH });
+    attachHover(host, { steps, K, xAt, yAt, x0, x1, rowH, narrow });
   }
 
   // ---------------------------------------------------------
@@ -350,8 +356,14 @@ export function renderRankChart(mount, { series, matches, meId }) {
           <span class="rc-tip-nm" style="color:${colorOf(r.i)}">${escapeHtml(r.s.userId === meId ? 'Você' : r.s.name)}</span>
           <span class="rc-tip-pt">${r.pts}</span>
         </div>`).join('');
+      // Card ANCORADO fora das linhas: na calha da direita (desktop) ou numa
+      // barra embaixo (mobile, onde a calha é estreita demais). Em vez de seguir
+      // o cursor e cobrir o gráfico, ele fica fixo e os rótulos de ponta apagam
+      // pra ele ocupar aquele espaço — o vínculo com o jogo vem da linha-guia.
+      tip.classList.toggle('rc-tip-bottom', geo.narrow);
+      tip.classList.toggle('rc-tip-side', !geo.narrow);
       tip.hidden = false;
-      placeTip(host, tip, cx);
+      svg.classList.add('rc-tipping');
     }
 
     function leave() {
@@ -359,6 +371,7 @@ export function renderRankChart(mount, { series, matches, meId }) {
       while (hover.firstChild) hover.removeChild(hover.firstChild);
       setHot(-1);
       tip.hidden = true;
+      svg.classList.remove('rc-tipping');
     }
 
     hit.addEventListener('mousemove', move);

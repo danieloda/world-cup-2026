@@ -253,10 +253,16 @@ try {
   }, { timeout: 5000 }).catch(() => {});
   const tip = await page.evaluate(() => {
     const t = document.querySelector('#rankChart .rc-tip');
-    return { hidden: t?.hidden, rows: t ? t.querySelectorAll('.rc-tip-r').length : 0, hasMatch: !!t?.querySelector('.rc-tip-match') };
+    return {
+      hidden: t?.hidden, rows: t ? t.querySelectorAll('.rc-tip-r').length : 0,
+      hasMatch: !!t?.querySelector('.rc-tip-match'),
+      side: t?.classList.contains('rc-tip-side'),               // 1366px → calha lateral
+      tipping: !!document.querySelector('#rankChart .rc-svg.rc-tipping'),  // rótulos de ponta apagam
+    };
   });
   check('hover: tooltip aparece com standings do foco', tip.hidden === false && tip.rows > 0, `linhas no tip=${tip.rows}`);
   check('hover (jogos da semana): header mostra o confronto', tip.hasMatch);
+  check('hover: card ANCORADO na calha (sai de cima das linhas) + rótulos apagam', tip.side === true && tip.tipping === true);
   await page.locator('#rankChart').screenshot({ path: join(shotsDir, 'rank-chart-hover.png') }).catch(() => {});
 
   // (7-neon) a linha sob o cursor acende em neon (.hot); as outras do foco apagam
