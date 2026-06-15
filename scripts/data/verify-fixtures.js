@@ -26,16 +26,30 @@ const REFRESH = args.includes('--refresh');
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const ANON_KEY = process.env.SUPABASE_PUBLISHABLE_KEY;
+const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
-const supabase = createClient(SUPABASE_URL, ANON_KEY);
+// A verificação só faz SELECT em matches. service_role bypassa RLS → lê sem
+// login. Cai pro anon + login admin se a service key não estiver disponível
+// (ex.: dev local sem ela no .env).
+const USE_SERVICE = !!SERVICE_KEY;
+const supabase = USE_SERVICE
+  ? createClient(SUPABASE_URL, SERVICE_KEY, { auth: { autoRefreshToken: false, persistSession: false } })
+  : createClient(SUPABASE_URL, ANON_KEY);
 const FIXTURES_PATH = join(__dirname, '..', '..', 'src', 'assets', 'data', 'fixtures.json');
 
 const C = { reset: '\x1b[0m', red: '\x1b[31m', green: '\x1b[32m', yellow: '\x1b[33m', blue: '\x1b[34m', bold: '\x1b[1m', dim: '\x1b[2m' };
 const log = (c, m) => console.log(`${C[c] || ''}${m}${C.reset}`);
 
 async function login() {
+  if (USE_SERVICE) {
+    log('green', '🔑 service_role (sem login)');
+    return;
+  }
+  if (!ADMIN_EMAIL || !ADMIN_PASSWORD) {
+    throw new Error('Defina SUPABASE_SERVICE_ROLE_KEY, ou ADMIN_EMAIL + ADMIN_PASSWORD');
+  }
   log('blue', '🔐 Logando...');
   const { error } = await supabase.auth.signInWithPassword({ email: ADMIN_EMAIL, password: ADMIN_PASSWORD });
   if (error) throw new Error('Login falhou: ' + error.message);
