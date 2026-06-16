@@ -47,14 +47,14 @@ function pickBand(scorers, pick) {
 
   return `
     <div class="ar-mypick">
-      <div class="ar-mypick-ic" aria-hidden="true">⚽</div>
-      <div class="ar-mypick-body">
-        <div class="ar-mypick-label">Seu artilheiro</div>
-        <div class="ar-mypick-name">${flag(pick.team)} ${escapeHtml(pick.name)} <small>${escapeHtml(teamPt(pick.team))}</small></div>
+      <div class="ar-mypick-head">
+        <span class="ar-mypick-ic" aria-hidden="true">⚽</span>
+        <span class="ar-mypick-label">Seu artilheiro</span>
+        <span class="ar-mypick-rk">${rk}</span>
       </div>
-      <div class="ar-mypick-stat">
-        <b>${goals}</b><span class="u">${goals === 1 ? 'gol' : 'gols'}</span>
-        <span class="rk">${rk}</span>
+      <div class="ar-mypick-row">
+        <span class="ar-mypick-name">${flag(pick.team)} <span class="nm">${escapeHtml(pick.name)}</span> <small>${escapeHtml(teamPt(pick.team))}</small></span>
+        <span class="ar-mypick-stat"><b>${goals}</b><span class="u">${goals === 1 ? 'gol' : 'gols'}</span></span>
       </div>
     </div>`;
 }
@@ -87,7 +87,7 @@ function listRow(scorers, s, myApiId) {
       <span class="ar-rank">${rankOf(scorers, s)}</span>
       ${flag(s.team)}
       <span class="ar-pl"><span class="ar-pl-txt">
-        <div class="ar-pl-name">${escapeHtml(s.name)}${isMine ? ' ' + mineTag() : ''}</div>
+        <div class="ar-pl-name">${escapeHtml(s.name)}</div>
         <div class="ar-pl-team">${escapeHtml(teamPt(s.team))}</div>
       </span></span>
       <span class="ar-g">${s.goals}<span class="u">G</span></span>
@@ -104,7 +104,7 @@ function pinnedPickRow(pick) {
       <span class="ar-rank">—</span>
       ${flag(pick.team)}
       <span class="ar-pl"><span class="ar-pl-txt">
-        <div class="ar-pl-name">${escapeHtml(pick.name)} ${mineTag()}</div>
+        <div class="ar-pl-name">${escapeHtml(pick.name)}</div>
         <div class="ar-pl-team">${escapeHtml(teamPt(pick.team))} · fora do Top 20</div>
       </span></span>
       <span class="ar-g">${g}<span class="u">G</span></span>

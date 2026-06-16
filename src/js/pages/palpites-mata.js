@@ -413,6 +413,7 @@ function renderNote() {
         <li>📈 <strong>Cada fase vale mais.</strong> Placar exato: 32-avos ${stageExact('r32')} · oitavas ${stageExact('r16')} · quartas ${stageExact('qf')} · semis ${stageExact('sf')} · 3º lugar ${stageExact('third')} · <strong>final ${stageExact('final')}</strong> pontos.</li>
         <li>➕ Não precisa cravar tudo — cada parte do placar (gols de um time, quem vence, diferença) já dá pontos.</li>
         <li>🏳️ <strong>Regra da vaga:</strong> você dá o placar de uma posição (ex.: "1º do Grupo A × 2º do Grupo B"). Vale para a seleção que <strong>realmente se classificar</strong> ali — as bandeiras são só um guia.</li>
+        <li><span class="pred-source">P</span> <strong>O selo P</strong> num time quer dizer que ele veio do <strong>seu palpite</strong> de quem se classifica (sua simulação da chave) — ainda não é resultado oficial. Quando o jogo define a vaga de verdade, o P some.</li>
         <li>⚽ Acha que vai dar empate? <strong>Escolha quem passa nos pênaltis</strong> (conta o placar do tempo normal).</li>
         <li>📊 <strong>Conforme os resultados saem</strong>, cada jogo vira a comparação do seu palpite com o resultado oficial e já mostra os pontos que você fez ali — placar, bônus de classificado e de artilheiro somados.</li>
       </ul>

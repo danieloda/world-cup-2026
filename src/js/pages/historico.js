@@ -497,24 +497,48 @@ function mybandHtml(m) {
   return `<div class="myline"><span class="myband ${lvl}">Você ${verb} ${pred} <span class="pts">${ptsTxt}</span> ${tag}${ball}</span></div>`;
 }
 
-// ----- Consenso: placares mais palpitados (token) + o SEU palpite -----
+// ----- Consenso: barra de votação ranqueada dos placares mais palpitados.
+// Bate o olho e vê o que domina + a proporção; quando encerrado, marca qual
+// placar ACONTECEU; o SEU palpite tem linha fixa (realçada no topo se está nos
+// mais palpitados, ou destacada embaixo se ficou de fora). -----
 function consensusHtml(m, bets, finished) {
   if (!bets.length) return '';
+  const total = bets.length;
   const freq = new Map();
   for (const b of bets) {
     const k = `${b.pred_home}-${b.pred_away}`;
     freq.set(k, (freq.get(k) ?? 0) + 1);
   }
-  const top = [...freq.entries()].sort((a, b) => b[1] - a[1]).slice(0, finished ? 2 : 3);
-  const pills = top.map(([k, n], i) => {
-    const [h, a] = k.split('-');
-    const unit = i === 0 ? '<span class="u"> palpites</span>' : '';  // some no mobile (fica só o número)
-    return `<span class="cpill ${i === 0 ? 'lead' : ''}"><span class="sb">${h}–${a}</span> <span class="n"><b>${n}</b>${unit}</span></span>`;
-  }).join('');
+  const sorted = [...freq.entries()].sort((a, b) => b[1] - a[1]);
+  const top = sorted.slice(0, 4);
+  const maxN = top[0]?.[1] ?? 1;
+  const actualKey = finished ? `${m.actual_home}-${m.actual_away}` : null;
   const mybet = bets.find(b => b.user_id === profile.id);
-  const you = mybet ? `<span class="you">você <span class="sb">${mybet.pred_home}–${mybet.pred_away}</span></span>` : '';
-  // pills + "você" agrupados em .cpills → no mobile o título sobe e os tokens quebram alinhados
-  return `<div class="consensus"><span class="ttl">Mais palpitados</span><div class="cpills">${pills}${you}</div></div>`;
+  const myKey = mybet ? `${mybet.pred_home}-${mybet.pred_away}` : null;
+
+  const row = (k, n, { rank, isYou } = {}) => {
+    const [h, a] = k.split('-');
+    const pct = Math.round((n / total) * 100);
+    const w = Math.max(6, Math.round((n / maxN) * 100));
+    const isHit = finished && k === actualKey;
+    const cls = [isHit ? 'hit' : '', !isHit && rank === 1 ? 'lead' : '', isYou ? 'you' : ''].filter(Boolean).join(' ');
+    const lead = isYou ? '<span class="cyou-lbl">Você</span>' : `<span class="crank">${rank}</span>`;
+    // o placar que ACONTECEU não ganha rótulo — só o número fica verde (classe .hit)
+    const right = `<b>${n}</b><span>${pct}%</span>`;
+    return `<div class="crow ${cls}">${lead}<span class="sl">${h}<span class="x">–</span>${a}</span><span class="ctrack"><span class="cfill" style="width:${w}%"></span></span><span class="ccount">${right}</span></div>`;
+  };
+
+  const rows = top.map(([k, n], i) => row(k, n, { rank: i + 1, isYou: false })).join('');
+  // seu palpite SEMPRE numa linha fixa embaixo (igual ao protótipo / sketch)
+  const youOut = mybet
+    ? `<div class="cons-you">${row(myKey, freq.get(myKey) ?? 1, { isYou: true })}</div>`
+    : '';
+
+  return `<div class="cons2">
+    <div class="cons-h"><span class="ttl">Mais palpitados</span><span class="tot">${total} palpite${total > 1 ? 's' : ''}</span></div>
+    <div class="cons-list">${rows}</div>
+    ${youOut}
+  </div>`;
 }
 
 // ----- Raio-X: tiers (cravaram / acertaram vencedor / não pontuaram) -----
@@ -577,8 +601,8 @@ function personChip(m, b) {
 function flatPeople(m, list) {
   return sortMeFirst(list).map(b => personChip(m, b)).join('');
 }
-// Tiers parcial/zerou: subgrupos por placar, ORDENADOS POR PONTOS desc (freq desempata)
-function groupedPeople(m, list) {
+// Subgrupos por placar dentro de um bucket, ORDENADOS POR PONTOS desc (freq desempata).
+function scorelineSubgroups(m, list) {
   const groups = new Map(); // "h-a" -> { home, away, pts, bets:[] }
   for (const b of list) {
     const key = `${b.pred_home}-${b.pred_away}`;
@@ -594,6 +618,41 @@ function groupedPeople(m, list) {
       <div class="pgroup">
         <div class="pgroup-h"><span class="sb">${g.home}–${g.away}</span>${ptsBadge}<span class="cnt">${n} ${n === 1 ? 'pessoa' : 'pessoas'}</span></div>
         <div class="pgroup-people">${chips}</div>
+      </div>`;
+  }).join('');
+}
+
+// Agrupa primeiro por RESULTADO previsto (vitória do mandante / empate / vitória
+// do visitante) e, dentro de cada um, por placar. Ordem fixa casa-empate-fora,
+// pra ler igual ao confronto (mandante à esquerda).
+function groupedPeople(m, list) {
+  const buckets = { home: [], draw: [], away: [] };
+  for (const b of list) {
+    const o = b.pred_home > b.pred_away ? 'home' : b.pred_home < b.pred_away ? 'away' : 'draw';
+    buckets[o].push(b);
+  }
+  const meta = {
+    home: { nm: teamPt(m.team_home), fl: flag(m.team_home), cls: 'win-h' },
+    draw: { nm: 'Empate', fl: '', cls: 'draw' },
+    away: { nm: teamPt(m.team_away), fl: flag(m.team_away), cls: 'win-a' },
+  };
+  // Grupos de resultado ORDENADOS pelo que mais pontuou: o resultado que de fato
+  // aconteceu pontua mais (ex.: num empate, quem cravou o empate fez +5 vs +1 de
+  // quem apostou em vitória), então sobe ao topo. Desempate por nº de pessoas.
+  const bucketPts = (o) => buckets[o].reduce((mx, b) => Math.max(mx, b.points_earned ?? 0), 0);
+  const order = ['home', 'draw', 'away']
+    .filter(o => buckets[o].length)
+    .sort((a, b) => bucketPts(b) - bucketPts(a) || buckets[b].length - buckets[a].length);
+  return order.map(o => {
+    const mt = meta[o];
+    const n = buckets[o].length;
+    const head = mt.fl
+      ? `<span class="ofl">${mt.fl}</span><span class="onm">${escapeHtml(mt.nm)}</span>`
+      : `<span class="oeq" aria-hidden="true">=</span><span class="onm">${escapeHtml(mt.nm)}</span>`;
+    return `
+      <div class="obucket ${mt.cls}">
+        <div class="obucket-h">${head}<span class="ocnt">${n}</span></div>
+        <div class="obucket-body">${scorelineSubgroups(m, buckets[o])}</div>
       </div>`;
   }).join('');
 }

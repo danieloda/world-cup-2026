@@ -150,7 +150,13 @@ function renderPage() {
       ])}</div>
     </section>
 
-    <p class="hist-note"><span>Quatro formas de pontuar: <b>Jogos</b> (cada acerto soma — lado, resultado e saldo) · <b>Campeão</b> +${championBonus(true)} · <b>Artilheiro</b> (gols × fase) · <b>Classificados</b> (time na fase certa). <a href="regras.html">Ver regras →</a></span></p>
+    <div class="scoreways" aria-label="Quatro formas de pontuar">
+      <div class="sw"><div class="sw-h"><span class="sw-ic">⚽</span><span class="sw-t">Jogos</span></div><p class="sw-d">Cada acerto soma: lado, resultado e saldo de gols.</p><span class="sw-v">por jogo</span></div>
+      <div class="sw g"><div class="sw-h"><span class="sw-ic">🏆</span><span class="sw-t">Campeão</span></div><p class="sw-d">Acertar quem levanta a taça.</p><span class="sw-v">+${championBonus(true)} pts</span></div>
+      <div class="sw"><div class="sw-h"><span class="sw-ic">🥅</span><span class="sw-t">Artilheiro</span></div><p class="sw-d">Gols do seu escolhido × multiplicador da fase.</p><span class="sw-v">+2 / gol</span></div>
+      <div class="sw g"><div class="sw-h"><span class="sw-ic">✓</span><span class="sw-t">Classificados</span></div><p class="sw-d">Cravar o time certo em cada vaga do mata-mata.</p><span class="sw-v">bônus</span></div>
+    </div>
+    <a class="sw-link" href="regras.html">Ver todas as regras →</a>
 
     ${renderPot(totalPot, split)}
 

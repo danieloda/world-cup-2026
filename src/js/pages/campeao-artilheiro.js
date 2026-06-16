@@ -267,6 +267,30 @@ function renderChampionCard(locked) {
   return renderChampionSelection(locked);
 }
 
+// Tinta da bandeira (board dos cards travado/resultado) — chaveada pelo código do
+// flag, igual ao card de Palpites da galera. Mapa LOCAL (função hoisteada, sem
+// const de módulo) p/ não dar TDZ no render de topo. Sem mapa → neutro do tema.
+function teamTint(team) {
+  const TINT = {
+    us: '#3C3B6E', mx: '#006847', ca: '#D52B1E', br: '#009739', ar: '#75AADB',
+    uy: '#5CBFEB', co: '#FCD116', ec: '#FFD100', py: '#D52B1E', pe: '#D91023',
+    cl: '#0039A6', ve: '#FCD116', pa: '#DA121A', cr: '#002B7F', hn: '#0073CF',
+    jm: '#FED100', ht: '#00209F',
+    fr: '#0055A4', es: '#C60B1E', de: '#DD0000', pt: '#006600', nl: '#FF6200',
+    hr: '#C1272D', it: '#008C45', be: '#FDDA24', ch: '#D52B1E', dk: '#C60C30',
+    pl: '#DC143C', no: '#BA0C2F', se: '#006AA7', at: '#ED2939', rs: '#C6363C',
+    cz: '#D7141A', tr: '#E30A17', ua: '#0057B7', gr: '#0D5EAF', hu: '#CD2A3E',
+    ro: '#002B7F', 'gb-eng': '#CE1124', 'gb-sct': '#005EB8', 'gb-wls': '#C8102E',
+    ma: '#C1272D', sn: '#00853F', gh: '#006B3F', ng: '#008751', eg: '#CE1126',
+    tn: '#E70013', dz: '#006233', cm: '#007A5E', ci: '#FF8200', cv: '#003893',
+    za: '#007A4D', ml: '#14B53A', cd: '#007FFF', ao: '#CE1126',
+    jp: '#BC002D', kr: '#CD2E3A', sa: '#006C35', qa: '#8A1538', ir: '#239F40',
+    au: '#00843D', nz: '#00247D', uz: '#0099B5', jo: '#007A3D', iq: '#CE1126', ae: '#00732F',
+  };
+  const code = (flag(team).match(/fi-([a-z-]+)/) || [])[1];
+  return TINT[code] || '#5b6472';
+}
+
 function renderChampionResult() {
   const actualWin = actualChampion();
   const hit = actualWin && championPick.team === actualWin;
@@ -313,24 +337,26 @@ function renderChampionResult() {
 
 function renderChampionLocked() {
   return `
-    <div class="cs-card cs-locked" id="cardChampion">
-      <div class="cs-card-icon">🏆</div>
-      <div class="cs-card-kicker">Aposta 1 · Campeão · <span class="nw">🔒 Travado</span></div>
-      <h3>Campeão da Copa</h3>
-      <p class="desc">Sua escolha está travada. Aguarde o fim da Final pra ver se acertou.</p>
-
-      <div class="cs-pick-box locked">
-        <div class="cs-pick-flag">${flag(championPick.team)}</div>
-        <div class="cs-pick-info">
-          <div class="cs-pick-name">${escapeHtml(teamPt(championPick.team))}</div>
-          <div class="cs-pick-sub">🔒 Sua escolha final · +${CHAMPION_BONUS_PTS} pts se acertar</div>
+    <article class="cs2 cs2-locked" id="cardChampion" style="--c1:${teamTint(championPick.team)};--c2:var(--accent)">
+      <div class="cs2-board">
+        <div class="cs2-top"><span class="cs2-kick">🏆 Seu Campeão</span><span class="cs2-pill lock">Travado</span></div>
+        <div class="cs2-pick">
+          <span class="cs2-flag">${flag(championPick.team)}</span>
+          <div class="cs2-id">
+            <div class="cs2-name">${escapeHtml(teamPt(championPick.team))}</div>
+            <div class="cs2-meta">Sua escolha final · a taça é decidida em 19/jul</div>
+          </div>
         </div>
       </div>
-
-      <div class="cs-deadline locked">
-        🔒 Trancado em <strong>${formatDeadline(deadline)}</strong>
+      <div class="cs2-stat">
+        <div class="cs2-num gold">+${CHAMPION_BONUS_PTS}</div>
+        <div class="cs2-stat-l">
+          <div class="cs2-stat-k">Bônus de campeão</div>
+          <div class="cs2-stat-v">se <b>${escapeHtml(teamPt(championPick.team))}</b> levantar a taça</div>
+        </div>
       </div>
-    </div>
+      <div class="cs2-foot">🔒 Trancado em <strong>${formatDeadline(deadline)}</strong> · resultado na Final</div>
+    </article>
   `;
 }
 
@@ -424,33 +450,31 @@ function renderScorerCard(locked) {
 
 function renderScorerLocked() {
   const current = scorerPick.players;
+  const { totalPts, totalGoals } = computeScorerBreakdown();
+  const scored = totalGoals > 0;
+  const meta = `${escapeHtml(teamPt(current.team))} · ${escapeHtml(current.position || 'jogador')}${current.shirt_number ? ' · #' + current.shirt_number : ''}`;
   return `
-    <div class="cs-card cs-locked" id="cardScorer">
-      <div class="cs-card-icon">⚽</div>
-      <div class="cs-card-kicker">Aposta 2 · Artilheiro · <span class="nw">🔒 Travado</span></div>
-      <h3>Artilheiro do Bolão</h3>
-      <p class="desc">Sua escolha está travada. Os pontos vão entrando conforme ele marca gols.</p>
-
-      <div class="cs-pick-box locked">
-        <div class="cs-pick-flag">${flag(current.team)}</div>
-        <div class="cs-pick-info">
-          <div class="cs-pick-name">${escapeHtml(current.full_name)}</div>
-          <div class="cs-pick-sub">🔒 ${escapeHtml(teamPt(current.team))} · ${escapeHtml(current.position || '')}${current.shirt_number ? ' · #' + current.shirt_number : ''}</div>
+    <article class="cs2 cs2-locked ${scored ? 'scoring' : ''}" id="cardScorer" style="--c1:${teamTint(current.team)};--c2:var(--accent)">
+      <div class="cs2-board">
+        <div class="cs2-top"><span class="cs2-kick">⚽ Seu Artilheiro</span><span class="cs2-pill ${scored ? 'live' : 'lock'}">${scored ? 'Marcando' : 'Travado'}</span></div>
+        <div class="cs2-pick">
+          <span class="cs2-flag">${flag(current.team)}</span>
+          <div class="cs2-id">
+            <div class="cs2-name">${escapeHtml(current.full_name)}</div>
+            <div class="cs2-meta">${meta}</div>
+          </div>
         </div>
       </div>
-
-      ${scorerGoals.length > 0 ? `
-        <div class="cs-scorer-running">
-          <div class="cs-scorer-running-label">Pontos parciais</div>
-          <div class="cs-scorer-running-value">+${computeScorerBreakdown().totalPts} pts</div>
-          <div class="cs-scorer-running-sub">${computeScorerBreakdown().totalGoals} gol${computeScorerBreakdown().totalGoals !== 1 ? 's' : ''} marcado${computeScorerBreakdown().totalGoals !== 1 ? 's' : ''} até agora</div>
+      <div class="cs2-stat">
+        <div class="cs2-num ${scored ? '' : 'zero'}">${totalGoals}</div>
+        <div class="cs2-stat-l">
+          <div class="cs2-stat-k">Gols dele${scored ? ' até agora' : ''}</div>
+          <div class="cs2-stat-v">${scored ? `<b>+${totalPts} pts</b> já somados pra você` : 'Ainda sem marcar — cada gol já conta'}</div>
         </div>
-      ` : ''}
-
-      <div class="cs-deadline locked">
-        🔒 Trancado em <strong>${formatDeadline(deadline)}</strong>
+        <div class="cs2-prize"><span class="p">+2 <small>/gol</small></span><span class="s">e mais nas fases finais</span></div>
       </div>
-    </div>
+      <div class="cs2-foot">🔒 Trancado em <strong>${formatDeadline(deadline)}</strong> · pontos entram a cada gol</div>
+    </article>
   `;
 }
 
