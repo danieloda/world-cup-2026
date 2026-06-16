@@ -7196,4 +7196,13 @@ input[type="number"].score-input {
   .rank-table tbody tr.me-row td.pts { background: #1d1a12; }
   .rank-table tbody tr.expanded td:nth-child(2),
   .rank-table tbody tr.expanded td.pts { background: #1b1813; }
+  /* Ao começar a rolar pro lado: a coluna do Jogador encolhe pra só a FOTO
+     (libera espaço pros dados, que ficavam espremidos). O nome volta quando
+     rola de volta à esquerda. Classe .is-xscroll é alternada por ranking.js. */
+  .rank-table-wrap.is-xscroll .rank-table { min-width: 840px; }
+  .rank-table-wrap.is-xscroll .rank-table thead th.col-player,
+  .rank-table-wrap.is-xscroll .rank-table tbody td:nth-child(2) { width: 56px; min-width: 56px; }
+  .rank-table-wrap.is-xscroll .rank-table thead th.col-player { font-size: 0; }
+  .rank-table-wrap.is-xscroll .rank-table tbody td:nth-child(2) .user-cell { gap: 0; }
+  .rank-table-wrap.is-xscroll .rank-table tbody td:nth-child(2) .user-cell > div:nth-child(2) { display: none; }
 }

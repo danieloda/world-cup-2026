@@ -631,6 +631,14 @@ function attachEventListeners() {
       return;
     }
   });
+  // Mobile: ao rolar a tabela na horizontal, encolhe a coluna do Jogador pra só
+  // a foto (libera espaço pros dados). Captura (scroll não borbulha) → sobrevive
+  // a re-renders. Limiar pequeno: colapsa assim que começa a arrastar.
+  document.addEventListener('scroll', (e) => {
+    const wrap = e.target?.closest?.('.rank-table-wrap');
+    if (wrap) wrap.classList.toggle('is-xscroll', wrap.scrollLeft > 6);
+  }, true);
+
   // Teclado: Enter/Espaço abre/fecha o drill-down na linha/pódio focado
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Enter' && e.key !== ' ') return;
