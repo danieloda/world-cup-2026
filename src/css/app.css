@@ -7175,7 +7175,9 @@ input[type="number"].score-input {
 @media (max-width: 600px) {
   .rank-table thead th:nth-child(n+3):nth-child(-n+11),
   .rank-table tbody td:nth-child(n+3):nth-child(-n+11) { display: table-cell; }  /* desfaz o hide do Tier 3 */
-  .rank-table { min-width: 580px; }
+  /* table-layout:fixed → as colunas precisam da largura DECLARADA (~965px somados)
+     senão espremem e os cabeçalhos se sobrepõem. Mantém o tamanho e rola lateral. */
+  .rank-table { min-width: 980px; }
   .rank-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
   .rank-legend { display: block; }
   .rank-table thead th { background: var(--bg-main); }
