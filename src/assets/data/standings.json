@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-16T02:07:10.993Z",
+  "updated_at": "2026-06-16T07:39:37.011Z",
   "season": 2026,
   "groups": {
     "A": [
@@ -329,6 +329,32 @@
     "G": [
       {
         "rank": 1,
+        "team": "New Zealand",
+        "played": 1,
+        "win": 0,
+        "draw": 1,
+        "lose": 0,
+        "gf": 2,
+        "ga": 2,
+        "gd": 0,
+        "points": 1,
+        "form": "D"
+      },
+      {
+        "rank": 2,
+        "team": "Iran",
+        "played": 1,
+        "win": 0,
+        "draw": 1,
+        "lose": 0,
+        "gf": 2,
+        "ga": 2,
+        "gd": 0,
+        "points": 1,
+        "form": "D"
+      },
+      {
+        "rank": 3,
         "team": "Belgium",
         "played": 1,
         "win": 0,
@@ -341,7 +367,7 @@
         "form": "D"
       },
       {
-        "rank": 2,
+        "rank": 4,
         "team": "Egypt",
         "played": 1,
         "win": 0,
@@ -352,32 +378,6 @@
         "gd": 0,
         "points": 1,
         "form": "D"
-      },
-      {
-        "rank": 3,
-        "team": "Iran",
-        "played": 0,
-        "win": 0,
-        "draw": 0,
-        "lose": 0,
-        "gf": 0,
-        "ga": 0,
-        "gd": 0,
-        "points": 0,
-        "form": null
-      },
-      {
-        "rank": 4,
-        "team": "New Zealand",
-        "played": 0,
-        "win": 0,
-        "draw": 0,
-        "lose": 0,
-        "gf": 0,
-        "ga": 0,
-        "gd": 0,
-        "points": 0,
-        "form": null
       }
     ],
     "H": [
