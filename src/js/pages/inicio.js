@@ -431,10 +431,10 @@ try {
   console.error('[inicio] FATAL:', err);
   reportFatal('inicio', err);
   document.body.innerHTML = `
-    <div style="padding:40px; max-width:720px; margin:40px auto; background:#181818; border-radius:12px; color:#fff; font-family:'Figtree',system-ui,-apple-system,sans-serif;">
-      <h1 style="color:#f15e6c">⚠️ Erro ao carregar Início</h1>
-      <pre style="background:#000; padding:16px; border-radius:8px; overflow:auto; white-space:pre-wrap; word-break:break-word; color:#f15e6c;">${err.stack || err.message || err}</pre>
-      <p style="margin-top:20px;"><a href="login.html" style="color:#f4c430">← Voltar ao login</a></p>
+    <div style="padding:40px; max-width:720px; margin:40px auto; background:#181818; border-radius:12px; color:var(--text); font-family:'Figtree',system-ui,-apple-system,sans-serif;">
+      <h1 style="color:var(--red)">⚠️ Erro ao carregar Início</h1>
+      <pre style="background:#000; padding:16px; border-radius:8px; overflow:auto; white-space:pre-wrap; word-break:break-word; color:var(--red);">${err.stack || err.message || err}</pre>
+      <p style="margin-top:20px;"><a href="login.html" style="color:var(--accent)">← Voltar ao login</a></p>
     </div>
   `;
 }
