@@ -1081,6 +1081,13 @@
   ],
   "France": [
     [
+      "2026-06-16",
+      "Senegal",
+      true,
+      "3-1",
+      "World Cup"
+    ],
+    [
       "2026-06-08",
       "Northern Ireland",
       true,
@@ -1141,13 +1148,6 @@
       "Iceland",
       true,
       "2-1",
-      "Eliminatórias"
-    ],
-    [
-      "2025-09-05",
-      "Ukraine",
-      false,
-      "2-0",
       "Eliminatórias"
     ]
   ],
@@ -2521,6 +2521,13 @@
   ],
   "Senegal": [
     [
+      "2026-06-16",
+      "France",
+      false,
+      "1-3",
+      "World Cup"
+    ],
+    [
       "2026-06-09",
       "Saudi Arabia",
       false,
@@ -2581,13 +2588,6 @@
       "Benin",
       false,
       "3-0",
-      "Copa Africana"
-    ],
-    [
-      "2025-12-27",
-      "Congo DR",
-      true,
-      "1-1",
       "Copa Africana"
     ]
   ],
