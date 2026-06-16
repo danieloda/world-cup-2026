@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-16T04:43:46.827Z",
+  "updated_at": "2026-06-16T10:00:06.025Z",
   "season": 2026,
   "scorers": [
     {
@@ -9,6 +9,14 @@
       "goals": 2,
       "assists": 0,
       "minutes": 72
+    },
+    {
+      "api_id": 94333,
+      "name": "E. Just",
+      "team": "New Zealand",
+      "goals": 2,
+      "assists": 0,
+      "minutes": 90
     },
     {
       "api_id": 265820,
@@ -59,20 +67,20 @@
       "minutes": 84
     },
     {
+      "api_id": 2691,
+      "name": "R. Rezaeian",
+      "team": "Iran",
+      "goals": 1,
+      "assists": 1,
+      "minutes": 90
+    },
+    {
       "api_id": 18979,
       "name": "V. Gyökeres",
       "team": "Sweden",
       "goals": 1,
       "assists": 1,
       "minutes": 90
-    },
-    {
-      "api_id": 542768,
-      "name": "Ibrahim Sadeh",
-      "team": "Jordan",
-      "goals": 1,
-      "assists": 1,
-      "minutes": null
     },
     {
       "api_id": 161921,
@@ -153,14 +161,6 @@
       "goals": 1,
       "assists": 0,
       "minutes": 70
-    },
-    {
-      "api_id": 453073,
-      "name": "Akam Hashim",
-      "team": "Iraq",
-      "goals": 1,
-      "assists": 0,
-      "minutes": null
     }
   ]
 }
