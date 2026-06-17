@@ -1,7 +1,15 @@
 {
-  "updated_at": "2026-06-17T07:28:30.297Z",
+  "updated_at": "2026-06-17T12:06:24.960Z",
   "season": 2026,
   "scorers": [
+    {
+      "api_id": 154,
+      "name": "L. Messi",
+      "team": "Argentina",
+      "goals": 3,
+      "assists": 0,
+      "minutes": 80
+    },
     {
       "api_id": 138835,
       "name": "F. Balogun",
@@ -11,17 +19,25 @@
       "minutes": 72
     },
     {
-      "api_id": 94333,
-      "name": "E. Just",
-      "team": "New Zealand",
+      "api_id": 265820,
+      "name": "Y. Ayari",
+      "team": "Sweden",
       "goals": 2,
       "assists": 0,
       "minutes": 90
     },
     {
-      "api_id": 265820,
-      "name": "Y. Ayari",
-      "team": "Sweden",
+      "api_id": 278,
+      "name": "Kylian Mbappé",
+      "team": "France",
+      "goals": 2,
+      "assists": 0,
+      "minutes": 90
+    },
+    {
+      "api_id": 94333,
+      "name": "E. Just",
+      "team": "New Zealand",
       "goals": 2,
       "assists": 0,
       "minutes": 90
@@ -33,6 +49,14 @@
       "goals": 2,
       "assists": 0,
       "minutes": 90
+    },
+    {
+      "api_id": 1100,
+      "name": "E. Haaland",
+      "team": "Norway",
+      "goals": 2,
+      "assists": 0,
+      "minutes": 95
     },
     {
       "api_id": 26475,
@@ -67,17 +91,17 @@
       "minutes": 84
     },
     {
-      "api_id": 2691,
-      "name": "R. Rezaeian",
-      "team": "Iran",
+      "api_id": 18979,
+      "name": "V. Gyökeres",
+      "team": "Sweden",
       "goals": 1,
       "assists": 1,
       "minutes": 90
     },
     {
-      "api_id": 18979,
-      "name": "V. Gyökeres",
-      "team": "Sweden",
+      "api_id": 2691,
+      "name": "R. Rezaeian",
+      "team": "Iran",
       "goals": 1,
       "assists": 1,
       "minutes": 90
@@ -89,6 +113,14 @@
       "goals": 1,
       "assists": 0,
       "minutes": 8
+    },
+    {
+      "api_id": 161904,
+      "name": "B. Barcola",
+      "team": "France",
+      "goals": 1,
+      "assists": 0,
+      "minutes": 10
     },
     {
       "api_id": 30484,
@@ -107,6 +139,14 @@
       "minutes": 14
     },
     {
+      "api_id": 446249,
+      "name": "I. Mbaye",
+      "team": "Senegal",
+      "goals": 1,
+      "assists": 0,
+      "minutes": 15
+    },
+    {
       "api_id": 34710,
       "name": "Oh Hyeon-Gyu",
       "team": "South Korea",
@@ -115,52 +155,12 @@
       "minutes": 21
     },
     {
-      "api_id": 157997,
-      "name": "A. Diallo",
-      "team": "Ivory Coast",
+      "api_id": 18967,
+      "name": "L. Østigård",
+      "team": "Norway",
       "goals": 1,
       "assists": 0,
-      "minutes": 34
-    },
-    {
-      "api_id": 106485,
-      "name": "Maurício",
-      "team": "Paraguay",
-      "goals": 1,
-      "assists": 0,
-      "minutes": 45
-    },
-    {
-      "api_id": 338014,
-      "name": "N. Irankunda",
-      "team": "Australia",
-      "goals": 1,
-      "assists": 0,
-      "minutes": 61
-    },
-    {
-      "api_id": 77037,
-      "name": "J. Lukić",
-      "team": "Bosnia & Herzegovina",
-      "goals": 1,
-      "assists": 0,
-      "minutes": 62
-    },
-    {
-      "api_id": 181812,
-      "name": "J. Musiala",
-      "team": "Germany",
-      "goals": 1,
-      "assists": 0,
-      "minutes": 64
-    },
-    {
-      "api_id": 37724,
-      "name": "C. Summerville",
-      "team": "Netherlands",
-      "goals": 1,
-      "assists": 0,
-      "minutes": 70
+      "minutes": 22
     }
   ]
 }
