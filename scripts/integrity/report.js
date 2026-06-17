@@ -127,6 +127,15 @@ export function buildReport({
 
   // Auditoria automática: TODO palpite lacrado tem updated_at <= prazo do jogo?
   // (updated_at está lacrado junto no snapshot — qualquer um recalcula isto.)
+  //
+  // INVARIANTE de que esta auditoria depende: predictions.updated_at = instante
+  // da ÚLTIMA EDIÇÃO DO PALPITE (pred_home/pred_away/pred_pen_winner) — nunca
+  // bumpado por escrita de sistema. Garantida pela migration 066: o trigger
+  // touch_prediction_updated_at só move updated_at quando o conteúdo do palpite
+  // muda (antes, o trigger compartilhado o bumpava também na escrita de
+  // points_earned pelo scoring → falso positivo "gravado após o prazo" em TODO
+  // jogo pontuado; ver integrity/reports/ERRATA_2026-06-17_falso-positivo-prazo.md).
+  // Se reaparecer "late" em jogo já pontuado, suspeite de regressão dessa invariante.
   const late = [];
   for (const [matchId, preds] of predsByMatch) {
     const m = byId.get(matchId);
