@@ -101,7 +101,7 @@ function detailsTable(summary, header, rows) {
  */
 export function buildReport({
   entry, content, matches, prevContent, csDeadline, predictionDeadline,
-  repoUrl, branch = 'main',
+  repoUrl, branch = 'main', regeneratedNote = '',
 }) {
   const byId = new Map(matches.map((m) => [m.id, m]));
   const prevSet = new Set(prevContent?.locked_match_ids ?? []);
@@ -125,19 +125,33 @@ export function buildReport({
     ...content.scorer_picks.map((s) => s.user_id),
   ]).size;
 
+  // updated_at de jogo JÁ FINALIZADO pode ser o instante do SCORING (escrita
+  // automática de points_earned pelo sistema, DEPOIS do jogo), não o da edição do
+  // palpite — bug corrigido na migration 066 (touch_prediction_updated_at só move
+  // updated_at quando pred_* muda). Em snapshots anteriores à 066 a assinatura do
+  // artefato é clara: TODAS as predictions do jogo com updated_at IDÊNTICO (um
+  // único UPDATE em lote). Esses NÃO são edição pós-prazo; a prova do prazo desses
+  // jogos é a trilha imutável prediction_audit (035) — todos antes do prazo.
+  // Ver integrity/reports/ERRATA_2026-06-17_falso-positivo-prazo.md. (Pós-066 os
+  // tempos voltam a ser distintos/reais e esta heurística não dispara.)
+  const finishedIds = new Set((content.results ?? []).map((r) => r.match_id));
+  const scoringStamped = new Set();
+  for (const [matchId, preds] of predsByMatch) {
+    if (!finishedIds.has(matchId) || !preds.length) continue;
+    const m = byId.get(matchId);
+    if (!m) continue;
+    const stamps = new Set(preds.map((p) => p.updated_at));
+    if (stamps.size === 1 && new Date(preds[0].updated_at) > predictionDeadline(m.match_date)) {
+      scoringStamped.add(matchId);
+    }
+  }
+
   // Auditoria automática: TODO palpite lacrado tem updated_at <= prazo do jogo?
   // (updated_at está lacrado junto no snapshot — qualquer um recalcula isto.)
-  //
-  // INVARIANTE de que esta auditoria depende: predictions.updated_at = instante
-  // da ÚLTIMA EDIÇÃO DO PALPITE (pred_home/pred_away/pred_pen_winner) — nunca
-  // bumpado por escrita de sistema. Garantida pela migration 066: o trigger
-  // touch_prediction_updated_at só move updated_at quando o conteúdo do palpite
-  // muda (antes, o trigger compartilhado o bumpava também na escrita de
-  // points_earned pelo scoring → falso positivo "gravado após o prazo" em TODO
-  // jogo pontuado; ver integrity/reports/ERRATA_2026-06-17_falso-positivo-prazo.md).
-  // Se reaparecer "late" em jogo já pontuado, suspeite de regressão dessa invariante.
+  // Jogos com o carimbo de scoring (acima) ficam de fora — não é edição pós-prazo.
   const late = [];
   for (const [matchId, preds] of predsByMatch) {
+    if (scoringStamped.has(matchId)) continue;
     const m = byId.get(matchId);
     if (!m) continue;
     const deadline = predictionDeadline(m.match_date);
@@ -178,27 +192,12 @@ export function buildReport({
         ? preds.map((p) => p.updated_at).sort().at(-1)
         : null;
       const lateHere = preds.some((p) => new Date(p.updated_at) > deadline);
-      const lastCell = lastUpd ? `${fmtShort(lastUpd)} ${lateHere ? '⚠️' : '✅'}` : '—';
+      const lastCell = !lastUpd ? '—'
+        : scoringStamped.has(id) ? `${fmtShort(lastUpd)} 🔧`
+          : `${fmtShort(lastUpd)} ${lateHere ? '⚠️' : '✅'}`;
       return `| **${teamOr(m.team_home)} × ${teamOr(m.team_away)}** | ${STAGE_LABEL[m.stage] || m.stage} `
         + `| ${fmtShort(m.match_date)} | ${fmtShort(deadline)} | ${preds.length} | ${lastCell} |`;
     });
-    // Palpite de cada participante, por jogo novo — nome de usuário do app
-    // (nunca e-mail). Colapsado para o relatório continuar legível.
-    const predTables = newLocked
-      .filter((id) => (predsByMatch.get(id) ?? []).length)
-      .map((id) => {
-        const m = byId.get(id);
-        const preds = predsByMatch.get(id);
-        const rows2 = preds
-          .map((p) => ({ name: nameOf(p.user_id), pred: fmtPred(p, m) }))
-          .sort(byName)
-          .map((r) => `| ${mdCell(r.name)} | ${r.pred} |`);
-        const title = m ? `${teamPlain(m.team_home)} × ${teamPlain(m.team_away)}` : `Jogo #${id}`;
-        return detailsTable(
-          `<b>${title}</b> — abrir os ${preds.length} palpites lacrados`,
-          ['Participante', 'Palpite'], rows2,
-        );
-      });
 
     newSection = [
       '| Jogo | Fase | Início | Prazo do palpite | Palpites lacrados | Último palpite recebido |',
@@ -207,14 +206,45 @@ export function buildReport({
       '',
       'Horários em Brasília (BRT). ✅ = todos os palpites do jogo foram registrados',
       '**antes** do prazo (o instante de cada palpite, `updated_at`, está lacrado junto).',
-      ...(predTables.length ? [
-        '',
-        ...predTables,
-        '',
-        '_Publicado somente depois da trava: ninguém pode mais copiar ou mudar nada._',
-      ] : []),
+      ...(scoringStamped.size ? ['🔧 = jogo já pontuado: o carimbo é o instante da '
+        + 'pontuação (sistema), não da edição — ver a auditoria de prazo abaixo.'] : []),
     ].join('\n');
   }
+
+  // ---- Ledger completo: palpites de TODOS os jogos travados até este lacre ----
+  // (colapsado por jogo). Antes só os jogos NOVOS do diff apareciam, então lacres
+  // sem jogo novo ficavam sem nenhum palpite à vista. Agora todo relatório é um
+  // registro completo e auto-contido — nome de usuário do app, nunca e-mail.
+  const lockedSorted = [...content.locked_match_ids].sort((a, b) => {
+    const ma = byId.get(a); const mb = byId.get(b);
+    const da = ma ? new Date(ma.match_date).getTime() : 0;
+    const db = mb ? new Date(mb.match_date).getTime() : 0;
+    return da - db || a - b;
+  });
+  const ledgerTables = lockedSorted
+    .filter((id) => (predsByMatch.get(id) ?? []).length)
+    .map((id) => {
+      const m = byId.get(id);
+      const preds = predsByMatch.get(id);
+      const rows = preds
+        .map((p) => ({ name: nameOf(p.user_id), pred: fmtPred(p, m) }))
+        .sort(byName)
+        .map((r) => `| ${mdCell(r.name)} | ${r.pred} |`);
+      const title = m ? `${teamPlain(m.team_home)} × ${teamPlain(m.team_away)}` : `Jogo #${id}`;
+      const tag = scoringStamped.has(id) ? ' 🔧' : '';
+      return detailsTable(
+        `<b>${title}</b>${tag} — abrir os ${preds.length} palpites lacrados`,
+        ['Participante', 'Palpite'], rows,
+      );
+    });
+  const ledgerSection = ledgerTables.length
+    ? [
+      ...ledgerTables,
+      '',
+      '_Cada bloco abre os palpites lacrados daquele jogo. Publicado somente depois',
+      'da trava: ninguém pode mais copiar ou mudar nada._',
+    ].join('\n\n')
+    : '_Ainda não há palpites travados neste lacre._';
 
   // Picks de campeão/artilheiro: listados com nome UMA vez, no lacre em que
   // estreiam (nos seguintes só os totais — eles não podem mais mudar).
@@ -251,7 +281,17 @@ export function buildReport({
   }
 
   // ---- Seção: auditoria de prazo ----
-  const auditSection = late.length === 0
+  // Nota do carimbo de scoring (só quando há jogo finalizado com updated_at = hora
+  // da pontuação): explica por que o instante lacrado desses é posterior ao prazo
+  // sem ser edição — a prova real do prazo deles é a trilha prediction_audit.
+  const scoringNote = scoringStamped.size === 0 ? '' : '\n\n'
+    + `> 🔧 **${scoringStamped.size} jogo(s) já pontuado(s)** neste lacre carregam, na coluna `
+    + '`updated_at`, o **instante da pontuação** (escrita automática de pontos pelo sistema '
+    + 'depois do jogo), não o da edição do palpite — por isso é posterior ao prazo. **Nenhum '
+    + 'palpite foi alterado:** o instante real de cada um está na trilha imutável '
+    + '`prediction_audit`, todos antes do prazo. Causa, prova e correção (migration 066) na '
+    + `[errata](${repoUrl}/blob/${branch}/integrity/reports/ERRATA_2026-06-17_falso-positivo-prazo.md).`;
+  const auditSection = (late.length === 0
     ? `✅ **Nenhum dos ${content.predictions.length} palpites lacrados foi registrado após o prazo do seu jogo**`
       + (content.champion_picks.length || content.scorer_picks.length
         ? ' — idem para os picks de campeão e artilheiro.'
@@ -260,7 +300,7 @@ export function buildReport({
       `⚠️ **${late.length} registro(s) com gravação APÓS o prazo** — exigem explicação do organizador:`,
       '',
       ...late.map((l) => `- usuário \`${String(l.user).slice(0, 8)}…\` em ${typeof l.matchId === 'number' ? `jogo #${l.matchId}` : l.matchId}: gravado ${fmtBRT(l.at)}, prazo era ${fmtBRT(l.deadline)}`),
-    ].join('\n');
+    ].join('\n')) + scoringNote;
 
   // ---- Seção: campeão/artilheiro ----
   let csLine;
@@ -275,7 +315,7 @@ export function buildReport({
   }
 
   return `# 🔒 Lacre de integridade #${entry.seq} — Bolão SBC 2026
-
+${regeneratedNote ? `\n${regeneratedNote}\n` : ''}
 **Carimbado em:** ${stampedAt}
 
 **O que este documento prova:** todos os palpites listados abaixo estavam
@@ -286,6 +326,10 @@ quebra o lacre e fica visível a qualquer pessoa, para sempre.
 ## Jogos que travaram neste lacre
 
 ${newSection}
+
+## Palpites lacrados (todos os jogos travados até este lacre)
+
+${ledgerSection}
 ${csSection}
 ## Auditoria automática de prazo
 

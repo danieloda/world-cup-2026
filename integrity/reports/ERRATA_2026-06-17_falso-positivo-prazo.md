@@ -184,15 +184,29 @@ atômicas:
    (desfaz tudo) se sobrar **qualquer** palpite pontuado com `updated_at` ainda
    após o prazo. Ou cura 100%, ou não muda nada — não há meio-termo silencioso.
 
-Além disso, `scripts/integrity/report.js` ganhou um comentário documentando a
-**invariante** ("`updated_at` = última edição do palpite, nunca escrita de
-sistema") para impedir regressão futura.
+Além disso, `scripts/integrity/report.js` foi corrigido para (a) **não confundir
+o carimbo de pontuação com edição**: quando todas as predictions de um jogo já
+finalizado têm o `updated_at` idêntico (assinatura de uma escrita em lote do
+scoring), o relatório marca o jogo com 🔧 e explica, em vez de acusar; e (b)
+passar a exibir o **ledger completo** — os palpites de todos os jogos travados
+até o lacre, e não só os jogos novos daquele lacre.
 
-> **Por que os relatórios #7–#15 continuam com o aviso?** Cada snapshot é selado e
-> imutável — reescrevê-lo quebraria a corrente de hashes (justamente a prova de
-> que não mexemos em nada). Então os lacres antigos **permanecem como estão**, e
-> esta errata fica ao lado deles como explicação permanente. Do **próximo lacre em
-> diante**, a auditoria volta a marcar ✅.
+### Os relatórios #6–#16 foram re-gerados (corrigidos) em 17/06/2026
+
+O relatório é **derivado** dos dados lacrados e **não entra no hash** — por isso
+pôde ser corrigido sem afetar a prova. Re-gerados pelo script
+`scripts/integrity/regenerate-reports.mjs` a partir dos **mesmos snapshots
+lacrados** (nada foi relido do banco além de nomes de times e prazos):
+
+- a auditoria de prazo dos lacres com jogos pontuados agora mostra ✅ + a nota 🔧
+  explicando o carimbo de pontuação (em vez do antigo "⚠️ N registros após o prazo");
+- cada relatório ganhou, no topo, um **aviso de que foi re-gerado** e por quê;
+- todo relatório agora traz o ledger completo de palpites.
+
+Os **snapshots lacrados e a corrente de hashes permanecem intactos**
+(`npm run integrity:verify` → `🎉 Cadeia íntegra (16 snapshots)`, hash final
+inalterado). O que mudou foi só o texto legível derivado — a prova matemática é
+exatamente a mesma de antes.
 
 ---
 

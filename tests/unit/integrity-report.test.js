@@ -84,11 +84,22 @@ describe('jogos que travaram neste lacre', () => {
     expect(md).not.toMatch(/Escócia|Scotland/);
   });
 
-  it('diff com o lacre anterior: jogo já travado antes não é listado como novo', () => {
+  it('diff com o lacre anterior: jogo já travado antes não entra na tabela de NOVOS', () => {
     const md2 = buildReport({ ...base, prevContent: { locked_match_ids: [1, 73, 74] } });
-    expect(md2).not.toContain('México × Polônia');
-    expect(md2).toContain('Canadá × Senegal');
+    // México (já travado antes) não é linha NOVA na tabela de jogos do lacre…
+    expect(md2).not.toContain('| **México × Polônia**');
+    // …mas continua no ledger completo de palpites lacrados.
+    expect(md2).toContain('<b>México × Polônia</b>');
+    expect(md2).toContain('| **Canadá × Senegal**');
     expect(md2).toContain('(1 novo(s) neste lacre)');
+  });
+
+  it('ledger lista os palpites de TODOS os jogos travados, mesmo sem jogo novo', () => {
+    const md3 = buildReport({ ...base, prevContent: { locked_match_ids: [1, 2, 73, 74] } });
+    expect(md3).toContain('Nenhum jogo novo travou desde o lacre anterior');
+    expect(md3).toContain('## Palpites lacrados (todos os jogos travados até este lacre)');
+    expect(md3).toContain('<b>México × Polônia</b> — abrir os 2 palpites lacrados');
+    expect(md3).toContain('| Ana | 2×0 |');
   });
 
   it('sem jogo novo: explica que o lacre registra outra mudança', () => {
@@ -170,6 +181,37 @@ describe('auditoria automática de prazo (updated_at lacrado ≤ deadline)', () 
     };
     const md = buildReport({ ...base, content: dirty });
     expect(md).toContain('pick de campeão');
+  });
+
+  // Jogo finalizado cujo updated_at (lacrado) é o instante da PONTUAÇÃO, não da
+  // edição: assinatura = todas as predictions do jogo com o MESMO timestamp.
+  const scoringStamped = {
+    ...content,
+    results: [{ match_id: 1, stage: 'group', status: 'FT', actual_home: 2, actual_away: 0, pen_winner: null }],
+    predictions: [
+      { user_id: U1, match_id: 1, pred_home: 2, pred_away: 0, pred_pen_winner: null, updated_at: '2026-06-12T15:00:00Z' },
+      { user_id: U2, match_id: 1, pred_home: 1, pred_away: 1, pred_pen_winner: null, updated_at: '2026-06-12T15:00:00Z' },
+    ],
+  };
+
+  it('jogo pontuado com updated_at uniforme = carimbo de scoring, NÃO acusa após o prazo', () => {
+    const md = buildReport({ ...base, content: scoringStamped });
+    expect(md).not.toContain('exigem explicação do organizador');
+    expect(md).toContain('Nenhum dos 2 palpites lacrados foi registrado após o prazo');
+    expect(md).toContain('1 jogo(s) já pontuado(s)');
+    expect(md).toContain('🔧');
+  });
+
+  it('edição real pós-prazo (timestamp destoa do lote do scoring) ainda é acusada', () => {
+    const mixed = {
+      ...scoringStamped,
+      predictions: [
+        { user_id: U1, match_id: 1, pred_home: 2, pred_away: 0, pred_pen_winner: null, updated_at: '2026-06-12T15:00:00Z' },
+        { user_id: U2, match_id: 1, pred_home: 9, pred_away: 9, pred_pen_winner: null, updated_at: '2026-06-12T18:30:00Z' },
+      ],
+    };
+    const md = buildReport({ ...base, content: mixed });
+    expect(md).toContain('registro(s) com gravação APÓS o prazo');
   });
 });
 
