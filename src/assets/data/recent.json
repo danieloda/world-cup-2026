@@ -649,6 +649,13 @@
   ],
   "Croatia": [
     [
+      "2026-06-17",
+      "England",
+      false,
+      "0-1",
+      "World Cup"
+    ],
+    [
       "2026-06-07",
       "Slovenia",
       true,
@@ -709,13 +716,6 @@
       "Montenegro",
       true,
       "4-0",
-      "Eliminatórias"
-    ],
-    [
-      "2025-09-05",
-      "Faroe Islands",
-      false,
-      "1-0",
       "Eliminatórias"
     ]
   ],
@@ -1009,6 +1009,13 @@
   ],
   "England": [
     [
+      "2026-06-17",
+      "Croatia",
+      true,
+      "1-0",
+      "World Cup"
+    ],
+    [
       "2026-06-10",
       "Costa Rica",
       true,
@@ -1069,13 +1076,6 @@
       "Serbia",
       false,
       "5-0",
-      "Eliminatórias"
-    ],
-    [
-      "2025-09-06",
-      "Andorra",
-      true,
-      "2-0",
       "Eliminatórias"
     ]
   ],
@@ -2233,6 +2233,13 @@
   ],
   "Portugal": [
     [
+      "2026-06-17",
+      "Congo DR",
+      true,
+      "1-1",
+      "World Cup"
+    ],
+    [
       "2026-06-10",
       "Nigeria",
       true,
@@ -2293,13 +2300,6 @@
       "Hungary",
       false,
       "3-2",
-      "Eliminatórias"
-    ],
-    [
-      "2025-09-06",
-      "Armenia",
-      false,
-      "5-0",
       "Eliminatórias"
     ]
   ],
@@ -3385,6 +3385,13 @@
   ],
   "DR Congo": [
     [
+      "2026-06-17",
+      "Portugal",
+      false,
+      "1-1",
+      "World Cup"
+    ],
+    [
       "2026-06-09",
       "Chile",
       true,
@@ -3446,13 +3453,6 @@
       true,
       "2-0",
       "Amistoso"
-    ],
-    [
-      "2025-11-16",
-      "Nigeria",
-      false,
-      "1-1",
-      "Eliminatórias"
     ]
   ]
 }
