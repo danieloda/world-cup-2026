@@ -1,6 +1,13 @@
 {
   "Algeria": [
     [
+      "2026-06-17",
+      "Argentina",
+      false,
+      "0-3",
+      "World Cup"
+    ],
+    [
       "2026-06-11",
       "Bolivia",
       false,
@@ -62,16 +69,16 @@
       true,
       "3-0",
       "Copa Africana"
-    ],
-    [
-      "2025-12-12",
-      "United Arab Emirates",
-      true,
-      "1-1",
-      "Arab Cup"
     ]
   ],
   "Argentina": [
+    [
+      "2026-06-17",
+      "Algeria",
+      true,
+      "3-0",
+      "World Cup"
+    ],
     [
       "2026-06-10",
       "Iceland",
@@ -133,13 +140,6 @@
       "Venezuela",
       true,
       "3-0",
-      "Eliminatórias"
-    ],
-    [
-      "2025-06-11",
-      "Colombia",
-      true,
-      "1-1",
       "Eliminatórias"
     ]
   ],
@@ -217,6 +217,13 @@
   ],
   "Austria": [
     [
+      "2026-06-17",
+      "Jordan",
+      true,
+      "1-1",
+      "World Cup"
+    ],
+    [
       "2026-06-01",
       "Tunisia",
       true,
@@ -277,13 +284,6 @@
       "Cyprus",
       true,
       "1-0",
-      "Eliminatórias"
-    ],
-    [
-      "2025-06-10",
-      "San Marino",
-      false,
-      "4-0",
       "Eliminatórias"
     ]
   ],
@@ -1441,6 +1441,13 @@
   ],
   "Iraq": [
     [
+      "2026-06-16",
+      "Norway",
+      true,
+      "1-4",
+      "World Cup"
+    ],
+    [
       "2026-06-10",
       "Venezuela",
       true,
@@ -1501,13 +1508,6 @@
       "United Arab Emirates",
       true,
       "2-1",
-      "Eliminatórias"
-    ],
-    [
-      "2025-11-13",
-      "United Arab Emirates",
-      false,
-      "1-1",
       "Eliminatórias"
     ]
   ],
@@ -1657,6 +1657,13 @@
   ],
   "Jordan": [
     [
+      "2026-06-17",
+      "Austria",
+      false,
+      "1-1",
+      "World Cup"
+    ],
+    [
       "2026-06-07",
       "Colombia",
       false,
@@ -1717,13 +1724,6 @@
       "Kuwait",
       false,
       "3-1",
-      "Arab Cup"
-    ],
-    [
-      "2025-12-03",
-      "United Arab Emirates",
-      true,
-      "2-1",
       "Arab Cup"
     ]
   ],
@@ -2017,6 +2017,13 @@
   ],
   "Norway": [
     [
+      "2026-06-16",
+      "Iraq",
+      false,
+      "4-1",
+      "World Cup"
+    ],
+    [
       "2026-06-07",
       "Morocco",
       false,
@@ -2078,13 +2085,6 @@
       true,
       "11-1",
       "Eliminatórias"
-    ],
-    [
-      "2025-09-04",
-      "Finland",
-      true,
-      "1-0",
-      "Amistoso"
     ]
   ],
   "Panama": [
