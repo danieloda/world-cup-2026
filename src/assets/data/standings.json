@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-17T16:53:49.461Z",
+  "updated_at": "2026-06-17T19:22:07.789Z",
   "season": 2026,
   "groups": {
     "A": [
@@ -545,29 +545,29 @@
     "K": [
       {
         "rank": 1,
-        "team": "Portugal",
-        "played": 0,
+        "team": "DR Congo",
+        "played": 1,
         "win": 0,
-        "draw": 0,
+        "draw": 1,
         "lose": 0,
-        "gf": 0,
-        "ga": 0,
+        "gf": 1,
+        "ga": 1,
         "gd": 0,
-        "points": 0,
-        "form": null
+        "points": 1,
+        "form": "D"
       },
       {
         "rank": 2,
-        "team": "DR Congo",
-        "played": 0,
+        "team": "Portugal",
+        "played": 1,
         "win": 0,
-        "draw": 0,
+        "draw": 1,
         "lose": 0,
-        "gf": 0,
-        "ga": 0,
+        "gf": 1,
+        "ga": 1,
         "gd": 0,
-        "points": 0,
-        "form": null
+        "points": 1,
+        "form": "D"
       },
       {
         "rank": 3,
