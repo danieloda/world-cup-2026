@@ -186,8 +186,10 @@ for (const [key, mig] of [['fee_amount', '001/admin'], ['pix_key', '026'], ['sit
 // group_stage_done/pool_settled só marcam DEPOIS do milestone → ausência pré-Copa = ok.
 const now = Date.now();
 const markerAgeH = (row) => (now - new Date(String(row.value).replace(/"/g, '')).getTime()) / 3.6e6;
-for (const name of ['daily_payments', 'group_completeness', 'cs_completeness',
-  'deadline_countdown', 'daily_recap', 'leader_change']) {
+// Ativos pós-059: group_completeness, daily_recap, leader_change marcam SEMPRE → ≤26h.
+// (daily_payments/cs_completeness DESLIGADOS na 059; deadline_countdown se auto-silencia
+//  pós-prazo de campeão/artilheiro — tratados no bloco de desagendados abaixo.)
+for (const name of ['group_completeness', 'daily_recap', 'leader_change']) {
   const row = sMap.get(`cron_lastrun_${name}`);
   if (!row) { bad(`cron alerts_${name}: nunca rodou (sem marker) — job não agendado?`); continue; }
   const ageH = markerAgeH(row);
@@ -213,6 +215,17 @@ for (const name of ['lock_tonight', 'round_movers', 'inactive_paid']) {
   ageH > hSinceSlot
     ? ok(`cron alerts_${name}: não roda desde ${(ageH / 24).toFixed(1)}d (desagendado, 053 ok)`)
     : bad(`cron alerts_${name} RODOU há ${ageH.toFixed(1)}h (depois do último slot) — deveria estar desagendado (053)`);
+}
+// Desligados na 059 (pedido do organizador, 2026-06-11): daily_payments e
+// cs_completeness foram unscheduled; deadline_countdown se cala sozinho pós-prazo
+// de campeão/artilheiro. Marker parado (mais velho que o último slot) = correto.
+for (const name of ['daily_payments', 'cs_completeness', 'deadline_countdown']) {
+  const row = sMap.get(`cron_lastrun_${name}`);
+  if (!row) { ok(`cron alerts_${name}: sem marker (desligado na 059)`); continue; }
+  const ageH = markerAgeH(row);
+  ageH > hSinceSlot
+    ? ok(`cron alerts_${name}: parado há ${(ageH / 24).toFixed(1)}d (desligado/silenciado na 059 — ok)`)
+    : bad(`cron alerts_${name} RODOU há ${ageH.toFixed(1)}h (depois do último slot) — deveria estar desligado (059)`);
 }
 // pipeline de alertas vivo
 {

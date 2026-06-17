@@ -45,7 +45,12 @@ export function scorePrediction(ph, pa, ppen, ah, aw, apen, stage) {
   else if (stage !== 'group' && apen) actualWinner = apen;
   else actualWinner = 'd';
 
-  if (predWinner === actualWinner) pts += v.ave;
+  // Cravar o placar do tempo normal (ph=ah E pa=aw) garante o ponto de RESULTADO
+  // mesmo errando o pênalti — regra "cravou = placar exato" (migration 056,
+  // espelha src/js/scoring.js). Sem isto, um empate de mata-mata cravado com
+  // pênalti errado perderia o ave e o E2E divergiria do banco.
+  const isExactScore = ph === ah && pa === aw;
+  if (isExactScore || predWinner === actualWinner) pts += v.ave;
   if ((ph - pa) === (ah - aw)) pts += v.dg;
 
   return pts;
