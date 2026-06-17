@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-17T00:02:11.473Z",
+  "updated_at": "2026-06-17T05:08:37.640Z",
   "season": 2026,
   "groups": {
     "A": [
@@ -437,6 +437,19 @@
     "I": [
       {
         "rank": 1,
+        "team": "Norway",
+        "played": 1,
+        "win": 1,
+        "draw": 0,
+        "lose": 0,
+        "gf": 4,
+        "ga": 1,
+        "gd": 3,
+        "points": 3,
+        "form": "W"
+      },
+      {
+        "rank": 2,
         "team": "France",
         "played": 1,
         "win": 1,
@@ -449,33 +462,7 @@
         "form": "W"
       },
       {
-        "rank": 2,
-        "team": "Iraq",
-        "played": 0,
-        "win": 0,
-        "draw": 0,
-        "lose": 0,
-        "gf": 0,
-        "ga": 0,
-        "gd": 0,
-        "points": 0,
-        "form": null
-      },
-      {
         "rank": 3,
-        "team": "Norway",
-        "played": 0,
-        "win": 0,
-        "draw": 0,
-        "lose": 0,
-        "gf": 0,
-        "ga": 0,
-        "gd": 0,
-        "points": 0,
-        "form": null
-      },
-      {
-        "rank": 4,
         "team": "Senegal",
         "played": 1,
         "win": 0,
@@ -486,37 +473,37 @@
         "gd": -2,
         "points": 0,
         "form": "L"
+      },
+      {
+        "rank": 4,
+        "team": "Iraq",
+        "played": 1,
+        "win": 0,
+        "draw": 0,
+        "lose": 1,
+        "gf": 1,
+        "ga": 4,
+        "gd": -3,
+        "points": 0,
+        "form": "L"
       }
     ],
     "J": [
       {
         "rank": 1,
         "team": "Argentina",
-        "played": 0,
-        "win": 0,
+        "played": 1,
+        "win": 1,
         "draw": 0,
         "lose": 0,
-        "gf": 0,
+        "gf": 3,
         "ga": 0,
-        "gd": 0,
-        "points": 0,
-        "form": null
+        "gd": 3,
+        "points": 3,
+        "form": "W"
       },
       {
         "rank": 2,
-        "team": "Algeria",
-        "played": 0,
-        "win": 0,
-        "draw": 0,
-        "lose": 0,
-        "gf": 0,
-        "ga": 0,
-        "gd": 0,
-        "points": 0,
-        "form": null
-      },
-      {
-        "rank": 3,
         "team": "Austria",
         "played": 0,
         "win": 0,
@@ -529,7 +516,7 @@
         "form": null
       },
       {
-        "rank": 4,
+        "rank": 3,
         "team": "Jordan",
         "played": 0,
         "win": 0,
@@ -540,6 +527,19 @@
         "gd": 0,
         "points": 0,
         "form": null
+      },
+      {
+        "rank": 4,
+        "team": "Algeria",
+        "played": 1,
+        "win": 0,
+        "draw": 0,
+        "lose": 1,
+        "gf": 0,
+        "ga": 3,
+        "gd": -3,
+        "points": 0,
+        "form": "L"
       }
     ],
     "K": [
