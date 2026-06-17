@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-17T18:35:39.534Z",
+  "updated_at": "2026-06-17T20:57:40.287Z",
   "season": 2026,
   "scorers": [
     {
@@ -27,9 +27,9 @@
       "minutes": 90
     },
     {
-      "api_id": 278,
-      "name": "Kylian Mbappé",
-      "team": "France",
+      "api_id": 1100,
+      "name": "E. Haaland",
+      "team": "Norway",
       "goals": 2,
       "assists": 0,
       "minutes": 90
@@ -43,20 +43,20 @@
       "minutes": 90
     },
     {
+      "api_id": 278,
+      "name": "Kylian Mbappé",
+      "team": "France",
+      "goals": 2,
+      "assists": 0,
+      "minutes": 90
+    },
+    {
       "api_id": 978,
       "name": "K. Havertz",
       "team": "Germany",
       "goals": 2,
       "assists": 0,
       "minutes": 90
-    },
-    {
-      "api_id": 1100,
-      "name": "E. Haaland",
-      "team": "Norway",
-      "goals": 2,
-      "assists": 0,
-      "minutes": 95
     },
     {
       "api_id": 26475,
@@ -91,17 +91,17 @@
       "minutes": 84
     },
     {
-      "api_id": 18979,
-      "name": "V. Gyökeres",
-      "team": "Sweden",
+      "api_id": 2691,
+      "name": "R. Rezaeian",
+      "team": "Iran",
       "goals": 1,
       "assists": 1,
       "minutes": 90
     },
     {
-      "api_id": 2691,
-      "name": "R. Rezaeian",
-      "team": "Iran",
+      "api_id": 18979,
+      "name": "V. Gyökeres",
+      "team": "Sweden",
       "goals": 1,
       "assists": 1,
       "minutes": 90
@@ -147,20 +147,20 @@
       "minutes": 15
     },
     {
+      "api_id": 18967,
+      "name": "L. Østigård",
+      "team": "Norway",
+      "goals": 1,
+      "assists": 0,
+      "minutes": 17
+    },
+    {
       "api_id": 34710,
       "name": "Oh Hyeon-Gyu",
       "team": "South Korea",
       "goals": 1,
       "assists": 0,
       "minutes": 21
-    },
-    {
-      "api_id": 18967,
-      "name": "L. Østigård",
-      "team": "Norway",
-      "goals": 1,
-      "assists": 0,
-      "minutes": 22
     }
   ]
 }
