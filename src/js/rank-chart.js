@@ -6,14 +6,24 @@
 // pra obter a POSIÇÃO, e desenha a trajetória do foco.
 //
 // Decisões (2026-06-15, aprovadas em protótipo):
-//  • Altura DINÂMICA: o gráfico só cresce com quantos jogadores estão no foco
-//    (poucos → baixinho). A altura sai do nº de selecionados, não do span.
 //  • Rótulos = hover: no DESKTOP os nomes saem de cima das linhas pra um PAINEL
 //    à direita que É o hover — em repouso mostra a classificação atual; ao passar
 //    o mouse vira o jogo sob o cursor (reordena, pontos, destaca a linha). Sem
 //    tooltip flutuante, sem rótulo cobrindo linha.
 //  • MOBILE: linha-espaguete não cabe; vira uma lista de SPARKLINES (uma mini
 //    trajetória por jogador + posição + seta de subiu/caiu).
+//
+// Clareza do desktop (2026-06-17):
+//  • Linhas em STEP (degrau) com rampa curta: a posição fica em PATAMAR durante o
+//    jogo e salta entre jogos — como um diagrama de tempo (o "clock" é a partida).
+//    1ª partida na borda esquerda, ÚLTIMA na DIREITA: o fim do gráfico É o último
+//    jogo (pontas, hover e divisória do último jogo caem no mesmo x).
+//  • Eixo Y de domínio ENXUTO: o núcleo cobre só onde o foco anda na 2ª metade +
+//    a posição atual; o ruído fundo do começo cai numa faixa COMPRIMIDA no rodapé
+//    (ou é absorvido linear, se for cauda curta). Altura ∝ posições do núcleo
+//    (px garantidos por posição → linhas respiram), com TETO relativo à viewport.
+//  • Grade dinâmica: uma linha por posição quando cabe + divisórias verticais por
+//    partida. Pontas explícitas (bolinha no fim de cada linha = posição atual).
 // Tempo em dois zooms: "Por semana" (Copa inteira) e "Jogos da semana" (só a
 // semana corrente, jogo a jogo). Foco livre via legenda; chips = reset.
 
@@ -71,9 +81,6 @@ export function renderRankChart(mount, { series, matches, meId }) {
     return `<span class="rc-av ${extra}" style="border-color:${colorMap.get(s.userId)}">${avatarHtml({ full_name: s.name, avatar_url: s.avatar_url })}</span>`;
   }
 
-  // altura dinâmica do gráfico (desktop): ∝ nº de selecionados
-  const dynH = (n) => clamp(Math.round(70 + 26 * n), 170, 560);
-
   mount.innerHTML = `
     <div class="rc-head">
       <div class="rc-presets" role="group" aria-label="Seleção rápida de jogadores">
@@ -127,35 +134,104 @@ export function renderRankChart(mount, { series, matches, meId }) {
     const steps = granKey === 'jogo' ? curWeekSteps : tl.weekEnds;
     const K = steps.length;
     const n = ids.length;
+    const lastStep = steps[steps.length - 1];
 
     const panW = width < 720 ? 250 : 296;   // mais largo: cabe Δ posição + Δ pontos no hover
     const chartW = Math.max(200, width - panW - 16);
-    const H = dynH(n);
     const PADl = 32, PADr = 12, PADt = 32, PADb = 22;  // PADt folgado: o rótulo de fase ("GRUPOS") respira acima das linhas
-    const plotH = H - PADt - PADb;
 
-    // faixa de posições do foco (zoom no foco)
-    let rLo = 1, rHi = N;
+    // ===== Eixo Y: domínio ENXUTO + altura por posição =====
+    // O começo da Copa é ruído: com todo mundo empatado a "posição" é só desempate,
+    // o que esticava o eixo até a lanterna e amassava as linhas lá em cima — onde o
+    // foco de fato vive. Agora o NÚCLEO do eixo cobre só onde as linhas andam na 2ª
+    // METADE (Copa já assentada) + a posição ATUAL. Excursões mais fundas que isso
+    // (o vai-e-vem do começo) não somem nem achatam: caem numa faixa COMPRIMIDA no
+    // rodapé, que mantém a ordem mas de-enfatiza o ruído.
+    let rLo = 1, rHi = Math.min(N, 6), deepHi = rHi;
     if (n) {
-      rLo = Infinity; rHi = -Infinity;
-      ids.forEach(i => { for (const gi of steps) { const p = pos[i][gi]; if (p < rLo) rLo = p; if (p > rHi) rHi = p; } });
-      rLo = Math.max(1, rLo - 1); rHi = Math.min(N, rHi + 1);
+      const half = Math.floor(steps.length / 2);
+      let best = Infinity, recentHi = 1, worst = 1;
+      ids.forEach(i => {
+        for (let k = 0; k < steps.length; k++) {
+          const p = pos[i][steps[k]];
+          if (p < best) best = p;
+          if (p > worst) worst = p;
+          if (k >= half && p > recentHi) recentHi = p;
+        }
+      });
+      rLo = Math.max(1, best - 1);
+      rHi = Math.min(N, recentHi + 1);
       if (rHi - rLo < 2) rHi = Math.min(N, rLo + 2);
+      deepHi = Math.max(rHi, worst);
+      // Se a cauda funda é pequena perto do núcleo, NÃO vale uma faixa comprimida
+      // (vira um vão vazio no rodapé): estende o eixo linear até lá. A faixa só fica
+      // quando a excursão é bem mais funda que o núcleo (ex.: top-10 + ruído inicial).
+      if (deepHi - rHi <= (rHi - rLo) * 0.6) rHi = deepHi;
     }
-    const span = Math.max(1, rHi - rLo);
+    const coreSpan = Math.max(1, rHi - rLo);
+    const hasDeep = deepHi > rHi;
+
+    // Altura ∝ posições do NÚCLEO (px garantidos por posição → as linhas respiram),
+    // não mais ∝ nº de selecionados. A faixa funda custa só uns px fixos.
+    const PXR = chartW < 420 ? 16 : 22;   // px por posição no núcleo (alvo)
+    const deepPx = hasDeep ? 52 : 0;
+    // teto relativo à VIEWPORT: o gráfico nunca passa da tela (folga p/ header,
+    // legenda e nota). Se o núcleo é grande (ex.: foco com alguém lá no fim),
+    // a altura bate no teto e as posições comprimem o necessário pra caber.
+    const vpCap = clamp((window.innerHeight || 800) - 300, 320, 600);
+    const H = clamp(Math.round(PADt + PADb + coreSpan * PXR + deepPx), 190, vpCap);
+    const plotH = H - PADt - PADb;
+    const yCore = PADt + (plotH - deepPx);   // base do trecho linear (núcleo)
+
     const x0 = PADl + 4, x1 = chartW - PADr;
-    const xAt = (k) => K <= 1 ? x1 : x0 + (x1 - x0) * (k / (K - 1));
-    const yAt = (p) => PADt + (p - rLo) / span * plotH;
+    // Cada partida tem uma POSIÇÃO no eixo (xAt) com um PATAMAR de largura ao redor:
+    // a posição fica reta durante o jogo e dá um DEGRAU entre jogos — como um sinal
+    // num diagrama de tempo (o "clock" é o jogo). A 1ª partida fica na borda esquerda
+    // e a ÚLTIMA na borda DIREITA — o fim do gráfico É a última partida (as pontas e
+    // o hover do último jogo caem no mesmo x).
+    const gap = K > 1 ? (x1 - x0) / (K - 1) : 0;
+    const xAt = (k) => K > 1 ? x0 + k * gap : x1;
+    const ramp = Math.min(13, gap * 0.26);   // transição curta entre jogos (suaviza o degrau)
+    // escala Y em 2 trechos: núcleo linear [rLo..rHi]→[PADt..yCore]; rodapé
+    // comprimido [rHi..deepHi]→[yCore..base] (mantém ordem, sem achatar idêntico).
+    const yAt = (p) => p <= rHi
+      ? PADt + (p - rLo) / coreSpan * (yCore - PADt)
+      : yCore + (p - rHi) / Math.max(1, deepHi - rHi) * (PADt + plotH - yCore);
+    const rowH = (yCore - PADt) / coreSpan;   // altura de uma posição no núcleo
 
     let g = '';
     stageBands(matches, steps, xAt, x0, x1).forEach((b, bi) => {
       if (bi % 2 === 1) g += `<rect class="rc-band" x="${b.x.toFixed(1)}" y="4" width="${b.w.toFixed(1)}" height="${(plotH + PADt - 4).toFixed(1)}"/>`;
       if (b.w > 64) g += `<text class="rc-band-lbl" x="${(b.x + b.w / 2).toFixed(1)}" y="15" text-anchor="middle">${escapeHtml(b.label)}</text>`;
     });
-    const yStep = Math.max(1, Math.ceil(span / 6));
+    if (hasDeep) g += `<rect class="rc-deepband" x="${x0}" y="${yCore.toFixed(1)}" width="${(x1 - x0).toFixed(1)}" height="${(PADt + plotH - yCore).toFixed(1)}"/>`;
+    // divisórias verticais ALINHADAS ÀS PARTIDAS: uma tracejada por jogo, passando
+    // pelo MEIO do patamar daquele jogo (onde o rótulo "Jogo N" e o hover caem). As
+    // transições (degraus) ficam ENTRE as tracejadas; dá pra ler a classificação de
+    // cada partida no cruzamento das linhas com a tracejada.
+    if (gap > 16) for (let k = 0; k < K; k++) {
+      const xb = xAt(k).toFixed(1);
+      g += `<line class="rc-vgrid" x1="${xb}" y1="${PADt}" x2="${xb}" y2="${(PADt + plotH).toFixed(1)}"/>`;
+    }
+    // grade dinâmica guiada por PIXELS: como a altura escala com o núcleo, cada
+    // posição costuma ter ~rowH px → rotula UMA linha por posição (1º, 2º, 3º…);
+    // só rareia (de 2 em 2…) se a altura bateu no teto e as linhas apertaram.
+    const yStep = Math.max(1, Math.round(16 / Math.max(1, rowH)));
     for (let p = rLo; p <= rHi; p += yStep) {
       g += `<line class="rc-grid" x1="${x0}" y1="${yAt(p).toFixed(1)}" x2="${x1}" y2="${yAt(p).toFixed(1)}"/>`;
       g += `<text class="rc-ylbl" x="${PADl - 4}" y="${(yAt(p) + 4).toFixed(1)}" text-anchor="end">${p}º</text>`;
+    }
+    if (hasDeep) {
+      // separador do núcleo + algumas marcas DENTRO da faixa comprimida (pra não
+      // virar um vão vazio) — passo maior porque ali as posições estão espremidas.
+      g += `<line class="rc-grid rc-grid-deep" x1="${x0}" y1="${yCore.toFixed(1)}" x2="${x1}" y2="${yCore.toFixed(1)}"/>`;
+      const deepStep = Math.max(1, Math.round((deepHi - rHi) / 3));
+      for (let p = rHi + deepStep; p < deepHi; p += deepStep) {
+        g += `<line class="rc-grid rc-grid-deep" x1="${x0}" y1="${yAt(p).toFixed(1)}" x2="${x1}" y2="${yAt(p).toFixed(1)}"/>`;
+        g += `<text class="rc-ylbl rc-ylbl-deep" x="${PADl - 4}" y="${(yAt(p) + 4).toFixed(1)}" text-anchor="end">${p}º</text>`;
+      }
+      g += `<line class="rc-grid rc-grid-deep" x1="${x0}" y1="${yAt(deepHi).toFixed(1)}" x2="${x1}" y2="${yAt(deepHi).toFixed(1)}"/>`;
+      g += `<text class="rc-ylbl rc-ylbl-deep" x="${PADl - 4}" y="${(yAt(deepHi) + 4).toFixed(1)}" text-anchor="end">${deepHi}º</text>`;
     }
     const tight = chartW < 380;
     const nx = granKey === 'semana' ? K : Math.min(tight ? 4 : 6, K);
@@ -169,9 +245,25 @@ export function renderRankChart(mount, { series, matches, meId }) {
     }
 
     let foc = '';
-    const lineOf = (i) => steps.map((gi, k) => `${xAt(k).toFixed(1)},${yAt(pos[i][gi]).toFixed(1)}`).join(' ');
+    // STEP com rampa: patamar reto na célula (jogo) + transição curta na borda.
+    const lineOf = (i) => {
+      let pts = '';
+      for (let k = 0; k < K; k++) {
+        const y = yAt(pos[i][steps[k]]).toFixed(1);
+        const L = (k === 0 ? x0 : xAt(k) - gap / 2 + ramp).toFixed(1);
+        const R = (k === K - 1 ? x1 : xAt(k) + gap / 2 - ramp).toFixed(1);
+        pts += `${L},${y} ${R},${y} `;
+      }
+      return pts.trim();
+    };
     ids.forEach(i => {
       foc += `<polyline class="rc-foc${series[i].userId === meId ? ' me' : ''}" data-i="${i}" stroke="${colorOf(i)}" style="--glow:${colorOf(i)}" points="${lineOf(i)}"/>`;
+    });
+    // Pontas explícitas: bolinha no FIM de cada linha (= posição atual). Some no
+    // hover (dão lugar às bolinhas que seguem o cursor) e volta ao sair do gráfico.
+    let endDots = '';
+    ids.forEach(i => {
+      endDots += `<circle class="rc-enddot${series[i].userId === meId ? ' me' : ''}" cx="${x1.toFixed(1)}" cy="${yAt(pos[i][lastStep]).toFixed(1)}" r="${series[i].userId === meId ? 4.6 : 3.8}" fill="${colorOf(i)}" style="--glow:${colorOf(i)}"/>`;
     });
 
     body.className = 'rc-body rc-main';
@@ -182,6 +274,7 @@ export function renderRankChart(mount, { series, matches, meId }) {
              aria-label="Evolução da posição no ranking ao longo da Copa">
           ${g}
           <g>${foc}</g>
+          <g class="rc-enddots">${endDots}</g>
           <line class="rc-cross" x1="0" y1="${PADt}" x2="0" y2="${(PADt + plotH).toFixed(1)}" hidden/>
           <g class="rc-hover"></g>
           <rect class="rc-hit" x="${x0}" y="${PADt}" width="${Math.max(0, x1 - x0)}" height="${plotH}" fill="transparent"/>
@@ -195,7 +288,7 @@ export function renderRankChart(mount, { series, matches, meId }) {
 
     const panRows = buildPanel(body, ids);
     updatePanel(panRows, ids, GAMES - 1, -1, false);
-    attachHover(body, { steps, K, xAt, yAt, x0, x1, H, plotH, PADt, rowH: plotH / span, ids, panRows });
+    attachHover(body, { steps, K, xAt, yAt, x0, x1, gap, H, plotH, PADt, rowH, ids, panRows });
   }
 
   // painel persistente — cria as linhas uma vez por draw, depois só reposiciona
@@ -262,6 +355,7 @@ export function renderRankChart(mount, { series, matches, meId }) {
     const hit = body.querySelector('.rc-hit');
     const cross = body.querySelector('.rc-cross');
     const hover = body.querySelector('.rc-hover');
+    const endg = body.querySelector('.rc-enddots');
     if (!svg || !hit) return;
     const focLines = svg.querySelectorAll('.rc-foc');
     const setHot = (i) => focLines.forEach(pl => {
@@ -278,10 +372,11 @@ export function renderRankChart(mount, { series, matches, meId }) {
       const vh = svg.viewBox.baseVal.height || box.height;
       const xv = (cx - box.left) / box.width * vw;
       const yv = (cy - box.top) / box.height * vh;
-      const k = clamp(Math.round((xv - geo.x0) / Math.max(1, geo.x1 - geo.x0) * (geo.K - 1)), 0, Math.max(0, geo.K - 1));
+      const k = geo.gap ? clamp(Math.round((xv - geo.x0) / geo.gap), 0, geo.K - 1) : 0;
       const gi = geo.steps[k];
       const xpx = geo.xAt(k);
 
+      if (endg) endg.style.display = 'none';
       cross.removeAttribute('hidden');
       cross.setAttribute('x1', xpx.toFixed(1));
       cross.setAttribute('x2', xpx.toFixed(1));
@@ -307,6 +402,7 @@ export function renderRankChart(mount, { series, matches, meId }) {
     }
 
     function leave() {
+      if (endg) endg.style.display = '';
       cross.setAttribute('hidden', '');
       while (hover.firstChild) hover.removeChild(hover.firstChild);
       setHot(-1);

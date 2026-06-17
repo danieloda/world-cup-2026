@@ -5895,6 +5895,12 @@ input[type="number"].score-input {
 
 /* grade horizontal: referência de posição sem pesar o desenho */
 .rc-grid { stroke: rgba(255, 255, 255, .055); stroke-width: 1; }
+/* divisórias verticais: cada célula = uma partida (as "bordas do clock") */
+.rc-vgrid { stroke: rgba(255, 255, 255, .05); stroke-width: 1; stroke-dasharray: 2 4; }
+/* faixa funda: zona comprimida no rodapé p/ as excursões-ruído do começo da Copa */
+.rc-deepband { fill: rgba(255, 255, 255, .022); }
+.rc-grid-deep { stroke: rgba(255, 255, 255, .14); stroke-dasharray: 2 3; }
+.rc-ylbl-deep { opacity: .6; }
 
 /* linhas: pelotão em cinza-contexto, foco colorido por cima */
 .rc-ctx { stroke: #2e2e31; stroke-width: 1.25; fill: none; }
@@ -5919,6 +5925,9 @@ input[type="number"].score-input {
 .rc-svg.rc-tipping .rc-endgrp { opacity: .12; }
 
 .rc-hdot { pointer-events: none; }
+/* pontas explícitas: bolinha no fim de cada linha (= posição atual), em repouso */
+.rc-enddot { pointer-events: none; stroke: var(--bg-main); stroke-width: 1.5; }
+.rc-enddot.me { filter: drop-shadow(0 0 5px var(--glow)); }
 .rc-cross { stroke: rgba(255,255,255,.35); stroke-width: 1; stroke-dasharray: 3 3; }
 .rc-hit { cursor: crosshair; }
 
