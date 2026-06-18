@@ -577,6 +577,13 @@
   ],
   "Colombia": [
     [
+      "2026-06-18",
+      "Uzbekistan",
+      false,
+      "3-1",
+      "World Cup"
+    ],
+    [
       "2026-06-07",
       "Jordan",
       true,
@@ -637,13 +644,6 @@
       "Venezuela",
       false,
       "6-3",
-      "Eliminatórias"
-    ],
-    [
-      "2025-09-04",
-      "Bolivia",
-      true,
-      "3-0",
       "Eliminatórias"
     ]
   ],
@@ -1225,6 +1225,13 @@
   ],
   "Ghana": [
     [
+      "2026-06-17",
+      "Panama",
+      true,
+      "1-0",
+      "World Cup"
+    ],
+    [
       "2026-06-02",
       "Wales",
       false,
@@ -1285,13 +1292,6 @@
       "Mali",
       true,
       "1-0",
-      "Eliminatórias"
-    ],
-    [
-      "2025-09-04",
-      "Chad",
-      false,
-      "1-1",
       "Eliminatórias"
     ]
   ],
@@ -2089,6 +2089,13 @@
   ],
   "Panama": [
     [
+      "2026-06-17",
+      "Ghana",
+      false,
+      "0-1",
+      "World Cup"
+    ],
+    [
       "2026-06-06",
       "Bosnia & Herzegovina",
       true,
@@ -2149,13 +2156,6 @@
       "Guatemala",
       false,
       "3-2",
-      "Eliminatórias"
-    ],
-    [
-      "2025-10-15",
-      "Suriname",
-      true,
-      "1-1",
       "Eliminatórias"
     ]
   ],
@@ -3169,6 +3169,13 @@
   ],
   "Uzbekistan": [
     [
+      "2026-06-18",
+      "Colombia",
+      true,
+      "1-3",
+      "World Cup"
+    ],
+    [
       "2026-06-08",
       "Netherlands",
       false,
@@ -3229,13 +3236,6 @@
       "Uruguay",
       true,
       "1-2",
-      "Amistoso"
-    ],
-    [
-      "2025-10-09",
-      "Kuwait",
-      true,
-      "2-0",
       "Amistoso"
     ]
   ],
