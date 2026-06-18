@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-18T00:19:05.869Z",
+  "updated_at": "2026-06-18T05:09:47.061Z",
   "season": 2026,
   "groups": {
     "A": [
@@ -545,6 +545,19 @@
     "K": [
       {
         "rank": 1,
+        "team": "Colombia",
+        "played": 1,
+        "win": 1,
+        "draw": 0,
+        "lose": 0,
+        "gf": 3,
+        "ga": 1,
+        "gd": 2,
+        "points": 3,
+        "form": "W"
+      },
+      {
+        "rank": 2,
         "team": "DR Congo",
         "played": 1,
         "win": 0,
@@ -557,7 +570,7 @@
         "form": "D"
       },
       {
-        "rank": 2,
+        "rank": 3,
         "team": "Portugal",
         "played": 1,
         "win": 0,
@@ -570,30 +583,17 @@
         "form": "D"
       },
       {
-        "rank": 3,
-        "team": "Uzbekistan",
-        "played": 0,
-        "win": 0,
-        "draw": 0,
-        "lose": 0,
-        "gf": 0,
-        "ga": 0,
-        "gd": 0,
-        "points": 0,
-        "form": null
-      },
-      {
         "rank": 4,
-        "team": "Colombia",
-        "played": 0,
+        "team": "Uzbekistan",
+        "played": 1,
         "win": 0,
         "draw": 0,
-        "lose": 0,
-        "gf": 0,
-        "ga": 0,
-        "gd": 0,
+        "lose": 1,
+        "gf": 1,
+        "ga": 3,
+        "gd": -2,
         "points": 0,
-        "form": null
+        "form": "L"
       }
     ],
     "L": [
@@ -613,28 +613,28 @@
       {
         "rank": 2,
         "team": "Ghana",
-        "played": 0,
-        "win": 0,
+        "played": 1,
+        "win": 1,
         "draw": 0,
         "lose": 0,
-        "gf": 0,
+        "gf": 1,
         "ga": 0,
-        "gd": 0,
-        "points": 0,
-        "form": null
+        "gd": 1,
+        "points": 3,
+        "form": "W"
       },
       {
         "rank": 3,
         "team": "Panama",
-        "played": 0,
+        "played": 1,
         "win": 0,
         "draw": 0,
-        "lose": 0,
+        "lose": 1,
         "gf": 0,
-        "ga": 0,
-        "gd": 0,
+        "ga": 1,
+        "gd": -1,
         "points": 0,
-        "form": null
+        "form": "L"
       },
       {
         "rank": 4,
