@@ -550,7 +550,7 @@ function renderResultRow(m) {
   const goalsHtml = goals.length > 0
     ? `<div class="gr-goals">
          <span class="gr-goals-cap">⚽ Gols</span>
-         ${[...homeGoals, ...awayGoals].map(g => `<span class="gr-scorer"><span class="fl">${flag(g.players.team)}</span> ${escapeHtml(g.players.full_name)} <b>${g.goals}'</b></span>`).join('')}
+         ${[...homeGoals, ...awayGoals].map(g => `<span class="gr-scorer"><span class="fl">${flag(g.players.team)}</span> ${escapeHtml(g.players.full_name)}${g.goals > 1 ? ` <b>×${g.goals}</b>` : ''}</span>`).join('')}
        </div>`
     : '';
 
