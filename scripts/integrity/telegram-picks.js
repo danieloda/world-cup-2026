@@ -181,8 +181,10 @@ function gameBlock(m, id, preds, nameOf, champs) {
 }
 
 // Ranking derivado do próprio content lacrado: results + predictions com a
-// pontuação por jogo do SSOT (scoring.js). Bônus de fim de torneio (campeão/
-// artilheiro/classificados) ficam fora — aqui o assunto são os JOGOS.
+// pontuação por jogo do SSOT (scoring.js). FALLBACK — usado só quando o
+// leaderboard oficial não vem (testes puros / run sem banco). Inclui SÓ pontos
+// de jogos (sem artilheiro/campeão/classificados); por isso o alerta de verdade
+// prefere rankingTable() abaixo, que lê o v_leaderboard.
 function standings(content, nameOf) {
   const resByMatch = new Map(content.results.map((r) => [r.match_id, r]));
   if (resByMatch.size === 0) return [];
@@ -200,9 +202,48 @@ function standings(content, nameOf) {
     .sort((a, b) => b[1] - a[1] || nameOf(a[0]).localeCompare(nameOf(b[0]), 'pt-BR'));
 }
 
+// Tabela do ranking para o alerta. Com o leaderboard OFICIAL (v_leaderboard,
+// passado pelo snapshot.js) a pontuação bate 100% com o site — inclui o bônus
+// de artilheiro AO VIVO (e campeão/classificados quando existirem). A ordem usa
+// o MESMO desempate da página de ranking (total → exatos → vencedor+saldo; ver
+// src/js/prize.js sortLeaderboard). Sem leaderboard, cai no derivado do snapshot.
+function rankingTable({ content, leaderboard, nameOf }) {
+  if (leaderboard && leaderboard.length) {
+    return [...leaderboard]
+      .sort((a, b) =>
+        (b.total_pts ?? 0) - (a.total_pts ?? 0)
+        || (b.exact_count ?? 0) - (a.exact_count ?? 0)
+        || (b.winner_sg_count ?? 0) - (a.winner_sg_count ?? 0)
+        || nameOf(a.user_id).localeCompare(nameOf(b.user_id), 'pt-BR'))
+      .map((r) => [r.user_id, r.total_pts ?? 0]);
+  }
+  return standings(content, nameOf);
+}
+
+// Quem mais subiu/caiu desde o ÚLTIMO lacre anunciado (posições no ranking
+// oficial). prevRanking = array de user_id na ordem do lacre anterior, guardado
+// pelo anúncio-único (post-picks.js). Só aparece com movimento de 2+ posições.
+function movementLine({ table, prevRanking, nameOf }) {
+  if (!prevRanking || prevRanking.length < 3 || table.length < 3) return null;
+  const curPos = new Map(table.map(([uid], i) => [uid, i + 1]));
+  const prevPos = new Map(prevRanking.map((uid, i) => [uid, i + 1]));
+  let up = null;
+  let down = null;
+  for (const [uid, pos] of curPos) {
+    if (!prevPos.has(uid)) continue;
+    const delta = prevPos.get(uid) - pos; // + sobe, - cai
+    if (delta > 0 && (!up || delta > up.delta)) up = { uid, delta, from: prevPos.get(uid), to: pos };
+    if (delta < 0 && (!down || delta < down.delta)) down = { uid, delta, from: prevPos.get(uid), to: pos };
+  }
+  const out = [];
+  if (up && up.delta >= 2) out.push(`🚀 Quem mais subiu: ${esc(nameOf(up.uid))} (${up.from}º → ${up.to}º, +${up.delta})`);
+  if (down && down.delta <= -2) out.push(`📉 Maior tombo: ${esc(nameOf(down.uid))} (${down.from}º → ${down.to}º, ${down.delta})`);
+  return out.length ? out.join('\n') : null;
+}
+
 // Bloco "Olho no ranking": top 3 + duelo líder × vice nos jogos deste lacre.
-function rankingBlock({ content, newLocked, byId, predsByMatch, nameOf }) {
-  const table = standings(content, nameOf);
+function rankingBlock({ content, leaderboard, prevRanking, newLocked, byId, predsByMatch, nameOf }) {
+  const table = rankingTable({ content, leaderboard, nameOf });
   if (table.length < 2 || !table.some(([, p]) => p > 0)) return null;
 
   const medals = ['🥇', '🥈', '🥉'];
@@ -259,6 +300,10 @@ function rankingBlock({ content, newLocked, byId, predsByMatch, nameOf }) {
       lines.push('', `🐢 Lanterna: ${esc(who)} (${pts(minPts)}) — todo campeão já foi lanterna um dia`);
     }
   }
+
+  // Quem mais subiu/caiu desde o último lacre anunciado (só com ranking oficial).
+  const move = movementLine({ table, prevRanking, nameOf });
+  if (move) lines.push('', move);
 
   return lines.join('\n');
 }
@@ -331,6 +376,96 @@ function boldestLine({ newLocked, byId, predsByMatch, nameOf }) {
   return `🎲 Palpite mais ousado do lacre: ${bold.p.pred_home}×${bold.p.pred_away} de ${esc(nameOf(bold.p.user_id))} em ${esc(matchName(byId.get(bold.id)))}`;
 }
 
+// Placar mais palpitado somando TODOS os jogos do lacre — a "cara" do lacre.
+function popularScoreLine({ newLocked, predsByMatch }) {
+  const gameIds = newLocked.filter((id) => (predsByMatch.get(id) ?? []).length > 0);
+  if (gameIds.length < 2) return null;
+  const scores = new Map();
+  for (const id of gameIds) {
+    for (const p of predsByMatch.get(id)) {
+      const k = `${p.pred_home}×${p.pred_away}`;
+      scores.set(k, (scores.get(k) ?? 0) + 1);
+    }
+  }
+  const ranked = [...scores.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+  const [topScore, topCount] = ranked[0];
+  if (topCount < 3) return null; // sem repetição não é "popular"
+  return `🎯 Placar mais palpitado do lacre: ${esc(topScore)} (${topCount} vezes)`;
+}
+
+// Otimista × Muralha: quem somou MAIS e MENOS gols nos palpites do lacre (só
+// quem palpitou todos os jogos, e com pelotão de verdade pra fazer sentido).
+function optimistWallLine({ newLocked, predsByMatch, nameOf }) {
+  const gameIds = newLocked.filter((id) => (predsByMatch.get(id) ?? []).length > 0);
+  if (gameIds.length < 2) return null;
+  const goals = new Map();
+  const count = new Map();
+  for (const id of gameIds) {
+    for (const p of predsByMatch.get(id)) {
+      goals.set(p.user_id, (goals.get(p.user_id) ?? 0) + p.pred_home + p.pred_away);
+      count.set(p.user_id, (count.get(p.user_id) ?? 0) + 1);
+    }
+  }
+  const full = [...goals.entries()].filter(([u]) => count.get(u) === gameIds.length);
+  if (full.length < MIN_POOL) return null;
+  full.sort((a, b) => b[1] - a[1] || nameOf(a[0]).localeCompare(nameOf(b[0]), 'pt-BR'));
+  const [topU, topG] = full[0];
+  const [botU, botG] = full[full.length - 1];
+  if (topG === botG) return null; // todo mundo no mesmo nível → sem graça
+  const n = gameIds.length;
+  return `☀️ Otimista do lacre: ${esc(nameOf(topU))} — ${topG} gols somados nos ${n} jogos\n`
+    + `🛡️ Muralha: ${esc(nameOf(botU))} — só ${botG} no total`;
+}
+
+// O jogo que mais DIVIDE a galera × o de CONSENSO quase total (pela maior fatia
+// de um lado). Pênaltis contam pro lado no mata-mata (mesma leitura do gameBlock).
+function mostDividedLine({ newLocked, byId, predsByMatch }) {
+  const stats = [];
+  for (const id of newLocked) {
+    const preds = predsByMatch.get(id) ?? [];
+    if (preds.length < MIN_POOL) continue;
+    const m = byId.get(id);
+    const stage = m?.stage ?? 'group';
+    const c = { h: 0, d: 0, a: 0 };
+    for (const p of preds) c[predOutcome(p, stage).side]++;
+    const top = Math.max(c.h, c.d, c.a);
+    const side = c.h === top ? 'h' : c.d === top ? 'd' : 'a';
+    stats.push({ id, share: top / preds.length, c, side, m });
+  }
+  if (stats.length < 2) return null;
+  stats.sort((a, b) => a.share - b.share || a.id - b.id);
+  const lo = stats[0];
+  const hi = stats[stats.length - 1];
+  const out = [];
+  if (lo.share <= 0.6) {
+    out.push(`🤔 Jogo que mais divide a galera: ${esc(matchName(lo.m))} (só ${Math.round(lo.share * 100)}% no favorito — ${lo.c.h}·${lo.c.d}·${lo.c.a})`);
+  }
+  if (hi.share >= 0.75 && hi.id !== lo.id) {
+    const fav = hi.side === 'd' ? 'empate' : teamPlain(hi.side === 'h' ? hi.m?.team_home : hi.m?.team_away);
+    out.push(`🤝 Consenso quase total: ${esc(matchName(hi.m))} (${Math.round(hi.share * 100)}% em ${esc(fav)})`);
+  }
+  return out.length ? out.join('\n') : null;
+}
+
+// Rei do empate: quem mais cravou EMPATE nos jogos do lacre (só com 3+ jogos e
+// 2+ empates — abaixo disso não é padrão, é acaso).
+function drawKingLine({ newLocked, predsByMatch, nameOf }) {
+  const gameIds = newLocked.filter((id) => (predsByMatch.get(id) ?? []).length > 0);
+  if (gameIds.length < 3) return null;
+  const draws = new Map();
+  for (const id of gameIds) {
+    for (const p of predsByMatch.get(id)) {
+      if (p.pred_home === p.pred_away) draws.set(p.user_id, (draws.get(p.user_id) ?? 0) + 1);
+    }
+  }
+  if (draws.size === 0) return null;
+  const max = Math.max(...draws.values());
+  if (max < 2) return null;
+  const who = [...draws.entries()].filter(([, c]) => c === max).map(([u]) => nameOf(u));
+  const label = who.length <= 2 ? nameList(who) : `${who.length} jogadores`;
+  return `🟰 Rei do empate: ${esc(label)} — empate em ${max} dos ${gameIds.length} jogos do lacre`;
+}
+
 /**
  * Monta as mensagens (HTML do Telegram) com o raio-X dos palpites dos jogos
  * que travaram NESTE lacre. Respeita o teto de tamanho do Telegram via
@@ -348,12 +483,17 @@ function boldestLine({ newLocked, byId, predsByMatch, nameOf }) {
  */
 export function buildPicksMessages({
   entry, content, prevContent, matches, reportUrl, maxLen = 3800,
+  leaderboard = null, prevRanking = null,
 }) {
   const prevSet = new Set(prevContent?.locked_match_ids ?? []);
   const newLocked = content.locked_match_ids.filter((id) => !prevSet.has(id));
   if (newLocked.length === 0) return [];
 
   const byId = new Map(matches.map((m) => [m.id, m]));
+  // Jogos do lacre na ordem em que a galera vê o dia: por horário de início
+  // (mais cedo primeiro). match_id como desempate determinístico.
+  newLocked.sort((a, b) =>
+    new Date(byId.get(a)?.match_date ?? 0) - new Date(byId.get(b)?.match_date ?? 0) || a - b);
   const nameById = new Map((content.users ?? []).map((u) => [u.user_id, u.name]));
   const nameOf = (id) => nameById.get(id) || `Participante ${String(id).slice(0, 8)}…`;
 
@@ -381,11 +521,19 @@ export function buildPicksMessages({
   const gameCount = blocks.length;
   if (gameCount === 0) return [];
 
-  const ctx = { content, newLocked, byId, predsByMatch, nameOf };
+  const ctx = { content, leaderboard, prevRanking, newLocked, byId, predsByMatch, nameOf };
   const ranking = rankingBlock(ctx);
   if (ranking) blocks.push(ranking);
 
-  const extras = [twinsLine(ctx), ...goalsLines(ctx), boldestLine(ctx)].filter(Boolean);
+  const extras = [
+    twinsLine(ctx),
+    popularScoreLine(ctx),
+    ...goalsLines(ctx),
+    mostDividedLine(ctx),
+    optimistWallLine(ctx),
+    drawKingLine(ctx),
+    boldestLine(ctx),
+  ].filter(Boolean);
   if (extras.length) blocks.push(['🍿 <b>Extras do lacre</b>', '', extras.join('\n\n')].join('\n'));
 
   const header = (cont) => `🔓 <b>Palpites lacrados — lacre #${entry.seq}</b>${cont ? ' (cont.)' : ''}`;

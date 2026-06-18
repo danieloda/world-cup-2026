@@ -119,14 +119,22 @@ describe('alerta de palpites lacrados no Telegram (telegram-picks.js → post-pi
     expect(tgPicksSrc).not.toMatch(/getUTCDate\(\) - 1, 23, 59/);
   });
 
-  it('snapshot.js GERA as mensagens depois do dedupe e do buildReport — e não as posta', () => {
-    const iDedupe = snapshotSrc.indexOf('Sem mudança');
-    const iReport = snapshotSrc.indexOf('buildReport(');
-    const iPicks = snapshotSrc.indexOf('buildPicksMessages(');
-    expect(iPicks).toBeGreaterThan(iReport);
-    expect(iReport).toBeGreaterThan(iDedupe);
-    // o envio fica fora do snapshot: as mensagens vão pra arquivo, não pra rede
-    expect(snapshotSrc.slice(iPicks)).not.toMatch(/postTelegram\(/);
+  it('snapshot.js só GERA as mensagens (arquivo) — o envio é do post-picks.js', () => {
+    // O alerta é DESACOPLADO do lock (sai de manhã, via maybeEmitPicks), mas
+    // continua só gerando o arquivo gitignored — quem posta é o passo separado.
+    expect(snapshotSrc).toMatch(/buildPicksMessages\(/);
+    expect(snapshotSrc).toMatch(/writeFileSync\(PICKS_OUT_FILE/);
+    // o ÚNICO envio ao Telegram pelo snapshot é o hash do lacre — nunca os
+    // palpites (esses vão pro arquivo e quem posta é o post-picks.js).
+    const sends = (snapshotSrc.match(/await postTelegram\(/g) || []).length;
+    expect(sends).toBe(1);
+  });
+
+  it('o alerta sai de manhã com ranking real: janela matinal + ranking oficial', () => {
+    // Guarda do conserto (timing + artilheiro): a emissão tem janela matinal
+    // (não a trava 00:10) e lê o v_leaderboard pra bater com o site.
+    expect(snapshotSrc).toMatch(/PICKS_BRT_FROM|janela matinal/);
+    expect(snapshotSrc).toMatch(/from\('v_leaderboard'\)/);
   });
 
   it('a Action posta os palpites SÓ DEPOIS do commit/push do relatório', () => {

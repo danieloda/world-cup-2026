@@ -96,6 +96,15 @@ describe('escopo — só o que travou NESTE lacre vira bloco de jogo', () => {
     expect(all).toContain('<b>Canadá × Senegal</b>');
   });
 
+  it('jogos ordenados por horário (mais cedo primeiro), não por id', () => {
+    // No lacre genesis tudo é novo: match 3 (Argentina×Chile, 09/06) é o mais
+    // cedo apesar do id maior; match 74 (França×Brasil, 28/06) é o mais tarde.
+    const genesis = buildPicksMessages({ ...base, prevContent: null }).join('\n');
+    expect(genesis.indexOf('Argentina × Chile')).toBeLessThan(genesis.indexOf('México × Polônia'));
+    expect(genesis.indexOf('México × Polônia')).toBeLessThan(genesis.indexOf('Canadá × Senegal'));
+    expect(genesis.indexOf('Canadá × Senegal')).toBeLessThan(genesis.indexOf('França × Brasil'));
+  });
+
   it('NÃO inclui bloco de jogo travado em lacre anterior (França/Argentina)', () => {
     expect(all).not.toContain('França');
     expect(all).not.toContain('Argentina');
@@ -253,6 +262,68 @@ describe('extras do lacre', () => {
   });
 });
 
+describe('ranking via leaderboard oficial — paridade com o site (artilheiro incluso)', () => {
+  // Leaderboard do v_leaderboard: total_pts JÁ inclui artilheiro/campeão/etc.
+  // A ordem é a do site (total → exatos → vencedor+saldo), podendo divergir do
+  // derivado-só-jogos do snapshot — é exatamente o que conserta o alerta.
+  const leaderboard = [
+    { user_id: U2, total_pts: 30, exact_count: 1, winner_sg_count: 2 }, // Bruno sobe pelo artilheiro
+    { user_id: U1, total_pts: 20, exact_count: 3, winner_sg_count: 1 },
+    { user_id: U3, total_pts: 10, exact_count: 0, winner_sg_count: 0 },
+    { user_id: U4, total_pts: 5, exact_count: 0, winner_sg_count: 0 },
+  ];
+
+  it('pódio usa os totais OFICIAIS (não o derivado só-jogos do snapshot)', () => {
+    const all = buildPicksMessages({ ...base, leaderboard }).join('\n');
+    expect(all).toContain('🥇 Bruno 30 pts\n🥈 Ana 20 pts\n🥉 Carlos 10 pts');
+    // o derivado-só-jogos colocaria Ana (7) na frente — confirma o override
+    expect(all).not.toContain('🥇 Ana 7 pts');
+  });
+
+  it('sem leaderboard → cai no derivado do snapshot (compatível)', () => {
+    const all = buildPicksMessages(base).join('\n');
+    expect(all).toContain('🥇 Ana 7 pts\n🥈 Bruno 5 pts\n🥉 Carlos 1 pt');
+  });
+
+  it('quem mais subiu/caiu desde o último lacre anunciado (prevRanking)', () => {
+    // Antes: Carlos 1º, Dani 2º, Ana 3º, Bruno 4º. Agora (leaderboard): Bruno, Ana, Carlos, Dani.
+    const prevRanking = [U3, U4, U1, U2];
+    const all = buildPicksMessages({ ...base, leaderboard, prevRanking }).join('\n');
+    expect(all).toContain('🚀 Quem mais subiu: Bruno (4º → 1º, +3)');
+    expect(all).toContain('📉 Maior tombo: Carlos (1º → 3º, -2)');
+  });
+
+  it('sem prevRanking → sem linha de subiu/caiu', () => {
+    const all = buildPicksMessages({ ...base, leaderboard }).join('\n');
+    expect(all).not.toContain('🚀');
+    expect(all).not.toContain('📉');
+  });
+});
+
+describe('curiosidades novas — derivadas só dos palpites lacrados', () => {
+  const all = buildPicksMessages(base).join('\n');
+
+  it('placar mais palpitado somando os jogos do lacre', () => {
+    expect(all).toContain('🎯 Placar mais palpitado do lacre: 2×1 (3 vezes)');
+  });
+
+  it('otimista × muralha (soma de gols por jogador nos jogos do lacre)', () => {
+    expect(all).toContain('☀️ Otimista do lacre: Dani — 10 gols somados nos 2 jogos');
+    expect(all).toContain('🛡️ Muralha: Carlos — só 3 no total');
+  });
+
+  it('jogo que mais divide × consenso quase total', () => {
+    expect(all).toContain('🤔 Jogo que mais divide a galera: México × Polônia (só 60% no favorito — 3·1·1)');
+    expect(all).toContain('🤝 Consenso quase total: Canadá × Senegal (100% em Canadá)');
+  });
+
+  it('rei do empate só com 3+ jogos (base tem 2 → ausente; genesis tem 4 → presente)', () => {
+    expect(all).not.toContain('🟰 Rei do empate');
+    const genesis = buildPicksMessages({ ...base, prevContent: null }).join('\n');
+    expect(genesis).toContain('🟰 Rei do empate: Carlos — empate em 2 dos 4 jogos do lacre');
+  });
+});
+
 describe('higiene — HTML escapado e nada de e-mail', () => {
   it('nome malicioso não injeta HTML na mensagem (linha de aposta solitária e ranking)', () => {
     const evil = {
@@ -279,10 +350,13 @@ describe('higiene — HTML escapado e nada de e-mail', () => {
 
 describe('chunking — teto do Telegram', () => {
   it('maxLen apertado divide em várias mensagens, todas dentro do teto e com cabeçalho', () => {
-    const msgs = buildPicksMessages({ ...base, prevContent: null, maxLen: 500 });
+    // 650: acima do maior bloco individual (o "Extras" do lacre genesis, com
+    // todas as curiosidades, ~540 com cabeçalho) — blocos não são quebrados.
+    const maxLen = 650;
+    const msgs = buildPicksMessages({ ...base, prevContent: null, maxLen });
     expect(msgs.length).toBeGreaterThan(1);
     for (const m of msgs) {
-      expect(m.length).toBeLessThanOrEqual(500);
+      expect(m.length).toBeLessThanOrEqual(maxLen);
       expect(m).toContain('Palpites lacrados — lacre #7');
     }
     // nenhum bloco se perde na divisão

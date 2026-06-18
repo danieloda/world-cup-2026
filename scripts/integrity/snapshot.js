@@ -121,6 +121,110 @@ async function postTelegram(text) {
   }
 }
 
+// ============================================================
+// Alerta de palpites recém-lacrados (engajamento) — DESACOPLADO do lock
+// ============================================================
+// O alerta sai DE MANHÃ, não na trava (00:10 BRT): aí todos os jogos do dia
+// anterior — inclusive os de madrugada (kickoff até ~01h BRT) — já terminaram e
+// foram apurados pelo admin, então o ranking lido do v_leaderboard é REAL e bate
+// com o site (jogos + artilheiro + campeão + classificados). Roda em TODA
+// invocação do snapshot (mesmo quando dedupa), com três guardas:
+//   1. Janela matinal (4h–12h BRT): as fixtures não têm jogo entre 02h e 12h BRT,
+//      então a manhã é sempre "depois de tudo e antes do 1º jogo (13h BRT)".
+//   2. Jogos finalizados: nenhum jogo já iniciado pode estar sem placar.
+//   3. Anúncio-único: âncora no último lacre ANUNCIADO (settings), não no
+//      snapshot anterior — manda exatamente uma vez por lacre, mesmo com os
+//      re-snapshots de resultado. post-picks.js grava o estado após enviar.
+// KEEP IN SYNC: post-picks.js (consome o .tmp + grava o estado) e a migração do
+// dispatch matinal (cron que acorda a Action de manhã).
+const PICKS_BRT_FROM = 4;   // depois dos jogos de madrugada (terminam ~03h BRT)
+const PICKS_BRT_TO = 13;    // antes do 1º jogo do dia (13h BRT)
+const ANNOUNCE_KEY = 'integrity_picks_announced';
+const NOT_PLAYED = ['void', 'postponed', 'canceled', 'cancelled'];
+
+const brtHour = (d) => (d.getUTCHours() + 24 - 3) % 24;
+
+async function readAnnounceState() {
+  const { data } = await admin.from('settings').select('value').eq('key', ANNOUNCE_KEY).maybeSingle();
+  if (!data) return null;
+  try { return typeof data.value === 'string' ? JSON.parse(data.value) : data.value; } catch { return null; }
+}
+
+async function maybeEmitPicks({ now, content, matches, manifest, entry }) {
+  // 1) Janela matinal — o run da trava (00:10 BRT) cai fora e adia.
+  const h = brtHour(now);
+  if (h < PICKS_BRT_FROM || h >= PICKS_BRT_TO) {
+    console.log(`   alerta de palpites: fora da janela matinal (${h}h BRT) — adiado.`);
+    return;
+  }
+  // 2) Gate: nenhum jogo já iniciado pode estar sem placar (em campo / não
+  //    apurado) — senão o ranking sairia incompleto.
+  const pending = matches.filter((m) =>
+    new Date(m.match_date) <= now && !m.finished && !NOT_PLAYED.includes(m.status));
+  if (pending.length) {
+    console.log(`   alerta de palpites: ${pending.length} jogo(s) sem placar ainda — adiado até apurar.`);
+    return;
+  }
+  // 3) Âncora = último lacre ANUNCIADO (não o snapshot imediatamente anterior).
+  const state = await readAnnounceState();
+  let prevLocked;
+  if (state?.seq != null) {
+    const annEntry = manifest.entries.find((e) => e.seq === state.seq);
+    let annSnap = null;
+    if (annEntry) {
+      try { annSnap = JSON.parse(readFileSync(join(INTEGRITY_DIR, annEntry.file), 'utf8')); } catch { /* ilegível */ }
+    }
+    prevLocked = new Set(annSnap?.locked_match_ids ?? []);
+  } else {
+    // Sem estado (1ª vez): trata como já anunciado tudo que travou há +24h, pra
+    // só os jogos do último dia entrarem (não o torneio inteiro).
+    const dayAgo = new Date(now.getTime() - 24 * 3600000);
+    prevLocked = new Set(matches.filter((m) => predictionDeadline(m.match_date) <= dayAgo).map((m) => m.id));
+  }
+  const newLocked = content.locked_match_ids.filter((id) => !prevLocked.has(id));
+  if (newLocked.length === 0) {
+    console.log('   alerta de palpites: nada novo desde o último anunciado — silêncio.');
+    return;
+  }
+  // 4) Ranking OFICIAL (v_leaderboard) — total_pts idêntico ao site (jogos +
+  //    artilheiro + campeão + classificados). Seleciona SÓ as colunas de pontos
+  //    (a view tem coluna de contato que o lacre nunca pode vazar — fica fora).
+  const { data: leaderboard, error: lbErr } = await admin
+    .from('v_leaderboard')
+    .select('user_id, total_pts, exact_count, winner_sg_count, scorer_pts');
+  if (lbErr) console.warn('   v_leaderboard indisponível — ranking cai no derivado do snapshot:', lbErr.message);
+
+  // Ordem atual (guardada pra medir "subiu/caiu" no próximo lacre) — mesmo
+  // desempate da página de ranking (total → exatos → vencedor+saldo).
+  const nameById = new Map((content.users ?? []).map((u) => [u.user_id, u.name]));
+  const nameOf = (id) => nameById.get(id) || '';
+  const currentRanking = (leaderboard ?? []).slice()
+    .sort((a, b) =>
+      (b.total_pts ?? 0) - (a.total_pts ?? 0)
+      || (b.exact_count ?? 0) - (a.exact_count ?? 0)
+      || (b.winner_sg_count ?? 0) - (a.winner_sg_count ?? 0)
+      || nameOf(a.user_id).localeCompare(nameOf(b.user_id), 'pt-BR'))
+    .map((r) => r.user_id);
+
+  const reportFname = `${String(entry.seq).padStart(4, '0')}_${brtDateStamp(new Date(entry.taken_at))}.md`;
+  const picksMessages = buildPicksMessages({
+    entry,
+    content,
+    prevContent: { locked_match_ids: [...prevLocked] },
+    matches,
+    reportUrl: `${REPO_URL}/blob/${BRANCH}/integrity/reports/${reportFname}`,
+    leaderboard: leaderboard ?? null,
+    prevRanking: state?.ranking ?? null,
+  });
+  if (!picksMessages.length) {
+    console.log('   alerta de palpites: nenhum bloco gerado — silêncio.');
+    return;
+  }
+  if (!existsSync(PICKS_OUT_DIR)) mkdirSync(PICKS_OUT_DIR, { recursive: true });
+  writeFileSync(PICKS_OUT_FILE, JSON.stringify({ seq: entry.seq, ranking: currentRanking, messages: picksMessages }, null, 2) + '\n');
+  console.log(`   alerta de palpites: ${picksMessages.length} mensagem(ns) do lacre #${entry.seq} aguardando publish (post-picks.js).`);
+}
+
 async function main() {
   const now = new Date();
 
@@ -215,80 +319,74 @@ async function main() {
     : { version: 1, description: 'Cadeia de integridade dos palpites do bolão. Verifique com: npm run integrity:verify', entries: [] };
 
   const last = manifest.entries[manifest.entries.length - 1];
-  if (last && last.content_hash === contentHash) {
-    console.log(`Sem mudança desde o snapshot #${last.seq} (content_hash igual). Nada a fazer.`);
-    return;
+  const unchanged = last && last.content_hash === contentHash;
+
+  // O lacre (snapshot + relatório + cadeia) é criado no run da TRAVA (00:10 BRT)
+  // e dedupa quando nada mudou. O ALERTA de palpites não sai mais junto: ele é
+  // desacoplado (maybeEmitPicks) pra sair DE MANHÃ, com o ranking já real.
+  let entry;
+  if (unchanged) {
+    console.log(`Sem mudança desde o snapshot #${last.seq} (content_hash igual) — não recria o lacre.`);
+    entry = last;
+  } else {
+    const prevChain = last ? last.chain_hash : GENESIS;
+    const chainHash = sha256(prevChain + contentHash);
+    const seq = (last ? last.seq : 0) + 1;
+    const fname = `${String(seq).padStart(4, '0')}_${now.toISOString().replace(/[:.]/g, '-')}.json`;
+
+    if (!existsSync(SNAP_DIR)) mkdirSync(SNAP_DIR, { recursive: true });
+    writeFileSync(join(SNAP_DIR, fname), body);
+
+    entry = {
+      seq,
+      file: `snapshots/${fname}`,
+      taken_at: now.toISOString(),
+      content_hash: contentHash,
+      prev_chain_hash: prevChain,
+      chain_hash: chainHash,
+      counts: {
+        locked_matches: lockedIds.length,
+        predictions: preds.length,
+        champion_picks: champions.length,
+        scorer_picks: scorers.length,
+      },
+    };
+    manifest.entries.push(entry);
+    writeFileSync(MANIFEST, JSON.stringify(manifest, null, 2) + '\n');
+
+    // Relatório legível do lacre (para não técnicos) — derivado do snapshot,
+    // commitado junto pela Action. "Novo neste lacre" = diff com o anterior.
+    let prevContent = null;
+    if (last) {
+      try {
+        prevContent = JSON.parse(readFileSync(join(INTEGRITY_DIR, last.file), 'utf8'));
+      } catch { /* snapshot anterior ilegível — relatório trata tudo como novo */ }
+    }
+    const reportFname = `${String(seq).padStart(4, '0')}_${brtDateStamp(now)}.md`;
+    if (!existsSync(REPORT_DIR)) mkdirSync(REPORT_DIR, { recursive: true });
+    writeFileSync(join(REPORT_DIR, reportFname), buildReport({
+      entry, content, matches, prevContent, csDeadline,
+      predictionDeadline, repoUrl: REPO_URL, branch: BRANCH,
+    }));
+
+    console.log(`✅ Snapshot #${seq}: ${preds.length} palpites de ${lockedIds.length} jogos travados.`);
+    console.log(`   content_hash: ${contentHash}`);
+    console.log(`   chain_hash:   ${chainHash}`);
+    console.log(`   relatório:    integrity/reports/${reportFname}`);
+
+    // Link sempre puro e visível (feedback 2026-06-12).
+    await postTelegram(
+      `🔒 <b>Snapshot de integridade #${seq}</b>\n` +
+      `${lockedIds.length} jogos travados · ${preds.length} palpites\n` +
+      `<code>chain ${chainHash}</code>\n` +
+      `📄 Relatório do lacre (o que travou e como conferir):\n` +
+      `${REPO_URL}/blob/${BRANCH}/integrity/reports/${reportFname}`
+    );
   }
 
-  const prevChain = last ? last.chain_hash : GENESIS;
-  const chainHash = sha256(prevChain + contentHash);
-  const seq = (last ? last.seq : 0) + 1;
-  const fname = `${String(seq).padStart(4, '0')}_${now.toISOString().replace(/[:.]/g, '-')}.json`;
-
-  if (!existsSync(SNAP_DIR)) mkdirSync(SNAP_DIR, { recursive: true });
-  writeFileSync(join(SNAP_DIR, fname), body);
-
-  const entry = {
-    seq,
-    file: `snapshots/${fname}`,
-    taken_at: now.toISOString(),
-    content_hash: contentHash,
-    prev_chain_hash: prevChain,
-    chain_hash: chainHash,
-    counts: {
-      locked_matches: lockedIds.length,
-      predictions: preds.length,
-      champion_picks: champions.length,
-      scorer_picks: scorers.length,
-    },
-  };
-  manifest.entries.push(entry);
-  writeFileSync(MANIFEST, JSON.stringify(manifest, null, 2) + '\n');
-
-  // Relatório legível do lacre (para não técnicos) — derivado do snapshot,
-  // commitado junto pela Action. "Novo neste lacre" = diff com o anterior.
-  let prevContent = null;
-  if (last) {
-    try {
-      prevContent = JSON.parse(readFileSync(join(INTEGRITY_DIR, last.file), 'utf8'));
-    } catch { /* snapshot anterior ilegível — relatório trata tudo como novo */ }
-  }
-  const reportFname = `${String(seq).padStart(4, '0')}_${brtDateStamp(now)}.md`;
-  if (!existsSync(REPORT_DIR)) mkdirSync(REPORT_DIR, { recursive: true });
-  writeFileSync(join(REPORT_DIR, reportFname), buildReport({
-    entry, content, matches, prevContent, csDeadline,
-    predictionDeadline, repoUrl: REPO_URL, branch: BRANCH,
-  }));
-
-  console.log(`✅ Snapshot #${seq}: ${preds.length} palpites de ${lockedIds.length} jogos travados.`);
-  console.log(`   content_hash: ${contentHash}`);
-  console.log(`   chain_hash:   ${chainHash}`);
-  console.log(`   relatório:    integrity/reports/${reportFname}`);
-
-  // Link sempre puro e visível (feedback 2026-06-12).
-  await postTelegram(
-    `🔒 <b>Snapshot de integridade #${seq}</b>\n` +
-    `${lockedIds.length} jogos travados · ${preds.length} palpites\n` +
-    `<code>chain ${chainHash}</code>\n` +
-    `📄 Relatório do lacre (o que travou e como conferir):\n` +
-    `${REPO_URL}/blob/${BRANCH}/integrity/reports/${reportFname}`
-  );
-
-  // Palpites recém-lacrados (decisão 2026-06-11): as mensagens são GERADAS
-  // aqui (mesmo content lacrado acima — só jogos que travaram NESTE lacre,
-  // nomes do app, nunca e-mail), mas o ENVIO é do passo seguinte da Action
-  // (post-picks.js), que só roda DEPOIS do verify + commit/push — o grupo só
-  // recebe o alerta se o relatório linkado estiver de fato publicado.
-  // Lacre sem jogo novo (ex.: só resultado) → nenhum arquivo → silêncio.
-  const picksMessages = buildPicksMessages({
-    entry, content, prevContent, matches,
-    reportUrl: `${REPO_URL}/blob/${BRANCH}/integrity/reports/${reportFname}`,
-  });
-  if (picksMessages.length) {
-    if (!existsSync(PICKS_OUT_DIR)) mkdirSync(PICKS_OUT_DIR, { recursive: true });
-    writeFileSync(PICKS_OUT_FILE, JSON.stringify({ seq, messages: picksMessages }, null, 2) + '\n');
-    console.log(`   palpites:     ${picksMessages.length} mensagem(ns) aguardando publish (post-picks.js)`);
-  }
+  // Alerta de palpites recém-lacrados — DESACOPLADO do lock (ver maybeEmitPicks).
+  // Roda em toda invocação (mesmo no dedup) e só dispara de manhã, com ranking real.
+  await maybeEmitPicks({ now, content, matches, manifest, entry });
 }
 
 main().catch((e) => { console.error(e); process.exit(1); });
