@@ -3701,6 +3701,37 @@ details.allbets[open] > summary .chev { transform: rotate(180deg); }
 .pred-break .brk.winner b { color: var(--accent); }
 .pred-break .brk.miss { color: var(--text-mute); background: transparent; padding-left: 0; }
 
+/* Mobile: o grid fixo (80+1fr+90+90+50) estoura a tela do celular e colapsa a
+   coluna do confronto a zero (a partida "some") e sobrepõe o texto. Reorganiza
+   cada palpite em 2D: data em cima, confronto (com wrap), palpite×real embaixo,
+   e os pontos numa coluna à direita que atravessa as 3 linhas. Escopo só nos
+   .pred-entry — as linhas de campeão usam grid próprio (1fr auto) e ficam ok. */
+@media (max-width: 480px) {
+  .pred-entry .profile-row {
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas:
+      "when when pts"
+      "vs   vs   pts"
+      "got  real pts";
+    gap: var(--space-1) var(--space-2h);
+    align-items: center;
+    padding: var(--space-2h) var(--space-2h);
+  }
+  .pred-entry .profile-row .when { grid-area: when; }
+  .pred-entry .profile-row .vs {
+    grid-area: vs;
+    white-space: normal; overflow: visible; text-overflow: clip;
+    line-height: 1.25;
+  }
+  .pred-entry .profile-row .got { grid-area: got; }
+  .pred-entry .profile-row .real { grid-area: real; justify-self: start; }
+  .pred-entry .profile-row .pts-cell {
+    grid-area: pts; align-self: center; font-size: var(--fs-lg);
+  }
+  /* a quebra aditiva não precisa do recuo de 92px (alinhava com o desktop) */
+  .pred-entry .pred-break { padding-left: var(--space-2h); padding-right: var(--space-2h); }
+}
+
 /* Champion pick result (acerto/erro do campeão) */
 .profile-row.champion-result.champion-hit {
   background: rgba(45, 200, 110, 0.06);
@@ -4374,11 +4405,11 @@ input[type="number"].score-input {
 .gr-scorer {
   display: inline-flex; align-items: center; gap: var(--space-1);
   margin-right: var(--space-2h); font-weight: var(--fw-medium);
-  white-space: nowrap;   /* nome + minuto são um token: nunca quebrar no meio */
+  white-space: nowrap;   /* nome + nº de gols são um token: nunca quebrar no meio */
 }
 .gr-scorer .fl { display: inline-flex; }
 .gr-scorer .fi { width: 15px; height: 11px; border-radius: 2px; }
-.gr-scorer b { color: var(--text-dim); font-weight: var(--fw-heavy); }   /* minuto do gol = fato, neutro */
+.gr-scorer b { color: var(--text-dim); font-weight: var(--fw-heavy); }   /* nº de gols (×2, ×3…) = fato, neutro */
 
 /* Toggle de lente (Projeção ⇄ Oficial) acima da classificação do grupo. */
 .stand-toggle-row {
