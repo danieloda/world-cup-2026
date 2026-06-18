@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-18T16:19:34.201Z",
+  "updated_at": "2026-06-18T18:38:30.054Z",
   "season": 2026,
   "groups": {
     "A": [
@@ -32,28 +32,28 @@
       {
         "rank": 3,
         "team": "Czech Republic",
-        "played": 1,
+        "played": 2,
         "win": 0,
-        "draw": 0,
+        "draw": 1,
         "lose": 1,
-        "gf": 1,
-        "ga": 2,
+        "gf": 2,
+        "ga": 3,
         "gd": -1,
-        "points": 0,
-        "form": "L"
+        "points": 1,
+        "form": "DL"
       },
       {
         "rank": 4,
         "team": "South Africa",
-        "played": 1,
+        "played": 2,
         "win": 0,
-        "draw": 0,
+        "draw": 1,
         "lose": 1,
-        "gf": 0,
-        "ga": 2,
+        "gf": 1,
+        "ga": 3,
         "gd": -2,
-        "points": 0,
-        "form": "L"
+        "points": 1,
+        "form": "DL"
       }
     ],
     "B": [
