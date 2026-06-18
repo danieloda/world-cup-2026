@@ -447,7 +447,13 @@ function renderDrill(u, payload) {
   const { preds, champion, scorer } = payload;
 
   // Stats
-  const scored = preds.filter(p => p.matches?.finished && p.points_earned != null);
+  // Cronológico ascendente (data+hora do jogo): a ordem natural de quem foi
+  // jogando. Sem isto a lista sai por match_id (slot do grupo), que embaralha —
+  // um jogo da rodada de hoje com id baixo aparece no meio de jogos de dias
+  // atrás. Os jogos mais recentes (de hoje) caem no FIM da lista.
+  const scored = preds
+    .filter(p => p.matches?.finished && p.points_earned != null)
+    .sort((a, b) => new Date(a.matches.match_date) - new Date(b.matches.match_date));
   const isExact = (p) => p.pred_home === p.matches.actual_home && p.pred_away === p.matches.actual_away;
   const exactos = scored.filter(isExact).length;
   const parciais = scored.filter(p => !isExact(p) && p.points_earned > 0).length;
