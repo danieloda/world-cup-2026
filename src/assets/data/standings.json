@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-19T21:52:21.439Z",
+  "updated_at": "2026-06-19T22:51:20.712Z",
   "season": 2026,
   "groups": {
     "A": [
@@ -168,28 +168,28 @@
       {
         "rank": 1,
         "team": "USA",
-        "played": 1,
-        "win": 1,
+        "played": 2,
+        "win": 2,
         "draw": 0,
         "lose": 0,
-        "gf": 4,
+        "gf": 6,
         "ga": 1,
-        "gd": 3,
-        "points": 3,
-        "form": "W"
+        "gd": 5,
+        "points": 6,
+        "form": "WW"
       },
       {
         "rank": 2,
         "team": "Australia",
-        "played": 1,
+        "played": 2,
         "win": 1,
         "draw": 0,
-        "lose": 0,
+        "lose": 1,
         "gf": 2,
-        "ga": 0,
-        "gd": 2,
+        "ga": 2,
+        "gd": 0,
         "points": 3,
-        "form": "W"
+        "form": "LW"
       },
       {
         "rank": 3,
