@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-19T02:18:44.003Z",
+  "updated_at": "2026-06-19T07:40:15.888Z",
   "season": 2026,
   "scorers": [
     {
@@ -11,12 +11,36 @@
       "minutes": 80
     },
     {
+      "api_id": 8489,
+      "name": "J. David",
+      "team": "Canada",
+      "goals": 3,
+      "assists": 0,
+      "minutes": 159
+    },
+    {
+      "api_id": 406244,
+      "name": "J. Manzambi",
+      "team": "Switzerland",
+      "goals": 2,
+      "assists": 0,
+      "minutes": 44
+    },
+    {
       "api_id": 138835,
       "name": "F. Balogun",
       "team": "USA",
       "goals": 2,
       "assists": 0,
       "minutes": 72
+    },
+    {
+      "api_id": 94333,
+      "name": "E. Just",
+      "team": "New Zealand",
+      "goals": 2,
+      "assists": 0,
+      "minutes": 90
     },
     {
       "api_id": 1100,
@@ -43,14 +67,6 @@
       "minutes": 90
     },
     {
-      "api_id": 94333,
-      "name": "E. Just",
-      "team": "New Zealand",
-      "goals": 2,
-      "assists": 0,
-      "minutes": 90
-    },
-    {
       "api_id": 184,
       "name": "H. Kane",
       "team": "England",
@@ -65,6 +81,14 @@
       "goals": 2,
       "assists": 0,
       "minutes": 90
+    },
+    {
+      "api_id": 2001,
+      "name": "C. Larin",
+      "team": "Canada",
+      "goals": 2,
+      "assists": 0,
+      "minutes": 112
     },
     {
       "api_id": 26475,
@@ -83,6 +107,14 @@
       "minutes": 89
     },
     {
+      "api_id": 294824,
+      "name": "N. Saliba",
+      "team": "Canada",
+      "goals": 1,
+      "assists": 1,
+      "minutes": 41
+    },
+    {
       "api_id": 280074,
       "name": "N. Brown",
       "team": "Germany",
@@ -91,25 +123,17 @@
       "minutes": 73
     },
     {
-      "api_id": 2901,
-      "name": "Hwang In-Beom",
-      "team": "South Korea",
-      "goals": 1,
-      "assists": 1,
-      "minutes": 84
-    },
-    {
-      "api_id": 18979,
-      "name": "V. Gyökeres",
-      "team": "Sweden",
+      "api_id": 2691,
+      "name": "R. Rezaeian",
+      "team": "Iran",
       "goals": 1,
       "assists": 1,
       "minutes": 90
     },
     {
-      "api_id": 2691,
-      "name": "R. Rezaeian",
-      "team": "Iran",
+      "api_id": 18979,
+      "name": "V. Gyökeres",
+      "team": "Sweden",
       "goals": 1,
       "assists": 1,
       "minutes": 90
@@ -123,44 +147,20 @@
       "minutes": 93
     },
     {
-      "api_id": 161921,
-      "name": "G. Reyna",
-      "team": "USA",
+      "api_id": 48471,
+      "name": "R. Vargas",
+      "team": "Switzerland",
       "goals": 1,
-      "assists": 0,
-      "minutes": 8
+      "assists": 1,
+      "minutes": 98
     },
     {
-      "api_id": 161904,
-      "name": "B. Barcola",
-      "team": "France",
+      "api_id": 2901,
+      "name": "Hwang In-Beom",
+      "team": "South Korea",
       "goals": 1,
-      "assists": 0,
-      "minutes": 10
-    },
-    {
-      "api_id": 30484,
-      "name": "M. Svanberg",
-      "team": "Sweden",
-      "goals": 1,
-      "assists": 0,
-      "minutes": 13
-    },
-    {
-      "api_id": 2001,
-      "name": "C. Larin",
-      "team": "Canada",
-      "goals": 1,
-      "assists": 0,
-      "minutes": 14
-    },
-    {
-      "api_id": 446249,
-      "name": "I. Mbaye",
-      "team": "Senegal",
-      "goals": 1,
-      "assists": 0,
-      "minutes": 15
+      "assists": 1,
+      "minutes": 178
     }
   ]
 }
