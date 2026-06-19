@@ -145,6 +145,13 @@
   ],
   "Australia": [
     [
+      "2026-06-19",
+      "USA",
+      false,
+      "0-2",
+      "World Cup"
+    ],
+    [
       "2026-06-14",
       "Türkiye",
       true,
@@ -205,13 +212,6 @@
       "Canada",
       false,
       "1-0",
-      "Amistoso"
-    ],
-    [
-      "2025-09-09",
-      "New Zealand",
-      false,
-      "3-1",
       "Amistoso"
     ]
   ],
@@ -3025,6 +3025,13 @@
   ],
   "USA": [
     [
+      "2026-06-19",
+      "Australia",
+      true,
+      "2-0",
+      "World Cup"
+    ],
+    [
       "2026-06-13",
       "Paraguay",
       true,
@@ -3085,13 +3092,6 @@
       "Ecuador",
       true,
       "1-1",
-      "Amistoso"
-    ],
-    [
-      "2025-09-09",
-      "Japan",
-      true,
-      "2-0",
       "Amistoso"
     ]
   ],
