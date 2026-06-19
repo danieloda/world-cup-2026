@@ -6,7 +6,7 @@ import { supabase } from '../supabase.js';
 import {
   flag, escapeHtml, formatTime, formatBrDate, isLocked, lockCountdownLabel, showToast,
   loadRecentMatches, loadQualifiers, teamPt, renderDateCalendar, predictionDeadline,
-  localDateKey, brParts, heroMeta,
+  predictionBatchKey, localDateKey, brParts, heroMeta,
 } from '../util.js';
 import { isRealTeam, resolveSlotToTeam, computeSlotResolution } from '../bracket.js';
 import { matchPoints, scoreBreakdown, stageMultiplier, scorerBonus } from '../scoring.js';
@@ -264,8 +264,16 @@ function isPerfectKo(m, pred) {
 // ============================================================
 // Visão por data
 // ============================================================
+// Dia em que a partida é LISTADA = lote de bloqueio (não o dia do apito): jogos
+// à meia-noite caem no lote da véspera, junto com quem trava na mesma noite. 063.
 function dateKey(m) {
-  return localDateKey(m.match_date);
+  return predictionBatchKey(m.match_date);
+}
+
+// Jogo que VIRA O DIA: apito 00h BRT listado no lote da véspera. O card mostra
+// 🌙 antes da data pra deixar claro que o apito é na madrugada do dia seguinte.
+function crossesBatchDay(m) {
+  return localDateKey(m.match_date) !== predictionBatchKey(m.match_date);
 }
 
 // Datas distintas (yyyy-mm-dd) dos jogos de mata-mata, em ordem cronológica.
@@ -438,7 +446,7 @@ function renderFinishedCard(m) {
   const pred = predsByMatch.get(m.id);
 
   const { day: _d, month: _mo } = brParts(m.match_date);
-  const dateLabel = `${String(_d).padStart(2,'0')}/${MEZES[_mo - 1]}`;
+  const dateLabel = `${crossesBatchDay(m) ? '<span class="nd-moon">🌙</span> ' : ''}${String(_d).padStart(2,'0')}/${MEZES[_mo - 1]}`;
   const timeLabel = formatTime(m.match_date);
 
   const isFinal = m.stage === 'final';
@@ -691,7 +699,7 @@ function renderOpenCard(m) {
   const penWinner = pred?.pred_pen_winner;
 
   const { day: _d, month: _mo } = brParts(m.match_date);
-  const dateLabel = `${String(_d).padStart(2,'0')}/${MEZES[_mo - 1]}`;
+  const dateLabel = `${crossesBatchDay(m) ? '<span class="nd-moon">🌙</span> ' : ''}${String(_d).padStart(2,'0')}/${MEZES[_mo - 1]}`;
   const timeLabel = formatTime(m.match_date);
 
   const isFinal = m.stage === 'final';

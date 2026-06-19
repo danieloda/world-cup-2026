@@ -621,6 +621,29 @@ export function predictionDeadline(matchDate) {
 }
 
 /**
+ * Chave do LOTE DE BLOQUEIO (yyyy-mm-dd) — o dia em que a partida deve ser
+ * LISTADA para palpite, agrupada com os jogos que travam na MESMA noite.
+ *
+ * Difere de localDateKey() só para jogos à meia-noite (00h BRT): o jogo de
+ * 20/jun 00:00 trava 18/jun 23:59 — o MESMO prazo dos jogos de 19/jun — logo
+ * pertence ao lote de 19/jun, não ao de 20/jun. Listado pelo apito (20/jun) ele
+ * já aparece TRAVADO numa data que o usuário só abre depois do prazo e esquece
+ * de palpitar; pelo lote (19/jun) ele aparece junto com os jogos da véspera,
+ * ainda dentro da janela. Ver migration 063.
+ *
+ * Derivado de predictionDeadline (paridade SQL↔JS já testada) para NÃO duplicar
+ * a regra da meia-noite: o lote é sempre o dia SEGUINTE ao prazo (o prazo é
+ * 23h59 da véspera do lote). Mantém-se em sincronia automática com 023/063.
+ * @param {string|Date} matchDate
+ * @returns {string} yyyy-mm-dd do dia de listagem (lote de bloqueio)
+ */
+export function predictionBatchKey(matchDate) {
+  // Prazo = 23h59 BRT da véspera do lote; +12h cai com folga no dia do lote
+  // (não depende de segundos na virada 23:59→00:00). localDateKey resolve em BRT.
+  return localDateKey(predictionDeadline(matchDate).getTime() + 12 * 3600000);
+}
+
+/**
  * Match travado para palpites: passou das 23h59 (Brasília) da véspera do jogo.
  */
 export function isLocked(m) {

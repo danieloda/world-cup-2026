@@ -697,6 +697,14 @@ em { font-style: normal; font-weight: var(--fw-medium); }
 }
 .match.bet .match-meta strong { color: var(--text); font-weight: var(--fw-heavy); font-size: var(--fs-md); }
 .match.bet .mm-sep { color: var(--line-strong); }
+.match.bet .mm-nextday {
+  font-size: var(--fs-2xs); font-weight: var(--fw-heavy); letter-spacing: var(--tracking-wide);
+  color: var(--accent); background: var(--accent-dim);
+  border-radius: var(--radius-pill); padding: var(--space-1) var(--space-2h); white-space: nowrap;
+}
+/* 🌙 em rótulos compactos de data (cards encerrados / mata) — só cor de destaque,
+   sem o pill cheio (que não cabe na linha .when). Vira o dia = apito na madrugada. */
+.nd-moon { color: var(--accent); }
 .match.bet .match-grp {
   margin-left: auto;
   font-size: var(--fs-2xs); letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--text-mute);

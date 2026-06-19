@@ -7,7 +7,7 @@ import {
   flag, escapeHtml, formatBrDate, formatTime,
   isLocked, isLive, lockCountdownLabel, showToast, loadRecentMatches,
   loadQualifiers, loadStandings, teamPt, groundShort, renderDateCalendar, predictionDeadline,
-  localDateKey, oddsToProbs, brParts, heroMeta, wireHScroll, computeStandings,
+  predictionBatchKey, localDateKey, oddsToProbs, brParts, heroMeta, wireHScroll, computeStandings,
 } from '../util.js';
 import { matchPoints, scoreBreakdown } from '../scoring.js';
 import { matchScorerPts as matchScorerPtsCore, groupCardSummary } from '../card-results.js';
@@ -482,6 +482,11 @@ function renderPalpiteRow(m) {
   const lockNote = (!live && !locked)
     ? `<div class="lock-note">${lockCountdownLabel(m.match_date)}</div>`
     : '';
+  // Apito vira o dia (00h BRT): o cabeçalho mostra o lote (véspera), então o card
+  // carimba a data REAL do apito pra não parecer que é a madrugada deste cabeçalho.
+  const nextDayNote = crossesBatchDay(m)
+    ? `<span class="mm-nextday" title="O apito é na madrugada do dia seguinte">🌙 apito ${formatBrDateShort(new Date(m.match_date))}</span>`
+    : '';
 
   return `
     <div class="match bet ${locked ? 'locked' : ''}" data-match-id="${m.id}">
@@ -489,6 +494,7 @@ function renderPalpiteRow(m) {
         <strong>${formatTime(m.match_date)}</strong>
         <span class="mm-sep">·</span>
         <span class="mm-ground">${escapeHtml(groundShort(m.ground))}</span>
+        ${nextDayNote}
         ${status}
         <span class="match-grp">Grupo ${m.group_name}</span>
       </div>
@@ -554,7 +560,7 @@ function renderResultRow(m) {
        </div>`
     : '';
 
-  const dateLabel = `${formatBrDateShort(new Date(m.match_date))} · ${formatTime(m.match_date)}`;
+  const dateLabel = `${crossesBatchDay(m) ? '<span class="nd-moon">🌙</span> ' : ''}${formatBrDateShort(new Date(m.match_date))} · ${formatTime(m.match_date)}`;
 
   return `
     <div class="gr-card ${resultClass}" data-match-id="${m.id}">
@@ -604,8 +610,16 @@ function grTeamRow(m, side, pred) {
 // ============================================================
 // Helpers
 // ============================================================
+// Dia em que a partida é LISTADA = lote de bloqueio (não o dia do apito): jogos
+// à meia-noite caem no lote da véspera, junto com quem trava na mesma noite. 063.
 function dateKey(m) {
-  return localDateKey(m.match_date);
+  return predictionBatchKey(m.match_date);
+}
+
+// Jogo que VIRA O DIA: apito 00h BRT listado no lote da véspera (lote ≠ dia do
+// apito). Recebe o selo 🌙 + data do apito p/ não confundir com o cabeçalho.
+function crossesBatchDay(m) {
+  return localDateKey(m.match_date) !== predictionBatchKey(m.match_date);
 }
 
 // Todas as datas distintas (yyyy-mm-dd) dos jogos, em ordem cronológica.
