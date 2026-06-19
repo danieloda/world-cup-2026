@@ -364,7 +364,7 @@
       "2026-06-18",
       "Switzerland",
       false,
-      "0-1",
+      "1-4",
       "World Cup"
     ],
     [
@@ -505,6 +505,13 @@
   ],
   "Canada": [
     [
+      "2026-06-18",
+      "Qatar",
+      true,
+      "6-0",
+      "World Cup"
+    ],
+    [
       "2026-06-12",
       "Bosnia & Herzegovina",
       true,
@@ -565,13 +572,6 @@
       "Colombia",
       true,
       "0-0",
-      "Amistoso"
-    ],
-    [
-      "2025-10-10",
-      "Australia",
-      true,
-      "0-1",
       "Amistoso"
     ]
   ],
@@ -1729,6 +1729,13 @@
   ],
   "Mexico": [
     [
+      "2026-06-19",
+      "South Korea",
+      true,
+      "1-0",
+      "World Cup"
+    ],
+    [
       "2026-06-11",
       "South Africa",
       true,
@@ -1789,13 +1796,6 @@
       "Panama",
       false,
       "1-0",
-      "Amistoso"
-    ],
-    [
-      "2025-11-19",
-      "Paraguay",
-      true,
-      "1-2",
       "Amistoso"
     ]
   ],
@@ -2305,6 +2305,13 @@
   ],
   "Qatar": [
     [
+      "2026-06-18",
+      "Canada",
+      false,
+      "0-6",
+      "World Cup"
+    ],
+    [
       "2026-06-13",
       "Switzerland",
       true,
@@ -2366,13 +2373,6 @@
       false,
       "0-0",
       "Eliminatórias"
-    ],
-    [
-      "2025-09-07",
-      "Russia",
-      true,
-      "1-4",
-      "Amistoso"
     ]
   ],
   "Saudi Arabia": [
@@ -2665,6 +2665,13 @@
   ],
   "South Korea": [
     [
+      "2026-06-19",
+      "Mexico",
+      false,
+      "0-1",
+      "World Cup"
+    ],
+    [
       "2026-06-12",
       "Czechia",
       true,
@@ -2725,13 +2732,6 @@
       "Brazil",
       true,
       "0-5",
-      "Amistoso"
-    ],
-    [
-      "2025-09-10",
-      "Mexico",
-      false,
-      "2-2",
       "Amistoso"
     ]
   ],
@@ -2884,7 +2884,7 @@
       "2026-06-18",
       "Bosnia & Herzegovina",
       true,
-      "1-0",
+      "4-1",
       "World Cup"
     ],
     [
