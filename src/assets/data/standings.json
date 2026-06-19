@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-18T23:11:38.577Z",
+  "updated_at": "2026-06-19T02:07:25.747Z",
   "season": 2026,
   "groups": {
     "A": [
@@ -59,6 +59,19 @@
     "B": [
       {
         "rank": 1,
+        "team": "Canada",
+        "played": 2,
+        "win": 1,
+        "draw": 1,
+        "lose": 0,
+        "gf": 7,
+        "ga": 1,
+        "gd": 6,
+        "points": 4,
+        "form": "WD"
+      },
+      {
+        "rank": 2,
         "team": "Switzerland",
         "played": 2,
         "win": 1,
@@ -71,33 +84,7 @@
         "form": "WD"
       },
       {
-        "rank": 2,
-        "team": "Canada",
-        "played": 1,
-        "win": 0,
-        "draw": 1,
-        "lose": 0,
-        "gf": 1,
-        "ga": 1,
-        "gd": 0,
-        "points": 1,
-        "form": "D"
-      },
-      {
         "rank": 3,
-        "team": "Qatar",
-        "played": 1,
-        "win": 0,
-        "draw": 1,
-        "lose": 0,
-        "gf": 1,
-        "ga": 1,
-        "gd": 0,
-        "points": 1,
-        "form": "D"
-      },
-      {
-        "rank": 4,
         "team": "Bosnia & Herzegovina",
         "played": 2,
         "win": 0,
@@ -106,6 +93,19 @@
         "gf": 2,
         "ga": 5,
         "gd": -3,
+        "points": 1,
+        "form": "LD"
+      },
+      {
+        "rank": 4,
+        "team": "Qatar",
+        "played": 2,
+        "win": 0,
+        "draw": 1,
+        "lose": 1,
+        "gf": 1,
+        "ga": 7,
+        "gd": -6,
         "points": 1,
         "form": "LD"
       }
