@@ -1,33 +1,33 @@
 {
-  "updated_at": "2026-06-19T02:07:25.747Z",
+  "updated_at": "2026-06-19T07:23:48.739Z",
   "season": 2026,
   "groups": {
     "A": [
       {
         "rank": 1,
         "team": "Mexico",
-        "played": 1,
-        "win": 1,
+        "played": 2,
+        "win": 2,
         "draw": 0,
         "lose": 0,
-        "gf": 2,
+        "gf": 3,
         "ga": 0,
-        "gd": 2,
-        "points": 3,
-        "form": "W"
+        "gd": 3,
+        "points": 6,
+        "form": "WW"
       },
       {
         "rank": 2,
         "team": "South Korea",
-        "played": 1,
+        "played": 2,
         "win": 1,
         "draw": 0,
-        "lose": 0,
+        "lose": 1,
         "gf": 2,
-        "ga": 1,
-        "gd": 1,
+        "ga": 2,
+        "gd": 0,
         "points": 3,
-        "form": "W"
+        "form": "LW"
       },
       {
         "rank": 3,
