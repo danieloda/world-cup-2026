@@ -148,8 +148,8 @@ Lançar um resultado (`finished=true`) dispara, **em ordem**:
 | Pontuação | `022_additive_scoring.sql` | `src/js/scoring.js` | `scoring*.test.js`, `scoring-sql.sql` |
 | Prazo | `prediction_deadline()` (023) | `src/js/util.js` | `deadline-parity` (unit+e2e) |
 | Bracket/slots | `resolve_match_slots()` (005) | `src/js/bracket.js`, `thirds-assign.js` | `bracket.test.js`, `tiebreak.sql` |
-| Desempate grupos (FIFA 2026) | `rank_group()` + `resolve_match_slots()` (068) | `src/js/util.js` (`computeStandings`), `bracket.js`, `standings-view.js` | `standings-tiebreak.test.js`, `thirds-tiebreak.test.js`, `tiebreak.sql` E/F |
-| Confronto direto + fair play | `rank_group()` (068) | `computeStandings`/`rankGroupTeams` | `standings-tiebreak`, `fairplay.test.js`, `tiebreak.sql` E/F |
+| Desempate grupos (FIFA 2026) | `rank_group()` + `resolve_match_slots()` (068) | `src/js/util.js` (`computeStandings`), `bracket.js`, `standings-view.js` | `standings-tiebreak.test.js`, `thirds-tiebreak.test.js`, `tiebreak.sql` E/F/G |
+| Confronto direto (RE-APLICADO recursivamente) + fair play | `_resolve_tied()`/`rank_group()` (069) | `computeStandings`/`resolveTiedOnPoints` | `standings-tiebreak`, `fairplay.test.js`, `tiebreak.sql` E/F/G |
 | Ranking FIFA (tiebreak final) | `fifa_rank()` (015) | `src/js/fifa-rank.js` | `tiebreak.sql` A/B |
 | Cartões → fair play (ingestão) | `matches.*_fairplay` (068) | `scripts/data/fetch-cards.js` + `scripts/lib/fairplay.js` | `fairplay.test.js` |
 | Classificado | `qualifier_bonus_*` (021/022) | `src/js/*` | `qualifier.test.js`, `qualifier-bonus.sql` |

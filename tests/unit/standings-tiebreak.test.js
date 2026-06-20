@@ -124,6 +124,44 @@ describe('confronto direto (3 times) — mini-tabela só dos jogos entre eles', 
     // Germany tem o melhor saldo geral mas é o último do empate triplo:
     expect(st.find(s => s.team === 'Germany').sg).toBe(7);
   });
+
+  it('empate triplo separa 1 e RE-APLICA confronto direto aos 2 restantes (caso Grupo B real)', () => {
+    // Reprodução do bug reportado: Grupo B com Suíça, Canadá e Bósnia em 6 pts.
+    // Mini-tabela dos 3 é um ciclo (mini-pts/SG iguais); o mini-gols só separa a
+    // Bósnia para 3º. Suíça e Canadá seguem empatados → re-aplica o confronto
+    // direto SÓ entre eles: Canadá venceu 2×1 → Canadá passa, apesar do mesmo
+    // saldo geral (+2) e do ranking FIFA melhor da Suíça (19 < 30).
+    const m = [
+      { id: 1, finished: true, team_home: 'Switzerland', team_away: 'Canada', actual_home: 1, actual_away: 2 },
+      { id: 2, finished: true, team_home: 'Switzerland', team_away: 'Bosnia & Herzegovina', actual_home: 1, actual_away: 0 },
+      { id: 3, finished: true, team_home: 'Bosnia & Herzegovina', team_away: 'Canada', actual_home: 1, actual_away: 0 },
+      { id: 4, finished: true, team_home: 'Switzerland', team_away: 'Qatar', actual_home: 2, actual_away: 0 },
+      { id: 5, finished: true, team_home: 'Canada', team_away: 'Qatar', actual_home: 2, actual_away: 0 },
+      { id: 6, finished: true, team_home: 'Bosnia & Herzegovina', team_away: 'Qatar', actual_home: 1, actual_away: 0 },
+    ];
+    const st = computeStandings(m, 'real');
+    expect(st.map(s => s.team)).toEqual(['Canada', 'Switzerland', 'Bosnia & Herzegovina', 'Qatar']);
+    // Suíça e Canadá empatam em pts/SG/GF — só o jogo direto separa:
+    expect(st[0].pts).toBe(6); expect(st[1].pts).toBe(6);
+    expect(st[0].sg).toBe(st[1].sg);
+    expect(st[0].gp).toBe(st[1].gp);
+  });
+
+  it('empate triplo TOTALMENTE empatado no confronto direto → cai para o saldo geral', () => {
+    // Os 3 empataram entre si (0×0) → mini-tabela idêntica (não separa ninguém);
+    // aí o saldo GERAL decide: France (+3) > Spain (+2) > England (+1).
+    const teams = ['France', 'Spain', 'England', 'Ghana'];
+    const st = computeStandings(groupMatches(teams, [
+      [0, 0], // France 0×0 Spain
+      [1, 0], // England 1×0 Ghana
+      [0, 0], // France 0×0 England
+      [2, 0], // Spain 2×0 Ghana
+      [3, 0], // France 3×0 Ghana
+      [0, 0], // Spain 0×0 England
+    ]), 'real');
+    expect(st.map(s => s.team)).toEqual(['France', 'Spain', 'England', 'Ghana']);
+    expect(st.slice(0, 3).every(s => s.pts === 5)).toBe(true);
+  });
 });
 
 describe('fair play — decide só no modo real, antes do rank FIFA', () => {

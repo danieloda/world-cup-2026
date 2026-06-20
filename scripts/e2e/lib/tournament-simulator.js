@@ -53,28 +53,44 @@ function computeGroupStandings(groupMatches) {
   return rankGroupTeams([...stats.values()], groupMatches);
 }
 
-// Ordena por pontos formando blocos de empate; dentro de cada bloco aplica o
-// confronto direto (mini-tabela), depois SG geral → GF geral → fair play → FIFA.
+// Ordena por pontos formando blocos de empate; cada bloco é resolvido por
+// confronto direto, RE-APLICADO recursivamente ao subconjunto ainda empatado
+// (regra oficial FIFA 2026). KEEP IN SYNC com src/js/util.js.
 function rankGroupTeams(teams, groupMatches) {
   const byPts = [...teams].sort((a, b) => b.pts - a.pts);
   const out = [];
   for (let i = 0; i < byPts.length;) {
     let j = i;
     while (j < byPts.length && byPts[j].pts === byPts[i].pts) j++;
-    const tied = byPts.slice(i, j);
-    if (tied.length > 1) {
-      const h2h = headToHeadStats(tied, groupMatches);
-      tied.sort((a, b) => {
-        const ha = h2h.get(a.team), hb = h2h.get(b.team);
-        return (hb.pts - ha.pts) || (hb.sg - ha.sg) || (hb.gf - ha.gf)
-          || (b.sg - a.sg) || (b.gp - a.gp)
-          || (b.fairPlay - a.fairPlay)
-          || (fifaRank(a.team) - fifaRank(b.team));
-      });
-    }
-    out.push(...tied);
+    out.push(...resolveTiedOnPoints(byPts.slice(i, j), groupMatches));
     i = j;
   }
+  return out;
+}
+
+// Confronto direto entre os empatados (pts→SG→gols); se um subconjunto seguir
+// empatado, re-aplica só a ele (recursão); esgotado, cai para SG geral → GF
+// geral → fair play → FIFA.
+function resolveTiedOnPoints(tied, groupMatches) {
+  if (tied.length === 1) return tied;
+  const h2h = headToHeadStats(tied, groupMatches);
+  const key = (t) => { const h = h2h.get(t.team); return `${h.pts}|${h.sg}|${h.gf}`; };
+  const ordered = [...tied].sort((a, b) => {
+    const ha = h2h.get(a.team), hb = h2h.get(b.team);
+    return (hb.pts - ha.pts) || (hb.sg - ha.sg) || (hb.gf - ha.gf);
+  });
+  const blocks = [];
+  for (const t of ordered) {
+    const last = blocks[blocks.length - 1];
+    if (last && key(last[0]) === key(t)) last.push(t);
+    else blocks.push([t]);
+  }
+  if (blocks.length === 1) {
+    return [...tied].sort((a, b) =>
+      (b.sg - a.sg) || (b.gp - a.gp) || (b.fairPlay - a.fairPlay) || (fifaRank(a.team) - fifaRank(b.team)));
+  }
+  const out = [];
+  for (const block of blocks) out.push(...(block.length > 1 ? resolveTiedOnPoints(block, groupMatches) : block));
   return out;
 }
 

@@ -39,8 +39,8 @@ do FIFA), `fairplay` (fórmula oficial de conduta por jogador/time),
 ### Nível 2 — Lógica de DB (psql, transação com ROLLBACK) · ~10s
 Os cálculos no PostgreSQL, independentes da implementação JS. Não deixam resíduo.
 - `scenarios/scoring-sql.sql` — `score_prediction` vs canônico (47 checks).
-- `scenarios/tiebreak.sql` — desempate FIFA 2026 (confronto direto E, fair play entre 3ºs F),
-  slots, cascata, bônus campeão (16 checks).
+- `scenarios/tiebreak.sql` — desempate FIFA 2026 (confronto direto E, fair play entre 3ºs F,
+  confronto direto RE-APLICADO recursivamente G), slots, cascata, bônus campeão (18 checks).
 - `scenarios/qualifier-bonus.sql` — BPE/BP, ordem de triggers, gating (11 checks).
 - **Rodar:** `docker exec -i supabase_db_world-cup-2026 psql -U postgres -d postgres -f /tmp/<arq>.sql`
 - **Pré-requisito:** profile admin existente (`00-setup-local.js` ou `bootstrap-local.sh`).

@@ -599,9 +599,8 @@ export function computeStandings(matches, mode, preds) {
 
 /**
  * Ordena as seleções DENTRO de um grupo pela ordem oficial FIFA 2026.
- * Os pontos formam blocos de empate; dentro de cada bloco aplica-se o confronto
- * direto (mini-tabela só com os jogos entre os empatados) e, persistindo o
- * empate, saldo geral → gols geral → fair play → ranking FIFA.
+ * Os pontos formam blocos de empate; cada bloco é resolvido por confronto direto
+ * (ver resolveTiedOnPoints).
  */
 function rankGroupTeams(teams, matches, mode, preds) {
   const byPts = [...teams].sort((a, b) => b.pts - a.pts);
@@ -609,24 +608,51 @@ function rankGroupTeams(teams, matches, mode, preds) {
   for (let i = 0; i < byPts.length;) {
     let j = i;
     while (j < byPts.length && byPts[j].pts === byPts[i].pts) j++;
-    const tied = byPts.slice(i, j);
-    if (tied.length > 1) {
-      const h2h = headToHeadStats(tied, matches, mode, preds);
-      tied.sort((a, b) => {
-        const ha = h2h.get(a.team), hb = h2h.get(b.team);
-        return (hb.pts - ha.pts)         // confronto direto: pontos
-          || (hb.sg - ha.sg)             // confronto direto: saldo
-          || (hb.gf - ha.gf)             // confronto direto: gols
-          || (b.sg - a.sg)               // saldo de gols geral
-          || (b.gp - a.gp)               // gols marcados geral
-          || (b.fairPlay - a.fairPlay)   // fair play (≤ 0, maior = melhor)
-          || (fifaRank(a.team) - fifaRank(b.team)); // ranking FIFA
-      });
-    }
-    out.push(...tied);
+    out.push(...resolveTiedOnPoints(byPts.slice(i, j), matches, mode, preds));
     i = j;
   }
   return out;
+}
+
+/**
+ * Resolve seleções empatadas em PONTOS pela regra oficial FIFA 2026: confronto
+ * direto (pts → SG → gols, só nos jogos ENTRE elas). Se, depois disso, um
+ * SUBCONJUNTO continuar empatado, o confronto direto é RE-APLICADO só a esse
+ * subconjunto (recursão — ex.: empate triplo que separa o 3º e deixa 2 ainda
+ * empatados → decide o jogo direto entre os 2). Esgotado o confronto direto
+ * (ninguém se separa), cai para: saldo geral → gols geral → fair play → FIFA.
+ */
+function resolveTiedOnPoints(tied, matches, mode, preds) {
+  if (tied.length === 1) return tied;
+  const h2h = headToHeadStats(tied, matches, mode, preds);
+  const key = (t) => { const h = h2h.get(t.team); return `${h.pts}|${h.sg}|${h.gf}`; };
+  const ordered = [...tied].sort((a, b) => {
+    const ha = h2h.get(a.team), hb = h2h.get(b.team);
+    return (hb.pts - ha.pts) || (hb.sg - ha.sg) || (hb.gf - ha.gf);
+  });
+  // Particiona em blocos de mesmo confronto direto (pts/SG/gols entre eles).
+  const blocks = [];
+  for (const t of ordered) {
+    const last = blocks[blocks.length - 1];
+    if (last && key(last[0]) === key(t)) last.push(t);
+    else blocks.push([t]);
+  }
+  // Confronto direto não separou ninguém (1 bloco só) → critérios gerais.
+  if (blocks.length === 1) return breakByOverall(tied);
+  // Senão, RE-APLICA o confronto direto a cada bloco ainda empatado.
+  const out = [];
+  for (const block of blocks) {
+    out.push(...(block.length > 1 ? resolveTiedOnPoints(block, matches, mode, preds) : block));
+  }
+  return out;
+}
+
+// Critérios gerais (quando o confronto direto se esgota): saldo geral → gols
+// geral → fair play (≤ 0, maior = melhor) → ranking FIFA (menor = melhor).
+function breakByOverall(teams) {
+  return [...teams].sort((a, b) =>
+    (b.sg - a.sg) || (b.gp - a.gp) || (b.fairPlay - a.fairPlay) || (fifaRank(a.team) - fifaRank(b.team))
+  );
 }
 
 /**

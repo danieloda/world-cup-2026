@@ -39,24 +39,37 @@ function expectedStandings(matches, group) {
     h.fp+=m.home_fairplay??0; a.fp+=m.away_fairplay??0;
     if(m.actual_home>m.actual_away) h.pts+=3; else if(m.actual_away>m.actual_home) a.pts+=3; else {h.pts++;a.pts++;}
   }
-  // Blocos de mesma pontuação → confronto direto (mini-tabela só dos jogos entre eles).
+  // h2h entre um conjunto de times (só jogos entre eles)
+  const h2hOf = (teams) => {
+    const names=new Set(teams.map(t=>t.team));
+    const h=new Map(teams.map(t=>[t.team,{pts:0,gf:0,ga:0}]));
+    for(const m of gm){ if(!names.has(m.team_home)||!names.has(m.team_away)) continue;
+      const H=h.get(m.team_home), A=h.get(m.team_away);
+      H.gf+=m.actual_home; H.ga+=m.actual_away; A.gf+=m.actual_away; A.ga+=m.actual_home;
+      if(m.actual_home>m.actual_away)H.pts+=3; else if(m.actual_away>m.actual_home)A.pts+=3; else{H.pts++;A.pts++;} }
+    return h;
+  };
+  // Confronto direto RECURSIVO: re-aplica ao subconjunto ainda empatado; esgotado,
+  // cai para saldo geral → gols geral → fair play → FIFA.
+  const resolve = (tied) => {
+    if(tied.length===1) return tied;
+    const h=h2hOf(tied);
+    const key=t=>{const x=h.get(t.team); return `${x.pts}|${x.gf-x.ga}|${x.gf}`;};
+    const ord=[...tied].sort((x,y)=>{const hx=h.get(x.team),hy=h.get(y.team);
+      return (hy.pts-hx.pts)||((hy.gf-hy.ga)-(hx.gf-hx.ga))||(hy.gf-hx.gf);});
+    const blocks=[];
+    for(const t of ord){ const last=blocks[blocks.length-1];
+      if(last && key(last[0])===key(t)) last.push(t); else blocks.push([t]); }
+    if(blocks.length===1) return [...tied].sort((x,y)=>
+      ((y.gf-y.ga)-(x.gf-x.ga))||(y.gf-x.gf)||(y.fp-x.fp)||(fifaRank(x.team)-fifaRank(y.team)));
+    const out=[]; for(const b of blocks) out.push(...(b.length>1?resolve(b):b)); return out;
+  };
+  // Blocos por pontos, cada um resolvido pelo confronto direto recursivo.
   const byPts=[...st.values()].sort((x,y)=>y.pts-x.pts);
   const out=[];
   for(let i=0;i<byPts.length;){
     let j=i; while(j<byPts.length && byPts[j].pts===byPts[i].pts) j++;
-    const tied=byPts.slice(i,j);
-    if(tied.length>1){
-      const names=new Set(tied.map(t=>t.team));
-      const h2h=new Map(tied.map(t=>[t.team,{pts:0,gf:0,ga:0}]));
-      for(const m of gm){ if(!names.has(m.team_home)||!names.has(m.team_away)) continue;
-        const H=h2h.get(m.team_home), A=h2h.get(m.team_away);
-        H.gf+=m.actual_home; H.ga+=m.actual_away; A.gf+=m.actual_away; A.ga+=m.actual_home;
-        if(m.actual_home>m.actual_away)H.pts+=3; else if(m.actual_away>m.actual_home)A.pts+=3; else{H.pts++;A.pts++;} }
-      tied.sort((x,y)=>{ const hx=h2h.get(x.team),hy=h2h.get(y.team);
-        return (hy.pts-hx.pts) || ((hy.gf-hy.ga)-(hx.gf-hx.ga)) || (hy.gf-hx.gf)
-          || ((y.gf-y.ga)-(x.gf-x.ga)) || (y.gf-x.gf) || (y.fp-x.fp) || (fifaRank(x.team)-fifaRank(y.team)); });
-    }
-    out.push(...tied); i=j;
+    out.push(...resolve(byPts.slice(i,j))); i=j;
   }
   return out.map(s=>s.team);
 }

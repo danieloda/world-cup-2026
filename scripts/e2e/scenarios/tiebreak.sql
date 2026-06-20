@@ -354,6 +354,57 @@ select 'F2: fair play −5 elimina o 3º de melhor FIFA (fair play > FIFA)',
        (select team from _bestthird);
 
 -- ============================================================
+-- CENÁRIO G — Confronto direto RE-APLICADO (empate triplo → 2 ainda empatados)
+-- Replica o caso real do Grupo B: Czech Republic, South Korea e Mexico em 6 pts.
+-- Mini-tabela é um ciclo; o mini-gols joga o Mexico para 3º; CZE e KOR seguem
+-- empatados → RE-APLICA o confronto direto SÓ entre eles → CZE (venceu 2×1) passa,
+-- apesar do mesmo saldo geral (+2) e do ranking FIFA pior (41 > 25 do KOR).
+-- (Regressão do bug onde a 068 caía no saldo geral/FIFA e punha o KOR à frente.)
+-- ============================================================
+select pg_temp.reset_all();
+alter table public.matches disable trigger trg_resolve_slots;
+-- Czech Republic 2×1 South Korea (confronto direto p/ CZE)
+update public.matches set actual_home=case when team_home='Czech Republic' then 2 else 1 end,
+                          actual_away=case when team_away='Czech Republic' then 2 else 1 end, finished=true, finished_at=now()
+  where group_name='A' and stage='group' and ((team_home='Czech Republic' and team_away='South Korea') or (team_home='South Korea' and team_away='Czech Republic'));
+-- South Korea 1×0 Mexico
+update public.matches set actual_home=case when team_home='South Korea' then 1 else 0 end,
+                          actual_away=case when team_away='South Korea' then 1 else 0 end, finished=true, finished_at=now()
+  where group_name='A' and stage='group' and ((team_home='South Korea' and team_away='Mexico') or (team_home='Mexico' and team_away='South Korea'));
+-- Mexico 1×0 Czech Republic  (fecha o ciclo)
+update public.matches set actual_home=case when team_home='Mexico' then 1 else 0 end,
+                          actual_away=case when team_away='Mexico' then 1 else 0 end, finished=true, finished_at=now()
+  where group_name='A' and stage='group' and ((team_home='Mexico' and team_away='Czech Republic') or (team_home='Czech Republic' and team_away='Mexico'));
+-- South Korea 2×0 South Africa
+update public.matches set actual_home=case when team_home='South Korea' then 2 else 0 end,
+                          actual_away=case when team_away='South Korea' then 2 else 0 end, finished=true, finished_at=now()
+  where group_name='A' and stage='group' and ((team_home='South Korea' and team_away='South Africa') or (team_home='South Africa' and team_away='South Korea'));
+-- Czech Republic 2×0 South Africa
+update public.matches set actual_home=case when team_home='Czech Republic' then 2 else 0 end,
+                          actual_away=case when team_away='Czech Republic' then 2 else 0 end, finished=true, finished_at=now()
+  where group_name='A' and stage='group' and ((team_home='Czech Republic' and team_away='South Africa') or (team_home='South Africa' and team_away='Czech Republic'));
+-- Mexico 1×0 South Africa
+update public.matches set actual_home=case when team_home='Mexico' then 1 else 0 end,
+                          actual_away=case when team_away='Mexico' then 1 else 0 end, finished=true, finished_at=now()
+  where group_name='A' and stage='group' and ((team_home='Mexico' and team_away='South Africa') or (team_home='South Africa' and team_away='Mexico'));
+alter table public.matches enable trigger trg_resolve_slots;
+select public.resolve_match_slots();
+
+-- G1: 1A == Czech Republic (venceu o confronto direto re-aplicado, FIFA pior)
+insert into _res(check_name, pass, detail)
+select 'G1: 1A=Czech Republic (confronto direto re-aplicado aos 2 restantes)',
+       bool_or(t='Czech Republic'), coalesce(string_agg(t,','),'<vazio>')
+from (select team_home t from public.matches where stage='r32' and slot_home='1A'
+      union all select team_away from public.matches where stage='r32' and slot_away='1A') x;
+
+-- G2: 2A == South Korea (perdeu o confronto direto re-aplicado, apesar do FIFA melhor)
+insert into _res(check_name, pass, detail)
+select 'G2: 2A=South Korea (perdeu o confronto direto re-aplicado)',
+       bool_or(t='South Korea'), coalesce(string_agg(t,','),'<vazio>')
+from (select team_home t from public.matches where stage='r32' and slot_home='2A'
+      union all select team_away from public.matches where stage='r32' and slot_away='2A') x;
+
+-- ============================================================
 -- RESULTADO
 -- ============================================================
 select id, case when pass then 'PASS' else 'FAIL' end as status, check_name, detail
