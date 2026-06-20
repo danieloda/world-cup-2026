@@ -1,0 +1,59 @@
+name: Refresh Cards
+
+# Puxa os cartões (amarelos/vermelhos) de cada partida ENCERRADA via API-Football
+# (/fixtures/events), computa a pontuação de fair play pela fórmula oficial da
+# FIFA e grava em public.matches — alimenta o 5º critério de desempate da Copa
+# 2026 (conduta). Idempotente: só busca jogos novos (cards_fetched_at IS NULL).
+#
+# Pré-requisitos (Settings → Secrets and variables → Actions):
+#   Secrets:
+#     - API_FOOTBALL_KEY
+#     - SUPABASE_SERVICE_ROLE_KEY
+#   Variables:
+#     - SUPABASE_URL
+#
+# NOTA: o cron do GitHub Actions costuma atrasar 4–8h neste repo. Como os cartões
+# só desempatam em empate total (raro), o atraso é tolerável; mas se um jogo
+# recém-encerrado precisar dos cartões já, use "Run workflow" (workflow_dispatch).
+# Fix durável (se virar crítico): gatilho via pg_cron → API, como no
+# integrity-snapshot (migration 062).
+
+on:
+  schedule:
+    # De hora em hora: cartões só aparecem depois que o jogo acaba; 1 chamada por
+    # jogo encerrado ainda sem cartões ingeridos.
+    - cron: '0 * * * *'
+  workflow_dispatch:        # botão "Run workflow" no GitHub UI
+
+concurrency:
+  group: refresh-cards
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    name: Fetch cards & upsert
+    runs-on: ubuntu-latest
+    # Só roda se houver credenciais (evita falhar em forks)
+    if: ${{ vars.SUPABASE_URL != '' }}
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          # Node 22 LTS — @supabase/supabase-js exige WebSocket nativo (não disponível em Node 20)
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run fetch-cards
+        env:
+          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/data/fetch-cards.js

@@ -529,17 +529,28 @@ export function renderDateCalendar({ dates, meta = {}, activeDate, legendLabels 
 }
 
 /**
- * Computa standings de um grupo a partir de uma lista de jogos.
+ * Computa standings de um grupo a partir de uma lista de jogos, aplicando o
+ * critério de desempate OFICIAL da Copa do Mundo 2026 (regra nova: o confronto
+ * direto vem ANTES do saldo geral):
+ *   1) Pontos
+ *   2) Confronto direto entre os empatados (pts → SG → gols, só nos jogos entre
+ *      eles) — ver rankGroupTeams/headToHeadStats
+ *   3) Saldo de gols geral
+ *   4) Gols marcados geral
+ *   5) Fair play (conduta — menos cartões; só no modo 'real')
+ *   6) Ranking FIFA
+ * KEEP IN SYNC com o SQL resolve_match_slots (migration 068), o simulador
+ * (scripts/e2e/lib/tournament-simulator.js) e o oráculo e2e (06-ui-assert.js).
  * @param matches  jogos do grupo (12 grupos × 6 = 72 total)
  * @param mode     'real' = usa actual_home/away; 'sim' = usa pred_home/away
  * @param preds    Map<match_id, prediction> (necessário se mode='sim')
- * @returns [{ team, j, v, e, d, gp, gc, sg, pts }] ordenado por pts/sg/gp
+ * @returns [{ team, j, v, e, d, gp, gc, sg, pts, fairPlay }] já ordenado
  */
 export function computeStandings(matches, mode, preds) {
   const stats = new Map();
   function ensure(team) {
     if (!stats.has(team)) {
-      stats.set(team, { team, j: 0, v: 0, e: 0, d: 0, gp: 0, gc: 0, sg: 0, pts: 0 });
+      stats.set(team, { team, j: 0, v: 0, e: 0, d: 0, gp: 0, gc: 0, sg: 0, pts: 0, fairPlay: 0 });
     }
     return stats.get(team);
   }
@@ -567,6 +578,13 @@ export function computeStandings(matches, mode, preds) {
     sh.j++; sa.j++;
     sh.gp += h; sh.gc += a;
     sa.gp += a; sa.gc += h;
+    // Fair play só existe com resultado real (ninguém palpita cartão). Os pontos
+    // já chegam computados pela fórmula oficial da FIFA na ingestão (fetch-cards.js):
+    // valor ≤ 0, quanto MAIOR (menos negativo) melhor.
+    if (mode === 'real') {
+      sh.fairPlay += m.home_fairplay ?? 0;
+      sa.fairPlay += m.away_fairplay ?? 0;
+    }
 
     if (h > a)       { sh.v++; sa.d++; sh.pts += 3; }
     else if (a > h)  { sa.v++; sh.d++; sa.pts += 3; }
@@ -576,14 +594,68 @@ export function computeStandings(matches, mode, preds) {
   // Compute SG
   for (const s of stats.values()) s.sg = s.gp - s.gc;
 
-  // Sort: PTS desc → SG desc → GP desc → FIFA rank asc (oficial)
-  // Mesmo critério do SQL (resolve_match_slots): pts/sg/gf + fifa_rank tiebreaker.
-  return [...stats.values()].sort((x, y) =>
-    y.pts - x.pts
-    || y.sg - x.sg
-    || y.gp - x.gp
-    || fifaRank(x.team) - fifaRank(y.team)
-  );
+  return rankGroupTeams([...stats.values()], matches, mode, preds);
+}
+
+/**
+ * Ordena as seleções DENTRO de um grupo pela ordem oficial FIFA 2026.
+ * Os pontos formam blocos de empate; dentro de cada bloco aplica-se o confronto
+ * direto (mini-tabela só com os jogos entre os empatados) e, persistindo o
+ * empate, saldo geral → gols geral → fair play → ranking FIFA.
+ */
+function rankGroupTeams(teams, matches, mode, preds) {
+  const byPts = [...teams].sort((a, b) => b.pts - a.pts);
+  const out = [];
+  for (let i = 0; i < byPts.length;) {
+    let j = i;
+    while (j < byPts.length && byPts[j].pts === byPts[i].pts) j++;
+    const tied = byPts.slice(i, j);
+    if (tied.length > 1) {
+      const h2h = headToHeadStats(tied, matches, mode, preds);
+      tied.sort((a, b) => {
+        const ha = h2h.get(a.team), hb = h2h.get(b.team);
+        return (hb.pts - ha.pts)         // confronto direto: pontos
+          || (hb.sg - ha.sg)             // confronto direto: saldo
+          || (hb.gf - ha.gf)             // confronto direto: gols
+          || (b.sg - a.sg)               // saldo de gols geral
+          || (b.gp - a.gp)               // gols marcados geral
+          || (b.fairPlay - a.fairPlay)   // fair play (≤ 0, maior = melhor)
+          || (fifaRank(a.team) - fifaRank(b.team)); // ranking FIFA
+      });
+    }
+    out.push(...tied);
+    i = j;
+  }
+  return out;
+}
+
+/**
+ * Mini-tabela do confronto direto: agrega pts/gols apenas nos jogos disputados
+ * ENTRE os times empatados (`tied`). Como `tied` já é o bloco de mesma pontuação,
+ * isso resolve uniformemente empates de 2 ou de 3+ times. Equivale ao predicado
+ * "os dois times do jogo têm os mesmos pontos-base" usado no SQL (migration 068).
+ */
+function headToHeadStats(tied, matches, mode, preds) {
+  const names = new Set(tied.map(t => t.team));
+  const h = new Map(tied.map(t => [t.team, { pts: 0, gf: 0, ga: 0, sg: 0 }]));
+  for (const m of matches) {
+    if (!names.has(m.team_home) || !names.has(m.team_away)) continue;
+    let sh, sa;
+    if (mode === 'real') {
+      if (!m.finished) continue;
+      sh = m.actual_home; sa = m.actual_away;
+    } else {
+      const p = preds?.get(m.id);
+      if (!p) continue;
+      sh = p.pred_home; sa = p.pred_away;
+    }
+    if (sh == null || sa == null) continue;
+    const H = h.get(m.team_home), A = h.get(m.team_away);
+    H.gf += sh; H.ga += sa; A.gf += sa; A.ga += sh;
+    if (sh > sa) H.pts += 3; else if (sa > sh) A.pts += 3; else { H.pts += 1; A.pts += 1; }
+  }
+  for (const v of h.values()) v.sg = v.gf - v.ga;
+  return h;
 }
 
 /**

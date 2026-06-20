@@ -113,7 +113,7 @@ function renderStandingsRows(standings, matches) {
 // ============================================================
 /**
  * Retorna a lista dos 3ºs colocados de todos os grupos, ordenados.
- * Cada item: { team, group, j, v, e, d, gp, gc, sg, pts, complete }
+ * Cada item: { team, group, j, v, e, d, gp, gc, sg, pts, fairPlay, complete }
  *   complete: true se o grupo está completo no modo atual
  */
 export function computeThirds(groupMatches, mode, predsByMatch) {
@@ -139,13 +139,15 @@ export function computeThirds(groupMatches, mode, predsByMatch) {
     }
   }
 
-  // Ordenar: completos primeiro, depois por PTS → SG → GP → FIFA rank (oficial)
+  // Ordenar: completos primeiro, depois pelo critério oficial dos 3ºs (grupos
+  // diferentes → SEM confronto direto): PTS → SG → GP → fair play → FIFA rank.
   return thirds.sort((x, y) => {
     if (x.complete !== y.complete) return x.complete ? -1 : 1;
     if (!x.complete && !y.complete) return 0;
     return (y.pts ?? 0) - (x.pts ?? 0)
         || (y.sg ?? 0) - (x.sg ?? 0)
         || (y.gp ?? 0) - (x.gp ?? 0)
+        || (y.fairPlay ?? 0) - (x.fairPlay ?? 0)
         || fifaRank(x.team) - fifaRank(y.team);
   });
 }

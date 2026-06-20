@@ -26,6 +26,7 @@
     "sync:qualifiers": "node scripts/data/fetch-qualifiers.js",
     "sync:topscorers": "node scripts/data/fetch-topscorers.js",
     "sync:standings": "node scripts/data/fetch-standings.js",
+    "sync:cards": "node scripts/data/fetch-cards.js",
     "integrity:snapshot": "node scripts/integrity/snapshot.js",
     "integrity:verify": "node scripts/integrity/verify.js"
   },

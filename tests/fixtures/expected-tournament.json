@@ -10,14 +10,14 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 407,
-          "full_name": "Á. Sepúlveda",
+          "player_id": 350,
+          "full_name": "B. Gutiérrez",
           "team": "Mexico",
           "goals": 2
         },
         {
-          "player_id": 379,
-          "full_name": "R. Alvarado",
+          "player_id": 357,
+          "full_name": "A. Vega",
           "team": "Mexico",
           "goals": 1
         }
@@ -33,32 +33,32 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 431,
-          "full_name": "Cho Gue-Sung",
+          "player_id": 388,
+          "full_name": "O. Hyun-Kyu",
           "team": "South Korea",
           "goals": 1
         },
         {
-          "player_id": 425,
-          "full_name": "Lee Dong-Gyeong",
+          "player_id": 384,
+          "full_name": "H. Hee-Chan",
           "team": "South Korea",
           "goals": 1
         },
         {
-          "player_id": 420,
-          "full_name": "Bae Jun-Ho",
+          "player_id": 379,
+          "full_name": "P. Seung-Ho",
           "team": "South Korea",
           "goals": 1
         },
         {
-          "player_id": 723,
-          "full_name": "L. Provod",
+          "player_id": 640,
+          "full_name": "M. Sadílek",
           "team": "Czech Republic",
           "goals": 1
         },
         {
-          "player_id": 727,
-          "full_name": "T. Chorý",
+          "player_id": 646,
+          "full_name": "A. Hložek",
           "team": "Czech Republic",
           "goals": 1
         }
@@ -74,26 +74,26 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 727,
-          "full_name": "T. Chorý",
+          "player_id": 646,
+          "full_name": "A. Hložek",
           "team": "Czech Republic",
           "goals": 1
         },
         {
-          "player_id": 721,
+          "player_id": 638,
           "full_name": "V. Darida",
           "team": "Czech Republic",
           "goals": 1
         },
         {
-          "player_id": 723,
-          "full_name": "L. Provod",
+          "player_id": 640,
+          "full_name": "M. Sadílek",
           "team": "Czech Republic",
           "goals": 1
         },
         {
-          "player_id": 991,
-          "full_name": "S. Campbell",
+          "player_id": 904,
+          "full_name": "I. Rayners",
           "team": "South Africa",
           "goals": 1
         }
@@ -109,20 +109,20 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 400,
-          "full_name": "A. González",
+          "player_id": 359,
+          "full_name": "C. Huerta",
           "team": "Mexico",
           "goals": 1
         },
         {
-          "player_id": 404,
-          "full_name": "G. Martínez",
+          "player_id": 363,
+          "full_name": "R. Alvarado",
           "team": "Mexico",
           "goals": 1
         },
         {
-          "player_id": 434,
-          "full_name": "Son Heung-Min",
+          "player_id": 378,
+          "full_name": "Y. Hyun-Jun",
           "team": "South Korea",
           "goals": 1
         }
@@ -138,20 +138,20 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 730,
-          "full_name": "P. Schick",
+          "player_id": 649,
+          "full_name": "J. Kuchta",
           "team": "Czech Republic",
           "goals": 1
         },
         {
-          "player_id": 402,
-          "full_name": "D. Lainez",
+          "player_id": 361,
+          "full_name": "J. Quiñones",
           "team": "Mexico",
           "goals": 2
         },
         {
-          "player_id": 400,
-          "full_name": "A. González",
+          "player_id": 359,
+          "full_name": "C. Huerta",
           "team": "Mexico",
           "goals": 1
         }
@@ -167,8 +167,8 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 420,
-          "full_name": "Bae Jun-Ho",
+          "player_id": 379,
+          "full_name": "P. Seung-Ho",
           "team": "South Korea",
           "goals": 1
         }
@@ -184,26 +184,26 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 1348,
-          "full_name": "D. Jebbison",
+          "player_id": 1202,
+          "full_name": "Mathieu Choinière",
           "team": "Canada",
           "goals": 1
         },
         {
-          "player_id": 1342,
-          "full_name": "M. Aiyenero",
+          "player_id": 1205,
+          "full_name": "Cyle Larin",
           "team": "Canada",
           "goals": 1
         },
         {
-          "player_id": 859,
-          "full_name": "E. Bajraktarevic",
+          "player_id": 777,
+          "full_name": "J. Lukic",
           "team": "Bosnia & Herzegovina",
           "goals": 1
         },
         {
-          "player_id": 858,
-          "full_name": "Kerim-Sam Alajbegović",
+          "player_id": 776,
+          "full_name": "E. Demirovic",
           "team": "Bosnia & Herzegovina",
           "goals": 1
         }
@@ -219,20 +219,20 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 1166,
-          "full_name": "Ahmed Alaa",
+          "player_id": 1048,
+          "full_name": "Edmilson Junior",
           "team": "Qatar",
           "goals": 2
         },
         {
-          "player_id": 1162,
-          "full_name": "G. Laye",
+          "player_id": 1046,
+          "full_name": "Abdulaziz Hatem",
           "team": "Qatar",
           "goals": 1
         },
         {
-          "player_id": 358,
-          "full_name": "D. Ndoye",
+          "player_id": 335,
+          "full_name": "N. Okafor",
           "team": "Switzerland",
           "goals": 2
         }
@@ -258,14 +258,14 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 1348,
-          "full_name": "D. Jebbison",
+          "player_id": 1202,
+          "full_name": "Mathieu Choinière",
           "team": "Canada",
           "goals": 1
         },
         {
-          "player_id": 1349,
-          "full_name": "C. Larin",
+          "player_id": 1203,
+          "full_name": "Stephen Eustáquio",
           "team": "Canada",
           "goals": 1
         }
@@ -291,26 +291,26 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 1168,
-          "full_name": "M. Gouda",
+          "player_id": 1050,
+          "full_name": "Hassan Al-Haydos",
           "team": "Qatar",
           "goals": 1
         },
         {
-          "player_id": 1167,
-          "full_name": "Edmilson Junior",
+          "player_id": 1049,
+          "full_name": "Mohammed Muntari",
           "team": "Qatar",
           "goals": 1
         },
         {
-          "player_id": 1159,
-          "full_name": "Ali",
+          "player_id": 1059,
+          "full_name": "Almoez Ali",
           "team": "Qatar",
           "goals": 1
         },
         {
-          "player_id": 1161,
-          "full_name": "Abdulaziz Hatem",
+          "player_id": 1066,
+          "full_name": "Mohamed Manai",
           "team": "Qatar",
           "goals": 1
         }
@@ -326,20 +326,20 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 668,
-          "full_name": "A. Ezzalzouli",
+          "player_id": 596,
+          "full_name": "B. Díaz",
           "team": "Morocco",
           "goals": 3
         },
         {
-          "player_id": 671,
-          "full_name": "C. Talbi",
+          "player_id": 585,
+          "full_name": "S. El Mourabet",
           "team": "Morocco",
           "goals": 1
         },
         {
-          "player_id": 669,
-          "full_name": "H. Igamane",
+          "player_id": 597,
+          "full_name": "G. Yassine",
           "team": "Morocco",
           "goals": 1
         }
@@ -355,26 +355,26 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 1290,
-          "full_name": "R. Providence",
+          "player_id": 1170,
+          "full_name": "L. Joseph",
           "team": "Haiti",
           "goals": 1
         },
         {
-          "player_id": 831,
-          "full_name": "A. Irving",
+          "player_id": 746,
+          "full_name": "B. Gilmour",
           "team": "Scotland",
           "goals": 1
         },
         {
-          "player_id": 836,
+          "player_id": 750,
           "full_name": "C. Adams",
           "team": "Scotland",
           "goals": 2
         },
         {
-          "player_id": 838,
-          "full_name": "B. Doak",
+          "player_id": 752,
+          "full_name": "G. Hirst",
           "team": "Scotland",
           "goals": 1
         }
@@ -390,38 +390,38 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 839,
-          "full_name": "L. Dykes",
+          "player_id": 753,
+          "full_name": "L. Shankland",
           "team": "Scotland",
           "goals": 1
         },
         {
-          "player_id": 829,
+          "player_id": 744,
           "full_name": "L. Ferguson",
           "team": "Scotland",
           "goals": 1
         },
         {
-          "player_id": 828,
-          "full_name": "Findlay Curtis",
+          "player_id": 743,
+          "full_name": "F. Curtis",
           "team": "Scotland",
           "goals": 1
         },
         {
-          "player_id": 665,
-          "full_name": "E. Ben Seghir",
+          "player_id": 593,
+          "full_name": "C. Talbi",
           "team": "Morocco",
           "goals": 1
         },
         {
-          "player_id": 651,
-          "full_name": "A. Adli",
+          "player_id": 587,
+          "full_name": "N. El Aynaoui",
           "team": "Morocco",
           "goals": 1
         },
         {
-          "player_id": 670,
-          "full_name": "S. Rahimi",
+          "player_id": 598,
+          "full_name": "A. Amaimouni",
           "team": "Morocco",
           "goals": 1
         }
@@ -437,14 +437,14 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 108,
-          "full_name": "Luiz Henrique",
+          "player_id": 124,
+          "full_name": "I. Thiago",
           "team": "Brazil",
           "goals": 2
         },
         {
-          "player_id": 1288,
-          "full_name": "D. Nazon",
+          "player_id": 1168,
+          "full_name": "W. Isidor",
           "team": "Haiti",
           "goals": 1
         }
@@ -460,8 +460,8 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 828,
-          "full_name": "Findlay Curtis",
+          "player_id": 743,
+          "full_name": "F. Curtis",
           "team": "Scotland",
           "goals": 1
         }
@@ -477,8 +477,8 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 1287,
-          "full_name": "L. Joseph",
+          "player_id": 1167,
+          "full_name": "F. Pierrot",
           "team": "Haiti",
           "goals": 1
         }
@@ -494,9 +494,9 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 1261,
-          "full_name": "M. Arfsten",
-          "team": "United States",
+          "player_id": 1141,
+          "full_name": "G. Reyna",
+          "team": "USA",
           "goals": 2
         }
       ]
@@ -511,26 +511,26 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 454,
+          "player_id": 410,
           "full_name": "M. Boyle",
           "team": "Australia",
           "goals": 1
         },
         {
-          "player_id": 785,
-          "full_name": "İ. Kahveci",
+          "player_id": 687,
+          "full_name": "Kenan Yıldız",
           "team": "Türkiye",
           "goals": 1
         },
         {
-          "player_id": 774,
-          "full_name": "H. Çalhanoğlu",
+          "player_id": 681,
+          "full_name": "Salih Özcan",
           "team": "Türkiye",
           "goals": 2
         },
         {
-          "player_id": 788,
-          "full_name": "K. Yıldız",
+          "player_id": 697,
+          "full_name": "Barış Alper Yılmaz",
           "team": "Türkiye",
           "goals": 1
         }
@@ -546,31 +546,31 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 1248,
-          "full_name": "B. Aaronson",
-          "team": "United States",
+          "player_id": 1133,
+          "full_name": "S. Berhalter",
+          "team": "USA",
           "goals": 1
         },
         {
-          "player_id": 1265,
-          "full_name": "H. Wright",
-          "team": "United States",
+          "player_id": 1132,
+          "full_name": "T. Adams",
+          "team": "USA",
           "goals": 1
         },
         {
-          "player_id": 457,
+          "player_id": 413,
           "full_name": "A. Mabil",
           "team": "Australia",
           "goals": 1
         },
         {
-          "player_id": 458,
+          "player_id": 414,
           "full_name": "C. Metcalfe",
           "team": "Australia",
           "goals": 1
         },
         {
-          "player_id": 459,
+          "player_id": 415,
           "full_name": "A. Šuto",
           "team": "Australia",
           "goals": 1
@@ -587,32 +587,32 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 786,
-          "full_name": "Y. Sarı",
+          "player_id": 693,
+          "full_name": "İrfan Can Kahveci",
           "team": "Türkiye",
           "goals": 1
         },
         {
-          "player_id": 785,
-          "full_name": "İ. Kahveci",
+          "player_id": 687,
+          "full_name": "Kenan Yıldız",
           "team": "Türkiye",
           "goals": 1
         },
         {
-          "player_id": 787,
-          "full_name": "A. Şimşir",
+          "player_id": 695,
+          "full_name": "Yunus Akgün",
           "team": "Türkiye",
           "goals": 1
         },
         {
-          "player_id": 783,
-          "full_name": "K. Aktürkoğlu",
+          "player_id": 684,
+          "full_name": "Arda Güler",
           "team": "Türkiye",
           "goals": 1
         },
         {
-          "player_id": 1192,
-          "full_name": "M. Almirón",
+          "player_id": 1084,
+          "full_name": "J. Enciso",
           "team": "Paraguay",
           "goals": 1
         }
@@ -628,15 +628,15 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 785,
-          "full_name": "İ. Kahveci",
+          "player_id": 687,
+          "full_name": "Kenan Yıldız",
           "team": "Türkiye",
           "goals": 1
         },
         {
-          "player_id": 1265,
-          "full_name": "H. Wright",
-          "team": "United States",
+          "player_id": 1132,
+          "full_name": "T. Adams",
+          "team": "USA",
           "goals": 1
         }
       ]
@@ -651,20 +651,20 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 1196,
-          "full_name": "A. Sanabria",
+          "player_id": 1088,
+          "full_name": "R. Sosa",
           "team": "Paraguay",
           "goals": 1
         },
         {
-          "player_id": 1185,
-          "full_name": "M. Galarza",
+          "player_id": 1092,
+          "full_name": "I. Pitta",
           "team": "Paraguay",
           "goals": 3
         },
         {
-          "player_id": 1184,
-          "full_name": "J. Enciso",
+          "player_id": 1091,
+          "full_name": "A. Arce",
           "team": "Paraguay",
           "goals": 1
         }
@@ -680,26 +680,26 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 553,
+          "player_id": 494,
           "full_name": "N. Woltemade",
           "team": "Germany",
           "goals": 1
         },
         {
-          "player_id": 1380,
+          "player_id": 1247,
           "full_name": "J. Margaritha",
           "team": "Curaçao",
           "goals": 1
         },
         {
-          "player_id": 1375,
-          "full_name": "T. Chong",
+          "player_id": 1242,
+          "full_name": "K. Gorre",
           "team": "Curaçao",
           "goals": 2
         },
         {
-          "player_id": 1370,
-          "full_name": "K. Felida",
+          "player_id": 1234,
+          "full_name": "L. Bacuna",
           "team": "Curaçao",
           "goals": 1
         }
@@ -715,26 +715,26 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 911,
-          "full_name": "A. Diallo",
+          "player_id": 827,
+          "full_name": "O. Diakité",
           "team": "Ivory Coast",
           "goals": 1
         },
         {
-          "player_id": 909,
+          "player_id": 825,
           "full_name": "A. Bonny",
           "team": "Ivory Coast",
           "goals": 2
         },
         {
-          "player_id": 908,
+          "player_id": 824,
           "full_name": "S. Adingra",
           "team": "Ivory Coast",
           "goals": 1
         },
         {
-          "player_id": 910,
-          "full_name": "O. Diakité",
+          "player_id": 826,
+          "full_name": "A. Diallo",
           "team": "Ivory Coast",
           "goals": 1
         }
@@ -750,14 +750,14 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 551,
+          "player_id": 492,
           "full_name": "L. Sané",
           "team": "Germany",
           "goals": 2
         },
         {
-          "player_id": 914,
-          "full_name": "P. Guiagon",
+          "player_id": 830,
+          "full_name": "N. Pépé",
           "team": "Ivory Coast",
           "goals": 2
         }
@@ -773,25 +773,25 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 1227,
-          "full_name": "J. Mercado",
+          "player_id": 1115,
+          "full_name": "J. Caicedo",
           "team": "Ecuador",
           "goals": 1
         },
         {
-          "player_id": 1222,
-          "full_name": "N. Angulo",
+          "player_id": 1110,
+          "full_name": "E. Valencia",
           "team": "Ecuador",
           "goals": 1
         },
         {
-          "player_id": 1224,
-          "full_name": "J. Corozo",
+          "player_id": 1112,
+          "full_name": "A. Minda",
           "team": "Ecuador",
           "goals": 2
         },
         {
-          "player_id": 1379,
+          "player_id": 1246,
           "full_name": "J. Locadia",
           "team": "Curaçao",
           "goals": 1
@@ -808,20 +808,20 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 1377,
-          "full_name": "S. Hansen",
+          "player_id": 1244,
+          "full_name": "G. Kastaneer",
           "team": "Curaçao",
           "goals": 1
         },
         {
-          "player_id": 1376,
-          "full_name": "K. Gorré",
+          "player_id": 1243,
+          "full_name": "S. Hansen",
           "team": "Curaçao",
           "goals": 2
         },
         {
-          "player_id": 1369,
-          "full_name": "L. Comenencia",
+          "player_id": 1233,
+          "full_name": "J. Bacuna",
           "team": "Curaçao",
           "goals": 1
         }
@@ -837,8 +837,8 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 1225,
-          "full_name": "Jeremy Arévalo",
+          "player_id": 1113,
+          "full_name": "J. Yeboah",
           "team": "Ecuador",
           "goals": 2
         }
@@ -854,14 +854,14 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 887,
-          "full_name": "C. Gakpo",
+          "player_id": 800,
+          "full_name": "Memphis Depay",
           "team": "Netherlands",
           "goals": 1
         },
         {
-          "player_id": 880,
-          "full_name": "T. Reijnders",
+          "player_id": 791,
+          "full_name": "F. de Jong",
           "team": "Netherlands",
           "goals": 1
         }
@@ -877,20 +877,20 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 627,
+          "player_id": 565,
           "full_name": "E. Achouri",
           "team": "Tunisia",
           "goals": 1
         },
         {
-          "player_id": 620,
-          "full_name": "H. Mahmoud",
+          "player_id": 572,
+          "full_name": "R. Elloumi",
           "team": "Tunisia",
           "goals": 2
         },
         {
-          "player_id": 629,
-          "full_name": "F. Chaouat",
+          "player_id": 567,
+          "full_name": "E. Saad",
           "team": "Tunisia",
           "goals": 1
         }
@@ -906,8 +906,8 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 81,
-          "full_name": "J. Karlström",
+          "player_id": 93,
+          "full_name": "Y. Ayari",
           "team": "Sweden",
           "goals": 2
         }
@@ -923,14 +923,14 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 628,
-          "full_name": "K. Ayari",
+          "player_id": 566,
+          "full_name": "I. Gharbi",
           "team": "Tunisia",
           "goals": 1
         },
         {
-          "player_id": 300,
-          "full_name": "Y. Suzuki",
+          "player_id": 272,
+          "full_name": "J. Suzuki",
           "team": "Japan",
           "goals": 3
         }
@@ -946,20 +946,20 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 83,
-          "full_name": "E. Smith",
+          "player_id": 95,
+          "full_name": "J. Karlström",
           "team": "Sweden",
           "goals": 1
         },
         {
-          "player_id": 80,
+          "player_id": 92,
+          "full_name": "T. Ali",
+          "team": "Sweden",
+          "goals": 1
+        },
+        {
+          "player_id": 94,
           "full_name": "L. Bergvall",
-          "team": "Sweden",
-          "goals": 1
-        },
-        {
-          "player_id": 82,
-          "full_name": "K. Sema",
           "team": "Sweden",
           "goals": 2
         }
@@ -975,14 +975,14 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 622,
-          "full_name": "Ismaël Gharbi",
+          "player_id": 560,
+          "full_name": "H. Mejbri",
           "team": "Tunisia",
           "goals": 2
         },
         {
-          "player_id": 628,
-          "full_name": "K. Ayari",
+          "player_id": 566,
+          "full_name": "I. Gharbi",
           "team": "Tunisia",
           "goals": 2
         }
@@ -998,14 +998,14 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 706,
-          "full_name": "Mostafa Mohamed",
+          "player_id": 614,
+          "full_name": "M. Saber",
           "team": "Egypt",
           "goals": 1
         },
         {
-          "player_id": 701,
-          "full_name": "Mostafa Fathi",
+          "player_id": 623,
+          "full_name": "A. Tawfiq",
           "team": "Egypt",
           "goals": 3
         }
@@ -1021,14 +1021,14 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 480,
+          "player_id": 440,
           "full_name": "A. Hosseinzadeh",
           "team": "Iran",
           "goals": 2
         },
         {
-          "player_id": 481,
-          "full_name": "A. Jahanbakhsh",
+          "player_id": 441,
+          "full_name": "M. Taremi",
           "team": "Iran",
           "goals": 3
         }
@@ -1044,20 +1044,20 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 21,
+          "player_id": 19,
+          "full_name": "C. De Ketelaere",
+          "team": "Belgium",
+          "goals": 2
+        },
+        {
+          "player_id": 20,
           "full_name": "J. Doku",
           "team": "Belgium",
           "goals": 2
         },
         {
-          "player_id": 22,
-          "full_name": "M. Fernandez-Pardo",
-          "team": "Belgium",
-          "goals": 2
-        },
-        {
-          "player_id": 13,
-          "full_name": "K. De Bruyne",
+          "player_id": 23,
+          "full_name": "D. Lukebakio",
           "team": "Belgium",
           "goals": 1
         }
@@ -1073,26 +1073,26 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 1316,
+          "player_id": 1194,
+          "full_name": "C. McCowatt",
+          "team": "New Zealand",
+          "goals": 1
+        },
+        {
+          "player_id": 1183,
+          "full_name": "J. Bell",
+          "team": "New Zealand",
+          "goals": 2
+        },
+        {
+          "player_id": 1189,
           "full_name": "C. Wood",
           "team": "New Zealand",
           "goals": 1
         },
         {
-          "player_id": 1305,
-          "full_name": "M. Garbett",
-          "team": "New Zealand",
-          "goals": 2
-        },
-        {
-          "player_id": 1311,
-          "full_name": "K. Barbarouses",
-          "team": "New Zealand",
-          "goals": 1
-        },
-        {
-          "player_id": 699,
-          "full_name": "Ibrahim Adel",
+          "player_id": 621,
+          "full_name": "O. Marmoush",
           "team": "Egypt",
           "goals": 1
         }
@@ -1108,14 +1108,14 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 701,
-          "full_name": "Mostafa Fathi",
+          "player_id": 623,
+          "full_name": "A. Tawfiq",
           "team": "Egypt",
           "goals": 1
         },
         {
-          "player_id": 483,
-          "full_name": "S. Moghanlou",
+          "player_id": 428,
+          "full_name": "R. Cheshmi",
           "team": "Iran",
           "goals": 1
         }
@@ -1131,20 +1131,20 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 21,
+          "player_id": 19,
+          "full_name": "C. De Ketelaere",
+          "team": "Belgium",
+          "goals": 1
+        },
+        {
+          "player_id": 25,
+          "full_name": "A. Saelemaekers",
+          "team": "Belgium",
+          "goals": 1
+        },
+        {
+          "player_id": 20,
           "full_name": "J. Doku",
-          "team": "Belgium",
-          "goals": 1
-        },
-        {
-          "player_id": 15,
-          "full_name": "Diego Moreira",
-          "team": "Belgium",
-          "goals": 1
-        },
-        {
-          "player_id": 22,
-          "full_name": "M. Fernandez-Pardo",
           "team": "Belgium",
           "goals": 1
         }
@@ -1160,21 +1160,21 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 199,
-          "full_name": "Ferran Torres",
+          "player_id": 194,
+          "full_name": "Gavi",
           "team": "Spain",
           "goals": 1
         },
         {
-          "player_id": 1056,
-          "full_name": "Hélio Varela",
-          "team": "Cape Verde",
+          "player_id": 962,
+          "full_name": "H. Varela",
+          "team": "Cape Verde Islands",
           "goals": 2
         },
         {
-          "player_id": 1043,
-          "full_name": "Deroy Duarte",
-          "team": "Cape Verde",
+          "player_id": 950,
+          "full_name": "T. Arcanjo",
+          "team": "Cape Verde Islands",
           "goals": 1
         }
       ]
@@ -1189,26 +1189,26 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 506,
-          "full_name": "Mohammed Abu Al Shamat",
+          "player_id": 462,
+          "full_name": "M. Kanno",
           "team": "Saudi Arabia",
           "goals": 1
         },
         {
-          "player_id": 526,
-          "full_name": "Saleh Al Shehri",
+          "player_id": 459,
+          "full_name": "Z. Al Johani",
           "team": "Saudi Arabia",
           "goals": 1
         },
         {
-          "player_id": 521,
-          "full_name": "Feras Al Brikan",
+          "player_id": 466,
+          "full_name": "S. Al Dawsari",
           "team": "Saudi Arabia",
           "goals": 1
         },
         {
-          "player_id": 528,
-          "full_name": "Ayman Yahya",
+          "player_id": 461,
+          "full_name": "A. Al Khaibari",
           "team": "Saudi Arabia",
           "goals": 1
         }
@@ -1224,20 +1224,20 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 191,
-          "full_name": "Álex Baena",
+          "player_id": 201,
+          "full_name": "Lamine Yamal",
           "team": "Spain",
           "goals": 2
         },
         {
-          "player_id": 199,
-          "full_name": "Ferran Torres",
+          "player_id": 194,
+          "full_name": "Gavi",
           "team": "Spain",
           "goals": 1
         },
         {
-          "player_id": 506,
-          "full_name": "Mohammed Abu Al Shamat",
+          "player_id": 462,
+          "full_name": "M. Kanno",
           "team": "Saudi Arabia",
           "goals": 1
         }
@@ -1253,21 +1253,21 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 140,
-          "full_name": "F. Pellistri",
+          "player_id": 144,
+          "full_name": "E. Martínez",
           "team": "Uruguay",
           "goals": 2
         },
         {
-          "player_id": 135,
+          "player_id": 154,
           "full_name": "R. Aguirre",
           "team": "Uruguay",
           "goals": 1
         },
         {
-          "player_id": 1049,
-          "full_name": "Gilson Benchimol",
-          "team": "Cape Verde",
+          "player_id": 955,
+          "full_name": "R. Mendes",
+          "team": "Cape Verde Islands",
           "goals": 2
         }
       ]
@@ -1282,21 +1282,21 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 1042,
-          "full_name": "Telmo Arcanjo",
-          "team": "Cape Verde",
+          "player_id": 949,
+          "full_name": "J. Monteiro",
+          "team": "Cape Verde Islands",
           "goals": 1
         },
         {
-          "player_id": 1054,
-          "full_name": "Garry Rodrigues",
-          "team": "Cape Verde",
-          "goals": 1
-        },
-        {
-          "player_id": 1052,
+          "player_id": 960,
           "full_name": "D. Livramento",
-          "team": "Cape Verde",
+          "team": "Cape Verde Islands",
+          "goals": 1
+        },
+        {
+          "player_id": 958,
+          "full_name": "J. Cabral",
+          "team": "Cape Verde Islands",
           "goals": 2
         }
       ]
@@ -1311,20 +1311,20 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 142,
-          "full_name": "F. Torres",
+          "player_id": 146,
+          "full_name": "Federico Valverde",
           "team": "Uruguay",
           "goals": 2
         },
         {
-          "player_id": 135,
+          "player_id": 154,
           "full_name": "R. Aguirre",
           "team": "Uruguay",
           "goals": 1
         },
         {
-          "player_id": 196,
-          "full_name": "Mikel Oyarzabal",
+          "player_id": 206,
+          "full_name": "Y. Pino",
           "team": "Spain",
           "goals": 1
         }
@@ -1340,8 +1340,8 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 322,
-          "full_name": "B. Dia",
+          "player_id": 293,
+          "full_name": "Assane Diao",
           "team": "Senegal",
           "goals": 1
         }
@@ -1357,20 +1357,20 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 809,
-          "full_name": "J. Hauge",
+          "player_id": 727,
+          "full_name": "A. Sørloth",
           "team": "Norway",
           "goals": 1
         },
         {
-          "player_id": 813,
-          "full_name": "A. Sørloth",
+          "player_id": 717,
+          "full_name": "P. Berg",
           "team": "Norway",
           "goals": 2
         },
         {
-          "player_id": 802,
-          "full_name": "P. Berg",
+          "player_id": 718,
+          "full_name": "K. Thorstvedt",
           "team": "Norway",
           "goals": 2
         }
@@ -1386,25 +1386,25 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 46,
-          "full_name": "M. Thuram",
+          "player_id": 48,
+          "full_name": "D. Doué",
           "team": "France",
           "goals": 1
         },
         {
-          "player_id": 37,
-          "full_name": "M. Koné",
+          "player_id": 51,
+          "full_name": "M. Olise",
           "team": "France",
           "goals": 2
         },
         {
-          "player_id": 1115,
+          "player_id": 1009,
           "full_name": "H. Abdulkareem",
           "team": "Iraq",
           "goals": 1
         },
         {
-          "player_id": 1108,
+          "player_id": 1002,
           "full_name": "Ibraheem Bayesh",
           "team": "Iraq",
           "goals": 1
@@ -1421,26 +1421,26 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 322,
-          "full_name": "B. Dia",
+          "player_id": 293,
+          "full_name": "Assane Diao",
           "team": "Senegal",
           "goals": 1
         },
         {
-          "player_id": 330,
-          "full_name": "C. Ndiaye",
+          "player_id": 291,
+          "full_name": "Idrissa Gueye",
           "team": "Senegal",
           "goals": 1
         },
         {
-          "player_id": 324,
-          "full_name": "H. Diallo",
+          "player_id": 296,
+          "full_name": "Sadio Mané",
           "team": "Senegal",
           "goals": 1
         },
         {
-          "player_id": 323,
-          "full_name": "M. Diakhon",
+          "player_id": 295,
+          "full_name": "Bamba Dieng",
           "team": "Senegal",
           "goals": 2
         }
@@ -1456,20 +1456,20 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 802,
-          "full_name": "P. Berg",
+          "player_id": 718,
+          "full_name": "K. Thorstvedt",
           "team": "Norway",
           "goals": 2
         },
         {
-          "player_id": 804,
-          "full_name": "Oscar Bobb",
+          "player_id": 720,
+          "full_name": "T. Aasgaard",
           "team": "Norway",
           "goals": 2
         },
         {
-          "player_id": 45,
-          "full_name": "Kylian Mbappé",
+          "player_id": 47,
+          "full_name": "Ousmane Dembélé",
           "team": "France",
           "goals": 2
         }
@@ -1485,7 +1485,7 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 1108,
+          "player_id": 1002,
           "full_name": "Ibraheem Bayesh",
           "team": "Iraq",
           "goals": 1
@@ -1502,14 +1502,14 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 577,
-          "full_name": "J. López",
+          "player_id": 516,
+          "full_name": "N. González",
           "team": "Argentina",
           "goals": 1
         },
         {
-          "player_id": 567,
-          "full_name": "E. Fernández",
+          "player_id": 507,
+          "full_name": "L. Paredes",
           "team": "Argentina",
           "goals": 3
         }
@@ -1525,20 +1525,20 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 1086,
-          "full_name": "O. Al Fakhouri",
+          "player_id": 969,
+          "full_name": "Mohammad Abu Zrayq",
           "team": "Jordan",
           "goals": 1
         },
         {
-          "player_id": 1075,
-          "full_name": "M. Abu Dahab",
+          "player_id": 976,
+          "full_name": "Rajaei Ayed",
           "team": "Jordan",
           "goals": 1
         },
         {
-          "player_id": 1094,
-          "full_name": "Mousa Tamari",
+          "player_id": 970,
+          "full_name": "Noor Al-Rawabdeh",
           "team": "Jordan",
           "goals": 2
         }
@@ -1554,8 +1554,8 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 576,
-          "full_name": "N. González",
+          "player_id": 515,
+          "full_name": "Julián Álvarez",
           "team": "Argentina",
           "goals": 1
         }
@@ -1571,26 +1571,26 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 1087,
-          "full_name": "Yazan Al Naimat",
+          "player_id": 971,
+          "full_name": "Ali Olwan",
           "team": "Jordan",
           "goals": 2
         },
         {
-          "player_id": 1090,
-          "full_name": "Baha&apos; Faisal",
+          "player_id": 975,
+          "full_name": "Mahmoud Al-Mardi",
           "team": "Jordan",
           "goals": 1
         },
         {
-          "player_id": 1086,
-          "full_name": "O. Al Fakhouri",
+          "player_id": 969,
+          "full_name": "Mohammad Abu Zrayq",
           "team": "Jordan",
           "goals": 1
         },
         {
-          "player_id": 1026,
-          "full_name": "Amin Chiakha",
+          "player_id": 934,
+          "full_name": "A. Gouiri",
           "team": "Algeria",
           "goals": 1
         }
@@ -1606,26 +1606,26 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 1028,
-          "full_name": "A. Gouiri",
+          "player_id": 936,
+          "full_name": "A. Hadj-Moussa",
           "team": "Algeria",
           "goals": 1
         },
         {
-          "player_id": 1030,
-          "full_name": "R. Mahrez",
+          "player_id": 924,
+          "full_name": "N. Bentaleb",
           "team": "Algeria",
           "goals": 2
         },
         {
-          "player_id": 1025,
-          "full_name": "F. Chaïbi",
+          "player_id": 933,
+          "full_name": "F. Ghedjemis",
           "team": "Algeria",
           "goals": 1
         },
         {
-          "player_id": 1029,
-          "full_name": "A. Hadj-Moussa",
+          "player_id": 923,
+          "full_name": "H. Aouar",
           "team": "Algeria",
           "goals": 1
         }
@@ -1641,8 +1641,8 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 1091,
-          "full_name": "Ali Olwan",
+          "player_id": 980,
+          "full_name": "Ibrahim Sabra",
           "team": "Jordan",
           "goals": 2
         }
@@ -1658,21 +1658,21 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 592,
-          "full_name": "Bruno Fernandes",
+          "player_id": 526,
+          "full_name": "Matheus Nunes",
           "team": "Portugal",
           "goals": 1
         },
         {
-          "player_id": 957,
-          "full_name": "B. Cipenga",
-          "team": "DR Congo",
+          "player_id": 876,
+          "full_name": "N. Mbuku",
+          "team": "Congo DR",
           "goals": 1
         },
         {
-          "player_id": 968,
-          "full_name": "Y. Wissa",
-          "team": "DR Congo",
+          "player_id": 873,
+          "full_name": "E. Kayembe",
+          "team": "Congo DR",
           "goals": 2
         }
       ]
@@ -1687,25 +1687,25 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 1143,
+          "player_id": 1037,
           "full_name": "A. Odilov",
           "team": "Uzbekistan",
           "goals": 1
         },
         {
-          "player_id": 1136,
+          "player_id": 1030,
           "full_name": "J. Iskanderov",
           "team": "Uzbekistan",
           "goals": 1
         },
         {
-          "player_id": 1142,
+          "player_id": 1036,
           "full_name": "D. Khamdamov",
           "team": "Uzbekistan",
           "goals": 2
         },
         {
-          "player_id": 1137,
+          "player_id": 1031,
           "full_name": "O. Hamrobekov",
           "team": "Uzbekistan",
           "goals": 1
@@ -1722,31 +1722,31 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 604,
-          "full_name": "Pedro Neto",
+          "player_id": 537,
+          "full_name": "Rafael Leão",
           "team": "Portugal",
           "goals": 1
         },
         {
-          "player_id": 1134,
+          "player_id": 1028,
           "full_name": "A. Gʻaniyev",
           "team": "Uzbekistan",
           "goals": 1
         },
         {
-          "player_id": 1145,
+          "player_id": 1039,
           "full_name": "E. Shomurodov",
           "team": "Uzbekistan",
           "goals": 1
         },
         {
-          "player_id": 1144,
+          "player_id": 1038,
           "full_name": "I. Sergeev",
           "team": "Uzbekistan",
           "goals": 1
         },
         {
-          "player_id": 1136,
+          "player_id": 1030,
           "full_name": "J. Iskanderov",
           "team": "Uzbekistan",
           "goals": 1
@@ -1773,32 +1773,32 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 592,
+          "player_id": 526,
+          "full_name": "Matheus Nunes",
+          "team": "Portugal",
+          "goals": 1
+        },
+        {
+          "player_id": 528,
           "full_name": "Bruno Fernandes",
           "team": "Portugal",
           "goals": 1
         },
         {
-          "player_id": 593,
-          "full_name": "Mateus Fernandes",
-          "team": "Portugal",
-          "goals": 1
-        },
-        {
-          "player_id": 602,
-          "full_name": "Ricardo Horta",
-          "team": "Portugal",
-          "goals": 1
-        },
-        {
-          "player_id": 600,
-          "full_name": "Francisco Conceição",
-          "team": "Portugal",
-          "goals": 1
-        },
-        {
-          "player_id": 603,
+          "player_id": 531,
           "full_name": "João Félix",
+          "team": "Portugal",
+          "goals": 1
+        },
+        {
+          "player_id": 527,
+          "full_name": "Cristiano Ronaldo",
+          "team": "Portugal",
+          "goals": 1
+        },
+        {
+          "player_id": 536,
+          "full_name": "Francisco Trincão",
           "team": "Portugal",
           "goals": 1
         }
@@ -1814,13 +1814,13 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 1146,
+          "player_id": 1040,
           "full_name": "O. O&apos;runov",
           "team": "Uzbekistan",
           "goals": 2
         },
         {
-          "player_id": 1137,
+          "player_id": 1031,
           "full_name": "O. Hamrobekov",
           "team": "Uzbekistan",
           "goals": 1
@@ -1837,26 +1837,26 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 217,
-          "full_name": "P. Foden",
+          "player_id": 223,
+          "full_name": "K. Mainoo",
           "team": "England",
           "goals": 1
         },
         {
-          "player_id": 230,
-          "full_name": "M. Rashford",
+          "player_id": 233,
+          "full_name": "A. Gordon",
           "team": "England",
           "goals": 1
         },
         {
-          "player_id": 70,
+          "player_id": 76,
           "full_name": "P. Musa",
           "team": "Croatia",
           "goals": 2
         },
         {
-          "player_id": 61,
-          "full_name": "L. Modrić",
+          "player_id": 66,
+          "full_name": "M. Kovačić",
           "team": "Croatia",
           "goals": 1
         }
@@ -1872,13 +1872,13 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 937,
+          "player_id": 853,
           "full_name": "J. Ayew",
           "team": "Ghana",
           "goals": 2
         },
         {
-          "player_id": 939,
+          "player_id": 855,
           "full_name": "A. Fatawu",
           "team": "Ghana",
           "goals": 1
@@ -1895,13 +1895,13 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 229,
-          "full_name": "N. Madueke",
+          "player_id": 232,
+          "full_name": "M. Rashford",
           "team": "England",
           "goals": 1
         },
         {
-          "player_id": 932,
+          "player_id": 848,
           "full_name": "K. Sibo",
           "team": "Ghana",
           "goals": 1
@@ -1918,25 +1918,25 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 273,
-          "full_name": "H. Hurtado",
+          "player_id": 252,
+          "full_name": "C. Yanis",
           "team": "Panama",
           "goals": 2
         },
         {
-          "player_id": 270,
-          "full_name": "J. Fajardo",
+          "player_id": 249,
+          "full_name": "C. Harvey",
           "team": "Panama",
           "goals": 1
         },
         {
-          "player_id": 266,
-          "full_name": "Y. Bárcenas",
+          "player_id": 258,
+          "full_name": "C. Waterman",
           "team": "Panama",
           "goals": 1
         },
         {
-          "player_id": 70,
+          "player_id": 76,
           "full_name": "P. Musa",
           "team": "Croatia",
           "goals": 1
@@ -1963,19 +1963,19 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 60,
-          "full_name": "M. Kovačić",
+          "player_id": 65,
+          "full_name": "K. Jakić",
           "team": "Croatia",
           "goals": 1
         },
         {
-          "player_id": 68,
-          "full_name": "A. Kramarić",
+          "player_id": 74,
+          "full_name": "Andrej Kramarić",
           "team": "Croatia",
           "goals": 1
         },
         {
-          "player_id": 935,
+          "player_id": 851,
           "full_name": "P. Adu",
           "team": "Ghana",
           "goals": 2
@@ -1992,14 +1992,14 @@
       "pen_winner": "away",
       "scorers": [
         {
-          "player_id": 423,
-          "full_name": "Hwang In-Beom",
+          "player_id": 382,
+          "full_name": "B. Jun-Ho",
           "team": "South Korea",
           "goals": 1
         },
         {
-          "player_id": 1350,
-          "full_name": "L. Millar",
+          "player_id": 1204,
+          "full_name": "Ismaël Koné",
           "team": "Canada",
           "goals": 1
         }
@@ -2008,14 +2008,14 @@
     {
       "id": 74,
       "stage": "r32",
-      "team_home": "Curaçao",
+      "team_home": "Ecuador",
       "team_away": "Paraguay",
       "actual_home": 0,
       "actual_away": 1,
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 1195,
+          "player_id": 1087,
           "full_name": "G. Caballero",
           "team": "Paraguay",
           "goals": 1
@@ -2032,8 +2032,8 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 665,
-          "full_name": "E. Ben Seghir",
+          "player_id": 593,
+          "full_name": "C. Talbi",
           "team": "Morocco",
           "goals": 2
         }
@@ -2049,14 +2049,14 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 829,
+          "player_id": 744,
           "full_name": "L. Ferguson",
           "team": "Scotland",
           "goals": 1
         },
         {
-          "player_id": 92,
-          "full_name": "B. Nygren",
+          "player_id": 103,
+          "full_name": "G. Nilsson",
           "team": "Sweden",
           "goals": 2
         }
@@ -2072,19 +2072,19 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 326,
-          "full_name": "B. Dieng",
+          "player_id": 298,
+          "full_name": "Cherif Ndiaye",
           "team": "Senegal",
           "goals": 2
         },
         {
-          "player_id": 325,
-          "full_name": "Assane Diao",
+          "player_id": 297,
+          "full_name": "Nicolas Jackson",
           "team": "Senegal",
           "goals": 1
         },
         {
-          "player_id": 478,
+          "player_id": 438,
           "full_name": "A. Alipour",
           "team": "Iran",
           "goals": 2
@@ -2094,22 +2094,22 @@
     {
       "id": 78,
       "stage": "r32",
-      "team_home": "Ecuador",
+      "team_home": "Curaçao",
       "team_away": "Norway",
       "actual_home": 2,
       "actual_away": 0,
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 1225,
-          "full_name": "Jeremy Arévalo",
-          "team": "Ecuador",
+          "player_id": 1243,
+          "full_name": "S. Hansen",
+          "team": "Curaçao",
           "goals": 1
         },
         {
-          "player_id": 1223,
-          "full_name": "J. Caicedo",
-          "team": "Ecuador",
+          "player_id": 1241,
+          "full_name": "T. Chong",
+          "team": "Curaçao",
           "goals": 1
         }
       ]
@@ -2124,19 +2124,19 @@
       "pen_winner": "away",
       "scorers": [
         {
-          "player_id": 404,
-          "full_name": "G. Martínez",
-          "team": "Mexico",
-          "goals": 1
-        },
-        {
-          "player_id": 379,
+          "player_id": 363,
           "full_name": "R. Alvarado",
           "team": "Mexico",
           "goals": 1
         },
         {
-          "player_id": 912,
+          "player_id": 357,
+          "full_name": "A. Vega",
+          "team": "Mexico",
+          "goals": 1
+        },
+        {
+          "player_id": 828,
           "full_name": "Y. Diomande",
           "team": "Ivory Coast",
           "goals": 2
@@ -2153,20 +2153,20 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 607,
-          "full_name": "Trincão",
-          "team": "Portugal",
-          "goals": 1
-        },
-        {
-          "player_id": 600,
+          "player_id": 546,
           "full_name": "Francisco Conceição",
           "team": "Portugal",
           "goals": 1
         },
         {
-          "player_id": 603,
-          "full_name": "João Félix",
+          "player_id": 527,
+          "full_name": "Cristiano Ronaldo",
+          "team": "Portugal",
+          "goals": 1
+        },
+        {
+          "player_id": 536,
+          "full_name": "Francisco Trincão",
           "team": "Portugal",
           "goals": 1
         }
@@ -2182,14 +2182,14 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 783,
-          "full_name": "K. Aktürkoğlu",
+          "player_id": 684,
+          "full_name": "Arda Güler",
           "team": "Türkiye",
           "goals": 1
         },
         {
-          "player_id": 784,
-          "full_name": "D. Gül",
+          "player_id": 685,
+          "full_name": "Deniz Gül",
           "team": "Türkiye",
           "goals": 1
         }
@@ -2205,26 +2205,26 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 21,
-          "full_name": "J. Doku",
+          "player_id": 19,
+          "full_name": "C. De Ketelaere",
           "team": "Belgium",
           "goals": 1
         },
         {
-          "player_id": 721,
+          "player_id": 638,
           "full_name": "V. Darida",
           "team": "Czech Republic",
           "goals": 1
         },
         {
-          "player_id": 727,
-          "full_name": "T. Chorý",
+          "player_id": 646,
+          "full_name": "A. Hložek",
           "team": "Czech Republic",
           "goals": 1
         },
         {
-          "player_id": 722,
-          "full_name": "A. Karabec",
+          "player_id": 639,
+          "full_name": "L. Provod",
           "team": "Czech Republic",
           "goals": 1
         }
@@ -2240,14 +2240,14 @@
       "pen_winner": "home",
       "scorers": [
         {
-          "player_id": 957,
-          "full_name": "B. Cipenga",
-          "team": "DR Congo",
+          "player_id": 876,
+          "full_name": "N. Mbuku",
+          "team": "Congo DR",
           "goals": 1
         },
         {
-          "player_id": 266,
-          "full_name": "Y. Bárcenas",
+          "player_id": 258,
+          "full_name": "C. Waterman",
           "team": "Panama",
           "goals": 1
         }
@@ -2256,21 +2256,21 @@
     {
       "id": 84,
       "stage": "r32",
-      "team_home": "Cape Verde",
+      "team_home": "Uruguay",
       "team_away": "Argentina",
       "actual_home": 2,
       "actual_away": 1,
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 1055,
-          "full_name": "Willy Semedo",
-          "team": "Cape Verde",
+          "player_id": 145,
+          "full_name": "R. Bentancur",
+          "team": "Uruguay",
           "goals": 2
         },
         {
-          "player_id": 576,
-          "full_name": "N. González",
+          "player_id": 515,
+          "full_name": "Julián Álvarez",
           "team": "Argentina",
           "goals": 1
         }
@@ -2290,27 +2290,27 @@
       "id": 86,
       "stage": "r32",
       "team_home": "Jordan",
-      "team_away": "Uruguay",
+      "team_away": "Cape Verde",
       "actual_home": 2,
       "actual_away": 1,
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 1093,
-          "full_name": "M. Taha",
+          "player_id": 968,
+          "full_name": "Amer Jamous",
           "team": "Jordan",
           "goals": 1
         },
         {
-          "player_id": 1094,
-          "full_name": "Mousa Tamari",
+          "player_id": 970,
+          "full_name": "Noor Al-Rawabdeh",
           "team": "Jordan",
           "goals": 1
         },
         {
-          "player_id": 143,
-          "full_name": "F. Viñas",
-          "team": "Uruguay",
+          "player_id": 949,
+          "full_name": "J. Monteiro",
+          "team": "Cape Verde Islands",
           "goals": 1
         }
       ]
@@ -2325,25 +2325,25 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 1137,
+          "player_id": 1031,
           "full_name": "O. Hamrobekov",
           "team": "Uzbekistan",
           "goals": 1
         },
         {
-          "player_id": 71,
-          "full_name": "I. Perišić",
+          "player_id": 77,
+          "full_name": "Marco Pašalić",
           "team": "Croatia",
           "goals": 1
         },
         {
-          "player_id": 68,
-          "full_name": "A. Kramarić",
+          "player_id": 74,
+          "full_name": "Andrej Kramarić",
           "team": "Croatia",
           "goals": 1
         },
         {
-          "player_id": 70,
+          "player_id": 76,
           "full_name": "P. Musa",
           "team": "Croatia",
           "goals": 1
@@ -2360,14 +2360,14 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 705,
-          "full_name": "Salah Mohsen",
+          "player_id": 613,
+          "full_name": "N. Emad",
           "team": "Egypt",
           "goals": 2
         },
         {
-          "player_id": 707,
-          "full_name": "Mohamed Salah",
+          "player_id": 615,
+          "full_name": "A. Zizo",
           "team": "Egypt",
           "goals": 1
         }
@@ -2383,20 +2383,20 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 328,
-          "full_name": "S. Mané",
+          "player_id": 304,
+          "full_name": "Ismaïla Sarr",
           "team": "Senegal",
           "goals": 1
         },
         {
-          "player_id": 329,
-          "full_name": "I. Mbaye",
+          "player_id": 306,
+          "full_name": "Ibrahim Mbaye",
           "team": "Senegal",
           "goals": 1
         },
         {
-          "player_id": 327,
-          "full_name": "N. Jackson",
+          "player_id": 299,
+          "full_name": "Iliman Ndiaye",
           "team": "Senegal",
           "goals": 1
         }
@@ -2412,14 +2412,14 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 672,
-          "full_name": "M. Zabiri",
+          "player_id": 586,
+          "full_name": "A. Bouaddi",
           "team": "Morocco",
           "goals": 2
         },
         {
-          "player_id": 668,
-          "full_name": "A. Ezzalzouli",
+          "player_id": 596,
+          "full_name": "B. Díaz",
           "team": "Morocco",
           "goals": 1
         }
@@ -2429,7 +2429,7 @@
       "id": 91,
       "stage": "r16",
       "team_home": "Sweden",
-      "team_away": "Ecuador",
+      "team_away": "Curaçao",
       "actual_home": 0,
       "actual_away": 0,
       "pen_winner": "home",
@@ -2449,21 +2449,21 @@
       "id": 93,
       "stage": "r16",
       "team_home": "DR Congo",
-      "team_away": "Cape Verde",
+      "team_away": "Uruguay",
       "actual_home": 1,
       "actual_away": 1,
       "pen_winner": "away",
       "scorers": [
         {
-          "player_id": 957,
-          "full_name": "B. Cipenga",
-          "team": "DR Congo",
+          "player_id": 876,
+          "full_name": "N. Mbuku",
+          "team": "Congo DR",
           "goals": 1
         },
         {
-          "player_id": 1050,
-          "full_name": "Nuno da Costa",
-          "team": "Cape Verde",
+          "player_id": 155,
+          "full_name": "F. Viñas",
+          "team": "Uruguay",
           "goals": 1
         }
       ]
@@ -2478,14 +2478,14 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 721,
+          "player_id": 638,
           "full_name": "V. Darida",
           "team": "Czech Republic",
           "goals": 1
         },
         {
-          "player_id": 729,
-          "full_name": "J. Kliment",
+          "player_id": 648,
+          "full_name": "M. Chytil",
           "team": "Czech Republic",
           "goals": 1
         }
@@ -2501,14 +2501,14 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 708,
-          "full_name": "Zizo",
+          "player_id": 616,
+          "full_name": "E. Ashour",
           "team": "Egypt",
           "goals": 1
         },
         {
-          "player_id": 699,
-          "full_name": "Ibrahim Adel",
+          "player_id": 621,
+          "full_name": "O. Marmoush",
           "team": "Egypt",
           "goals": 2
         }
@@ -2524,20 +2524,20 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 1168,
-          "full_name": "M. Gouda",
+          "player_id": 1050,
+          "full_name": "Hassan Al-Haydos",
           "team": "Qatar",
           "goals": 2
         },
         {
-          "player_id": 1167,
-          "full_name": "Edmilson Junior",
+          "player_id": 1049,
+          "full_name": "Mohammed Muntari",
           "team": "Qatar",
           "goals": 1
         },
         {
-          "player_id": 68,
-          "full_name": "A. Kramarić",
+          "player_id": 74,
+          "full_name": "Andrej Kramarić",
           "team": "Croatia",
           "goals": 1
         }
@@ -2556,22 +2556,22 @@
     {
       "id": 98,
       "stage": "qf",
-      "team_home": "Cape Verde",
+      "team_home": "Uruguay",
       "team_away": "Czech Republic",
       "actual_home": 3,
       "actual_away": 0,
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 1054,
-          "full_name": "Garry Rodrigues",
-          "team": "Cape Verde",
+          "player_id": 144,
+          "full_name": "E. Martínez",
+          "team": "Uruguay",
           "goals": 2
         },
         {
-          "player_id": 1056,
-          "full_name": "Hélio Varela",
-          "team": "Cape Verde",
+          "player_id": 146,
+          "full_name": "Federico Valverde",
+          "team": "Uruguay",
           "goals": 1
         }
       ]
@@ -2586,8 +2586,8 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 91,
-          "full_name": "G. Nilsson",
+          "player_id": 102,
+          "full_name": "A. Isak",
           "team": "Sweden",
           "goals": 2
         }
@@ -2603,14 +2603,14 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 703,
-          "full_name": "N. Mansy",
+          "player_id": 611,
+          "full_name": "M. Ateya",
           "team": "Egypt",
           "goals": 2
         },
         {
-          "player_id": 1159,
-          "full_name": "Ali",
+          "player_id": 1059,
+          "full_name": "Almoez Ali",
           "team": "Qatar",
           "goals": 1
         }
@@ -2620,33 +2620,33 @@
       "id": 101,
       "stage": "sf",
       "team_home": "Morocco",
-      "team_away": "Cape Verde",
+      "team_away": "Uruguay",
       "actual_home": 1,
       "actual_away": 3,
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 672,
-          "full_name": "M. Zabiri",
+          "player_id": 586,
+          "full_name": "A. Bouaddi",
           "team": "Morocco",
           "goals": 1
         },
         {
-          "player_id": 1050,
-          "full_name": "Nuno da Costa",
-          "team": "Cape Verde",
+          "player_id": 155,
+          "full_name": "F. Viñas",
+          "team": "Uruguay",
           "goals": 1
         },
         {
-          "player_id": 1051,
-          "full_name": "Jovane Cabral",
-          "team": "Cape Verde",
+          "player_id": 156,
+          "full_name": "Darwin Núñez",
+          "team": "Uruguay",
           "goals": 1
         },
         {
-          "player_id": 1049,
-          "full_name": "Gilson Benchimol",
-          "team": "Cape Verde",
+          "player_id": 154,
+          "full_name": "R. Aguirre",
+          "team": "Uruguay",
           "goals": 1
         }
       ]
@@ -2661,8 +2661,8 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 706,
-          "full_name": "Mostafa Mohamed",
+          "player_id": 614,
+          "full_name": "M. Saber",
           "team": "Egypt",
           "goals": 1
         }
@@ -2678,14 +2678,14 @@
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 667,
-          "full_name": "Y. En-Nesyri",
+          "player_id": 595,
+          "full_name": "A. El Kaabi",
           "team": "Morocco",
           "goals": 2
         },
         {
-          "player_id": 88,
-          "full_name": "T. Ali",
+          "player_id": 99,
+          "full_name": "A. Bernhardsson",
           "team": "Sweden",
           "goals": 3
         }
@@ -2694,21 +2694,21 @@
     {
       "id": 104,
       "stage": "final",
-      "team_home": "Cape Verde",
+      "team_home": "Uruguay",
       "team_away": "Egypt",
       "actual_home": 3,
       "actual_away": 1,
       "pen_winner": null,
       "scorers": [
         {
-          "player_id": 1054,
-          "full_name": "Garry Rodrigues",
-          "team": "Cape Verde",
+          "player_id": 144,
+          "full_name": "E. Martínez",
+          "team": "Uruguay",
           "goals": 3
         },
         {
-          "player_id": 703,
-          "full_name": "N. Mansy",
+          "player_id": 611,
+          "full_name": "M. Ateya",
           "team": "Egypt",
           "goals": 1
         }
@@ -2724,21 +2724,21 @@
     "3B": "Switzerland",
     "1C": "Scotland",
     "2C": "Morocco",
-    "3C": "Haiti",
+    "3C": "Brazil",
     "1D": "Türkiye",
     "2D": "USA",
     "3D": "Paraguay",
-    "1E": "Curaçao",
-    "2E": "Ecuador",
+    "1E": "Ecuador",
+    "2E": "Curaçao",
     "3E": "Ivory Coast",
     "1F": "Tunisia",
     "2F": "Sweden",
-    "3F": "Japan",
+    "3F": "Netherlands",
     "1G": "Belgium",
     "2G": "Egypt",
     "3G": "Iran",
-    "1H": "Cape Verde",
-    "2H": "Uruguay",
+    "1H": "Uruguay",
+    "2H": "Cape Verde",
     "3H": "Spain",
     "1I": "Senegal",
     "2I": "Norway",
@@ -2765,10 +2765,10 @@
     "W76": "Sweden",
     "L76": "Scotland",
     "W74": "Paraguay",
-    "L74": "Curaçao",
+    "L74": "Ecuador",
     "W75": "Morocco",
     "L75": "Tunisia",
-    "W78": "Ecuador",
+    "W78": "Curaçao",
     "L78": "Norway",
     "W77": "Senegal",
     "L77": "Iran",
@@ -2780,7 +2780,7 @@
     "L82": "Belgium",
     "W81": "Türkiye",
     "L81": "Algeria",
-    "W84": "Cape Verde",
+    "W84": "Uruguay",
     "L84": "Argentina",
     "W83": "DR Congo",
     "L83": "Panama",
@@ -2789,7 +2789,7 @@
     "W88": "Egypt",
     "L88": "USA",
     "W86": "Jordan",
-    "L86": "Uruguay",
+    "L86": "Cape Verde",
     "W87": "Croatia",
     "L87": "Uzbekistan",
     "W90": "Morocco",
@@ -2797,10 +2797,10 @@
     "W89": "Senegal",
     "L89": "Paraguay",
     "W91": "Sweden",
-    "L91": "Ecuador",
+    "L91": "Curaçao",
     "W92": "Portugal",
     "L92": "Ivory Coast",
-    "W93": "Cape Verde",
+    "W93": "Uruguay",
     "L93": "DR Congo",
     "W94": "Czech Republic",
     "L94": "Türkiye",
@@ -2810,27 +2810,27 @@
     "L96": "Croatia",
     "W97": "Morocco",
     "L97": "Senegal",
-    "W98": "Cape Verde",
+    "W98": "Uruguay",
     "L98": "Czech Republic",
     "W99": "Sweden",
     "L99": "Portugal",
     "W100": "Egypt",
     "L100": "Qatar",
-    "W101": "Cape Verde",
+    "W101": "Uruguay",
     "L101": "Morocco",
     "W102": "Egypt",
     "L102": "Sweden",
     "W103": "Sweden",
     "L103": "Morocco",
-    "W104": "Cape Verde",
+    "W104": "Uruguay",
     "L104": "Egypt"
   },
   "topScorer": {
-    "player_id": 1054,
-    "full_name": "Garry Rodrigues",
-    "team": "Cape Verde",
-    "total_goals": 6
+    "player_id": 144,
+    "full_name": "E. Martínez",
+    "team": "Uruguay",
+    "total_goals": 7
   },
-  "champion": "Cape Verde",
+  "champion": "Uruguay",
   "seed": "wc2026-e2e-v1"
 }

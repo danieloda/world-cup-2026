@@ -52,7 +52,7 @@ Quando "algo está errado", cheque nesta ordem — do sinal mais barato ao mais 
 | **Lançar resultado** | `finished=true` dispara cascata: resolve slots → re-score → bônus classificado → alertas. | `tiebreak.sql`, `verify-data`, `test-rescore-on-edit` |
 | **Pontuação** | Aditiva (placar + classificado + artilheiro + campeão). SSOT em 3 cópias que concordam. | `scoring*`, `scoring-sql`, `verify:prod` |
 | **Ranking + desempate** | `v_leaderboard` (só pagantes) ordena por pts → exatos → V+S. | `prize`, `leaderboard-parity`, `standings-tiebreak` |
-| **Grupos → mata-mata** | Com grupos cheios, `resolve_match_slots()` popula o KO (pts>SG>GF>FIFA, cascata). | `bracket`, `thirds-assign`, `tiebreak.sql` |
+| **Grupos → mata-mata** | Com grupos cheios, `resolve_match_slots()` popula o KO. Desempate FIFA 2026: pts→confronto direto→SG→GF→fair play→FIFA (3ºs sem confronto direto). | `bracket`, `thirds-assign`, `tiebreak.sql` |
 | **Sem duplicata de jogador** | `unique` em players/predictions/player_goals; prod auditado. | `integrity-guards`, `prod-smoke` |
 
 ---

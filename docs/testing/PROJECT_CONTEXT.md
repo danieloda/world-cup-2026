@@ -100,7 +100,9 @@ QF 5/20/2→**32** · SF 8/32/2→**50** · 3º 4/16/1→**25** · Final 12/48/4
 
 Lançar um resultado (`finished=true`) dispara, **em ordem**:
 1. `trigger_resolve_slots` → `resolve_match_slots()` — resolve `team_home/away` dos jogos
-   seguintes (1A/2A/3X compostos via backtracking → W##/L## em cascata). **Desempate: pts > SG > GF > FIFA rank.**
+   seguintes (1A/2A/3X compostos via backtracking → W##/L## em cascata). **Desempate de grupos
+   (oficial FIFA 2026, migration 068): pts → confronto direto → SG → GF → fair play → FIFA rank.**
+   Entre os melhores 3ºs (grupos diferentes) NÃO há confronto direto: pts → SG → GF → fair play → FIFA.
 2. `on_match_finished` — recomputa `points_earned` dos palpites daquele jogo.
 3. `trigger_qualifier_bonus` — recomputa o cache BPE/BP.
 4. `trg_z_alert_*` — POSTam ao edge (Telegram). **Desligados nos testes** p/ não vazar.
@@ -146,7 +148,10 @@ Lançar um resultado (`finished=true`) dispara, **em ordem**:
 | Pontuação | `022_additive_scoring.sql` | `src/js/scoring.js` | `scoring*.test.js`, `scoring-sql.sql` |
 | Prazo | `prediction_deadline()` (023) | `src/js/util.js` | `deadline-parity` (unit+e2e) |
 | Bracket/slots | `resolve_match_slots()` (005) | `src/js/bracket.js`, `thirds-assign.js` | `bracket.test.js`, `tiebreak.sql` |
-| Desempate FIFA | `fifa_rank()` (015) | `src/js/fifa-rank.js` | `tiebreak.sql` B1/B2 |
+| Desempate grupos (FIFA 2026) | `rank_group()` + `resolve_match_slots()` (068) | `src/js/util.js` (`computeStandings`), `bracket.js`, `standings-view.js` | `standings-tiebreak.test.js`, `thirds-tiebreak.test.js`, `tiebreak.sql` E/F |
+| Confronto direto + fair play | `rank_group()` (068) | `computeStandings`/`rankGroupTeams` | `standings-tiebreak`, `fairplay.test.js`, `tiebreak.sql` E/F |
+| Ranking FIFA (tiebreak final) | `fifa_rank()` (015) | `src/js/fifa-rank.js` | `tiebreak.sql` A/B |
+| Cartões → fair play (ingestão) | `matches.*_fairplay` (068) | `scripts/data/fetch-cards.js` + `scripts/lib/fairplay.js` | `fairplay.test.js` |
 | Classificado | `qualifier_bonus_*` (021/022) | `src/js/*` | `qualifier.test.js`, `qualifier-bonus.sql` |
 | Raio-X | — | `src/js/raiox.js` | `raiox-render.test.js` |
 | Cards de palpite (grupos/mata) | — | `src/js/card-results.js` (puro) + `palpites-grupos.js`, `palpites-mata.js` | `card-results.test.js` + smoke e2e + `docs/features/palpites-cards.md` |

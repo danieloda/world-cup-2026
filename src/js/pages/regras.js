@@ -424,13 +424,19 @@ function renderDesempate() {
     <div class="rules-two">
       <div class="rules-half">
         <div class="rules-half-title">🏆 Classificação dos grupos (seleções)</div>
-        <p class="rules-p">Para decidir quais <strong>seleções</strong> avançam quando empatam em pontos no grupo:</p>
+        <p class="rules-p">Para decidir quais <strong>seleções</strong> avançam quando empatam em pontos no grupo (ordem oficial da Copa 2026):</p>
         <ol class="rules-ord">
           <li>Pontos no grupo</li>
+          <li>Confronto direto (entre as seleções empatadas)</li>
           <li>Saldo de gols</li>
           <li>Gols marcados</li>
+          <li>Fair play (menos cartões amarelos e vermelhos)</li>
           <li>Ranking da FIFA (melhor posição passa)</li>
         </ol>
+        <p class="rules-p" style="font-size:.85em; color:var(--text-mute);">
+          Entre os melhores 3ºs colocados (grupos diferentes) não há confronto direto:
+          pontos → saldo → gols → fair play → ranking da FIFA.
+        </p>
       </div>
       <div class="rules-half">
         <div class="rules-half-title">👥 Ranking do bolão (participantes)</div>

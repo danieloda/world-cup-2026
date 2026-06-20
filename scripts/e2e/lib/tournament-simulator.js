@@ -27,12 +27,15 @@ function pickScore(rng, stage) {
 }
 
 /**
- * Replica computeStandings da app pra grupos.
+ * Replica computeStandings da app pra grupos — implementação INDEPENDENTE de
+ * propósito (oráculo). Ordem oficial FIFA 2026: pts → confronto direto → SG
+ * geral → GF geral → fair play → FIFA rank. KEEP IN SYNC com src/js/util.js e
+ * o SQL resolve_match_slots (migration 068).
  */
 function computeGroupStandings(groupMatches) {
   const stats = new Map();
   const ensure = (team) => {
-    if (!stats.has(team)) stats.set(team, { team, pts: 0, gp: 0, gc: 0, sg: 0 });
+    if (!stats.has(team)) stats.set(team, { team, pts: 0, gp: 0, gc: 0, sg: 0, fairPlay: 0 });
     return stats.get(team);
   };
   for (const m of groupMatches) {
@@ -40,15 +43,57 @@ function computeGroupStandings(groupMatches) {
     const sa = ensure(m.team_away);
     sh.gp += m.actual_home; sh.gc += m.actual_away;
     sa.gp += m.actual_away; sa.gc += m.actual_home;
+    sh.fairPlay += m.home_fairplay ?? 0;  // ≤ 0; ausente nos jogos simulados → 0
+    sa.fairPlay += m.away_fairplay ?? 0;
     if (m.actual_home > m.actual_away) sh.pts += 3;
     else if (m.actual_away > m.actual_home) sa.pts += 3;
     else { sh.pts += 1; sa.pts += 1; }
   }
   for (const s of stats.values()) s.sg = s.gp - s.gc;
-  return [...stats.values()].sort((x, y) =>
-    // Tiebreaker oficial: pts → SG → GF → FIFA rank (igual ao SQL resolve_match_slots / migration 015)
-    y.pts - x.pts || y.sg - x.sg || y.gp - x.gp || fifaRank(x.team) - fifaRank(y.team)
-  );
+  return rankGroupTeams([...stats.values()], groupMatches);
+}
+
+// Ordena por pontos formando blocos de empate; dentro de cada bloco aplica o
+// confronto direto (mini-tabela), depois SG geral → GF geral → fair play → FIFA.
+function rankGroupTeams(teams, groupMatches) {
+  const byPts = [...teams].sort((a, b) => b.pts - a.pts);
+  const out = [];
+  for (let i = 0; i < byPts.length;) {
+    let j = i;
+    while (j < byPts.length && byPts[j].pts === byPts[i].pts) j++;
+    const tied = byPts.slice(i, j);
+    if (tied.length > 1) {
+      const h2h = headToHeadStats(tied, groupMatches);
+      tied.sort((a, b) => {
+        const ha = h2h.get(a.team), hb = h2h.get(b.team);
+        return (hb.pts - ha.pts) || (hb.sg - ha.sg) || (hb.gf - ha.gf)
+          || (b.sg - a.sg) || (b.gp - a.gp)
+          || (b.fairPlay - a.fairPlay)
+          || (fifaRank(a.team) - fifaRank(b.team));
+      });
+    }
+    out.push(...tied);
+    i = j;
+  }
+  return out;
+}
+
+// Mini-tabela do confronto direto: só os jogos ENTRE os times empatados.
+function headToHeadStats(tied, groupMatches) {
+  const names = new Set(tied.map((t) => t.team));
+  const h = new Map(tied.map((t) => [t.team, { pts: 0, gf: 0, ga: 0, sg: 0 }]));
+  for (const m of groupMatches) {
+    if (!names.has(m.team_home) || !names.has(m.team_away)) continue;
+    if (m.actual_home == null || m.actual_away == null) continue;
+    const H = h.get(m.team_home), A = h.get(m.team_away);
+    H.gf += m.actual_home; H.ga += m.actual_away;
+    A.gf += m.actual_away; A.ga += m.actual_home;
+    if (m.actual_home > m.actual_away) H.pts += 3;
+    else if (m.actual_away > m.actual_home) A.pts += 3;
+    else { H.pts += 1; A.pts += 1; }
+  }
+  for (const v of h.values()) v.sg = v.gf - v.ga;
+  return h;
 }
 
 /**
@@ -174,13 +219,17 @@ export function simulateTournament(matches, players, seed = 'wc2026-e2e-v1') {
         pts: standings[2].pts,
         sg: standings[2].sg,
         gp: standings[2].gp,
+        fairPlay: standings[2].fairPlay ?? 0,
       });
     }
   }
 
   // === STEP 3: Resolve slots compostos 3X/Y/Z usando BACKTRACKING ===
-  // Mesmo tiebreaker do SQL (migration 015): pts → SG → GF → FIFA rank
-  thirds.sort((a, b) => b.pts - a.pts || b.sg - a.sg || b.gp - a.gp || fifaRank(a.team) - fifaRank(b.team));
+  // Ranking dos 3ºs (grupos diferentes → SEM confronto direto), igual ao SQL
+  // (migration 068): pts → SG → GF → fair play → FIFA rank.
+  thirds.sort((a, b) => b.pts - a.pts || b.sg - a.sg || b.gp - a.gp
+    || (b.fairPlay ?? 0) - (a.fairPlay ?? 0)
+    || fifaRank(a.team) - fifaRank(b.team));
 
   // Lista de slots compostos a resolver (ordem do id)
   const koMatches = matches.filter((m) => m.stage !== 'group').sort((a, b) => a.id - b.id);

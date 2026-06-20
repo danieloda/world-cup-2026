@@ -27,35 +27,56 @@ const check = (name, pass, detail='') => { results.push({ name, pass, detail });
   console.log(`   ${pass?C.g+'✓':C.r+'✗'} ${name}${detail?C.d+' — '+detail:''}${C.x}`); };
 
 // ---- Oráculo de standings (independente do util.js do front) ----
+// Ordem oficial FIFA 2026: pts → confronto direto → SG geral → GF geral → fair
+// play → rank FIFA. Mantido INDEPENDENTE de propósito (cross-check do front/SQL).
 function expectedStandings(matches, group) {
   const gm = matches.filter(m => m.stage==='group' && m.group_name===group && m.finished);
   const st = new Map();
-  const ens = t => { if(!st.has(t)) st.set(t,{team:t,pts:0,gf:0,ga:0}); return st.get(t); };
+  const ens = t => { if(!st.has(t)) st.set(t,{team:t,pts:0,gf:0,ga:0,fp:0}); return st.get(t); };
   for (const m of gm) {
     const h=ens(m.team_home), a=ens(m.team_away);
     h.gf+=m.actual_home; h.ga+=m.actual_away; a.gf+=m.actual_away; a.ga+=m.actual_home;
+    h.fp+=m.home_fairplay??0; a.fp+=m.away_fairplay??0;
     if(m.actual_home>m.actual_away) h.pts+=3; else if(m.actual_away>m.actual_home) a.pts+=3; else {h.pts++;a.pts++;}
   }
-  return [...st.values()].sort((x,y)=>
-    y.pts-x.pts || (y.gf-y.ga)-(x.gf-x.ga) || y.gf-x.gf || fifaRank(x.team)-fifaRank(y.team)
-  ).map(s=>s.team);
+  // Blocos de mesma pontuação → confronto direto (mini-tabela só dos jogos entre eles).
+  const byPts=[...st.values()].sort((x,y)=>y.pts-x.pts);
+  const out=[];
+  for(let i=0;i<byPts.length;){
+    let j=i; while(j<byPts.length && byPts[j].pts===byPts[i].pts) j++;
+    const tied=byPts.slice(i,j);
+    if(tied.length>1){
+      const names=new Set(tied.map(t=>t.team));
+      const h2h=new Map(tied.map(t=>[t.team,{pts:0,gf:0,ga:0}]));
+      for(const m of gm){ if(!names.has(m.team_home)||!names.has(m.team_away)) continue;
+        const H=h2h.get(m.team_home), A=h2h.get(m.team_away);
+        H.gf+=m.actual_home; H.ga+=m.actual_away; A.gf+=m.actual_away; A.ga+=m.actual_home;
+        if(m.actual_home>m.actual_away)H.pts+=3; else if(m.actual_away>m.actual_home)A.pts+=3; else{H.pts++;A.pts++;} }
+      tied.sort((x,y)=>{ const hx=h2h.get(x.team),hy=h2h.get(y.team);
+        return (hy.pts-hx.pts) || ((hy.gf-hy.ga)-(hx.gf-hx.ga)) || (hy.gf-hx.gf)
+          || ((y.gf-y.ga)-(x.gf-x.ga)) || (y.gf-x.gf) || (y.fp-x.fp) || (fifaRank(x.team)-fifaRank(y.team)); });
+    }
+    out.push(...tied); i=j;
+  }
+  return out.map(s=>s.team);
 }
 
 const admin = makeAdminClient();
 const { data: matches } = await admin.from('matches')
-  .select('id,stage,group_name,team_home,team_away,actual_home,actual_away,pen_winner,finished,match_date');
+  .select('id,stage,group_name,team_home,team_away,actual_home,actual_away,home_fairplay,away_fairplay,pen_winner,finished,match_date');
 const { data: lb } = await admin.from('v_leaderboard').select('user_id,full_name,total_pts,exact_count,winner_sg_count');
 
 // 8 melhores 3ºs do DB (pts→SG→GF→FIFA)
 const GROUPS = [...new Set(matches.filter(m=>m.stage==='group').map(m=>m.group_name))].sort();
 const thirdsDb = GROUPS.map(g => expectedStandings(matches, g)[2]).filter(Boolean);
 const best8Thirds = [...thirdsDb].sort((a,b)=>{
-  // recomputa stats do 3º pra ordenar entre grupos
-  const stat = t => { let pts=0,gf=0,ga=0; for(const m of matches.filter(x=>x.stage==='group'&&x.finished&&(x.team_home===t||x.team_away===t))){
+  // recomputa stats do 3º pra ordenar entre grupos (grupos diferentes → SEM
+  // confronto direto): pts → SG → GF → fair play → rank FIFA.
+  const stat = t => { let pts=0,gf=0,ga=0,fp=0; for(const m of matches.filter(x=>x.stage==='group'&&x.finished&&(x.team_home===t||x.team_away===t))){
     const home=m.team_home===t; const f=home?m.actual_home:m.actual_away, ag=home?m.actual_away:m.actual_home;
-    gf+=f; ga+=ag; if(f>ag)pts+=3; else if(f===ag)pts++; } return {pts,sg:gf-ga,gf}; };
+    gf+=f; ga+=ag; fp+=home?(m.home_fairplay??0):(m.away_fairplay??0); if(f>ag)pts+=3; else if(f===ag)pts++; } return {pts,sg:gf-ga,gf,fp}; };
   const sa=stat(a), sb=stat(b);
-  return sb.pts-sa.pts || sb.sg-sa.sg || sb.gf-sa.gf || fifaRank(a)-fifaRank(b);
+  return sb.pts-sa.pts || sb.sg-sa.sg || sb.gf-sa.gf || sb.fp-sa.fp || fifaRank(a)-fifaRank(b);
 }).slice(0,8);
 
 const browser = await chromium.launch({ headless: true });

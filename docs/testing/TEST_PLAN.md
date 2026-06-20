@@ -23,7 +23,9 @@ prazo/scoring, invariância de fuso, invariantes de RLS, sintaxe/paths.
 Desde 2026-06-10 também: `card-results` (classificação dos cards palpite×resultado
 + paridade card↔replay), `progression-core` (replay do ranking; fim de série ==
 total do leaderboard), `chart-utils` (posições/timeline/faixas dos gráficos),
-`standings-tiebreak` (cada nível do desempate pts→SG→GF→FIFA isolado),
+`standings-tiebreak` (cada nível do desempate FIFA 2026 isolado: pts→confronto
+direto→SG→GF→fair play→FIFA), `thirds-tiebreak` (fair play decide entre 3ºs antes
+do FIFA), `fairplay` (fórmula oficial de conduta por jogador/time),
 `leaderboard-parity` (ORDER BY do v_leaderboard ↔ prize.js) e
 `integrity-guards` (cron do snapshot + fórmula de prazo + UNIQUEs anti-duplicata).
 - **Rodar:** `npm test` · cobertura com catraca: `npm run test:coverage`
@@ -37,7 +39,8 @@ total do leaderboard), `chart-utils` (posições/timeline/faixas dos gráficos),
 ### Nível 2 — Lógica de DB (psql, transação com ROLLBACK) · ~10s
 Os cálculos no PostgreSQL, independentes da implementação JS. Não deixam resíduo.
 - `scenarios/scoring-sql.sql` — `score_prediction` vs canônico (47 checks).
-- `scenarios/tiebreak.sql` — desempate FIFA, slots, cascata, bônus campeão (12 checks).
+- `scenarios/tiebreak.sql` — desempate FIFA 2026 (confronto direto E, fair play entre 3ºs F),
+  slots, cascata, bônus campeão (16 checks).
 - `scenarios/qualifier-bonus.sql` — BPE/BP, ordem de triggers, gating (11 checks).
 - **Rodar:** `docker exec -i supabase_db_world-cup-2026 psql -U postgres -d postgres -f /tmp/<arq>.sql`
 - **Pré-requisito:** profile admin existente (`00-setup-local.js` ou `bootstrap-local.sh`).

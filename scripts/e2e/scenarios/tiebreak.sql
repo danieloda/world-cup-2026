@@ -17,13 +17,16 @@ begin;
 
 create temp table _res(id serial, check_name text, pass boolean, detail text) on commit drop;
 
--- Helper de reset (restaura slots KO, zera resultados)
+-- Helper de reset (restaura slots KO, zera resultados E cartões)
 create or replace function pg_temp.reset_all() returns void language plpgsql as $$
 begin
   update public.matches set team_home = slot_home where slot_home is not null and team_home <> slot_home;
   update public.matches set team_away = slot_away where slot_away is not null and team_away <> slot_away;
   update public.matches set actual_home=null, actual_away=null, pen_winner=null, finished=false, finished_at=null
     where finished or actual_home is not null or actual_away is not null or pen_winner is not null;
+  update public.matches set home_yellow=0, home_red=0, away_yellow=0, away_red=0,
+                            home_fairplay=0, away_fairplay=0, cards_fetched_at=null
+    where home_fairplay <> 0 or away_fairplay <> 0 or cards_fetched_at is not null;
 end $$;
 
 -- Standings esperados por FIFA (todos empatados em pts/SG/GF)
@@ -247,6 +250,108 @@ from (
   from public.matches km, _dsel d
   where km.slot_home = 'W'||d.r32id or km.slot_away = 'W'||d.r32id
 ) x;
+
+-- ============================================================
+-- CENÁRIO E — Confronto direto decide DENTRO do grupo (regra nova 2026)
+-- Grupo A: Mexico(15) South Korea(25) Czech Republic(41) South Africa(60).
+-- Mexico e KOR empatam em 6 pts; Mexico GANHOU o confronto direto (2×1), mas KOR
+-- tem saldo geral MELHOR (+9 vs +1). Pela regra nova, Mexico fica em 1º (confronto
+-- direto vem ANTES do saldo). Antes de 2026 (saldo primeiro) KOR seria o 1º.
+-- ============================================================
+select pg_temp.reset_all();
+alter table public.matches disable trigger trg_resolve_slots;
+-- Mexico 2×1 South Korea  (confronto direto p/ Mexico)
+update public.matches set actual_home=case when team_home='Mexico' then 2 else 1 end,
+                          actual_away=case when team_away='Mexico' then 2 else 1 end, finished=true, finished_at=now()
+  where group_name='A' and stage='group' and ((team_home='Mexico' and team_away='South Korea') or (team_home='South Korea' and team_away='Mexico'));
+-- Mexico 0×1 Czech Republic (Mexico tropeça)
+update public.matches set actual_home=case when team_home='Mexico' then 0 else 1 end,
+                          actual_away=case when team_away='Mexico' then 0 else 1 end, finished=true, finished_at=now()
+  where group_name='A' and stage='group' and ((team_home='Mexico' and team_away='Czech Republic') or (team_home='Czech Republic' and team_away='Mexico'));
+-- Mexico 1×0 South Africa
+update public.matches set actual_home=case when team_home='Mexico' then 1 else 0 end,
+                          actual_away=case when team_away='Mexico' then 1 else 0 end, finished=true, finished_at=now()
+  where group_name='A' and stage='group' and ((team_home='Mexico' and team_away='South Africa') or (team_home='South Africa' and team_away='Mexico'));
+-- South Korea 5×0 South Africa  (KOR infla o saldo)
+update public.matches set actual_home=case when team_home='South Korea' then 5 else 0 end,
+                          actual_away=case when team_away='South Korea' then 5 else 0 end, finished=true, finished_at=now()
+  where group_name='A' and stage='group' and ((team_home='South Korea' and team_away='South Africa') or (team_home='South Africa' and team_away='South Korea'));
+-- South Korea 5×0 Czech Republic (KOR infla o saldo)
+update public.matches set actual_home=case when team_home='South Korea' then 5 else 0 end,
+                          actual_away=case when team_away='South Korea' then 5 else 0 end, finished=true, finished_at=now()
+  where group_name='A' and stage='group' and ((team_home='South Korea' and team_away='Czech Republic') or (team_home='Czech Republic' and team_away='South Korea'));
+-- Czech Republic 0×0 South Africa
+update public.matches set actual_home=0, actual_away=0, finished=true, finished_at=now()
+  where group_name='A' and stage='group' and ((team_home='Czech Republic' and team_away='South Africa') or (team_home='South Africa' and team_away='Czech Republic'));
+alter table public.matches enable trigger trg_resolve_slots;
+select public.resolve_match_slots();
+
+-- E1: 1A == Mexico (venceu o confronto direto, apesar do saldo geral pior)
+insert into _res(check_name, pass, detail)
+select 'E1: 1A=Mexico (confronto direto vence saldo geral)',
+       bool_or(t='Mexico'), coalesce(string_agg(t,','),'<vazio>')
+from (select team_home t from public.matches where stage='r32' and slot_home='1A'
+      union all select team_away from public.matches where stage='r32' and slot_away='1A') x;
+
+-- E2: 2A == South Korea (perdeu o confronto direto apesar do saldo melhor)
+insert into _res(check_name, pass, detail)
+select 'E2: 2A=South Korea (perdeu o confronto direto)',
+       bool_or(t='South Korea'), coalesce(string_agg(t,','),'<vazio>')
+from (select team_home t from public.matches where stage='r32' and slot_home='2A'
+      union all select team_away from public.matches where stage='r32' and slot_away='2A') x;
+
+-- ============================================================
+-- CENÁRIO F — Fair play decide entre os 3ºs (4º critério, ANTES do FIFA)
+-- Base: em todo jogo de grupo o time de MELHOR FIFA vence 1×0 → posições = ordem
+-- FIFA e o 3º de cada grupo é o 3º melhor FIFA (3 pts, SG−1, GF1). Os 12 3ºs
+-- empatam em pts/SG/GF → ranqueados por fair play e, só depois, FIFA.
+-- ============================================================
+select pg_temp.reset_all();
+alter table public.matches disable trigger trg_resolve_slots;
+update public.matches set
+  actual_home = case when public.fifa_rank(team_home) < public.fifa_rank(team_away) then 1 else 0 end,
+  actual_away = case when public.fifa_rank(team_away) < public.fifa_rank(team_home) then 1 else 0 end,
+  home_fairplay=0, away_fairplay=0, finished=true, finished_at=now()
+where stage='group';
+alter table public.matches enable trigger trg_resolve_slots;
+select public.resolve_match_slots();
+
+-- 3º de MELHOR FIFA entre todos os grupos (seria o rank 1 dos 3ºs no baseline)
+create temp table _bestthird on commit drop as
+select team from (
+  select group_name, team, row_number() over (partition by group_name order by public.fifa_rank(team)) rn
+  from (select group_name, team_home team from public.matches where stage='group'
+        union select group_name, team_away from public.matches where stage='group') s
+) z where rn = 3 order by public.fifa_rank(team) limit 1;
+
+-- F1: no baseline (sem cartões), esse 3º se classifica (entra nos slots compostos do R32)
+insert into _res(check_name, pass, detail)
+select 'F1: 3º de melhor FIFA se classifica sem cartões',
+       exists(select 1 from (
+         select team_home team from public.matches where stage='r32' and slot_home like '3%/%'
+         union select team_away from public.matches where stage='r32' and slot_away like '3%/%'
+       ) q join _bestthird b on b.team=q.team),
+       (select team from _bestthird);
+
+-- injeta fair play −5 nesse 3º (1 jogo de grupo dele) → pior conduta de todos os 3ºs
+alter table public.matches disable trigger trg_resolve_slots;
+update public.matches p set
+  home_fairplay = case when p.team_home=(select team from _bestthird) then -5 else p.home_fairplay end,
+  away_fairplay = case when p.team_away=(select team from _bestthird) then -5 else p.away_fairplay end
+where p.id = (select min(id) from public.matches
+              where stage='group' and (team_home=(select team from _bestthird) or team_away=(select team from _bestthird)));
+alter table public.matches enable trigger trg_resolve_slots;
+select public.resolve_match_slots();
+
+-- F2: com fair play −5 o MESMO 3º (melhor FIFA) NÃO se classifica mais
+-- (os outros 11, com conduta 0, passam à frente) → prova fair play ANTES do FIFA
+insert into _res(check_name, pass, detail)
+select 'F2: fair play −5 elimina o 3º de melhor FIFA (fair play > FIFA)',
+       not exists(select 1 from (
+         select team_home team from public.matches where stage='r32' and slot_home like '3%/%'
+         union select team_away from public.matches where stage='r32' and slot_away like '3%/%'
+       ) q join _bestthird b on b.team=q.team),
+       (select team from _bestthird);
 
 -- ============================================================
 -- RESULTADO

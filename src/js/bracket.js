@@ -53,7 +53,7 @@ export function resolveSlotToTeam(slot, res) {
  */
 export function computeSlotResolution({ allMatches, matches, predsByMatch, mode = 'real-first' }) {
   const res = new Map();
-  const thirdsRanked = [];  // [{ group, team, pts, sg, gp, source }]
+  const thirdsRanked = [];  // [{ group, team, pts, sg, gp, fairPlay, source }]
   const usePredOnly = mode === 'pred-only';
 
   // Adapter local: computeStandings do util com o formato esperado aqui.
@@ -90,15 +90,19 @@ export function computeSlotResolution({ allMatches, matches, predsByMatch, mode 
         pts: standings[2].pts,
         sg: standings[2].sg,
         gp: standings[2].gp,
+        fairPlay: standings[2].fairPlay ?? 0,
         source,
       });
     }
   }
 
   // === 1.5) Slots compostos de 3ºs lugares (3A/B/C/D/F, 3C/D/F/G/H, etc.) ===
-  // Desempate oficial: pts → SG → GF → FIFA rank (igual DB resolve_match_slots e terceiros.js)
+  // Ranking dos 3ºs (grupos diferentes → SEM confronto direto): pts → SG → GF →
+  // fair play → FIFA rank (igual DB resolve_match_slots e standings-view.js).
   thirdsRanked.sort((a, b) =>
-    b.pts - a.pts || b.sg - a.sg || b.gp - a.gp || fifaRank(a.team) - fifaRank(b.team)
+    b.pts - a.pts || b.sg - a.sg || b.gp - a.gp
+    || (b.fairPlay ?? 0) - (a.fairPlay ?? 0)
+    || fifaRank(a.team) - fifaRank(b.team)
   );
   // Slots compostos distintos, em ordem de match id (= ordem do servidor/simulador).
   // Usa slot_home/slot_away (slot original) — team_home/away pode já estar resolvido.

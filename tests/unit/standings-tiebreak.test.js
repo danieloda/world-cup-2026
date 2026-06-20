@@ -1,6 +1,7 @@
 // ============================================================
 // computeStandings — o desempate de grupos que ALIMENTA o mata-mata.
-// Critério (igual ao SQL resolve_match_slots): PTS → SG → GF → rank FIFA.
+// Critério OFICIAL FIFA 2026 (igual ao SQL resolve_match_slots da migration 068):
+//   PTS → CONFRONTO DIRETO → SG geral → GF geral → FAIR PLAY → rank FIFA.
 // Cada nível é exercitado ISOLADO (os anteriores empatados de propósito),
 // num grupo completo de 4 — não só miniaturas de 2 times.
 // ============================================================
@@ -76,6 +77,83 @@ describe('nível 4 — tudo igual, rank FIFA decide', () => {
     expect(st.map(s => s.team)).toEqual(expected);                 // France, Mexico, Japan, SAf
     // E os 4 estão de fato 100% empatados nos 3 critérios anteriores:
     for (const s of st) { expect(s.pts).toBe(3); expect(s.sg).toBe(0); expect(s.gp).toBe(3); }
+  });
+});
+
+describe('confronto direto (2 times) — vem ANTES do saldo geral', () => {
+  it('quem venceu o confronto direto passa, mesmo com saldo e FIFA piores', () => {
+    // Brazil e Argentina empatam em 6 pts. Brazil GANHOU o confronto direto (2×1),
+    // mas tem saldo geral PIOR (+1 vs +9) e ranking FIFA PIOR (6 vs 3). Pela regra
+    // nova (confronto direto antes do saldo), Brazil fica na frente.
+    const teams = ['Brazil', 'Argentina', 'Chile', 'Bolivia'];
+    const st = computeStandings(groupMatches(teams, [
+      [2, 1], // Brazil 2×1 Argentina   (confronto direto p/ Brazil)
+      [0, 0], // Chile 0×0 Bolivia
+      [0, 1], // Brazil 0×1 Chile        (Brazil tropeça)
+      [5, 0], // Argentina 5×0 Bolivia   (Argentina infla o saldo)
+      [1, 0], // Brazil 1×0 Bolivia
+      [5, 0], // Argentina 5×0 Chile     (Argentina infla o saldo)
+    ]), 'real');
+    expect(st.map(s => s.team)).toEqual(['Brazil', 'Argentina', 'Chile', 'Bolivia']);
+    expect(st[0].pts).toBe(6);
+    expect(st[1].pts).toBe(6);
+    // Confirma que o saldo (e o FIFA) seriam INVERSOS — prova que o H2H mandou:
+    expect(st[0].sg).toBeLessThan(st[1].sg); // Brazil +1 < Argentina +9
+  });
+});
+
+describe('confronto direto (3 times) — mini-tabela só dos jogos entre eles', () => {
+  it('empate triplo: ordena pela mini-tabela, não pelo saldo geral', () => {
+    // Germany, Croatia e Morocco fazem ciclo (cada um vence um) e batem Ghana → 6 pts.
+    // No confronto direto os 3 têm 3 pts; o SALDO da mini-tabela decide:
+    //   Morocco +2 > Croatia 0 > Germany −2.
+    // Germany tem o MAIOR saldo geral (+7, goleou Ghana 9×0) e mesmo assim cai p/ 3º.
+    const teams = ['Germany', 'Croatia', 'Morocco', 'Ghana'];
+    const st = computeStandings(groupMatches(teams, [
+      [1, 0], // Germany 1×0 Croatia
+      [1, 0], // Morocco 1×0 Ghana
+      [0, 3], // Germany 0×3 Morocco
+      [1, 0], // Croatia 1×0 Ghana
+      [9, 0], // Germany 9×0 Ghana   (saldo geral inflado de propósito)
+      [1, 0], // Croatia 1×0 Morocco
+    ]), 'real');
+    expect(st.map(s => s.team)).toEqual(['Morocco', 'Croatia', 'Germany', 'Ghana']);
+    for (const t of ['Germany', 'Croatia', 'Morocco']) {
+      expect(st.find(s => s.team === t).pts).toBe(6);
+    }
+    // Germany tem o melhor saldo geral mas é o último do empate triplo:
+    expect(st.find(s => s.team === 'Germany').sg).toBe(7);
+  });
+});
+
+describe('fair play — decide só no modo real, antes do rank FIFA', () => {
+  it('menos cartões passa na frente, mesmo com FIFA pior', () => {
+    // Japan 0×0 Mexico: empatam em tudo (1 pt, SG 0, GF 0) e o confronto direto
+    // também empata. Japan levou menos cartões (fair play −1 vs −4) → passa,
+    // apesar do ranking FIFA pior (18 vs 15).
+    const matches = [
+      { id: 1, finished: true, team_home: 'Japan', team_away: 'Mexico',
+        actual_home: 0, actual_away: 0, home_fairplay: -1, away_fairplay: -4 },
+    ];
+    const st = computeStandings(matches, 'real');
+    expect(st[0].team).toBe('Japan');
+    expect(st[1].team).toBe('Mexico');
+    expect(st[0].fairPlay).toBe(-1);
+    expect(st[1].fairPlay).toBe(-4);
+  });
+
+  it('no modo palpite os cartões são ignorados → FIFA decide', () => {
+    // Mesmo jogo com cartões anexados, mas em modo 'pred': ninguém palpita cartão,
+    // então fairPlay fica 0 p/ ambos e o rank FIFA (Mexico 15 < Japan 18) decide.
+    const matches = [
+      { id: 1, finished: false, team_home: 'Japan', team_away: 'Mexico',
+        actual_home: null, actual_away: null, home_fairplay: -1, away_fairplay: -4 },
+    ];
+    const preds = new Map([[1, { pred_home: 0, pred_away: 0 }]]);
+    const st = computeStandings(matches, 'pred', preds);
+    expect(st[0].team).toBe('Mexico');
+    expect(st[0].fairPlay).toBe(0);
+    expect(st[1].fairPlay).toBe(0);
   });
 });
 
