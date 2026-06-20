@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-20T15:55:06.796Z",
+  "updated_at": "2026-06-20T17:37:39.298Z",
   "season": 2026,
   "scorers": [
     {
@@ -16,7 +16,15 @@
       "team": "Canada",
       "goals": 3,
       "assists": 0,
-      "minutes": 159
+      "minutes": 151
+    },
+    {
+      "api_id": 762,
+      "name": "Vinícius Júnior",
+      "team": "Brazil",
+      "goals": 2,
+      "assists": 1,
+      "minutes": 171
     },
     {
       "api_id": 406244,
@@ -25,14 +33,6 @@
       "goals": 2,
       "assists": 0,
       "minutes": 44
-    },
-    {
-      "api_id": 138835,
-      "name": "F. Balogun",
-      "team": "USA",
-      "goals": 2,
-      "assists": 0,
-      "minutes": 72
     },
     {
       "api_id": 278,
@@ -67,14 +67,6 @@
       "minutes": 90
     },
     {
-      "api_id": 184,
-      "name": "H. Kane",
-      "team": "England",
-      "goals": 2,
-      "assists": 0,
-      "minutes": 90
-    },
-    {
       "api_id": 978,
       "name": "K. Havertz",
       "team": "Germany",
@@ -83,12 +75,44 @@
       "minutes": 90
     },
     {
+      "api_id": 184,
+      "name": "H. Kane",
+      "team": "England",
+      "goals": 2,
+      "assists": 0,
+      "minutes": 90
+    },
+    {
+      "api_id": 1165,
+      "name": "Matheus Cunha",
+      "team": "Brazil",
+      "goals": 2,
+      "assists": 0,
+      "minutes": 93
+    },
+    {
       "api_id": 2001,
       "name": "C. Larin",
       "team": "Canada",
       "goals": 2,
       "assists": 0,
-      "minutes": 112
+      "minutes": 104
+    },
+    {
+      "api_id": 138835,
+      "name": "F. Balogun",
+      "team": "USA",
+      "goals": 2,
+      "assists": 0,
+      "minutes": 161
+    },
+    {
+      "api_id": 161897,
+      "name": "I. Saibari",
+      "team": "Morocco",
+      "goals": 2,
+      "assists": 0,
+      "minutes": 173
     },
     {
       "api_id": 26475,
@@ -112,39 +136,7 @@
       "team": "Canada",
       "goals": 1,
       "assists": 1,
-      "minutes": 41
-    },
-    {
-      "api_id": 280074,
-      "name": "N. Brown",
-      "team": "Germany",
-      "goals": 1,
-      "assists": 1,
-      "minutes": 73
-    },
-    {
-      "api_id": 2691,
-      "name": "R. Rezaeian",
-      "team": "Iran",
-      "goals": 1,
-      "assists": 1,
-      "minutes": 90
-    },
-    {
-      "api_id": 18979,
-      "name": "V. Gyökeres",
-      "team": "Sweden",
-      "goals": 1,
-      "assists": 1,
-      "minutes": 90
-    },
-    {
-      "api_id": 2489,
-      "name": "L. Díaz",
-      "team": "Colombia",
-      "goals": 1,
-      "assists": 1,
-      "minutes": 93
+      "minutes": 33
     },
     {
       "api_id": 48471,
@@ -161,6 +153,14 @@
       "goals": 1,
       "assists": 1,
       "minutes": 174
+    },
+    {
+      "api_id": 355994,
+      "name": "A. Freeman",
+      "team": "USA",
+      "goals": 1,
+      "assists": 1,
+      "minutes": 180
     }
   ]
 }
