@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-20T19:00:27.447Z",
+  "updated_at": "2026-06-20T20:24:09.332Z",
   "season": 2026,
   "groups": {
     "A": [
@@ -275,33 +275,33 @@
     "F": [
       {
         "rank": 1,
-        "team": "Sweden",
-        "played": 1,
+        "team": "Netherlands",
+        "played": 2,
         "win": 1,
-        "draw": 0,
+        "draw": 1,
         "lose": 0,
-        "gf": 5,
-        "ga": 1,
+        "gf": 7,
+        "ga": 3,
         "gd": 4,
-        "points": 3,
-        "form": "W"
+        "points": 4,
+        "form": "WD"
       },
       {
         "rank": 2,
-        "team": "Japan",
-        "played": 1,
-        "win": 0,
-        "draw": 1,
-        "lose": 0,
-        "gf": 2,
-        "ga": 2,
+        "team": "Sweden",
+        "played": 2,
+        "win": 1,
+        "draw": 0,
+        "lose": 1,
+        "gf": 6,
+        "ga": 6,
         "gd": 0,
-        "points": 1,
-        "form": "D"
+        "points": 3,
+        "form": "LW"
       },
       {
         "rank": 3,
-        "team": "Netherlands",
+        "team": "Japan",
         "played": 1,
         "win": 0,
         "draw": 1,
