@@ -433,6 +433,13 @@
   ],
   "Brazil": [
     [
+      "2026-06-20",
+      "Haiti",
+      true,
+      "3-0",
+      "World Cup"
+    ],
+    [
       "2026-06-13",
       "Morocco",
       true,
@@ -494,13 +501,6 @@
       false,
       "5-0",
       "Amistoso"
-    ],
-    [
-      "2025-09-09",
-      "Bolivia",
-      false,
-      "0-1",
-      "Eliminatórias"
     ]
   ],
   "Canada": [
@@ -1297,6 +1297,13 @@
   ],
   "Haiti": [
     [
+      "2026-06-20",
+      "Brazil",
+      false,
+      "0-3",
+      "World Cup"
+    ],
+    [
       "2026-06-14",
       "Scotland",
       true,
@@ -1357,13 +1364,6 @@
       "Nicaragua",
       false,
       "3-0",
-      "Eliminatórias"
-    ],
-    [
-      "2025-09-10",
-      "Costa Rica",
-      false,
-      "3-3",
       "Eliminatórias"
     ]
   ],
@@ -2161,6 +2161,13 @@
   ],
   "Paraguay": [
     [
+      "2026-06-20",
+      "Türkiye",
+      false,
+      "1-0",
+      "World Cup"
+    ],
+    [
       "2026-06-13",
       "USA",
       false,
@@ -2221,13 +2228,6 @@
       "Peru",
       false,
       "1-0",
-      "Eliminatórias"
-    ],
-    [
-      "2025-09-04",
-      "Ecuador",
-      true,
-      "0-0",
       "Eliminatórias"
     ]
   ],
@@ -3241,6 +3241,13 @@
   ],
   "Türkiye": [
     [
+      "2026-06-20",
+      "Paraguay",
+      true,
+      "0-1",
+      "World Cup"
+    ],
+    [
       "2026-06-14",
       "Australia",
       false,
@@ -3301,13 +3308,6 @@
       "Bulgaria",
       false,
       "6-1",
-      "Eliminatórias"
-    ],
-    [
-      "2025-09-07",
-      "Spain",
-      true,
-      "0-6",
       "Eliminatórias"
     ]
   ],
