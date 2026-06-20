@@ -1153,6 +1153,13 @@
   ],
   "Germany": [
     [
+      "2026-06-20",
+      "Ivory Coast",
+      true,
+      "2-1",
+      "World Cup"
+    ],
+    [
       "2026-06-14",
       "Curaçao",
       true,
@@ -1213,13 +1220,6 @@
       "Luxembourg",
       true,
       "4-0",
-      "Eliminatórias"
-    ],
-    [
-      "2025-09-07",
-      "Northern Ireland",
-      true,
-      "3-1",
       "Eliminatórias"
     ]
   ],
@@ -1513,6 +1513,13 @@
   ],
   "Ivory Coast": [
     [
+      "2026-06-20",
+      "Germany",
+      false,
+      "1-2",
+      "World Cup"
+    ],
+    [
       "2026-06-14",
       "Ecuador",
       true,
@@ -1573,13 +1580,6 @@
       "Cameroon",
       true,
       "1-1",
-      "Copa Africana"
-    ],
-    [
-      "2025-12-24",
-      "Mozambique",
-      true,
-      "1-0",
       "Copa Africana"
     ]
   ],
