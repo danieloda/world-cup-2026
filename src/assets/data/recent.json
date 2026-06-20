@@ -1873,6 +1873,13 @@
   ],
   "Netherlands": [
     [
+      "2026-06-20",
+      "Sweden",
+      true,
+      "5-1",
+      "World Cup"
+    ],
+    [
       "2026-06-14",
       "Japan",
       true,
@@ -1933,13 +1940,6 @@
       "Malta",
       false,
       "4-0",
-      "Eliminatórias"
-    ],
-    [
-      "2025-09-07",
-      "Lithuania",
-      false,
-      "3-2",
       "Eliminatórias"
     ]
   ],
@@ -2809,6 +2809,13 @@
   ],
   "Sweden": [
     [
+      "2026-06-20",
+      "Netherlands",
+      false,
+      "1-5",
+      "World Cup"
+    ],
+    [
       "2026-06-15",
       "Tunisia",
       true,
@@ -2868,13 +2875,6 @@
       "2025-10-10",
       "Switzerland",
       true,
-      "0-2",
-      "Eliminatórias"
-    ],
-    [
-      "2025-09-08",
-      "Kosovo",
-      false,
       "0-2",
       "Eliminatórias"
     ]
