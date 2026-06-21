@@ -1,7 +1,15 @@
 {
-  "updated_at": "2026-06-21T14:55:21.521Z",
+  "updated_at": "2026-06-21T16:47:08.585Z",
   "season": 2026,
   "scorers": [
+    {
+      "api_id": 26475,
+      "name": "D. Undav",
+      "team": "Germany",
+      "goals": 3,
+      "assists": 2,
+      "minutes": 56
+    },
     {
       "api_id": 154,
       "name": "L. Messi",
@@ -19,12 +27,36 @@
       "minutes": 151
     },
     {
+      "api_id": 37724,
+      "name": "C. Summerville",
+      "team": "Netherlands",
+      "goals": 2,
+      "assists": 1,
+      "minutes": 115
+    },
+    {
+      "api_id": 72155,
+      "name": "A. Ueda",
+      "team": "Japan",
+      "goals": 2,
+      "assists": 1,
+      "minutes": 168
+    },
+    {
       "api_id": 762,
       "name": "Vinícius Júnior",
       "team": "Brazil",
       "goals": 2,
       "assists": 1,
       "minutes": 171
+    },
+    {
+      "api_id": 247,
+      "name": "C. Gakpo",
+      "team": "Netherlands",
+      "goals": 2,
+      "assists": 1,
+      "minutes": 174
     },
     {
       "api_id": 406244,
@@ -35,25 +67,17 @@
       "minutes": 44
     },
     {
-      "api_id": 278,
-      "name": "Kylian Mbappé",
-      "team": "France",
+      "api_id": 38750,
+      "name": "B. Brobbey",
+      "team": "Netherlands",
       "goals": 2,
       "assists": 0,
-      "minutes": 90
+      "minutes": 84
     },
     {
       "api_id": 94333,
       "name": "E. Just",
       "team": "New Zealand",
-      "goals": 2,
-      "assists": 0,
-      "minutes": 90
-    },
-    {
-      "api_id": 265820,
-      "name": "Y. Ayari",
-      "team": "Sweden",
       "goals": 2,
       "assists": 0,
       "minutes": 90
@@ -67,9 +91,9 @@
       "minutes": 90
     },
     {
-      "api_id": 978,
-      "name": "K. Havertz",
-      "team": "Germany",
+      "api_id": 278,
+      "name": "Kylian Mbappé",
+      "team": "France",
       "goals": 2,
       "assists": 0,
       "minutes": 90
@@ -107,6 +131,22 @@
       "minutes": 161
     },
     {
+      "api_id": 2601,
+      "name": "D. Kamada",
+      "team": "Japan",
+      "goals": 2,
+      "assists": 0,
+      "minutes": 163
+    },
+    {
+      "api_id": 265820,
+      "name": "Y. Ayari",
+      "team": "Sweden",
+      "goals": 2,
+      "assists": 0,
+      "minutes": 169
+    },
+    {
       "api_id": 161897,
       "name": "I. Saibari",
       "team": "Morocco",
@@ -115,52 +155,12 @@
       "minutes": 173
     },
     {
-      "api_id": 26475,
-      "name": "D. Undav",
+      "api_id": 978,
+      "name": "K. Havertz",
       "team": "Germany",
-      "goals": 1,
-      "assists": 2,
-      "minutes": 26
-    },
-    {
-      "api_id": 2864,
-      "name": "A. Isak",
-      "team": "Sweden",
-      "goals": 1,
-      "assists": 2,
-      "minutes": 89
-    },
-    {
-      "api_id": 294824,
-      "name": "N. Saliba",
-      "team": "Canada",
-      "goals": 1,
-      "assists": 1,
-      "minutes": 33
-    },
-    {
-      "api_id": 48471,
-      "name": "R. Vargas",
-      "team": "Switzerland",
-      "goals": 1,
-      "assists": 1,
-      "minutes": 98
-    },
-    {
-      "api_id": 2901,
-      "name": "Hwang In-Beom",
-      "team": "South Korea",
-      "goals": 1,
-      "assists": 1,
-      "minutes": 174
-    },
-    {
-      "api_id": 355994,
-      "name": "A. Freeman",
-      "team": "USA",
-      "goals": 1,
-      "assists": 1,
-      "minutes": 180
+      "goals": 2,
+      "assists": 0,
+      "minutes": 175
     }
   ]
 }
