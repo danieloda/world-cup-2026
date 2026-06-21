@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-20T22:52:11.712Z",
+  "updated_at": "2026-06-21T00:02:34.040Z",
   "season": 2026,
   "groups": {
     "A": [
@@ -222,28 +222,28 @@
       {
         "rank": 1,
         "team": "Germany",
-        "played": 1,
-        "win": 1,
+        "played": 2,
+        "win": 2,
         "draw": 0,
         "lose": 0,
-        "gf": 7,
-        "ga": 1,
-        "gd": 6,
-        "points": 3,
-        "form": "W"
+        "gf": 9,
+        "ga": 2,
+        "gd": 7,
+        "points": 6,
+        "form": "WW"
       },
       {
         "rank": 2,
         "team": "Ivory Coast",
-        "played": 1,
+        "played": 2,
         "win": 1,
         "draw": 0,
-        "lose": 0,
-        "gf": 1,
-        "ga": 0,
-        "gd": 1,
+        "lose": 1,
+        "gf": 2,
+        "ga": 2,
+        "gd": 0,
         "points": 3,
-        "form": "W"
+        "form": "LW"
       },
       {
         "rank": 3,
