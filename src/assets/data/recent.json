@@ -3097,6 +3097,13 @@
   ],
   "Uruguay": [
     [
+      "2026-06-21",
+      "Cape Verde Islands",
+      true,
+      "0-1",
+      "World Cup"
+    ],
+    [
       "2026-06-15",
       "Saudi Arabia",
       false,
@@ -3157,13 +3164,6 @@
       "Peru",
       true,
       "3-0",
-      "Eliminatórias"
-    ],
-    [
-      "2025-06-10",
-      "Venezuela",
-      true,
-      "2-0",
       "Eliminatórias"
     ]
   ],
@@ -3313,6 +3313,13 @@
   ],
   "Cape Verde": [
     [
+      "2026-06-21",
+      "Uruguay",
+      false,
+      "1-0",
+      "World Cup"
+    ],
+    [
       "2026-06-15",
       "Spain",
       false,
@@ -3373,13 +3380,6 @@
       "Libya",
       false,
       "3-3",
-      "Eliminatórias"
-    ],
-    [
-      "2025-09-09",
-      "Cameroon",
-      true,
-      "1-0",
       "Eliminatórias"
     ]
   ],
