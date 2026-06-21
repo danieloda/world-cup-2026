@@ -150,6 +150,10 @@ function renderComoFunciona() {
       ${miniCard('🎟️', 'Bônus de classificado', 'A cada fase do mata-mata, você ganha pontos por acertar quais seleções avançam.')}
     </div>
     <div class="rules-tip">
+      ⏰ Fique de olho no <strong>prazo</strong>: cada palpite fecha às <strong>23h59 da véspera</strong>
+      do jogo — passou disso, não dá mais para mudar. Os detalhes estão em <a href="#prazos">Prazos</a>.
+    </div>
+    <div class="rules-tip">
       💡 Você não precisa entender de conta: é só dar o placar dos jogos. O sistema soma os pontos
       <strong>sozinho</strong>, assim que cada resultado é lançado.
     </div>
@@ -251,18 +255,35 @@ function renderFases() {
   const row = (label, pick, hl) => `
     <tr ${hl ? 'class="rules-matrix-mult"' : ''}>
       <td class="rules-matrix-label">${label}</td>
-      ${STAGES.map(s => {
-        const v = pick(matchPoints(s.id));
-        return `<td class="${hl ? '' : ''}">${v}</td>`;
-      }).join('')}
+      ${STAGES.map(s => `<td>${pick(matchPoints(s.id))}</td>`).join('')}
     </tr>`;
+
+  // Escada do placar exato pelo caminho principal do título (sem a disputa de 3º,
+  // que é um ramo à parte e quebraria a subida). Reaproveita o grid do Artilheiro,
+  // e os números vêm todos de scoring.js — a página nunca diverge da engine.
+  const mainPath = ['group', 'r32', 'r16', 'qf', 'sf', 'final'];
+  const escada = mainPath.map(id => {
+    const s = STAGES.find(x => x.id === id);
+    return `
+      <div class="rules-scorer-col">
+        <div class="rules-scorer-stage">${s.short}</div>
+        <div class="rules-scorer-val">${matchPoints(id).exact}</div>
+        <div class="rules-scorer-per">pts</div>
+      </div>`;
+  }).join('');
 
   return section('fases', `
     <p class="rules-p">
-      Quanto mais decisivo o jogo, <strong>mais pontos ele vale</strong>. Um placar exato na
-      <strong>final</strong> vale <strong>${matchPoints('final').exact}</strong> pontos — contra
-      <strong>${GP.exact}</strong> de um jogo de grupos. É por isso que <strong>a emoção fica para o fim</strong>:
-      mesmo quem não foi bem nos grupos pode virar o jogo no mata-mata.
+      Quanto mais decisivo o jogo, <strong>mais ele vale</strong> — e essa subida é
+      <strong>de propósito</strong>. Cravar o placar de um jogo de grupos dá <strong>${GP.exact}</strong>
+      pontos; no <strong>mata-mata</strong> esse mesmo acerto vai subindo, fase a fase, até
+      <strong>${matchPoints('final').exact}</strong> na final:
+    </p>
+    <div class="rules-scorer-grid">${escada}</div>
+    <p class="rules-p">
+      Esse é o <strong>máximo</strong> de cada fase — a soma de todos os acertos. Mas você
+      <strong>pontua mesmo sem cravar</strong>: cada parte do placar tem seu valor, e todas sobem
+      junto no mata-mata.
     </p>
     <div class="rules-table-wrap hscroll"><div class="hscroll-in">
       <table class="rules-matrix">
@@ -277,9 +298,18 @@ function renderFases() {
         </tbody>
       </table>
     </div></div>
-    <div class="rules-tip">
-      💡 A linha <strong>Placar exato</strong> é o máximo que um jogo daquela fase pode dar
-      (a soma de todos os acertos).
+    <div class="rules-example">
+      <div class="rules-example-head">Por que cresce tanto?</div>
+      <p>
+        As fases finais valem muito mais de propósito. Com esses pesos,
+        <strong>mais da metade dos pontos do bolão</strong> ainda está em jogo
+        <strong>depois</strong> da fase de grupos — e <strong>liderar os grupos não garante o
+        título</strong>.
+      </p>
+      <p class="rules-example-result">
+        Assim <strong>ninguém é eliminado cedo</strong>: um tropeço no começo não te tira da
+        briga, e a decisão fica para a <strong>reta final</strong>.
+      </p>
     </div>
   `);
 }
