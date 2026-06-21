@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-21T18:58:36.039Z",
+  "updated_at": "2026-06-21T20:26:56.372Z",
   "season": 2026,
   "groups": {
     "A": [
@@ -383,6 +383,19 @@
     "H": [
       {
         "rank": 1,
+        "team": "Spain",
+        "played": 2,
+        "win": 1,
+        "draw": 1,
+        "lose": 0,
+        "gf": 4,
+        "ga": 0,
+        "gd": 4,
+        "points": 4,
+        "form": "WD"
+      },
+      {
+        "rank": 2,
         "team": "Uruguay",
         "played": 1,
         "win": 0,
@@ -395,21 +408,8 @@
         "form": "D"
       },
       {
-        "rank": 2,
-        "team": "Saudi Arabia",
-        "played": 1,
-        "win": 0,
-        "draw": 1,
-        "lose": 0,
-        "gf": 1,
-        "ga": 1,
-        "gd": 0,
-        "points": 1,
-        "form": "D"
-      },
-      {
         "rank": 3,
-        "team": "Spain",
+        "team": "Cape Verde",
         "played": 1,
         "win": 0,
         "draw": 1,
@@ -422,16 +422,16 @@
       },
       {
         "rank": 4,
-        "team": "Cape Verde",
-        "played": 1,
+        "team": "Saudi Arabia",
+        "played": 2,
         "win": 0,
         "draw": 1,
-        "lose": 0,
-        "gf": 0,
-        "ga": 0,
-        "gd": 0,
+        "lose": 1,
+        "gf": 1,
+        "ga": 5,
+        "gd": -4,
         "points": 1,
-        "form": "D"
+        "form": "LD"
       }
     ],
     "I": [
