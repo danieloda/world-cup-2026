@@ -132,6 +132,25 @@ describe('invariantes de RLS (anti-regressão das migrations)', () => {
     expect(sel).toMatch(/is_admin\(\)/);
   });
 
+  it('4 views são security_invoker=on e o flip é a última palavra (advisor CRITICAL, 070)', () => {
+    // O Security Advisor marca `create view` definer (security_invoker=off) como
+    // CRITICAL. A 070 flipou as 4 views p/ invoker via ALTER. Um `create or replace
+    // view` POSTERIOR ao ALTER zera o flag silenciosamente → CRITICAL volta sem
+    // nenhum teste falhar. Aqui garantimos que o SET é sempre mais novo que o
+    // último (re)define da view.
+    for (const v of ['v_leaderboard', 'v_scorer_ranking', 'v_pool_stats', 'v_revealed_matches']) {
+      const setRe = new RegExp(`alter view public\\.${v}\\s+set\\s*\\(\\s*security_invoker\\s*=\\s*on`, 'is');
+      const createRe = new RegExp(`create\\s+(?:or replace\\s+)?view public\\.${v}\\b`, 'is');
+      let setNum = -1, createNum = -1;
+      for (const m of migrations) {
+        if (setRe.test(m.text)) setNum = Math.max(setNum, m.num);
+        if (createRe.test(m.text)) createNum = Math.max(createNum, m.num);
+      }
+      expect(setNum, `${v}: falta 'alter view ... set (security_invoker = on)'`).toBeGreaterThan(-1);
+      expect(setNum, `${v}: create/replace na migration ${createNum} é mais novo que o set (${setNum}) → invoker perdido`).toBeGreaterThanOrEqual(createNum);
+    }
+  });
+
   it('funções SECURITY DEFINER continuam revogadas de authenticated (H1/H2)', () => {
     const fns = [
       'recompute_prediction_points', 'recompute_qualifier_points',
