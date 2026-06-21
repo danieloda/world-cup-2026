@@ -289,6 +289,13 @@
   ],
   "Belgium": [
     [
+      "2026-06-21",
+      "Iran",
+      true,
+      "0-0",
+      "World Cup"
+    ],
+    [
       "2026-06-15",
       "Egypt",
       true,
@@ -349,13 +356,6 @@
       "FYR Macedonia",
       true,
       "0-0",
-      "Eliminatórias"
-    ],
-    [
-      "2025-09-07",
-      "Kazakhstan",
-      true,
-      "6-0",
       "Eliminatórias"
     ]
   ],
@@ -1369,6 +1369,13 @@
   ],
   "Iran": [
     [
+      "2026-06-21",
+      "Belgium",
+      false,
+      "0-0",
+      "World Cup"
+    ],
+    [
       "2026-06-16",
       "New Zealand",
       true,
@@ -1430,13 +1437,6 @@
       false,
       "1-2",
       "Amistoso"
-    ],
-    [
-      "2025-09-08",
-      "Uzbekistan",
-      true,
-      "0-1",
-      "Copa CAFA"
     ]
   ],
   "Iraq": [
@@ -2380,7 +2380,7 @@
       "2026-06-21",
       "Spain",
       false,
-      "0-3",
+      "0-4",
       "World Cup"
     ],
     [
@@ -2740,7 +2740,7 @@
       "2026-06-21",
       "Saudi Arabia",
       true,
-      "3-0",
+      "4-0",
       "World Cup"
     ],
     [
