@@ -721,6 +721,13 @@
   ],
   "Curaçao": [
     [
+      "2026-06-21",
+      "Ecuador",
+      false,
+      "0-0",
+      "World Cup"
+    ],
+    [
       "2026-06-14",
       "Germany",
       false,
@@ -781,13 +788,6 @@
       "Jamaica",
       true,
       "2-0",
-      "Eliminatórias"
-    ],
-    [
-      "2025-09-10",
-      "Bermuda",
-      true,
-      "3-2",
       "Eliminatórias"
     ]
   ],
@@ -865,6 +865,13 @@
   ],
   "Ecuador": [
     [
+      "2026-06-21",
+      "Curaçao",
+      true,
+      "0-0",
+      "World Cup"
+    ],
+    [
       "2026-06-14",
       "Ivory Coast",
       false,
@@ -926,13 +933,6 @@
       false,
       "1-1",
       "Amistoso"
-    ],
-    [
-      "2025-09-09",
-      "Argentina",
-      true,
-      "1-0",
-      "Eliminatórias"
     ]
   ],
   "Egypt": [
@@ -1585,6 +1585,13 @@
   ],
   "Japan": [
     [
+      "2026-06-21",
+      "Tunisia",
+      false,
+      "2-0",
+      "World Cup"
+    ],
+    [
       "2026-06-14",
       "Netherlands",
       false,
@@ -1645,13 +1652,6 @@
       "USA",
       false,
       "0-2",
-      "Amistoso"
-    ],
-    [
-      "2025-09-07",
-      "Mexico",
-      false,
-      "0-0",
       "Amistoso"
     ]
   ],
@@ -2953,6 +2953,13 @@
   ],
   "Tunisia": [
     [
+      "2026-06-21",
+      "Japan",
+      true,
+      "0-2",
+      "World Cup"
+    ],
+    [
       "2026-06-15",
       "Sweden",
       false,
@@ -3014,13 +3021,6 @@
       true,
       "3-1",
       "Copa Africana"
-    ],
-    [
-      "2025-12-07",
-      "Qatar",
-      false,
-      "3-0",
-      "Arab Cup"
     ]
   ],
   "USA": [
