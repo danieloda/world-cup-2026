@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-21T00:02:34.040Z",
+  "updated_at": "2026-06-21T05:15:15.426Z",
   "season": 2026,
   "groups": {
     "A": [
@@ -248,28 +248,28 @@
       {
         "rank": 3,
         "team": "Ecuador",
-        "played": 1,
+        "played": 2,
         "win": 0,
-        "draw": 0,
+        "draw": 1,
         "lose": 1,
         "gf": 0,
         "ga": 1,
         "gd": -1,
-        "points": 0,
-        "form": "L"
+        "points": 1,
+        "form": "DL"
       },
       {
         "rank": 4,
         "team": "Curaçao",
-        "played": 1,
+        "played": 2,
         "win": 0,
-        "draw": 0,
+        "draw": 1,
         "lose": 1,
         "gf": 1,
         "ga": 7,
         "gd": -6,
-        "points": 0,
-        "form": "L"
+        "points": 1,
+        "form": "DL"
       }
     ],
     "F": [
