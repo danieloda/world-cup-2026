@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-21T23:07:38.714Z",
+  "updated_at": "2026-06-22T00:21:10.636Z",
   "season": 2026,
   "groups": {
     "A": [
@@ -409,19 +409,6 @@
       },
       {
         "rank": 3,
-        "team": "Cape Verde",
-        "played": 1,
-        "win": 0,
-        "draw": 1,
-        "lose": 0,
-        "gf": 0,
-        "ga": 0,
-        "gd": 0,
-        "points": 1,
-        "form": "D"
-      },
-      {
-        "rank": 4,
         "team": "Saudi Arabia",
         "played": 2,
         "win": 0,
@@ -432,6 +419,19 @@
         "gd": -4,
         "points": 1,
         "form": "LD"
+      },
+      {
+        "rank": 4,
+        "team": "Cape Verde",
+        "played": 1,
+        "win": 0,
+        "draw": 1,
+        "lose": 0,
+        "gf": 0,
+        "ga": 0,
+        "gd": 0,
+        "points": 1,
+        "form": "D"
       }
     ],
     "I": [
