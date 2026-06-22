@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-22T16:10:08.546Z",
+  "updated_at": "2026-06-22T19:45:55.076Z",
   "season": 2026,
   "groups": {
     "A": [
@@ -492,28 +492,28 @@
       {
         "rank": 1,
         "team": "Argentina",
-        "played": 1,
-        "win": 1,
+        "played": 2,
+        "win": 2,
         "draw": 0,
         "lose": 0,
-        "gf": 3,
+        "gf": 5,
         "ga": 0,
-        "gd": 3,
-        "points": 3,
-        "form": "W"
+        "gd": 5,
+        "points": 6,
+        "form": "WW"
       },
       {
         "rank": 2,
         "team": "Austria",
-        "played": 1,
+        "played": 2,
         "win": 1,
         "draw": 0,
-        "lose": 0,
+        "lose": 1,
         "gf": 3,
-        "ga": 1,
-        "gd": 2,
+        "ga": 3,
+        "gd": 0,
         "points": 3,
-        "form": "W"
+        "form": "LW"
       },
       {
         "rank": 3,
