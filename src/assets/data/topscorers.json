@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-22T00:15:01.791Z",
+  "updated_at": "2026-06-22T05:35:20.970Z",
   "season": 2026,
   "scorers": [
     {
@@ -33,6 +33,22 @@
       "goals": 2,
       "assists": 1,
       "minutes": 115
+    },
+    {
+      "api_id": 47323,
+      "name": "Mikel Oyarzabal",
+      "team": "Spain",
+      "goals": 2,
+      "assists": 1,
+      "minutes": 135
+    },
+    {
+      "api_id": 51776,
+      "name": "M. Araújo",
+      "team": "Uruguay",
+      "goals": 2,
+      "assists": 1,
+      "minutes": 162
     },
     {
       "api_id": 72155,
@@ -75,22 +91,6 @@
       "minutes": 84
     },
     {
-      "api_id": 94333,
-      "name": "E. Just",
-      "team": "New Zealand",
-      "goals": 2,
-      "assists": 0,
-      "minutes": 90
-    },
-    {
-      "api_id": 1100,
-      "name": "E. Haaland",
-      "team": "Norway",
-      "goals": 2,
-      "assists": 0,
-      "minutes": 90
-    },
-    {
       "api_id": 278,
       "name": "Kylian Mbappé",
       "team": "France",
@@ -99,9 +99,9 @@
       "minutes": 90
     },
     {
-      "api_id": 184,
-      "name": "H. Kane",
-      "team": "England",
+      "api_id": 1100,
+      "name": "E. Haaland",
+      "team": "Norway",
       "goals": 2,
       "assists": 0,
       "minutes": 90
@@ -155,9 +155,9 @@
       "minutes": 173
     },
     {
-      "api_id": 978,
-      "name": "K. Havertz",
-      "team": "Germany",
+      "api_id": 94333,
+      "name": "E. Just",
+      "team": "New Zealand",
       "goals": 2,
       "assists": 0,
       "minutes": 175
