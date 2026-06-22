@@ -73,6 +73,13 @@
   ],
   "Argentina": [
     [
+      "2026-06-22",
+      "Austria",
+      true,
+      "1-0",
+      "World Cup"
+    ],
+    [
       "2026-06-17",
       "Algeria",
       true,
@@ -133,13 +140,6 @@
       "Ecuador",
       false,
       "0-1",
-      "Eliminatórias"
-    ],
-    [
-      "2025-09-04",
-      "Venezuela",
-      true,
-      "3-0",
       "Eliminatórias"
     ]
   ],
@@ -217,6 +217,13 @@
   ],
   "Austria": [
     [
+      "2026-06-22",
+      "Argentina",
+      false,
+      "0-1",
+      "World Cup"
+    ],
+    [
       "2026-06-17",
       "Jordan",
       true,
@@ -277,13 +284,6 @@
       "Bosnia & Herzegovina",
       false,
       "2-1",
-      "Eliminatórias"
-    ],
-    [
-      "2025-09-06",
-      "Cyprus",
-      true,
-      "1-0",
       "Eliminatórias"
     ]
   ],
