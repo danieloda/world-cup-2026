@@ -691,12 +691,26 @@ em { font-style: normal; font-weight: var(--fw-medium); }
     "raiox raiox raiox raiox raiox";
   gap: var(--space-2h) var(--space-3h);
 }
+/* Meta = dois blocos que quebram como UNIDADE no mobile: "quando/onde" (hora ·
+   estádio, nunca parte no meio do nome) e os "selos" (🌙 vira-dia, status, grupo).
+   Sem isso, a linha única espremia o nome do estádio em 2 linhas e sobrepunha os
+   pills num viewport estreito. */
 .match.bet .match-meta {
-  grid-area: meta; display: flex; align-items: center; gap: var(--space-2);
+  grid-area: meta; display: flex; flex-wrap: wrap; align-items: center;
+  gap: var(--space-1h) var(--space-2h);
   font-size: var(--fs-sm); color: var(--text-mute);
 }
-.match.bet .match-meta strong { color: var(--text); font-weight: var(--fw-heavy); font-size: var(--fs-md); }
-.match.bet .mm-sep { color: var(--line-strong); }
+.match.bet .mm-when {
+  display: inline-flex; align-items: center; gap: var(--space-2); min-width: 0;
+}
+.match.bet .match-meta strong { color: var(--text); font-weight: var(--fw-heavy); font-size: var(--fs-md); flex-shrink: 0; }
+.match.bet .mm-sep { color: var(--line-strong); flex-shrink: 0; }
+/* nome do estádio nunca quebra no meio; se faltar espaço, corta com reticências */
+.match.bet .mm-ground { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.match.bet .mm-tags {
+  display: inline-flex; align-items: center; flex-wrap: wrap;
+  gap: var(--space-1h) var(--space-2); margin-left: auto;
+}
 .match.bet .mm-nextday {
   font-size: var(--fs-2xs); font-weight: var(--fw-heavy); letter-spacing: var(--tracking-wide);
   color: var(--accent); background: var(--accent-dim);
@@ -706,11 +720,12 @@ em { font-style: normal; font-weight: var(--fw-medium); }
    sem o pill cheio (que não cabe na linha .when). Vira o dia = apito na madrugada. */
 .nd-moon { color: var(--accent); }
 .match.bet .match-grp {
-  margin-left: auto;
   font-size: var(--fs-2xs); letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--text-mute);
   background: var(--card-elev); border: 1px solid var(--line);
-  border-radius: var(--radius-pill); padding: var(--space-1) var(--space-2h);
+  border-radius: var(--radius-pill); padding: var(--space-1) var(--space-2h); white-space: nowrap;
 }
+/* selos de status (ao vivo / travado) são tokens inquebráveis dentro de .mm-tags */
+.match.bet .mm-tags .pill { white-space: nowrap; flex-shrink: 0; }
 .match.bet .team { font-size: 15px; }
 .match.bet .team.home { grid-area: home; justify-content: flex-end; }
 .match.bet .team.away { grid-area: away; justify-content: flex-start; }
@@ -732,6 +747,11 @@ em { font-style: normal; font-weight: var(--fw-medium); }
   .match.bet .score-sep { display: none; }
   .match.bet .team.home, .match.bet .team.away { justify-content: flex-start; }
   .match.bet .score-input { justify-self: end; }
+  /* Cards COM selo (status/vira-dia) alinham os selos à esquerda — mesma sangria
+     do estádio — pra um ritmo consistente quando quebram pra 2ª linha. Jogo aberto
+     (só o chip do grupo) mantém margin-left:auto → fica compacto à direita. */
+  .match.bet .mm-tags:has(.pill),
+  .match.bet .mm-tags:has(.mm-nextday) { margin-left: 0; }
 }
 
 /* ===== Card "próximo jogo" do Início (.match.next) — clicável =====

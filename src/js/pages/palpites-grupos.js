@@ -491,12 +491,16 @@ function renderPalpiteRow(m) {
   return `
     <div class="match bet ${locked ? 'locked' : ''}" data-match-id="${m.id}">
       <div class="match-meta">
-        <strong>${formatTime(m.match_date)}</strong>
-        <span class="mm-sep">·</span>
-        <span class="mm-ground">${escapeHtml(groundShort(m.ground))}</span>
-        ${nextDayNote}
-        ${status}
-        <span class="match-grp">Grupo ${m.group_name}</span>
+        <span class="mm-when">
+          <strong>${formatTime(m.match_date)}</strong>
+          <span class="mm-sep">·</span>
+          <span class="mm-ground">${escapeHtml(groundShort(m.ground))}</span>
+        </span>
+        <span class="mm-tags">
+          ${nextDayNote}
+          ${status}
+          <span class="match-grp">Grupo ${m.group_name}</span>
+        </span>
       </div>
       <div class="team home">
         <span class="flag">${flag(m.team_home)}</span>
