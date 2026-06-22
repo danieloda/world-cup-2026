@@ -536,9 +536,59 @@ function consensusHtml(m, bets, finished) {
 
   return `<div class="cons2">
     <div class="cons-h"><span class="ttl">Mais palpitados</span><span class="tot">${total} palpite${total > 1 ? 's' : ''}</span></div>
+    ${outcomeBarHtml(m, bets, finished)}
     <div class="cons-list">${rows}</div>
     ${youOut}
   </div>`;
+}
+
+// ----- Barra 1X2: quanto da galera apostou em vitória do mandante / empate /
+// vitória do visitante (resultado, sem placar). Antecede a lista de placares e
+// reusa a MESMA linguagem visual da barra de odds do Raio-X (verde casa · âmbar
+// empate · vermelho fora) — é a rima visual entre o que o MERCADO acha (Raio-X)
+// e o que a GALERA acha (aqui). Em jogo aberto, realça a maioria; em jogo
+// encerrado, o resultado que ACONTECEU brilha e os palpites perdedores recuam. -----
+function outcomeBarHtml(m, bets, finished) {
+  const counts = { home: 0, draw: 0, away: 0 };
+  for (const b of bets) {
+    const o = b.pred_home > b.pred_away ? 'home' : b.pred_home < b.pred_away ? 'away' : 'draw';
+    counts[o]++;
+  }
+  const total = bets.length;
+  const pct = o => Math.round((counts[o] / total) * 100);
+  const homePt = teamPt(m.team_home), awayPt = teamPt(m.team_away);
+  const nameOf = o => o === 'home' ? homePt : o === 'away' ? awayPt : 'empate';
+
+  const actual = finished
+    ? (m.actual_home > m.actual_away ? 'home' : m.actual_home < m.actual_away ? 'away' : 'draw')
+    : null;
+  // maioria da galera (jogo aberto) — desempate por ordem casa→empate→fora
+  const lead = ['home', 'draw', 'away'].reduce((a, b) => counts[b] > counts[a] ? b : a);
+
+  // Só os resultados com voto entram; índice serve pro reveal escalonado (tally).
+  // flex proporcional ao nº de palpites; o % vai DENTRO do segmento (igual rx-1x2).
+  const order = ['home', 'draw', 'away'].filter(o => counts[o] > 0);
+  const segs = order.map((o, i) => {
+    const mark = finished ? (o === actual ? ' is-actual' : ' is-dim') : (o === lead ? ' is-lead' : '');
+    return `<span class="rx-1x2-seg ${o}${mark}" style="flex:${counts[o]};animation-delay:${i * 80}ms">${pct(o)}%</span>`;
+  }).join('');
+
+  const verdict = finished
+    ? `<div class="cons-1x2-verdict ${actual}"><span class="v-ic">${ICON.check}</span>Deu ${actual === 'draw' ? '<b>empate</b>' : `<b>${escapeHtml(nameOf(actual))}</b>`}</div>`
+    : `<div class="cons-1x2-verdict ${lead}">Maioria ${lead === 'draw' ? 'no <b>empate</b>' : `na vitória de <b>${escapeHtml(nameOf(lead))}</b>`}</div>`;
+
+  return `
+    <div class="cons-1x2">
+      <div class="rx-1x2-head">
+        <span class="rx-1x2-team home"><span class="flag">${flag(m.team_home)}</span>${escapeHtml(homePt)}</span>
+        <span class="rx-1x2-draw">resultado</span>
+        <span class="rx-1x2-team away">${escapeHtml(awayPt)}<span class="flag">${flag(m.team_away)}</span></span>
+      </div>
+      <div class="rx-1x2-bar" role="img" aria-label="${pct('home')}% vitória ${escapeHtml(homePt)}, ${pct('draw')}% empate, ${pct('away')}% vitória ${escapeHtml(awayPt)}">
+        ${segs}
+      </div>
+      ${verdict}
+    </div>`;
 }
 
 // ----- Raio-X: tiers (cravaram / acertaram vencedor / não pontuaram) -----
@@ -578,10 +628,14 @@ function tierHtml(m, level, label, list, flat) {
     </details>`;
 }
 
-// "Você" sempre primeiro; depois ordem alfabética
+// "Você" sempre primeiro; depois pela POSIÇÃO no ranking do bolão (1º no topo),
+// pra cada subgrupo de placar ler do mais bem colocado pro último. Sem posição
+// (defensivo — todo pago tem) cai pro fim; nome desempata empates de posição.
 function sortMeFirst(list) {
+  const rank = id => posByUser.get(id) ?? Infinity;
   return [...list].sort((a, b) =>
     (b.user_id === profile.id) - (a.user_id === profile.id)
+    || rank(a.user_id) - rank(b.user_id)
     || (a.profiles?.full_name || '').localeCompare(b.profiles?.full_name || ''));
 }
 // Badge da posição atual no ranking, ao lado do nome. Pódio (1–3) = ouro/prata/bronze.

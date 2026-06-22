@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>1X2 da galera — verificação visual</title>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="../../../src/css/app.css" rel="stylesheet">
+<style>
+  body { background: var(--bg, #0c0c0c); padding: 32px; }
+  .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 460px)); gap: 28px; align-items: start; }
+  .lab { font: 800 11px/1 'Figtree'; letter-spacing: .12em; text-transform: uppercase; color: var(--text-mute); margin: 0 0 10px 2px; }
+  h1 { font: 900 22px/1 'Figtree'; color: var(--text); margin: 0 0 24px; }
+  .rcard { background: var(--card, #141414); border: 1px solid var(--line); border-radius: 16px; padding: 16px; }
+</style>
+</head>
+<body>
+<h1>Barra 1X2 da galera · estados</h1>
+<div class="grid">
+
+  <!-- 1) Aguardando (lacrado) — Jordânia × Argélia, igual ao print -->
+  <div>
+    <p class="lab">Próxima partida (aguardando)</p>
+    <div class="rcard">
+      <div class="cons2">
+        <div class="cons-h"><span class="ttl">Mais palpitados</span><span class="tot">76 palpites</span></div>
+        <div class="cons-1x2">
+          <div class="rx-1x2-head">
+            <span class="rx-1x2-team home"><span class="flag"><span class="fi fi-jo"></span></span>Jordânia</span>
+            <span class="rx-1x2-draw">resultado</span>
+            <span class="rx-1x2-team away">Argélia<span class="flag"><span class="fi fi-dz"></span></span></span>
+          </div>
+          <div class="rx-1x2-bar" role="img" aria-label="16% Jordânia, 24% empate, 60% Argélia">
+            <span class="rx-1x2-seg home" style="flex:12;animation-delay:0ms">16%</span>
+            <span class="rx-1x2-seg draw" style="flex:18;animation-delay:80ms">24%</span>
+            <span class="rx-1x2-seg away is-lead" style="flex:46;animation-delay:160ms">60%</span>
+          </div>
+          <div class="cons-1x2-verdict away">Maioria na vitória de <b>Argélia</b></div>
+        </div>
+        <div class="cons-list">
+          <div class="crow lead"><span class="crank">1</span><span class="sl">0<span class="x">–</span>1</span><span class="ctrack"><span class="cfill" style="width:100%"></span></span><span class="ccount"><b>33</b><span>43%</span></span></div>
+          <div class="crow"><span class="crank">2</span><span class="sl">1<span class="x">–</span>2</span><span class="ctrack"><span class="cfill" style="width:58%"></span></span><span class="ccount"><b>19</b><span>25%</span></span></div>
+          <div class="crow"><span class="crank">3</span><span class="sl">1<span class="x">–</span>1</span><span class="ctrack"><span class="cfill" style="width:30%"></span></span><span class="ccount"><b>10</b><span>13%</span></span></div>
+          <div class="crow"><span class="crank">4</span><span class="sl">0<span class="x">–</span>2</span><span class="ctrack"><span class="cfill" style="width:15%"></span></span><span class="ccount"><b>5</b><span>6%</span></span></div>
+        </div>
+        <div class="cons-you"><div class="crow you"><span class="cyou-lbl">Você</span><span class="sl">0<span class="x">–</span>1</span><span class="ctrack"><span class="cfill" style="width:58%"></span></span><span class="ccount"><b>19</b><span>25%</span></span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2) Encerrado — vitória do mandante -->
+  <div>
+    <p class="lab">Encerrado · deu mandante</p>
+    <div class="rcard">
+      <div class="cons2">
+        <div class="cons-h"><span class="ttl">Mais palpitados</span><span class="tot">62 palpites</span></div>
+        <div class="cons-1x2">
+          <div class="rx-1x2-head">
+            <span class="rx-1x2-team home"><span class="flag"><span class="fi fi-br"></span></span>Brasil</span>
+            <span class="rx-1x2-draw">resultado</span>
+            <span class="rx-1x2-team away">Croácia<span class="flag"><span class="fi fi-hr"></span></span></span>
+          </div>
+          <div class="rx-1x2-bar" role="img" aria-label="61% Brasil, 24% empate, 15% Croácia">
+            <span class="rx-1x2-seg home is-actual" style="flex:38;animation-delay:0ms">61%</span>
+            <span class="rx-1x2-seg draw is-dim" style="flex:15;animation-delay:80ms">24%</span>
+            <span class="rx-1x2-seg away is-dim" style="flex:9;animation-delay:160ms">15%</span>
+          </div>
+          <div class="cons-1x2-verdict home"><span class="v-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>Deu <b>Brasil</b></div>
+        </div>
+        <div class="cons-list">
+          <div class="crow hit"><span class="crank">1</span><span class="sl">2<span class="x">–</span>1</span><span class="ctrack"><span class="cfill" style="width:100%"></span></span><span class="ccount"><b>19</b><span>31%</span></span></div>
+          <div class="crow"><span class="crank">2</span><span class="sl">2<span class="x">–</span>0</span><span class="ctrack"><span class="cfill" style="width:63%"></span></span><span class="ccount"><b>12</b><span>19%</span></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3) Encerrado — empate -->
+  <div>
+    <p class="lab">Encerrado · deu empate</p>
+    <div class="rcard">
+      <div class="cons2">
+        <div class="cons-h"><span class="ttl">Mais palpitados</span><span class="tot">54 palpites</span></div>
+        <div class="cons-1x2">
+          <div class="rx-1x2-head">
+            <span class="rx-1x2-team home"><span class="flag"><span class="fi fi-pt"></span></span>Portugal</span>
+            <span class="rx-1x2-draw">resultado</span>
+            <span class="rx-1x2-team away">Espanha<span class="flag"><span class="fi fi-es"></span></span></span>
+          </div>
+          <div class="rx-1x2-bar" role="img" aria-label="33% Portugal, 31% empate, 36% Espanha">
+            <span class="rx-1x2-seg home is-dim" style="flex:18;animation-delay:0ms">33%</span>
+            <span class="rx-1x2-seg draw is-actual" style="flex:17;animation-delay:80ms">31%</span>
+            <span class="rx-1x2-seg away is-dim" style="flex:19;animation-delay:160ms">36%</span>
+          </div>
+          <div class="cons-1x2-verdict draw"><span class="v-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>Deu <b>empate</b></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4) Encerrado — vitória do visitante, com segmento estreito (edge) -->
+  <div>
+    <p class="lab">Encerrado · deu visitante (segmento estreito)</p>
+    <div class="rcard">
+      <div class="cons2">
+        <div class="cons-h"><span class="ttl">Mais palpitados</span><span class="tot">48 palpites</span></div>
+        <div class="cons-1x2">
+          <div class="rx-1x2-head">
+            <span class="rx-1x2-team home"><span class="flag"><span class="fi fi-mx"></span></span>México</span>
+            <span class="rx-1x2-draw">resultado</span>
+            <span class="rx-1x2-team away">Argentina<span class="flag"><span class="fi fi-ar"></span></span></span>
+          </div>
+          <div class="rx-1x2-bar" role="img" aria-label="71% México, 21% empate, 8% Argentina">
+            <span class="rx-1x2-seg home is-dim" style="flex:34;animation-delay:0ms">71%</span>
+            <span class="rx-1x2-seg draw is-dim" style="flex:10;animation-delay:80ms">21%</span>
+            <span class="rx-1x2-seg away is-actual" style="flex:4;animation-delay:160ms">8%</span>
+          </div>
+          <div class="cons-1x2-verdict away"><span class="v-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>Deu <b>Argentina</b></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
