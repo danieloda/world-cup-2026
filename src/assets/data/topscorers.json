@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-22T16:11:35.587Z",
+  "updated_at": "2026-06-22T19:48:52.374Z",
   "season": 2026,
   "scorers": [
     {
@@ -91,17 +91,17 @@
       "minutes": 84
     },
     {
-      "api_id": 278,
-      "name": "Kylian Mbappé",
-      "team": "France",
+      "api_id": 1100,
+      "name": "E. Haaland",
+      "team": "Norway",
       "goals": 2,
       "assists": 0,
       "minutes": 90
     },
     {
-      "api_id": 1100,
-      "name": "E. Haaland",
-      "team": "Norway",
+      "api_id": 278,
+      "name": "Kylian Mbappé",
+      "team": "France",
       "goals": 2,
       "assists": 0,
       "minutes": 90
