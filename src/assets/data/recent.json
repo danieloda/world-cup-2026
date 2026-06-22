@@ -76,7 +76,7 @@
       "2026-06-22",
       "Austria",
       true,
-      "1-0",
+      "2-0",
       "World Cup"
     ],
     [
@@ -220,7 +220,7 @@
       "2026-06-22",
       "Argentina",
       false,
-      "0-1",
+      "0-2",
       "World Cup"
     ],
     [
@@ -1081,6 +1081,13 @@
   ],
   "France": [
     [
+      "2026-06-22",
+      "Iraq",
+      true,
+      "1-0",
+      "World Cup"
+    ],
+    [
       "2026-06-16",
       "Senegal",
       true,
@@ -1141,13 +1148,6 @@
       "Azerbaijan",
       true,
       "3-0",
-      "Eliminatórias"
-    ],
-    [
-      "2025-09-09",
-      "Iceland",
-      true,
-      "2-1",
       "Eliminatórias"
     ]
   ],
@@ -1441,6 +1441,13 @@
   ],
   "Iraq": [
     [
+      "2026-06-22",
+      "France",
+      false,
+      "0-1",
+      "World Cup"
+    ],
+    [
       "2026-06-16",
       "Norway",
       true,
@@ -1502,13 +1509,6 @@
       true,
       "2-1",
       "Arab Cup"
-    ],
-    [
-      "2025-11-18",
-      "United Arab Emirates",
-      true,
-      "2-1",
-      "Eliminatórias"
     ]
   ],
   "Ivory Coast": [
