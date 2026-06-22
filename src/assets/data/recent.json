@@ -937,6 +937,13 @@
   ],
   "Egypt": [
     [
+      "2026-06-22",
+      "New Zealand",
+      false,
+      "3-1",
+      "World Cup"
+    ],
+    [
       "2026-06-15",
       "Belgium",
       false,
@@ -997,13 +1004,6 @@
       "Benin",
       true,
       "3-1",
-      "Copa Africana"
-    ],
-    [
-      "2025-12-29",
-      "Angola",
-      false,
-      "0-0",
       "Copa Africana"
     ]
   ],
@@ -1945,6 +1945,13 @@
   ],
   "New Zealand": [
     [
+      "2026-06-22",
+      "Egypt",
+      true,
+      "1-3",
+      "World Cup"
+    ],
+    [
       "2026-06-16",
       "Iran",
       false,
@@ -2005,13 +2012,6 @@
       "Poland",
       false,
       "0-1",
-      "Amistoso"
-    ],
-    [
-      "2025-09-09",
-      "Australia",
-      true,
-      "1-3",
       "Amistoso"
     ]
   ],
@@ -3100,7 +3100,7 @@
       "2026-06-21",
       "Cape Verde Islands",
       true,
-      "0-1",
+      "2-2",
       "World Cup"
     ],
     [
@@ -3316,7 +3316,7 @@
       "2026-06-21",
       "Uruguay",
       false,
-      "1-0",
+      "2-2",
       "World Cup"
     ],
     [
