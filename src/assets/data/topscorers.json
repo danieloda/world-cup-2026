@@ -1,7 +1,15 @@
 {
-  "updated_at": "2026-06-23T01:49:15.474Z",
+  "updated_at": "2026-06-23T06:10:37.366Z",
   "season": 2026,
   "scorers": [
+    {
+      "api_id": 154,
+      "name": "L. Messi",
+      "team": "Argentina",
+      "goals": 5,
+      "assists": 0,
+      "minutes": 175
+    },
     {
       "api_id": 26475,
       "name": "D. Undav",
@@ -9,14 +17,6 @@
       "goals": 3,
       "assists": 2,
       "minutes": 56
-    },
-    {
-      "api_id": 154,
-      "name": "L. Messi",
-      "team": "Argentina",
-      "goals": 3,
-      "assists": 0,
-      "minutes": 80
     },
     {
       "api_id": 8489,
