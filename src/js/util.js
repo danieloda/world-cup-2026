@@ -75,6 +75,22 @@ export function flag(team) {
 }
 
 /**
+ * Rótulo curto de uma vaga de mata-mata ainda indefinida (slot), pra exibir onde
+ * não há bandeira (ex.: banner de "jogos travam"): "2A" → "2º A",
+ * "3A/B/C/D/F" → "3º", "W73" → "Venc. M73", "L101" → "Perd. M101".
+ * Standalone (sem estado de módulo), ao contrário do teamDisplay da página Mata-mata.
+ */
+export function slotShortLabel(slot) {
+  const s = String(slot ?? '');
+  let m;
+  if ((m = /^(\d)([A-L])$/.exec(s))) return `${m[1]}º ${m[2]}`;
+  if (/^3[A-Z/]+$/.test(s)) return '3º';
+  if ((m = /^W(\d+)$/.exec(s))) return `Venc. M${m[1]}`;
+  if ((m = /^L(\d+)$/.exec(s))) return `Perd. M${m[1]}`;
+  return s;
+}
+
+/**
  * Retorna emoji unicode da bandeira — pra usar em <option> onde HTML não renderiza.
  * Pares de regional indicators (A-Z → U+1F1E6 - U+1F1FF). Códigos compostos (gb-wls)
  * fallback pra 🏴.

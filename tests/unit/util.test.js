@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   flag,
+  slotShortLabel,
   decodeHtmlEntities,
   teamPt,
   groundPt,
@@ -48,6 +49,31 @@ describe('flag', () => {
   it('handles null/undefined', () => {
     expect(flag(null)).toBe('<span class="fi fi-xx"></span>');
     expect(flag(undefined)).toBe('<span class="fi fi-xx"></span>');
+  });
+});
+
+describe('slotShortLabel', () => {
+  // Vagas de mata-mata ainda indefinidas no banner de "jogos travam":
+  // sem bandeira, mostra o rótulo curto da vaga.
+  it('formata posição+grupo (ex.: 2A → "2º A")', () => {
+    expect(slotShortLabel('2A')).toBe('2º A');
+    expect(slotShortLabel('1E')).toBe('1º E');
+  });
+
+  it('encurta os melhores terceiros (3A/B/C/D/F → "3º")', () => {
+    expect(slotShortLabel('3A/B/C/D/F')).toBe('3º');
+    expect(slotShortLabel('3C/E/F/H/I')).toBe('3º');
+  });
+
+  it('rotula vencedor/perdedor de jogo (W73 / L101)', () => {
+    expect(slotShortLabel('W73')).toBe('Venc. M73');
+    expect(slotShortLabel('L101')).toBe('Perd. M101');
+  });
+
+  it('devolve a string crua quando não reconhece (inclui time real)', () => {
+    expect(slotShortLabel('Brazil')).toBe('Brazil');
+    expect(slotShortLabel('')).toBe('');
+    expect(slotShortLabel(null)).toBe('');
   });
 });
 

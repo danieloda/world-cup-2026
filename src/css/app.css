@@ -6733,6 +6733,14 @@ input[type="number"].score-input {
 .la-game-teams .flag { width: 18px; height: 13px; border-radius: 2px; overflow: hidden; }
 .la-game-teams .flag img,
 .la-game-teams .flag .fi { width: 18px !important; height: 13px !important; border-radius: 2px; }
+/* Vaga de mata-mata sem time definido: chip com o rótulo da vaga em vez da bandeira */
+.la-slot {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 18px; height: 15px; padding: 0 var(--space-1);
+  border-radius: 3px; background: rgba(255, 255, 255, .08);
+  color: var(--text-dim); font: var(--fw-bold) var(--fs-2xs)/1 var(--font);
+  white-space: nowrap;
+}
 .la-vs { color: var(--text-mute); font-size: var(--fs-2xs); font-weight: var(--fw-bold); }
 .la-game-clock { color: var(--text-dim); font-weight: var(--fw-bold); font-variant-numeric: tabular-nums; }
 .la-more { font-size: var(--fs-sm); color: var(--text-mute); font-weight: var(--fw-medium); padding-left: var(--space-0); }

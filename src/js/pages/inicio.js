@@ -7,8 +7,9 @@ import { loadLockAlerts } from '../lock-alerts.js';
 import {
   flag, escapeHtml, greeting, firstName, daysToKickoffLabel, brDayWindowUtc,
   formatBrDate, formatTime, lockCountdownLabel, stageLabel, isLive,
-  teamPt, groundShort, heroMeta,
+  teamPt, groundShort, heroMeta, slotShortLabel,
 } from '../util.js';
+import { isRealTeam } from '../bracket.js';
 import { renderJourneyChart } from '../journey-chart.js';
 import { loadProgression, demoProgression } from '../progression.js';
 import { startAutoRefresh } from '../auto-refresh.js';
@@ -122,6 +123,15 @@ function startCountdown() {
   setInterval(tick, 1000);
 }
 
+// Lado de um confronto no chip do banner: bandeira quando o time já é real;
+// rótulo da vaga (ex.: "2º A", "3º") quando é mata-mata ainda indefinido — aí
+// não há bandeira e o fi-xx aparecia como quadrado branco quebrado.
+function lockTeamMark(name) {
+  return isRealTeam(name)
+    ? `<span class="flag">${flag(name)}</span>`
+    : `<span class="la-slot">${escapeHtml(slotShortLabel(name))}</span>`;
+}
+
 // Banner de alerta: jogos pendentes (sem palpite) perto do bloqueio.
 // Vermelho + pulso quando há algo travando em <48h; âmbar quando só <1 semana.
 // Some por completo quando não há nada pendente na janela.
@@ -145,9 +155,9 @@ function renderLockBanner() {
   const chips = a.matches.slice(0, 3).map(m => `
     <div class="la-game">
       <span class="la-game-teams">
-        <span class="flag">${flag(m.team_home)}</span>
+        ${lockTeamMark(m.team_home)}
         <span class="la-vs">×</span>
-        <span class="flag">${flag(m.team_away)}</span>
+        ${lockTeamMark(m.team_away)}
       </span>
       <span class="la-game-clock">${lockCountdownLabel(m.match_date)}</span>
     </div>
