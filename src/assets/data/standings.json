@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-23T05:37:26.630Z",
+  "updated_at": "2026-06-23T08:45:36.964Z",
   "season": 2026,
   "groups": {
     "A": [
@@ -517,29 +517,29 @@
       },
       {
         "rank": 3,
-        "team": "Jordan",
-        "played": 1,
-        "win": 0,
+        "team": "Algeria",
+        "played": 2,
+        "win": 1,
         "draw": 0,
         "lose": 1,
-        "gf": 1,
-        "ga": 3,
+        "gf": 2,
+        "ga": 4,
         "gd": -2,
-        "points": 0,
-        "form": "L"
+        "points": 3,
+        "form": "WL"
       },
       {
         "rank": 4,
-        "team": "Algeria",
-        "played": 1,
+        "team": "Jordan",
+        "played": 2,
         "win": 0,
         "draw": 0,
-        "lose": 1,
-        "gf": 0,
-        "ga": 3,
+        "lose": 2,
+        "gf": 2,
+        "ga": 5,
         "gd": -3,
         "points": 0,
-        "form": "L"
+        "form": "LL"
       }
     ],
     "K": [
