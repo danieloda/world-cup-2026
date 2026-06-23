@@ -345,13 +345,15 @@ function renderVaga() {
 function renderPenaltis() {
   return section('penaltis', `
     <p class="rules-p">
-      Se você acha que um jogo de mata-mata vai terminar <strong>empatado</strong>, escolha também
-      <strong>quem passa nos pênaltis</strong>. Essa escolha define o "vencedor" do seu palpite.
+      No mata-mata, jogo empatado vai para a <strong>prorrogação</strong> — e o que conta para os seus
+      pontos é o <strong>placar ao final da prorrogação</strong> (os gols dos 30 minutos extras
+      <strong>valem</strong>). Se ainda assim o jogo terminar empatado, escolha também
+      <strong>quem passa nos pênaltis</strong>: essa escolha define o "vencedor" do seu palpite.
     </p>
     <ul class="rules-list">
-      <li>Vale o <strong>placar do tempo normal</strong> para os pontos de gols e de diferença.</li>
-      <li>Se você cravar o placar do tempo normal, leva o <strong>placar exato</strong> — mesmo que erre quem ganhou nos pênaltis.</li>
-      <li>Na fase de grupos não há pênaltis: empate é empate.</li>
+      <li>Vale o <strong>placar ao final da prorrogação</strong> (já com os gols dos 30 min extras) para os pontos de gols e de diferença.</li>
+      <li>Se você cravar esse placar, leva o <strong>placar exato</strong> — mesmo que erre quem ganhou nos pênaltis.</li>
+      <li>Na fase de grupos não há prorrogação nem pênaltis: empate é empate.</li>
     </ul>
   `);
 }

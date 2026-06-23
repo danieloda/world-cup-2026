@@ -55,7 +55,7 @@ export function matchPoints(stage) {
  * Each correct component SUMS:
  *   - +ag  for each side whose goal count is exactly right (0, 1 or 2 sides)
  *   - +ave if the winner/draw is right (KO draw by pen winner) OR the score is
- *          exact — cravar o placar do tempo normal vale o resultado mesmo com pênalti errado
+ *          exact — cravar o placar ao final da prorrogação vale o resultado mesmo com pênalti errado
  *   - +dg  if the goal difference is right (includes 0-diff draws)
  * So a perfect score = 2*ag + ave + dg.
  *
@@ -79,9 +79,9 @@ export function scorePrediction(predHome, predAway, predPen, actualHome, actualA
   if (predHome === actualHome) pts += ag;
   if (predAway === actualAway) pts += ag;
 
-  // AVE — winner / draw. Cravar o placar do tempo normal (gols dos dois lados
-  // iguais ao real) garante o ponto de RESULTADO mesmo errando o pênalti — a
-  // regra promete "placar exato" a quem crava (ver regras.html#penaltis).
+  // AVE — winner / draw. Cravar o placar ao final da prorrogação (gols dos dois
+  // lados iguais ao real) garante o ponto de RESULTADO mesmo errando o pênalti —
+  // a regra promete "placar exato" a quem crava (ver regras.html#penaltis).
   const isExactScore = predHome === actualHome && predAway === actualAway;
   const predWinner = determineWinner(predHome, predAway, predPen, stage);
   const actualWinner = determineWinner(actualHome, actualAway, actualPen, stage);
