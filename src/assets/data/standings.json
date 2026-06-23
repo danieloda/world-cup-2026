@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-23T22:02:06.417Z",
+  "updated_at": "2026-06-23T23:18:39.806Z",
   "season": 2026,
   "groups": {
     "A": [
@@ -600,28 +600,28 @@
       {
         "rank": 1,
         "team": "England",
-        "played": 1,
+        "played": 2,
         "win": 1,
-        "draw": 0,
+        "draw": 1,
         "lose": 0,
         "gf": 4,
         "ga": 2,
         "gd": 2,
-        "points": 3,
-        "form": "W"
+        "points": 4,
+        "form": "DW"
       },
       {
         "rank": 2,
         "team": "Ghana",
-        "played": 1,
+        "played": 2,
         "win": 1,
-        "draw": 0,
+        "draw": 1,
         "lose": 0,
         "gf": 1,
         "ga": 0,
         "gd": 1,
-        "points": 3,
-        "form": "W"
+        "points": 4,
+        "form": "DW"
       },
       {
         "rank": 3,
