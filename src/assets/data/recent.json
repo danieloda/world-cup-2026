@@ -1009,6 +1009,13 @@
   ],
   "England": [
     [
+      "2026-06-23",
+      "Ghana",
+      true,
+      "0-0",
+      "World Cup"
+    ],
+    [
       "2026-06-17",
       "Croatia",
       true,
@@ -1070,13 +1077,6 @@
       true,
       "3-0",
       "Amistoso"
-    ],
-    [
-      "2025-09-09",
-      "Serbia",
-      false,
-      "5-0",
-      "Eliminatórias"
     ]
   ],
   "France": [
@@ -1225,6 +1225,13 @@
   ],
   "Ghana": [
     [
+      "2026-06-23",
+      "England",
+      false,
+      "0-0",
+      "World Cup"
+    ],
+    [
       "2026-06-17",
       "Panama",
       true,
@@ -1285,13 +1292,6 @@
       "Central African Republic",
       false,
       "5-0",
-      "Eliminatórias"
-    ],
-    [
-      "2025-09-08",
-      "Mali",
-      true,
-      "1-0",
       "Eliminatórias"
     ]
   ],
@@ -2233,6 +2233,13 @@
   ],
   "Portugal": [
     [
+      "2026-06-23",
+      "Uzbekistan",
+      true,
+      "5-0",
+      "World Cup"
+    ],
+    [
       "2026-06-17",
       "Congo DR",
       true,
@@ -2293,13 +2300,6 @@
       "Rep. Of Ireland",
       true,
       "1-0",
-      "Eliminatórias"
-    ],
-    [
-      "2025-09-09",
-      "Hungary",
-      false,
-      "3-2",
       "Eliminatórias"
     ]
   ],
@@ -3169,6 +3169,13 @@
   ],
   "Uzbekistan": [
     [
+      "2026-06-23",
+      "Portugal",
+      false,
+      "0-5",
+      "World Cup"
+    ],
+    [
       "2026-06-18",
       "Colombia",
       true,
@@ -3229,13 +3236,6 @@
       "Egypt",
       true,
       "2-0",
-      "Amistoso"
-    ],
-    [
-      "2025-10-13",
-      "Uruguay",
-      true,
-      "1-2",
       "Amistoso"
     ]
   ],
