@@ -1,6 +1,13 @@
 {
   "Algeria": [
     [
+      "2026-06-23",
+      "Jordan",
+      false,
+      "1-1",
+      "World Cup"
+    ],
+    [
       "2026-06-17",
       "Argentina",
       false,
@@ -61,13 +68,6 @@
       "Burkina Faso",
       true,
       "1-0",
-      "Copa Africana"
-    ],
-    [
-      "2025-12-24",
-      "Sudan",
-      true,
-      "3-0",
       "Copa Africana"
     ]
   ],
@@ -1084,7 +1084,7 @@
       "2026-06-22",
       "Iraq",
       true,
-      "1-0",
+      "3-0",
       "World Cup"
     ],
     [
@@ -1444,7 +1444,7 @@
       "2026-06-22",
       "France",
       false,
-      "0-1",
+      "0-3",
       "World Cup"
     ],
     [
@@ -1657,6 +1657,13 @@
   ],
   "Jordan": [
     [
+      "2026-06-23",
+      "Algeria",
+      true,
+      "1-1",
+      "World Cup"
+    ],
+    [
       "2026-06-17",
       "Austria",
       false,
@@ -1717,13 +1724,6 @@
       "Egypt",
       false,
       "3-0",
-      "Arab Cup"
-    ],
-    [
-      "2025-12-06",
-      "Kuwait",
-      false,
-      "3-1",
       "Arab Cup"
     ]
   ],
@@ -2017,6 +2017,13 @@
   ],
   "Norway": [
     [
+      "2026-06-23",
+      "Senegal",
+      true,
+      "3-2",
+      "World Cup"
+    ],
+    [
       "2026-06-16",
       "Iraq",
       false,
@@ -2077,13 +2084,6 @@
       "Israel",
       true,
       "5-0",
-      "Eliminatórias"
-    ],
-    [
-      "2025-09-09",
-      "Moldova",
-      true,
-      "11-1",
       "Eliminatórias"
     ]
   ],
@@ -2521,6 +2521,13 @@
   ],
   "Senegal": [
     [
+      "2026-06-23",
+      "Norway",
+      false,
+      "2-3",
+      "World Cup"
+    ],
+    [
       "2026-06-16",
       "France",
       false,
@@ -2581,13 +2588,6 @@
       "Sudan",
       true,
       "3-1",
-      "Copa Africana"
-    ],
-    [
-      "2025-12-30",
-      "Benin",
-      false,
-      "3-0",
       "Copa Africana"
     ]
   ],
