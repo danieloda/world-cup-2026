@@ -351,6 +351,20 @@
         "champion_picks": 76,
         "scorer_picks": 76
       }
+    },
+    {
+      "seq": 26,
+      "file": "snapshots/0026_2026-06-23T06-57-17-878Z.json",
+      "taken_at": "2026-06-23T06:57:17.878Z",
+      "content_hash": "fdc4a2fb5240153d28d1157d544fb8fdf1e250d73935d445fa7e22b179616d7f",
+      "prev_chain_hash": "05b5424b78bb4a1c4881bea3281cf008d87d1cf25a568c962b47e2a2aeebf4eb",
+      "chain_hash": "208db8e6e7475829c51cd707b79dcc4af095503834797ea408a2a0a0628e269a",
+      "counts": {
+        "locked_matches": 48,
+        "predictions": 3637,
+        "champion_picks": 76,
+        "scorer_picks": 76
+      }
     }
   ]
 }
