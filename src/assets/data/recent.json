@@ -361,6 +361,13 @@
   ],
   "Bosnia & Herzegovina": [
     [
+      "2026-06-24",
+      "Qatar",
+      true,
+      "2-1",
+      "World Cup"
+    ],
+    [
       "2026-06-18",
       "Switzerland",
       false,
@@ -422,13 +429,6 @@
       false,
       "4-1",
       "Amistoso"
-    ],
-    [
-      "2025-10-09",
-      "Cyprus",
-      false,
-      "2-2",
-      "Eliminatórias"
     ]
   ],
   "Brazil": [
@@ -505,6 +505,13 @@
   ],
   "Canada": [
     [
+      "2026-06-24",
+      "Switzerland",
+      false,
+      "0-1",
+      "World Cup"
+    ],
+    [
       "2026-06-18",
       "Qatar",
       true,
@@ -563,13 +570,6 @@
     [
       "2025-11-14",
       "Ecuador",
-      true,
-      "0-0",
-      "Amistoso"
-    ],
-    [
-      "2025-10-15",
-      "Colombia",
       true,
       "0-0",
       "Amistoso"
@@ -2305,6 +2305,13 @@
   ],
   "Qatar": [
     [
+      "2026-06-24",
+      "Bosnia & Herzegovina",
+      false,
+      "1-2",
+      "World Cup"
+    ],
+    [
       "2026-06-18",
       "Canada",
       false,
@@ -2365,13 +2372,6 @@
       "United Arab Emirates",
       true,
       "2-1",
-      "Eliminatórias"
-    ],
-    [
-      "2025-10-08",
-      "Oman",
-      false,
-      "0-0",
       "Eliminatórias"
     ]
   ],
@@ -2881,6 +2881,13 @@
   ],
   "Switzerland": [
     [
+      "2026-06-24",
+      "Canada",
+      true,
+      "1-0",
+      "World Cup"
+    ],
+    [
       "2026-06-18",
       "Bosnia & Herzegovina",
       true,
@@ -2941,13 +2948,6 @@
       "Slovenia",
       false,
       "0-0",
-      "Eliminatórias"
-    ],
-    [
-      "2025-10-10",
-      "Sweden",
-      false,
-      "2-0",
       "Eliminatórias"
     ]
   ],
