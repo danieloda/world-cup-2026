@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-24T23:51:43.441Z",
+  "updated_at": "2026-06-25T02:45:59.119Z",
   "season": 2026,
   "groups": {
     "A": [
@@ -114,54 +114,54 @@
       {
         "rank": 1,
         "team": "Brazil",
-        "played": 2,
-        "win": 1,
+        "played": 3,
+        "win": 2,
         "draw": 1,
         "lose": 0,
-        "gf": 4,
+        "gf": 7,
         "ga": 1,
-        "gd": 3,
-        "points": 4,
-        "form": "WD"
+        "gd": 6,
+        "points": 7,
+        "form": "WWD"
       },
       {
         "rank": 2,
         "team": "Morocco",
-        "played": 2,
-        "win": 1,
+        "played": 3,
+        "win": 2,
         "draw": 1,
         "lose": 0,
-        "gf": 2,
-        "ga": 1,
-        "gd": 1,
-        "points": 4,
-        "form": "WD"
+        "gf": 6,
+        "ga": 3,
+        "gd": 3,
+        "points": 7,
+        "form": "WWD"
       },
       {
         "rank": 3,
         "team": "Scotland",
-        "played": 2,
+        "played": 3,
         "win": 1,
         "draw": 0,
-        "lose": 1,
+        "lose": 2,
         "gf": 1,
-        "ga": 1,
-        "gd": 0,
+        "ga": 4,
+        "gd": -3,
         "points": 3,
-        "form": "LW"
+        "form": "LLW"
       },
       {
         "rank": 4,
         "team": "Haiti",
-        "played": 2,
+        "played": 3,
         "win": 0,
         "draw": 0,
-        "lose": 2,
-        "gf": 0,
-        "ga": 4,
-        "gd": -4,
+        "lose": 3,
+        "gf": 2,
+        "ga": 8,
+        "gd": -6,
         "points": 0,
-        "form": "LL"
+        "form": "LLL"
       }
     ],
     "D": [
