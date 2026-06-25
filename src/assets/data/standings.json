@@ -1,59 +1,59 @@
 {
-  "updated_at": "2026-06-25T02:45:59.119Z",
+  "updated_at": "2026-06-25T06:35:34.821Z",
   "season": 2026,
   "groups": {
     "A": [
       {
         "rank": 1,
         "team": "Mexico",
-        "played": 2,
-        "win": 2,
+        "played": 3,
+        "win": 3,
         "draw": 0,
         "lose": 0,
-        "gf": 3,
+        "gf": 6,
         "ga": 0,
-        "gd": 3,
-        "points": 6,
-        "form": "WW"
+        "gd": 6,
+        "points": 9,
+        "form": "WWW"
       },
       {
         "rank": 2,
-        "team": "South Korea",
-        "played": 2,
+        "team": "South Africa",
+        "played": 3,
         "win": 1,
-        "draw": 0,
-        "lose": 1,
-        "gf": 2,
-        "ga": 2,
-        "gd": 0,
-        "points": 3,
-        "form": "LW"
-      },
-      {
-        "rank": 3,
-        "team": "Czech Republic",
-        "played": 2,
-        "win": 0,
         "draw": 1,
         "lose": 1,
         "gf": 2,
         "ga": 3,
         "gd": -1,
-        "points": 1,
-        "form": "DL"
+        "points": 4,
+        "form": "WDL"
+      },
+      {
+        "rank": 3,
+        "team": "South Korea",
+        "played": 3,
+        "win": 1,
+        "draw": 0,
+        "lose": 2,
+        "gf": 2,
+        "ga": 3,
+        "gd": -1,
+        "points": 3,
+        "form": "LLW"
       },
       {
         "rank": 4,
-        "team": "South Africa",
-        "played": 2,
+        "team": "Czech Republic",
+        "played": 3,
         "win": 0,
         "draw": 1,
-        "lose": 1,
-        "gf": 1,
-        "ga": 3,
-        "gd": -2,
+        "lose": 2,
+        "gf": 2,
+        "ga": 6,
+        "gd": -4,
         "points": 1,
-        "form": "DL"
+        "form": "LDL"
       }
     ],
     "B": [
