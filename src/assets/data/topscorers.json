@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-25T05:46:45.639Z",
+  "updated_at": "2026-06-25T09:27:37.942Z",
   "season": 2026,
   "scorers": [
     {
@@ -9,6 +9,14 @@
       "goals": 5,
       "assists": 0,
       "minutes": 170
+    },
+    {
+      "api_id": 762,
+      "name": "Vinícius Júnior",
+      "team": "Brazil",
+      "goals": 4,
+      "assists": 1,
+      "minutes": 264
     },
     {
       "api_id": 278,
@@ -35,12 +43,36 @@
       "minutes": 56
     },
     {
+      "api_id": 406244,
+      "name": "J. Manzambi",
+      "team": "Switzerland",
+      "goals": 3,
+      "assists": 1,
+      "minutes": 129
+    },
+    {
+      "api_id": 1165,
+      "name": "Matheus Cunha",
+      "team": "Brazil",
+      "goals": 3,
+      "assists": 0,
+      "minutes": 169
+    },
+    {
+      "api_id": 161897,
+      "name": "I. Saibari",
+      "team": "Morocco",
+      "goals": 3,
+      "assists": 0,
+      "minutes": 243
+    },
+    {
       "api_id": 8489,
       "name": "J. David",
       "team": "Canada",
       "goals": 3,
       "assists": 0,
-      "minutes": 151
+      "minutes": 248
     },
     {
       "api_id": 37724,
@@ -75,14 +107,6 @@
       "minutes": 168
     },
     {
-      "api_id": 762,
-      "name": "Vinícius Júnior",
-      "team": "Brazil",
-      "goals": 2,
-      "assists": 1,
-      "minutes": 171
-    },
-    {
       "api_id": 247,
       "name": "C. Gakpo",
       "team": "Netherlands",
@@ -91,12 +115,20 @@
       "minutes": 174
     },
     {
-      "api_id": 406244,
-      "name": "J. Manzambi",
+      "api_id": 48471,
+      "name": "R. Vargas",
       "team": "Switzerland",
       "goals": 2,
+      "assists": 1,
+      "minutes": 178
+    },
+    {
+      "api_id": 340173,
+      "name": "Ermin Mahmić",
+      "team": "Bosnia & Herzegovina",
+      "goals": 2,
       "assists": 0,
-      "minutes": 44
+      "minutes": 33
     },
     {
       "api_id": 38750,
@@ -107,22 +139,6 @@
       "minutes": 84
     },
     {
-      "api_id": 1165,
-      "name": "Matheus Cunha",
-      "team": "Brazil",
-      "goals": 2,
-      "assists": 0,
-      "minutes": 93
-    },
-    {
-      "api_id": 2001,
-      "name": "C. Larin",
-      "team": "Canada",
-      "goals": 2,
-      "assists": 0,
-      "minutes": 104
-    },
-    {
       "api_id": 138835,
       "name": "F. Balogun",
       "team": "USA",
@@ -131,36 +147,20 @@
       "minutes": 161
     },
     {
-      "api_id": 2601,
-      "name": "D. Kamada",
-      "team": "Japan",
+      "api_id": 2001,
+      "name": "C. Larin",
+      "team": "Canada",
       "goals": 2,
       "assists": 0,
-      "minutes": 163
+      "minutes": 162
     },
     {
-      "api_id": 2218,
-      "name": "I. Sarr",
-      "team": "Senegal",
+      "api_id": 35532,
+      "name": "J. Quiñones",
+      "team": "Mexico",
       "goals": 2,
       "assists": 0,
-      "minutes": 165
-    },
-    {
-      "api_id": 265820,
-      "name": "Y. Ayari",
-      "team": "Sweden",
-      "goals": 2,
-      "assists": 0,
-      "minutes": 169
-    },
-    {
-      "api_id": 161897,
-      "name": "I. Saibari",
-      "team": "Morocco",
-      "goals": 2,
-      "assists": 0,
-      "minutes": 173
+      "minutes": 253
     }
   ]
 }
