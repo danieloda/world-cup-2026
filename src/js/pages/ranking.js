@@ -4,7 +4,7 @@ import { renderShell } from '../sidebar.js';
 import { supabase } from '../supabase.js';
 import {
   flag, escapeHtml, teamPt, formatBrShort, formatTime, showToast,
-  avatarHtml, getInitials, heroMeta,
+  avatarHtml, getInitials, heroMeta, stageLabel,
 } from '../util.js';
 import { championBonus, scoreBreakdown } from '../scoring.js';
 import { renderRankChart } from '../rank-chart.js';
@@ -427,24 +427,27 @@ async function expandUser(userId) {
 }
 
 async function loadUserDetails(userId) {
-  const [predsRes, champRes, scorerPickRes] = await Promise.all([
+  const [predsRes, champRes, scorerPickRes, qualRes] = await Promise.all([
     supabase.from('predictions')
       .select('*, matches(*)')
       .eq('user_id', userId)
       .order('match_id'),
     supabase.from('champion_picks').select('*').eq('user_id', userId).maybeSingle(),
     supabase.from('top_scorer_picks').select('*, players(*)').eq('user_id', userId).maybeSingle(),
+    // Bônus de classificados (BPE/BP) — fonte do detalhe é o cache SQL.
+    supabase.from('user_qualifier_points').select('points, breakdown').eq('user_id', userId).maybeSingle(),
   ]);
 
   return {
     preds: predsRes.data ?? [],
     champion: champRes.data,
     scorer: scorerPickRes.data,
+    qualifier: qualRes.data,
   };
 }
 
 function renderDrill(u, payload) {
-  const { preds, champion, scorer } = payload;
+  const { preds, champion, scorer, qualifier } = payload;
 
   // Stats
   // Cronológico ascendente (data+hora do jogo): a ordem natural de quem foi
@@ -470,23 +473,20 @@ function renderDrill(u, payload) {
         <button class="profile-close" data-action="close-drill" title="Fechar">×</button>
       </div>
 
-      <div class="profile-stats">
-        <div class="profile-stat">
-          <div class="v">${u.match_pts}</div>
-          <div class="l">Pts jogos</div>
-        </div>
-        <div class="profile-stat">
-          <div class="v gold">${u.champion_pts}</div>
-          <div class="l">Pts campeão</div>
-        </div>
-        <div class="profile-stat">
-          <div class="v gold">${u.scorer_pts}</div>
-          <div class="l">Pts artilheiro</div>
-        </div>
-        <div class="profile-stat">
-          <div class="v gold">${u.qualifier_pts ?? 0}</div>
-          <div class="l">Pts classificados</div>
-        </div>
+      <div class="profile-section-title">De onde vêm os pontos</div>
+      <div class="points-ledger">
+        <div class="pl-item"><span class="pl-v">${u.match_pts}</span><span class="pl-l">Jogos</span></div>
+        <span class="pl-op">+</span>
+        <div class="pl-item"><span class="pl-v">${u.champion_pts}</span><span class="pl-l">Campeão</span></div>
+        <span class="pl-op">+</span>
+        <div class="pl-item"><span class="pl-v">${u.scorer_pts}</span><span class="pl-l">Artilheiro</span></div>
+        <span class="pl-op">+</span>
+        <div class="pl-item"><span class="pl-v">${u.qualifier_pts ?? 0}</span><span class="pl-l">Classificados</span></div>
+        <span class="pl-op">=</span>
+        <div class="pl-item total"><span class="pl-v">${u.total_pts}</span><span class="pl-l">Total</span></div>
+      </div>
+
+      <div class="profile-stats accuracy">
         <div class="profile-stat">
           <div class="v green">${exactos}</div>
           <div class="l">Placares exatos</div>
@@ -508,6 +508,8 @@ function renderDrill(u, payload) {
         <div class="pts-cell ${u.scorer_pts > 0 ? 'win' : 'zero'}">${u.scorer_pts > 0 ? '+' + u.scorer_pts : '—'}</div>
       </div>
 
+      ${renderQualifierSection(u, qualifier)}
+
       ${scored.length > 0 ? `
         <div class="profile-section-title">Histórico de palpites pontuados (${scored.length})</div>
         ${scored.map(renderPredRow).join('')}
@@ -522,6 +524,55 @@ function renderDrill(u, payload) {
         </div>
       ` : ''}
     </div>
+  `;
+}
+
+// Ordem das fases do mata-mata (pra agrupar o bônus de classificado).
+const QUAL_PHASE_ORDER = ['r32', 'r16', 'qf', 'sf', 'third', 'final'];
+
+// Seção "Classificados" — detalha o bônus de chave (BPE/BP) por fase.
+// Lê o breakdown gravado pelo SQL (user_qualifier_points); não recalcula.
+function renderQualifierSection(u, qualifier) {
+  const total = u.qualifier_pts ?? 0;
+  const items = qualifier?.breakdown?.items ?? [];
+
+  if (items.length === 0) {
+    return `
+      <div class="profile-section-title">Classificados — bônus de chave</div>
+      <div class="qual-empty">Nenhum bônus de classificado ainda. Ele entra conforme as vagas do mata-mata vão sendo definidas.</div>
+    `;
+  }
+
+  // Agrupa por fase, na ordem do torneio. Dentro da fase, maior pontuação primeiro.
+  const byPhase = new Map();
+  for (const it of items) {
+    if (!byPhase.has(it.phase)) byPhase.set(it.phase, []);
+    byPhase.get(it.phase).push(it);
+  }
+
+  const groups = QUAL_PHASE_ORDER
+    .filter(p => byPhase.has(p))
+    .map(phase => {
+      const list = byPhase.get(phase).slice().sort((a, b) => b.pts - a.pts);
+      const sub = list.reduce((s, it) => s + (it.pts ?? 0), 0);
+      const rows = list.map(it => `
+        <div class="qual-item">
+          <span class="qi-team">${flag(it.pred)} ${escapeHtml(teamPt(it.pred))}</span>
+          <span class="qual-badge ${it.kind === 'bpe' ? 'bpe' : 'bp'}">${it.kind === 'bpe' ? '✓ posição exata' : '~ certo na fase'}</span>
+          <span class="qi-pts">+${it.pts}</span>
+        </div>
+      `).join('');
+      return `
+        <div class="qual-phase">
+          <div class="qual-phase-head"><span>${escapeHtml(stageLabel(phase))}</span><span class="qual-phase-sum">+${sub}</span></div>
+          ${rows}
+        </div>
+      `;
+    }).join('');
+
+  return `
+    <div class="profile-section-title">Classificados — bônus de chave <span class="qst-count">+${total}</span></div>
+    <div class="qual-list">${groups}</div>
   `;
 }
 

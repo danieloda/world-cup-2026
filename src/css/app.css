@@ -3793,6 +3793,94 @@ details.allbets[open] > summary .chev { transform: rotate(180deg); }
   color: var(--red);
 }
 
+/* ===== Ledger de pontos (de onde vêm os pontos) ===== */
+.points-ledger {
+  display: flex; flex-wrap: wrap; align-items: stretch;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4h);
+}
+.points-ledger .pl-item {
+  flex: 1 1 0; min-width: 76px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-2);
+  background: rgba(255, 255, 255, .03);
+  border-radius: var(--radius-md);
+}
+.points-ledger .pl-v {
+  font-size: var(--fs-xl); font-weight: var(--fw-black);
+  letter-spacing: var(--tracking-tight); line-height: var(--lh-none);
+  font-variant-numeric: tabular-nums;
+}
+.points-ledger .pl-l {
+  font-size: var(--fs-2xs); color: var(--text-mute);
+  letter-spacing: var(--tracking-caps); text-transform: uppercase;
+  font-weight: var(--fw-bold); text-align: center;
+}
+.points-ledger .pl-item.total {
+  background: var(--accent-dim);
+  border: 1px solid var(--accent);
+}
+.points-ledger .pl-item.total .pl-v,
+.points-ledger .pl-item.total .pl-l { color: var(--accent); }
+.points-ledger .pl-op {
+  display: flex; align-items: center; flex: 0 0 auto;
+  font-size: var(--fs-lg); font-weight: var(--fw-black);
+  color: var(--text-mute);
+}
+/* Acertos (exatos/parciais/erros) — grupo secundário, mais enxuto */
+.profile-stats.accuracy {
+  grid-template-columns: repeat(3, 1fr);
+  margin-bottom: var(--space-4);
+}
+@media (max-width: 480px) {
+  /* No celular os operadores quebram feio; some com eles e deixa os blocos fluírem.
+     A caixa "Total" continua destacada, então a soma segue legível. */
+  .points-ledger .pl-op { display: none; }
+  .points-ledger .pl-item { min-width: 42%; }   /* 2 por linha (2×2 nas 4 fontes) */
+  .points-ledger .pl-item.total { flex-basis: 100%; }
+}
+
+/* ===== Seção Classificados (bônus de chave, BPE/BP) ===== */
+.qst-count { color: var(--positive); font-weight: var(--fw-heavy); margin-left: var(--space-1h); }
+.qual-list {
+  display: flex; flex-direction: column; gap: var(--space-2h);
+  margin-bottom: var(--space-2);
+}
+.qual-phase {
+  background: rgba(255, 255, 255, .02);
+  border-radius: var(--radius-md);
+  padding: var(--space-2h) var(--space-3) var(--space-2);
+}
+.qual-phase-head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: var(--fs-xs); letter-spacing: var(--tracking-caps);
+  text-transform: uppercase; color: var(--text-dim); font-weight: var(--fw-heavy);
+  padding-bottom: var(--space-2); margin-bottom: var(--space-1h);
+  border-bottom: 1px solid var(--line);
+}
+.qual-phase-sum { color: var(--positive); font-weight: var(--fw-heavy); }
+.qual-item {
+  display: grid; grid-template-columns: 1fr auto auto;
+  gap: var(--space-2h); align-items: center;
+  padding: var(--space-1h) var(--space-0);
+}
+.qual-item + .qual-item { border-top: 1px solid rgba(255, 255, 255, .03); }
+.qual-item .qi-team {
+  font-weight: var(--fw-bold);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.qual-item .qual-badge { margin-top: 0; }
+.qual-item .qi-pts {
+  font-weight: var(--fw-heavy); color: var(--positive);
+  font-variant-numeric: tabular-nums; min-width: 26px; text-align: right;
+}
+.qual-empty {
+  padding: var(--space-4); margin-bottom: var(--space-2);
+  background: rgba(255, 255, 255, .02); border-radius: var(--radius-md);
+  color: var(--text-mute); font-size: var(--fs-sm); text-align: center;
+}
+
 /* ===== Thirds table (3ºs Lugares) ===== */
 .thirds-wrap {
   background: var(--card);
