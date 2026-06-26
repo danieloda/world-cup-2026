@@ -1081,6 +1081,13 @@
   ],
   "France": [
     [
+      "2026-06-26",
+      "Norway",
+      false,
+      "3-1",
+      "World Cup"
+    ],
+    [
       "2026-06-22",
       "Iraq",
       true,
@@ -1141,13 +1148,6 @@
       "Iceland",
       false,
       "2-2",
-      "Eliminatórias"
-    ],
-    [
-      "2025-10-10",
-      "Azerbaijan",
-      true,
-      "3-0",
       "Eliminatórias"
     ]
   ],
@@ -1441,6 +1441,13 @@
   ],
   "Iraq": [
     [
+      "2026-06-26",
+      "Senegal",
+      false,
+      "0-1",
+      "World Cup"
+    ],
+    [
       "2026-06-22",
       "France",
       false,
@@ -1501,13 +1508,6 @@
       "Sudan",
       false,
       "2-0",
-      "Arab Cup"
-    ],
-    [
-      "2025-12-03",
-      "Bahrain",
-      true,
-      "2-1",
       "Arab Cup"
     ]
   ],
@@ -2017,6 +2017,13 @@
   ],
   "Norway": [
     [
+      "2026-06-26",
+      "France",
+      true,
+      "1-3",
+      "World Cup"
+    ],
+    [
       "2026-06-23",
       "Senegal",
       true,
@@ -2078,13 +2085,6 @@
       true,
       "1-1",
       "Amistoso"
-    ],
-    [
-      "2025-10-11",
-      "Israel",
-      true,
-      "5-0",
-      "Eliminatórias"
     ]
   ],
   "Panama": [
@@ -2521,6 +2521,13 @@
   ],
   "Senegal": [
     [
+      "2026-06-26",
+      "Iraq",
+      true,
+      "1-0",
+      "World Cup"
+    ],
+    [
       "2026-06-23",
       "Norway",
       false,
@@ -2581,13 +2588,6 @@
       "Mali",
       false,
       "1-0",
-      "Copa Africana"
-    ],
-    [
-      "2026-01-03",
-      "Sudan",
-      true,
-      "3-1",
       "Copa Africana"
     ]
   ],
