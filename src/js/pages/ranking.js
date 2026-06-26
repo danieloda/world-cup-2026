@@ -473,20 +473,23 @@ function renderDrill(u, payload) {
         <button class="profile-close" data-action="close-drill" title="Fechar">×</button>
       </div>
 
-      <div class="profile-section-title">De onde vêm os pontos</div>
-      <div class="points-ledger">
-        <div class="pl-item"><span class="pl-v">${u.match_pts}</span><span class="pl-l">Jogos</span></div>
-        <span class="pl-op">+</span>
-        <div class="pl-item"><span class="pl-v">${u.champion_pts}</span><span class="pl-l">Campeão</span></div>
-        <span class="pl-op">+</span>
-        <div class="pl-item"><span class="pl-v">${u.scorer_pts}</span><span class="pl-l">Artilheiro</span></div>
-        <span class="pl-op">+</span>
-        <div class="pl-item"><span class="pl-v">${u.qualifier_pts ?? 0}</span><span class="pl-l">Classificados</span></div>
-        <span class="pl-op">=</span>
-        <div class="pl-item total"><span class="pl-v">${u.total_pts}</span><span class="pl-l">Total</span></div>
-      </div>
-
-      <div class="profile-stats accuracy">
+      <div class="profile-stats">
+        <div class="profile-stat">
+          <div class="v">${u.match_pts}</div>
+          <div class="l">Pts jogos</div>
+        </div>
+        <div class="profile-stat">
+          <div class="v gold">${u.champion_pts}</div>
+          <div class="l">Pts campeão</div>
+        </div>
+        <div class="profile-stat">
+          <div class="v gold">${u.scorer_pts}</div>
+          <div class="l">Pts artilheiro</div>
+        </div>
+        <div class="profile-stat">
+          <div class="v gold">${u.qualifier_pts ?? 0}</div>
+          <div class="l">Pts classificados</div>
+        </div>
         <div class="profile-stat">
           <div class="v green">${exactos}</div>
           <div class="l">Placares exatos</div>
