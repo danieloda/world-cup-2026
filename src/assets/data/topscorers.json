@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-26T04:50:37.426Z",
+  "updated_at": "2026-06-26T08:31:07.705Z",
   "season": 2026,
   "scorers": [
     {
@@ -155,9 +155,9 @@
       "minutes": 162
     },
     {
-      "api_id": 35532,
-      "name": "J. Quiñones",
-      "team": "Mexico",
+      "api_id": 2601,
+      "name": "D. Kamada",
+      "team": "Japan",
       "goals": 2,
       "assists": 0,
       "minutes": 253
