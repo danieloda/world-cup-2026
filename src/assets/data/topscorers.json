@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-26T00:57:11.932Z",
+  "updated_at": "2026-06-26T04:50:37.426Z",
   "season": 2026,
   "scorers": [
     {
@@ -51,12 +51,28 @@
       "minutes": 129
     },
     {
+      "api_id": 38750,
+      "name": "B. Brobbey",
+      "team": "Netherlands",
+      "goals": 3,
+      "assists": 0,
+      "minutes": 161
+    },
+    {
       "api_id": 1165,
       "name": "Matheus Cunha",
       "team": "Brazil",
       "goals": 3,
       "assists": 0,
       "minutes": 169
+    },
+    {
+      "api_id": 8489,
+      "name": "J. David",
+      "team": "Canada",
+      "goals": 3,
+      "assists": 0,
+      "minutes": 241
     },
     {
       "api_id": 161897,
@@ -67,20 +83,12 @@
       "minutes": 243
     },
     {
-      "api_id": 8489,
-      "name": "J. David",
-      "team": "Canada",
-      "goals": 3,
-      "assists": 0,
-      "minutes": 248
-    },
-    {
       "api_id": 37724,
       "name": "C. Summerville",
       "team": "Netherlands",
       "goals": 2,
       "assists": 1,
-      "minutes": 115
+      "minutes": 133
     },
     {
       "api_id": 47323,
@@ -99,22 +107,6 @@
       "minutes": 162
     },
     {
-      "api_id": 72155,
-      "name": "A. Ueda",
-      "team": "Japan",
-      "goals": 2,
-      "assists": 1,
-      "minutes": 168
-    },
-    {
-      "api_id": 247,
-      "name": "C. Gakpo",
-      "team": "Netherlands",
-      "goals": 2,
-      "assists": 1,
-      "minutes": 174
-    },
-    {
       "api_id": 48471,
       "name": "R. Vargas",
       "team": "Switzerland",
@@ -123,12 +115,28 @@
       "minutes": 178
     },
     {
-      "api_id": 38750,
-      "name": "B. Brobbey",
+      "api_id": 72155,
+      "name": "A. Ueda",
+      "team": "Japan",
+      "goals": 2,
+      "assists": 1,
+      "minutes": 234
+    },
+    {
+      "api_id": 247,
+      "name": "C. Gakpo",
       "team": "Netherlands",
       "goals": 2,
+      "assists": 1,
+      "minutes": 258
+    },
+    {
+      "api_id": 153430,
+      "name": "A. Elanga",
+      "team": "Sweden",
+      "goals": 2,
       "assists": 0,
-      "minutes": 84
+      "minutes": 126
     },
     {
       "api_id": 3246,
@@ -147,20 +155,12 @@
       "minutes": 162
     },
     {
-      "api_id": 2601,
-      "name": "D. Kamada",
-      "team": "Japan",
+      "api_id": 35532,
+      "name": "J. Quiñones",
+      "team": "Mexico",
       "goals": 2,
       "assists": 0,
-      "minutes": 163
-    },
-    {
-      "api_id": 265820,
-      "name": "Y. Ayari",
-      "team": "Sweden",
-      "goals": 2,
-      "assists": 0,
-      "minutes": 169
+      "minutes": 253
     }
   ]
 }
