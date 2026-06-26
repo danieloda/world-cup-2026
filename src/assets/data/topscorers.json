@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-25T17:30:32.385Z",
+  "updated_at": "2026-06-26T00:57:11.932Z",
   "season": 2026,
   "scorers": [
     {
@@ -16,7 +16,7 @@
       "team": "Brazil",
       "goals": 4,
       "assists": 1,
-      "minutes": 264
+      "minutes": 261
     },
     {
       "api_id": 278,
@@ -40,7 +40,7 @@
       "team": "Germany",
       "goals": 3,
       "assists": 2,
-      "minutes": 56
+      "minutes": 86
     },
     {
       "api_id": 406244,
@@ -123,14 +123,6 @@
       "minutes": 178
     },
     {
-      "api_id": 340173,
-      "name": "Ermin Mahmić",
-      "team": "Bosnia & Herzegovina",
-      "goals": 2,
-      "assists": 0,
-      "minutes": 33
-    },
-    {
       "api_id": 38750,
       "name": "B. Brobbey",
       "team": "Netherlands",
@@ -139,12 +131,12 @@
       "minutes": 84
     },
     {
-      "api_id": 138835,
-      "name": "F. Balogun",
-      "team": "USA",
+      "api_id": 3246,
+      "name": "N. Pépé",
+      "team": "Ivory Coast",
       "goals": 2,
       "assists": 0,
-      "minutes": 161
+      "minutes": 157
     },
     {
       "api_id": 2001,
@@ -155,12 +147,20 @@
       "minutes": 162
     },
     {
-      "api_id": 35532,
-      "name": "J. Quiñones",
-      "team": "Mexico",
+      "api_id": 2601,
+      "name": "D. Kamada",
+      "team": "Japan",
       "goals": 2,
       "assists": 0,
-      "minutes": 253
+      "minutes": 163
+    },
+    {
+      "api_id": 265820,
+      "name": "Y. Ayari",
+      "team": "Sweden",
+      "goals": 2,
+      "assists": 0,
+      "minutes": 169
     }
   ]
 }
