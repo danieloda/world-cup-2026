@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-27T01:31:28.897Z",
+  "updated_at": "2026-06-27T05:35:16.797Z",
   "season": 2026,
   "groups": {
     "A": [
@@ -329,109 +329,109 @@
     "G": [
       {
         "rank": 1,
-        "team": "Egypt",
-        "played": 2,
+        "team": "Belgium",
+        "played": 3,
         "win": 1,
-        "draw": 1,
+        "draw": 2,
         "lose": 0,
-        "gf": 4,
+        "gf": 6,
         "ga": 2,
-        "gd": 2,
-        "points": 4,
-        "form": "WD"
+        "gd": 4,
+        "points": 5,
+        "form": "WDD"
       },
       {
         "rank": 2,
-        "team": "Iran",
-        "played": 2,
-        "win": 0,
+        "team": "Egypt",
+        "played": 3,
+        "win": 1,
         "draw": 2,
         "lose": 0,
-        "gf": 2,
-        "ga": 2,
-        "gd": 0,
-        "points": 2,
-        "form": "DD"
+        "gf": 5,
+        "ga": 3,
+        "gd": 2,
+        "points": 5,
+        "form": "DWD"
       },
       {
         "rank": 3,
-        "team": "Belgium",
-        "played": 2,
+        "team": "Iran",
+        "played": 3,
         "win": 0,
-        "draw": 2,
+        "draw": 3,
         "lose": 0,
-        "gf": 1,
-        "ga": 1,
+        "gf": 3,
+        "ga": 3,
         "gd": 0,
-        "points": 2,
-        "form": "DD"
+        "points": 3,
+        "form": "DDD"
       },
       {
         "rank": 4,
         "team": "New Zealand",
-        "played": 2,
+        "played": 3,
         "win": 0,
         "draw": 1,
-        "lose": 1,
-        "gf": 3,
-        "ga": 5,
-        "gd": -2,
+        "lose": 2,
+        "gf": 4,
+        "ga": 10,
+        "gd": -6,
         "points": 1,
-        "form": "LD"
+        "form": "LLD"
       }
     ],
     "H": [
       {
         "rank": 1,
         "team": "Spain",
-        "played": 2,
-        "win": 1,
+        "played": 3,
+        "win": 2,
         "draw": 1,
         "lose": 0,
-        "gf": 4,
+        "gf": 5,
         "ga": 0,
-        "gd": 4,
-        "points": 4,
-        "form": "WD"
+        "gd": 5,
+        "points": 7,
+        "form": "WWD"
       },
       {
         "rank": 2,
-        "team": "Uruguay",
-        "played": 2,
-        "win": 0,
-        "draw": 2,
-        "lose": 0,
-        "gf": 3,
-        "ga": 3,
-        "gd": 0,
-        "points": 2,
-        "form": "DD"
-      },
-      {
-        "rank": 3,
         "team": "Cape Verde",
-        "played": 2,
+        "played": 3,
         "win": 0,
-        "draw": 2,
+        "draw": 3,
         "lose": 0,
         "gf": 2,
         "ga": 2,
         "gd": 0,
+        "points": 3,
+        "form": "DDD"
+      },
+      {
+        "rank": 3,
+        "team": "Uruguay",
+        "played": 3,
+        "win": 0,
+        "draw": 2,
+        "lose": 1,
+        "gf": 3,
+        "ga": 4,
+        "gd": -1,
         "points": 2,
-        "form": "DD"
+        "form": "LDD"
       },
       {
         "rank": 4,
         "team": "Saudi Arabia",
-        "played": 2,
+        "played": 3,
         "win": 0,
-        "draw": 1,
+        "draw": 2,
         "lose": 1,
         "gf": 1,
         "ga": 5,
         "gd": -4,
-        "points": 1,
-        "form": "LD"
+        "points": 2,
+        "form": "DLD"
       }
     ],
     "I": [
