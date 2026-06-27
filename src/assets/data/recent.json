@@ -289,6 +289,13 @@
   ],
   "Belgium": [
     [
+      "2026-06-27",
+      "New Zealand",
+      false,
+      "5-1",
+      "World Cup"
+    ],
+    [
       "2026-06-21",
       "Iran",
       true,
@@ -349,13 +356,6 @@
       "Wales",
       false,
       "4-2",
-      "Eliminatórias"
-    ],
-    [
-      "2025-10-10",
-      "FYR Macedonia",
-      true,
-      "0-0",
       "Eliminatórias"
     ]
   ],
@@ -937,6 +937,13 @@
   ],
   "Egypt": [
     [
+      "2026-06-27",
+      "Iran",
+      true,
+      "1-1",
+      "World Cup"
+    ],
+    [
       "2026-06-22",
       "New Zealand",
       false,
@@ -997,13 +1004,6 @@
       "Ivory Coast",
       true,
       "3-2",
-      "Copa Africana"
-    ],
-    [
-      "2026-01-05",
-      "Benin",
-      true,
-      "3-1",
       "Copa Africana"
     ]
   ],
@@ -1369,6 +1369,13 @@
   ],
   "Iran": [
     [
+      "2026-06-27",
+      "Egypt",
+      false,
+      "1-1",
+      "World Cup"
+    ],
+    [
       "2026-06-21",
       "Belgium",
       false,
@@ -1429,13 +1436,6 @@
       "Tanzania",
       true,
       "2-0",
-      "Amistoso"
-    ],
-    [
-      "2025-10-10",
-      "Russia",
-      false,
-      "1-2",
       "Amistoso"
     ]
   ],
@@ -1945,6 +1945,13 @@
   ],
   "New Zealand": [
     [
+      "2026-06-27",
+      "Belgium",
+      true,
+      "1-5",
+      "World Cup"
+    ],
+    [
       "2026-06-22",
       "Egypt",
       true,
@@ -2005,13 +2012,6 @@
       "Norway",
       false,
       "1-1",
-      "Amistoso"
-    ],
-    [
-      "2025-10-09",
-      "Poland",
-      false,
-      "0-1",
       "Amistoso"
     ]
   ],
@@ -2377,6 +2377,13 @@
   ],
   "Saudi Arabia": [
     [
+      "2026-06-27",
+      "Cape Verde Islands",
+      false,
+      "0-0",
+      "World Cup"
+    ],
+    [
       "2026-06-21",
       "Spain",
       false,
@@ -2437,13 +2444,6 @@
       "Jordan",
       true,
       "0-1",
-      "Arab Cup"
-    ],
-    [
-      "2025-12-11",
-      "Palestine",
-      false,
-      "2-1",
       "Arab Cup"
     ]
   ],
@@ -2737,6 +2737,13 @@
   ],
   "Spain": [
     [
+      "2026-06-27",
+      "Uruguay",
+      false,
+      "1-0",
+      "World Cup"
+    ],
+    [
       "2026-06-21",
       "Saudi Arabia",
       true,
@@ -2797,13 +2804,6 @@
       "Bulgaria",
       true,
       "4-0",
-      "Eliminatórias"
-    ],
-    [
-      "2025-10-11",
-      "Georgia",
-      true,
-      "2-0",
       "Eliminatórias"
     ]
   ],
@@ -3097,6 +3097,13 @@
   ],
   "Uruguay": [
     [
+      "2026-06-27",
+      "Spain",
+      true,
+      "0-1",
+      "World Cup"
+    ],
+    [
       "2026-06-21",
       "Cape Verde Islands",
       true,
@@ -3157,13 +3164,6 @@
       "Chile",
       false,
       "0-0",
-      "Eliminatórias"
-    ],
-    [
-      "2025-09-04",
-      "Peru",
-      true,
-      "3-0",
       "Eliminatórias"
     ]
   ],
@@ -3313,6 +3313,13 @@
   ],
   "Cape Verde": [
     [
+      "2026-06-27",
+      "Saudi Arabia",
+      true,
+      "0-0",
+      "World Cup"
+    ],
+    [
       "2026-06-21",
       "Uruguay",
       false,
@@ -3373,13 +3380,6 @@
       "Eswatini",
       true,
       "3-0",
-      "Eliminatórias"
-    ],
-    [
-      "2025-10-08",
-      "Libya",
-      false,
-      "3-3",
       "Eliminatórias"
     ]
   ],
