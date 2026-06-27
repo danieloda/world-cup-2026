@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-27T04:18:02.545Z",
+  "updated_at": "2026-06-27T07:35:58.455Z",
   "season": 2026,
   "scorers": [
     {
@@ -99,6 +99,14 @@
       "minutes": 243
     },
     {
+      "api_id": 94333,
+      "name": "E. Just",
+      "team": "New Zealand",
+      "goals": 3,
+      "assists": 0,
+      "minutes": 271
+    },
+    {
       "api_id": 37724,
       "name": "C. Summerville",
       "team": "Netherlands",
@@ -107,28 +115,12 @@
       "minutes": 133
     },
     {
-      "api_id": 47323,
-      "name": "Mikel Oyarzabal",
-      "team": "Spain",
-      "goals": 2,
-      "assists": 1,
-      "minutes": 135
-    },
-    {
-      "api_id": 51776,
-      "name": "M. Araújo",
-      "team": "Uruguay",
-      "goals": 2,
-      "assists": 1,
-      "minutes": 162
-    },
-    {
       "api_id": 20696,
       "name": "P. Gueye",
       "team": "Senegal",
       "goals": 2,
       "assists": 1,
-      "minutes": 175
+      "minutes": 177
     },
     {
       "api_id": 48471,
@@ -139,6 +131,14 @@
       "minutes": 178
     },
     {
+      "api_id": 47323,
+      "name": "Mikel Oyarzabal",
+      "team": "Spain",
+      "goals": 2,
+      "assists": 1,
+      "minutes": 211
+    },
+    {
       "api_id": 72155,
       "name": "A. Ueda",
       "team": "Japan",
@@ -147,20 +147,20 @@
       "minutes": 234
     },
     {
+      "api_id": 51776,
+      "name": "M. Araújo",
+      "team": "Uruguay",
+      "goals": 2,
+      "assists": 1,
+      "minutes": 252
+    },
+    {
       "api_id": 247,
       "name": "C. Gakpo",
       "team": "Netherlands",
       "goals": 2,
       "assists": 1,
       "minutes": 258
-    },
-    {
-      "api_id": 153430,
-      "name": "A. Elanga",
-      "team": "Sweden",
-      "goals": 2,
-      "assists": 0,
-      "minutes": 126
     }
   ]
 }
