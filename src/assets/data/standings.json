@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-28T21:03:24.297Z",
+  "updated_at": "2026-06-28T22:12:28.446Z",
   "season": 2026,
   "groups": {
     "A": [
@@ -27,7 +27,7 @@
         "ga": 3,
         "gd": -1,
         "points": 4,
-        "form": "WDL"
+        "form": "LWDL"
       },
       {
         "rank": 3,
@@ -81,7 +81,7 @@
         "ga": 3,
         "gd": 5,
         "points": 4,
-        "form": "LWD"
+        "form": "WLWD"
       },
       {
         "rank": 3,
