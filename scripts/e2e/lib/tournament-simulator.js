@@ -142,18 +142,6 @@ function generateScorers(rng, homeTeam, awayTeam, homeGoals, awayGoals, playersB
 }
 
 /**
- * Resolve slot composto de 3os (3A/B/C/D/F, etc).
- * @param slotStr ex: "3A/B/C/D/F"
- * @param thirds ordered [{group, team, pts, sg, gp}]
- * @param used Set de team names ja usados
- */
-function resolveThirdSlot(slotStr, thirds, used) {
-  const groups = slotStr.slice(1).split('/');
-  const candidate = thirds.find((t) => groups.includes(t.group) && !used.has(t.team));
-  return candidate ? candidate.team : null;
-}
-
-/**
  * Recebe lista bruta de matches do DB e simula todo o torneio.
  * Retorna matches preenchidos + topScorer.
  */
@@ -240,9 +228,10 @@ export function simulateTournament(matches, players, seed = 'wc2026-e2e-v1') {
     }
   }
 
-  // === STEP 3: Resolve slots compostos 3X/Y/Z usando BACKTRACKING ===
+  // === STEP 3: Resolve slots compostos 3X/Y/Z pela TABELA OFICIAL (Annexe C) ===
   // Ranking dos 3ºs (grupos diferentes → SEM confronto direto), igual ao SQL
-  // (migration 068): pts → SG → GF → fair play → FIFA rank.
+  // (migration 068): pts → SG → GF → fair play → FIFA rank. Esse ranking decide
+  // só QUAIS 8 grupos passam; a atribuição aos slots vem da tabela oficial.
   thirds.sort((a, b) => b.pts - a.pts || b.sg - a.sg || b.gp - a.gp
     || (b.fairPlay ?? 0) - (a.fairPlay ?? 0)
     || fifaRank(a.team) - fifaRank(b.team));
@@ -259,13 +248,13 @@ export function simulateTournament(matches, players, seed = 'wc2026-e2e-v1') {
     }
   }
 
-  // Backtracking (lógica compartilhada com a página e o servidor)
+  // Tabela oficial (lógica compartilhada com a página e o servidor)
   const thirdAssignment = assignCompositeThirds(compositeSlots, thirds);
   for (const [slot, third] of thirdAssignment) {
     slotMap.set(slot, third.team);
   }
   if (thirdAssignment.size < compositeSlots.length) {
-    console.error('[simulator] BACKTRACKING falhou — nenhuma atribuicao valida de terceiros');
+    console.error('[simulator] atribuicao de terceiros incompleta — combinacao fora da tabela oficial?');
   }
 
   // === STEP 4: Cascata de W##/L## (round by round) ===
