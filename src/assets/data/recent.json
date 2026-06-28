@@ -505,6 +505,13 @@
   ],
   "Canada": [
     [
+      "2026-06-28",
+      "South Africa",
+      false,
+      "0-0",
+      "World Cup"
+    ],
+    [
       "2026-06-24",
       "Switzerland",
       false,
@@ -565,13 +572,6 @@
       "Venezuela",
       true,
       "2-0",
-      "Amistoso"
-    ],
-    [
-      "2025-11-14",
-      "Ecuador",
-      true,
-      "0-0",
       "Amistoso"
     ]
   ],
@@ -2593,6 +2593,13 @@
   ],
   "South Africa": [
     [
+      "2026-06-28",
+      "Canada",
+      true,
+      "0-0",
+      "World Cup"
+    ],
+    [
       "2026-06-25",
       "South Korea",
       true,
@@ -2653,13 +2660,6 @@
       "Zimbabwe",
       false,
       "3-2",
-      "Copa Africana"
-    ],
-    [
-      "2025-12-26",
-      "Egypt",
-      false,
-      "0-1",
       "Copa Africana"
     ]
   ],
