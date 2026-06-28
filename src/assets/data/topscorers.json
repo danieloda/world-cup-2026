@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-28T20:16:00.367Z",
+  "updated_at": "2026-06-28T21:38:45.602Z",
   "season": 2026,
   "scorers": [
     {
@@ -83,14 +83,6 @@
       "minutes": 169
     },
     {
-      "api_id": 8489,
-      "name": "J. David",
-      "team": "Canada",
-      "goals": 3,
-      "assists": 0,
-      "minutes": 241
-    },
-    {
       "api_id": 161897,
       "name": "I. Saibari",
       "team": "Morocco",
@@ -121,6 +113,14 @@
       "goals": 3,
       "assists": 0,
       "minutes": 279
+    },
+    {
+      "api_id": 8489,
+      "name": "J. David",
+      "team": "Canada",
+      "goals": 3,
+      "assists": 0,
+      "minutes": 335
     },
     {
       "api_id": 37724,
