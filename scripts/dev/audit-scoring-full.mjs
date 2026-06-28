@@ -21,6 +21,8 @@ import { dirname, join } from 'path';
 import { scorePrediction, scorerBonus, stageMultiplier } from '../../src/js/scoring.js';
 import { fifaRank } from '../../src/js/fifa-rank.js';
 import { THIRDS_ALLOCATION } from '../../src/js/thirds-allocation.js';
+import { computeStandings } from '../../src/js/util.js';
+import { assignCompositeThirds } from '../../src/js/thirds-assign.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 config({ path: join(__dirname, '..', '..', '.env') });
@@ -222,6 +224,56 @@ cScorer === 0 ? okv('scorer_pts confere p/ todos os pagantes') : null;
 cChamp === 0 ? okv(finalMatch?.finished ? 'champion_pts confere' : 'champion_pts = 0 p/ todos (final não disputada)') : null;
 cQual === 0 ? okv('qualifier_pts (view) == cache user_qualifier_points p/ todos') : null;
 cTotal === 0 ? okv('total_pts == soma dos 4 componentes p/ todos') : null;
+
+// ============================================================
+head('[6] Bônus de classificado RECOMPUTADO do zero (bracket previsto: h2h recursivo + tabela oficial)');
+// Reconstrói o bracket PREVISTO de cada usuário com a MESMA lógica do cliente/
+// real (util.computeStandings recursivo + tabela oficial, sem greedy quando >=8)
+// e recompara o qualifier_pts ao cache. Pega erro de regra (não só view≠cache).
+const QPHASE = { r32: 1, r16: 2, qf: 3, sf: 5, third: 3, final: 8 };  // 022_additive_scoring
+const SEEDQ = { ABCDF: '1E', CDFGH: '1I', CEFHI: '1A', EHIJK: '1L', BEFIJ: '1D', AEHIJ: '1G', EFGIJ: '1B', DEIJL: '1K' };
+const predsByUser = new Map();
+for (const p of predictions) { if (!predsByUser.has(p.user_id)) predsByUser.set(p.user_id, new Map()); predsByUser.get(p.user_id).set(p.match_id, p); }
+const groupSizes = {}; for (const m of groupGames) groupSizes[m.group_name] = (groupSizes[m.group_name] || 0) + 1;
+const compositeDefs = [...new Set(koGames.flatMap(m => [m.slot_home, m.slot_away]).filter(s => s && s.startsWith('3') && s.includes('/')))].map(s => ({ slot: s, validGroups: s.slice(1).split('/') }));
+const realPhaseTeams = {}; for (const m of koGames) for (const t of [m.team_home, m.team_away]) if (isReal(t)) (realPhaseTeams[m.stage] ??= new Set()).add(t);
+function predictedQualifier(pm) {
+  const slot = new Map(); const thirds = [];
+  for (const g of Object.keys(groupSizes)) {
+    const gms = groupGames.filter(m => m.group_name === g);
+    if (!gms.every(m => pm.has(m.id))) continue;
+    const st = computeStandings(gms, 'sim', pm);
+    if (st.length < 3) continue;
+    slot.set('1' + g, st[0].team); slot.set('2' + g, st[1].team); slot.set('3' + g, st[2].team);
+    thirds.push({ group: g, team: st[2].team, pts: st[2].pts, sg: st[2].sg, gp: st[2].gp, fairPlay: st[2].fairPlay ?? 0 });
+  }
+  thirds.sort((a, b) => b.pts - a.pts || b.sg - a.sg || b.gp - a.gp || fifaRank(a.team) - fifaRank(b.team));
+  if (thirds.length >= 8) for (const [s, t] of assignCompositeThirds(compositeDefs, thirds)) slot.set(s, t.team);
+  for (let pass = 0; pass < 10; pass++) { let ch = false;
+    for (const m of [...koGames].sort((a, b) => a.id - b.id)) {
+      const ht = slot.get(m.slot_home), at = slot.get(m.slot_away); if (!ht || !at) continue;
+      const p = pm.get(m.id); if (!p || p.pred_home == null) continue;
+      let w, l; if (p.pred_home > p.pred_away) { w = ht; l = at; } else if (p.pred_away > p.pred_home) { w = at; l = ht; }
+      else if (p.pred_pen_winner === 'home') { w = ht; l = at; } else if (p.pred_pen_winner === 'away') { w = at; l = ht; } else continue;
+      if (!slot.has('W' + m.id)) { slot.set('W' + m.id, w); ch = true; } if (!slot.has('L' + m.id)) { slot.set('L' + m.id, l); ch = true; }
+    } if (!ch) break;
+  }
+  let pts = 0;
+  for (const m of koGames) for (const side of ['home', 'away']) {
+    const actual = side === 'home' ? m.team_home : m.team_away; if (!isReal(actual)) continue;
+    const ref = side === 'home' ? (m.slot_home || m.team_home) : (m.slot_away || m.team_away);
+    const pred = slot.get(ref); if (!pred) continue; const bpe = QPHASE[m.stage];
+    if (pred === actual) pts += bpe; else if (realPhaseTeams[m.stage]?.has(pred)) { if (m.stage !== 'r32') pts += Math.round(bpe / 2); }
+  }
+  return pts;
+}
+let qRecalc = 0;
+for (const u of paid) {
+  const exp = predictedQualifier(predsByUser.get(u.id) || new Map());
+  const cur = uqpByUser.get(u.id) || 0;
+  if (exp !== cur) { qRecalc++; if (qRecalc <= 15) bad(`${u.full_name}: qualifier cache ${cur} ≠ recálculo oficial ${exp} (${exp - cur > 0 ? '+' : ''}${exp - cur})`); }
+}
+qRecalc === 0 ? okv('qualifier_pts de todos bate com o recálculo independente (h2h recursivo + tabela oficial)') : bad(`${qRecalc} usuários com qualifier_pts divergente do recálculo oficial`);
 
 // ============================================================
 console.log(`\n${C.b}━━━ Resultado: ${checks} checagens · ${C.g}${checks - 0} ok${C.x}${C.b} · ${fails ? C.r : ''}${fails} falhas${C.x}${C.b} · ${warns ? C.y : ''}${warns} avisos${C.x}`);
