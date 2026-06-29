@@ -433,6 +433,13 @@
   ],
   "Brazil": [
     [
+      "2026-06-29",
+      "Japan",
+      true,
+      "2-1",
+      "World Cup"
+    ],
+    [
       "2026-06-24",
       "Scotland",
       false,
@@ -493,13 +500,6 @@
       "Senegal",
       true,
       "2-0",
-      "Amistoso"
-    ],
-    [
-      "2025-10-14",
-      "Japan",
-      false,
-      "2-3",
       "Amistoso"
     ]
   ],
@@ -1585,6 +1585,13 @@
   ],
   "Japan": [
     [
+      "2026-06-29",
+      "Brazil",
+      false,
+      "1-2",
+      "World Cup"
+    ],
+    [
       "2026-06-25",
       "Sweden",
       true,
@@ -1645,13 +1652,6 @@
       "Brazil",
       true,
       "3-2",
-      "Amistoso"
-    ],
-    [
-      "2025-10-10",
-      "Paraguay",
-      true,
-      "2-2",
       "Amistoso"
     ]
   ],
