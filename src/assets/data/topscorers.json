@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-29T19:05:40.759Z",
+  "updated_at": "2026-06-29T20:57:03.008Z",
   "season": 2026,
   "scorers": [
     {
@@ -32,7 +32,7 @@
       "team": "Brazil",
       "goals": 4,
       "assists": 1,
-      "minutes": 261
+      "minutes": 360
     },
     {
       "api_id": 1100,
@@ -80,7 +80,7 @@
       "team": "Brazil",
       "goals": 3,
       "assists": 0,
-      "minutes": 169
+      "minutes": 235
     },
     {
       "api_id": 161897,
@@ -155,12 +155,12 @@
       "minutes": 192
     },
     {
-      "api_id": 47323,
-      "name": "Mikel Oyarzabal",
-      "team": "Spain",
+      "api_id": 72155,
+      "name": "A. Ueda",
+      "team": "Japan",
       "goals": 2,
       "assists": 1,
-      "minutes": 211
+      "minutes": 333
     }
   ]
 }
