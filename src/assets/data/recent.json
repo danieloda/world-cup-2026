@@ -1153,6 +1153,13 @@
   ],
   "Germany": [
     [
+      "2026-06-29",
+      "Paraguay",
+      true,
+      "1-1",
+      "World Cup"
+    ],
+    [
       "2026-06-25",
       "Ecuador",
       false,
@@ -1213,13 +1220,6 @@
       "Luxembourg",
       false,
       "2-0",
-      "Eliminatórias"
-    ],
-    [
-      "2025-10-13",
-      "Northern Ireland",
-      false,
-      "1-0",
       "Eliminatórias"
     ]
   ],
@@ -2161,6 +2161,13 @@
   ],
   "Paraguay": [
     [
+      "2026-06-29",
+      "Germany",
+      false,
+      "1-1",
+      "World Cup"
+    ],
+    [
       "2026-06-26",
       "Australia",
       true,
@@ -2221,13 +2228,6 @@
       "South Korea",
       false,
       "0-2",
-      "Amistoso"
-    ],
-    [
-      "2025-10-10",
-      "Japan",
-      false,
-      "2-2",
       "Amistoso"
     ]
   ],
