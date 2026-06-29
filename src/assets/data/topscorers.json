@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-29T04:14:13.121Z",
+  "updated_at": "2026-06-29T09:12:17.675Z",
   "season": 2026,
   "scorers": [
     {
@@ -120,7 +120,7 @@
       "team": "Canada",
       "goals": 3,
       "assists": 0,
-      "minutes": 335
+      "minutes": 338
     },
     {
       "api_id": 37724,
