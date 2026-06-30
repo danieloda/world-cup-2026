@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-30T06:15:35.178Z",
+  "updated_at": "2026-06-30T10:07:25.633Z",
   "season": 2026,
   "scorers": [
     {
@@ -67,12 +67,20 @@
       "minutes": 246
     },
     {
+      "api_id": 247,
+      "name": "C. Gakpo",
+      "team": "Netherlands",
+      "goals": 3,
+      "assists": 1,
+      "minutes": 371
+    },
+    {
       "api_id": 38750,
       "name": "B. Brobbey",
       "team": "Netherlands",
       "goals": 3,
       "assists": 0,
-      "minutes": 161
+      "minutes": 232
     },
     {
       "api_id": 1165,
@@ -81,14 +89,6 @@
       "goals": 3,
       "assists": 0,
       "minutes": 235
-    },
-    {
-      "api_id": 161897,
-      "name": "I. Saibari",
-      "team": "Morocco",
-      "goals": 3,
-      "assists": 0,
-      "minutes": 243
     },
     {
       "api_id": 184,
@@ -104,7 +104,7 @@
       "team": "New Zealand",
       "goals": 3,
       "assists": 0,
-      "minutes": 271
+      "minutes": 265
     },
     {
       "api_id": 20649,
@@ -112,15 +112,7 @@
       "team": "DR Congo",
       "goals": 3,
       "assists": 0,
-      "minutes": 279
-    },
-    {
-      "api_id": 978,
-      "name": "K. Havertz",
-      "team": "Germany",
-      "goals": 3,
-      "assists": 0,
-      "minutes": 305
+      "minutes": 270
     },
     {
       "api_id": 8489,
@@ -131,12 +123,28 @@
       "minutes": 338
     },
     {
+      "api_id": 978,
+      "name": "K. Havertz",
+      "team": "Germany",
+      "goals": 3,
+      "assists": 0,
+      "minutes": 355
+    },
+    {
+      "api_id": 161897,
+      "name": "I. Saibari",
+      "team": "Morocco",
+      "goals": 3,
+      "assists": 0,
+      "minutes": 363
+    },
+    {
       "api_id": 37724,
       "name": "C. Summerville",
       "team": "Netherlands",
       "goals": 2,
-      "assists": 1,
-      "minutes": 133
+      "assists": 2,
+      "minutes": 253
     },
     {
       "api_id": 20696,
@@ -144,15 +152,7 @@
       "team": "Senegal",
       "goals": 2,
       "assists": 1,
-      "minutes": 177
-    },
-    {
-      "api_id": 48471,
-      "name": "R. Vargas",
-      "team": "Switzerland",
-      "goals": 2,
-      "assists": 1,
-      "minutes": 178
+      "minutes": 170
     },
     {
       "api_id": 72155,
