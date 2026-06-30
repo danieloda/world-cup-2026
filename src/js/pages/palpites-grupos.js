@@ -7,7 +7,7 @@ import {
   flag, escapeHtml, formatBrDate, formatTime,
   isLocked, isLive, lockCountdownLabel, showToast, loadRecentMatches,
   loadQualifiers, loadStandings, teamPt, groundShort, renderDateCalendar, predictionDeadline,
-  predictionBatchKey, localDateKey, oddsToProbs, brParts, heroMeta, wireHScroll, computeStandings,
+  predictionBatchKey, localDateKey, buildForecast, brParts, heroMeta, wireHScroll, computeStandings,
 } from '../util.js';
 import { matchPoints, scoreBreakdown } from '../scoring.js';
 import { matchScorerPts as matchScorerPtsCore, groupCardSummary } from '../card-results.js';
@@ -48,35 +48,15 @@ function raioxData(m) {
   return {
     recentByTeam,
     h2h: h2hByMatch.get(m.id) ?? null,
-    predictions: buildForecast(m),
+    // "Previsão" = barra 1X2 (odds) + radar (predictions) + placar provável /
+    // perfil de gols (markets). Shaping compartilhado em util.buildForecast.
+    predictions: buildForecast(
+      predictionsByMatch.get(m.id) ?? null,
+      oddsByMatch.get(m.id),
+      marketsByMatch.get(m.id) ?? null,
+    ),
     qualifiers,
     standings,
-  };
-}
-
-// "Previsão" do Raio-X = barra 1X2 + radar de força. A BARRA agora vem das ODDS
-// (probabilidade implícita de-margined, ver oddsToProbs); o RADAR continua vindo
-// do /predictions da API-Football (form/ataque/defesa). Une os dois num objeto
-// no shape que renderPredictionsBlock espera. Sem odds, a barra cai pro % da API
-// (raro: as odds cobrem todos os jogos de grupo). Retorna null se não há nenhum.
-function buildForecast(m) {
-  const apiPred = predictionsByMatch.get(m.id) ?? null;   // { pHome,…, radar, comparison, source }
-  const probs = oddsToProbs(oddsByMatch.get(m.id));       // das odds, ou null
-  const markets = marketsByMatch.get(m.id) ?? null;       // placar provável + perfil de gols (Betano)
-  if (!probs && !apiPred && !markets) return null;
-  const bar = probs
-    ? { pHome: probs.pHome, pDraw: probs.pDraw, pAway: probs.pAway, favored: probs.favored,
-        source: oddsByMatch.get(m.id)?.bookmaker_name || 'Betano' }
-    : apiPred
-    ? { pHome: apiPred.pHome, pDraw: apiPred.pDraw, pAway: apiPred.pAway, favored: apiPred.favored,
-        source: apiPred.source || 'API-Football' }
-    : { source: 'Betano' };
-  return {
-    ...bar,
-    radar: apiPred?.radar ?? null,
-    comparison: apiPred?.comparison ?? null,
-    scorelines: markets?.scorelines ?? null,
-    goals: markets?.goals ?? null,
   };
 }
 

@@ -3,6 +3,7 @@ import {
   renderPredictionsBlock, renderRecentBlock, renderH2HBlock, renderQualifiersBlock,
   renderRaioXContent,
 } from '../../src/js/raiox.js';
+import { buildForecast } from '../../src/js/util.js';
 
 /**
  * RENDER ADVERSARIAL do Raio-X (parte do ponto "admin/raio-x").
@@ -166,5 +167,31 @@ describe('Raio-X renderRaioXContent — grupo ao vivo + tendências', () => {
     const html = noThrow(() => renderRaioXContent('Brazil', 'Argentina',
       { recentByTeam: new Map(), h2h: null, predictions: null, qualifiers: null, standings: undefined }), 'no-stand');
     clean(html, 'no-stand');
+  });
+});
+
+// Caso do MODAL de mata-mata: confronto já real recebe `predictions` (de
+// util.buildForecast) e SEM standings/grupo (KO não tem grupo comum). Garante que
+// a aba "Previsão" aparece com a barra do mercado + placar provável.
+describe('Raio-X renderRaioXContent — mata-mata com previsão (modal)', () => {
+  const predictions = buildForecast(
+    { pHome: 10, pDraw: 45, pAway: 45, favored: 'away', source: 'API-Football',
+      radar: { axes: ['Forma'], home: [55], away: [60] }, comparison: [{ label: 'Forma', home: 55, away: 60 }] },
+    { odd_home: 5.10, odd_draw: 3.50, odd_away: 1.75, bookmaker_name: 'Betano' },
+    // markets FLAT (shape do normalizeOddsMarkets): scorelines + mercados de gol.
+    { scorelines: [{ score: '0-1', prob: 16 }], overUnder: { line: 2.5, over: 45, under: 55 },
+      btts: { yes: 48, no: 52 }, totalGoals: [{ goals: 2, prob: 28 }],
+      teamGoals: { home: { exp: 0.9, dist: [] }, away: { exp: 1.5, dist: [] } } },
+  );
+
+  it('confronto real → aba Previsão com favorito do mercado, placar provável e perfil de gols', () => {
+    const html = noThrow(() => renderRaioXContent('Canada', 'Morocco',
+      { recentByTeam: new Map(), h2h: null, predictions, qualifiers: null, standings: null }), 'ko-pred');
+    clean(html, 'ko-pred');
+    expect(html).toContain('data-rxx-tab="pred"');   // aba Previsão existe
+    expect(html).toContain('Previsão');
+    expect(html).toContain('Placar provável');
+    expect(html).toContain('Perfil de gols');         // fix: perfil de gols agora aparece
+    expect(html).not.toContain('Grupo');              // KO não tem grupo comum
   });
 });

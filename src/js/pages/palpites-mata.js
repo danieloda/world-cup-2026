@@ -6,7 +6,7 @@ import { supabase } from '../supabase.js';
 import {
   flag, escapeHtml, formatTime, formatBrDate, isLocked, lockCountdownLabel, showToast,
   loadRecentMatches, loadQualifiers, teamPt, renderDateCalendar, predictionDeadline,
-  predictionBatchKey, localDateKey, brParts, heroMeta,
+  predictionBatchKey, localDateKey, brParts, heroMeta, buildForecast,
 } from '../util.js';
 import { isRealTeam, resolveSlotToTeam, computeSlotResolution } from '../bracket.js';
 import { matchPoints, scoreBreakdown, stageMultiplier, scorerBonus } from '../scoring.js';
@@ -73,6 +73,9 @@ let championPickTeam = null;         // time escolhido como campeão (bônus na 
 let realChampion = null;             // campeão real (vencedor da final, quando jogada)
 let recentByTeam = new Map();        // team -> forma recente (Raio-X)
 let qualifiers = null;               // assets/data/qualifiers.json — campanha de eliminatórias (Raio-X)
+let oddsByMatch = new Map();         // match_id -> { odd_home, odd_draw, odd_away, bookmaker_name } (barra 1X2 do Raio-X)
+let marketsByMatch = new Map();      // match_id -> markets normalizados (placar provável + perfil de gols)
+let forecastByMatch = new Map();     // match_id -> previsão normalizada (match_predictions.payload — radar/comparison)
 let viewMode = 'date';               // 'bracket' | 'date' — layout: chave ou lista por data (padrão: por data)
 let activeDate = null;               // ISO yyyy-mm-dd quando viewMode === 'date'
 const saveTimers = new Map();        // match_id -> setTimeout handle
@@ -116,7 +119,7 @@ try {
 // Data
 // ============================================================
 async function loadData() {
-  const [statsRes, matchesRes, predsRes, goalsRes, qualRes, scorerRes, champRes] = await Promise.all([
+  const [statsRes, matchesRes, predsRes, goalsRes, qualRes, scorerRes, champRes, oddsRes, marketsRes, forecastRes] = await Promise.all([
     supabase.from('v_pool_stats').select('*').single(),
     supabase.from('matches').select('*').order('match_date'),
     supabase.from('predictions').select('*').eq('user_id', profile.id),
@@ -124,6 +127,11 @@ async function loadData() {
     supabase.from('user_qualifier_points').select('breakdown').eq('user_id', profile.id).maybeSingle(),
     supabase.from('top_scorer_picks').select('player_id, players(full_name)').eq('user_id', profile.id).maybeSingle(),
     supabase.from('champion_picks').select('team').eq('user_id', profile.id).maybeSingle(),
+    // Raio-X "Previsão" (mata-mata): barra 1X2 + radar + placar provável/perfil de
+    // gols. Query de markets SEPARADA (degrada sozinha se a coluna 065 não existir).
+    supabase.from('match_odds').select('match_id, odd_home, odd_draw, odd_away, bookmaker_name'),
+    supabase.from('match_odds').select('match_id, markets'),
+    supabase.from('match_predictions').select('match_id, payload'),
   ]);
 
   if (matchesRes.error) throw matchesRes.error;
@@ -133,6 +141,13 @@ async function loadData() {
   allMatches = matchesRes.data ?? [];
   matches = allMatches.filter(m => m.stage !== 'group');
   predsByMatch = new Map((predsRes.data ?? []).map(p => [p.match_id, p]));
+
+  // Fontes do Raio-X "Previsão" (degradam graciosas: erro/ausência → mapa vazio →
+  // a seção some, igual ao gating do projeto). Só os jogos de mata-mata com times
+  // reais terão essas linhas (pipeline fetch-odds/predictions --ko).
+  oddsByMatch = new Map((oddsRes.data ?? []).map(o => [o.match_id, o]));
+  marketsByMatch = new Map((marketsRes.data ?? []).map(o => [o.match_id, o.markets]));
+  forecastByMatch = new Map((forecastRes.data ?? []).map(p => [p.match_id, p.payload]));
 
   goalsByMatch = new Map();
   for (const g of (goalsRes.data ?? [])) {
@@ -185,9 +200,23 @@ function resolveSide(m, side) {
 }
 
 // Dados que alimentam o Raio-X (módulo ../raiox.js). No render do botão o H2H
-// ainda não foi buscado (h2h null); ele é resolvido on-demand ao abrir o modal.
-function raioxData(h2h = null) {
-  return { recentByTeam, h2h, qualifiers };
+// ainda não foi buscado (h2h null) e a previsão não é passada (predictions null);
+// ambos são resolvidos on-demand ao abrir o modal.
+function raioxData(h2h = null, predictions = null) {
+  return { recentByTeam, h2h, qualifiers, predictions };
+}
+
+// "Previsão" do confronto (barra 1X2 + radar + placar provável + perfil de gols),
+// das linhas de match_odds/match_predictions deste match_id. Shaping em
+// util.buildForecast (mesmo dos grupos). Só vale quando os dois lados já são times
+// REAIS — a fixture da API descreve o confronto OFICIAL, não a sua simulação da
+// chave (a guarda fica em openRaioXForMata).
+function buildForecastFor(m) {
+  return buildForecast(
+    forecastByMatch.get(m.id) ?? null,
+    oddsByMatch.get(m.id),
+    marketsByMatch.get(m.id) ?? null,
+  );
 }
 
 // Busca o confronto direto entre dois times (tabela team_h2h, par canônico
@@ -205,11 +234,16 @@ async function fetchH2HPair(homeTeam, awayTeam) {
   return { fixtures: data.fixtures, summary };
 }
 
-// Busca o H2H do par e abre o modal do Raio-X (forma recente + confronto direto).
-async function openRaioXForMata(homeTeam, awayTeam) {
+// Busca o H2H do par e abre o modal do Raio-X (forma + confronto + previsão).
+async function openRaioXForMata(m, homeTeam, awayTeam) {
   let h2h = null;
   try { h2h = await fetchH2HPair(homeTeam, awayTeam); } catch (e) { console.warn('[h2h]', e); }
-  openRaioXModal({ homeTeam, awayTeam, data: raioxData(h2h) });
+  // Previsão (odds/radar/placar provável) SÓ quando os dois lados já são times
+  // reais: a fixture da API é o confronto oficial, não a sua simulação da chave.
+  // Numa vaga ainda simulada o time exibido pode não ser o do mercado → enganoso.
+  const bothReal = isRealTeam(m.team_home) && isRealTeam(m.team_away);
+  const predictions = bothReal ? buildForecastFor(m) : null;
+  openRaioXModal({ homeTeam, awayTeam, data: raioxData(h2h, predictions) });
 }
 
 // A resolução do bracket (slots → times) vive em ../bracket.js (puro, testável).
@@ -896,7 +930,7 @@ function attachEventListeners() {
       const m = matches.find(mm => mm.id === matchId);
       const homeTeam = m && resolveSide(m, 'home');
       const awayTeam = m && resolveSide(m, 'away');
-      if (homeTeam && awayTeam) openRaioXForMata(homeTeam, awayTeam);
+      if (m && homeTeam && awayTeam) openRaioXForMata(m, homeTeam, awayTeam);
       return;
     }
 

@@ -55,3 +55,24 @@ export function normalizePrediction(entry, apiHomeId, apiAwayId) {
 
   return { source: 'API-Football', pHome, pDraw, pAway, favored, comparison, radar };
 }
+
+// Inverte a ótica casa↔fora de uma previsão JÁ normalizada. Usado no mata-mata
+// quando a fixture da API tem o mando OPOSTO ao nosso team_home: a previsão
+// (favorito, %, comparison, radar) sai na ótica da fixture, mas o Raio-X exibe
+// na ótica do NOSSO mandante. Espelha favored, pHome↔pAway, e o lado home↔away
+// de cada eixo do comparison e do radar.
+export function flipPrediction(p) {
+  if (!p) return p;
+  return {
+    ...p,
+    pHome: p.pAway,
+    pAway: p.pHome,
+    favored: p.favored === 'home' ? 'away' : p.favored === 'away' ? 'home' : 'draw',
+    comparison: Array.isArray(p.comparison)
+      ? p.comparison.map(c => ({ label: c.label, home: c.away, away: c.home }))
+      : p.comparison,
+    radar: p.radar
+      ? { axes: p.radar.axes, home: p.radar.away, away: p.radar.home }
+      : p.radar,
+  };
+}

@@ -160,6 +160,27 @@ function buildTeamGoals(bets, id) {
   return { exp: Math.round(exp * 10) / 10, dist };
 }
 
+// Inverte a ótica casa↔fora de um objeto de mercados JÁ normalizado. Usado no
+// mata-mata quando a fixture da API tem o mando OPOSTO ao nosso team_home (ver
+// scripts/data/fetch-odds.js): a Betano dá os mercados na ótica da fixture, mas
+// o Raio-X exibe na ótica do NOSSO mandante. overUnder/btts/totalGoals são
+// simétricos (não têm lado) → ficam iguais. scorelines invertem os dígitos
+// (1-0 → 0-1, mesma prob) e teamGoals troca home↔away.
+export function flipMarkets(mk) {
+  if (!mk) return mk;
+  const out = { ...mk };
+  if (Array.isArray(mk.scorelines)) {
+    out.scorelines = mk.scorelines.map(s => {
+      const [a, b] = String(s.score).split('-');
+      return { score: `${b}-${a}`, prob: s.prob };
+    });
+  }
+  if (mk.teamGoals) {
+    out.teamGoals = { home: mk.teamGoals.away ?? null, away: mk.teamGoals.home ?? null };
+  }
+  return out;
+}
+
 export function normalizeOddsMarkets(bets) {
   if (!Array.isArray(bets) || !bets.length) return null;
 

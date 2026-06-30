@@ -15,9 +15,9 @@
  * Idempotente. Custo: ~72 requests (fase de grupos).
  *
  * Usage:
- *   node scripts/fetch-predictions.js              # grava em PROD (cuidado!)
+ *   node scripts/fetch-predictions.js              # fase de grupos (grava em PROD)
+ *   node scripts/fetch-predictions.js --ko         # mata-mata (confrontos já reais)
  *   node scripts/fetch-predictions.js --dry-run    # só mostra, não grava nada
- *   node scripts/fetch-predictions.js --stage=knockout
  *
  * ⚠️ Sem --dry-run, escreve direto no Supabase de PRODUÇÃO (usa o
  *    SUPABASE_SERVICE_ROLE_KEY do .env). O caminho normal é a GitHub Action.
@@ -28,7 +28,8 @@ import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { config } from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
-import { normalizePrediction } from '../lib/normalize-prediction.js';
+import { normalizePrediction, flipPrediction } from '../lib/normalize-prediction.js';
+import { resolveKnockoutFixtures } from '../lib/link-knockout.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 config({ path: join(__dirname, '..', '..', '.env') });
@@ -42,6 +43,7 @@ const FIXTURES_PATH = join(__dirname, '..', '..', 'src', 'assets', 'data', 'fixt
 
 const argv = process.argv.slice(2);
 const DRY_RUN = argv.includes('--dry-run');
+const KO = argv.includes('--ko');
 const STAGE = argv.find(a => a.startsWith('--stage='))?.split('=')[1] || 'group';
 
 function assert(cond, msg) { if (!cond) { console.error('ERRO:', msg); process.exit(1); } }
@@ -52,6 +54,19 @@ assert(SERVICE_KEY, 'SUPABASE_SERVICE_ROLE_KEY ausente em .env');
 const admin = createClient(SUPABASE_URL, SERVICE_KEY, {
   auth: { autoRefreshToken: false, persistSession: false }
 });
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// GET genérico na API-Football com retry pra 429 (usado pelo linkage do mata-mata).
+async function apiGet(path) {
+  for (let a = 0; a < 4; a++) {
+    const r = await fetch(API_BASE + path, { headers: { 'x-apisports-key': API_KEY } });
+    if (r.status === 429) { await sleep(3000); continue; }
+    if (!r.ok) throw new Error(`API HTTP ${r.status} (${path})`);
+    return r.json();
+  }
+  throw new Error('rate limited ' + path);
+}
 
 // ------------------------------------------------------------
 // 1) Linkage api_fixture_id (igual fetch-odds.js)
@@ -143,9 +158,63 @@ async function fetchAllPredictions() {
   console.log(`\nResumo: ${ok} com previsão · ${missing} sem previsão${DRY_RUN ? '  (DRY-RUN — nada gravado)' : ''}`);
 }
 
+// ------------------------------------------------------------
+// 3) Mata-mata: previsões dos confrontos já reais (ligação ao vivo)
+// ------------------------------------------------------------
+// Mesma ideia do fetch-odds --ko: a fixture só existe quando os dois lados estão
+// definidos, e o MANDO da API pode ser oposto ao nosso team_home — aí reorientamos
+// a previsão (flipPrediction) pra ótica do nosso mandante.
+async function fetchKnockoutPredictions() {
+  const koMap = await resolveKnockoutFixtures({
+    admin, apiGet, fixturesPath: FIXTURES_PATH, dryRun: DRY_RUN, log: console.log,
+  });
+  if (!koMap.size) { console.log('\nNenhum confronto de mata-mata com times reais ainda.'); return; }
+
+  console.log(`\nBuscando previsões (mata-mata) para ${koMap.size} confronto(s)…`);
+  let ok = 0, missing = 0;
+  for (const [matchId, info] of koMap) {
+    try {
+      const entry = await fetchFixturePrediction(info.apiFixtureId);
+      // Normaliza na ótica da API (favored/comparison/radar consistentes entre si)…
+      let norm = entry
+        ? normalizePrediction(entry, entry.teams?.home?.id ?? null, entry.teams?.away?.id ?? null)
+        : null;
+      // …e reorienta pra ótica do nosso mandante quando a API tem o mando oposto.
+      const reversed = norm && info.ourHomeApiId !== (entry.teams?.home?.id ?? info.apiHomeId);
+      if (reversed) norm = flipPrediction(norm);
+
+      if (!norm) {
+        console.log(`  [no-pred] #${matchId}`);
+        missing++;
+        if (!DRY_RUN) {
+          const { error: delErr } = await admin.from('match_predictions').delete().eq('match_id', matchId);
+          if (delErr) throw delErr;
+        }
+        continue;
+      }
+
+      if (!DRY_RUN) {
+        const { error: upErr } = await admin.from('match_predictions').upsert({
+          match_id: matchId,
+          payload: norm,
+          advice: entry.predictions.advice ?? null,
+          fetched_at: new Date().toISOString(),
+        }, { onConflict: 'match_id' });
+        if (upErr) throw upErr;
+      }
+      console.log(`  [ok]${DRY_RUN ? '[dry]' : ''} #${matchId} ${norm.pHome}/${norm.pDraw}/${norm.pAway} → ${norm.favored}${reversed ? ' (mando invertido)' : ''}${norm.radar ? ' +radar' : ''}`);
+      ok++;
+    } catch (e) {
+      console.error(`  [erro] #${matchId}:`, e.message);
+    }
+  }
+  console.log(`\nResumo mata-mata: ${ok} com previsão · ${missing} sem${DRY_RUN ? '  (DRY-RUN — nada gravado)' : ''}`);
+}
+
 async function main() {
-  console.log('=== SBC 2026 · fetch-predictions ===');
+  console.log(`=== SBC 2026 · fetch-predictions${KO ? ' (mata-mata)' : ''} ===`);
   if (DRY_RUN) console.log('(DRY-RUN — não grava nada no Supabase)\n');
+  if (KO) { await fetchKnockoutPredictions(); return; }
   await linkFixtureIds();
   await fetchAllPredictions();
 }

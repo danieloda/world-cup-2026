@@ -43,9 +43,18 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run fetch-odds
+      - name: Run fetch-odds (fase de grupos)
         env:
           API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: node scripts/data/fetch-odds.js
+
+      # Mata-mata: só os confrontos JÁ definidos (times reais) têm fixture na API.
+      # Ligação ao vivo por par de seleções; reorienta o mando p/ o nosso team_home.
+      - name: Run fetch-odds (mata-mata)
+        env:
+          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/data/fetch-odds.js --ko

@@ -44,9 +44,18 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run fetch-predictions
+      - name: Run fetch-predictions (fase de grupos)
         env:
           API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: node scripts/data/fetch-predictions.js
+
+      # Mata-mata: só os confrontos JÁ definidos (times reais) têm fixture na API.
+      # Ligação ao vivo por par de seleções; reorienta o radar/favorito p/ o nosso team_home.
+      - name: Run fetch-predictions (mata-mata)
+        env:
+          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/data/fetch-predictions.js --ko

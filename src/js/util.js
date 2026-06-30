@@ -901,6 +901,43 @@ export function oddsToProbs(o) {
   return { pHome, pDraw, pAway, favored };
 }
 
+// "Previsão" do Raio-X = barra 1X2 + radar de força + placar provável + perfil
+// de gols, num objeto no shape que renderPredictionsBlock (raiox.js) consome.
+// A BARRA vem das ODDS (prob. implícita de-margined); sem odds, cai pro % da API
+// (raro). O radar/comparison vêm do /predictions; scorelines/goals dos mercados
+// extras. Compartilhado por palpites-grupos e palpites-mata pra não driftar.
+//   apiPred: match_predictions.payload normalizado (ou null)
+//   odds:    linha de match_odds { odd_home, odd_draw, odd_away, bookmaker_name } (ou undefined)
+//   markets: match_odds.markets normalizado, FLAT:
+//            { scorelines, overUnder, btts, totalGoals, teamGoals } (ou null)
+// Retorna null se não há NENHUMA das três fontes.
+export function buildForecast(apiPred, odds, markets) {
+  const probs = oddsToProbs(odds);
+  if (!probs && !apiPred && !markets) return null;
+  const bar = probs
+    ? { pHome: probs.pHome, pDraw: probs.pDraw, pAway: probs.pAway, favored: probs.favored,
+        source: odds?.bookmaker_name || 'Betano' }
+    : apiPred
+    ? { pHome: apiPred.pHome, pDraw: apiPred.pDraw, pAway: apiPred.pAway, favored: apiPred.favored,
+        source: apiPred.source || 'API-Football' }
+    : { source: 'Betano' };
+  // O "perfil de gols" (renderGoalsBlock) consome pred.goals = { overUnder, btts,
+  // totalGoals, teamGoals }. normalizeOddsMarkets devolve esses campos FLAT (sem
+  // wrapper `goals`), então os reagrupamos aqui — antes lia markets.goals (sempre
+  // undefined) e o perfil de gols nunca aparecia.
+  const hasGoalMkts = !!(markets && (markets.overUnder || markets.btts || markets.totalGoals?.length || markets.teamGoals));
+  return {
+    ...bar,
+    radar: apiPred?.radar ?? null,
+    comparison: apiPred?.comparison ?? null,
+    scorelines: markets?.scorelines ?? null,
+    goals: hasGoalMkts
+      ? { overUnder: markets.overUnder ?? null, btts: markets.btts ?? null,
+          totalGoals: markets.totalGoals ?? null, teamGoals: markets.teamGoals ?? null }
+      : null,
+  };
+}
+
 // ============================================================
 // Team Tooltip — hover popover com últimos 5 jogos da seleção
 // ============================================================

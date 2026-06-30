@@ -16,7 +16,13 @@
  * Idempotente — pode rodar quantas vezes quiser. Custo: ~72 requests (fase de
  * grupos) → mesmo de antes (1 request por jogo), bem abaixo do limite do plano.
  *
- * Usage: node scripts/fetch-odds.js
+ * Usage:
+ *   node scripts/data/fetch-odds.js              # fase de grupos (grava em PROD)
+ *   node scripts/data/fetch-odds.js --ko         # mata-mata (confrontos já reais)
+ *   node scripts/data/fetch-odds.js --dry-run    # não grava nada (só mostra)
+ *
+ * ⚠️ Sem --dry-run, escreve direto no Supabase de PRODUÇÃO (usa o
+ *    SUPABASE_SERVICE_ROLE_KEY do .env). O caminho normal é a GitHub Action.
  */
 
 import { readFileSync } from 'fs';
@@ -24,7 +30,8 @@ import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { config } from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
-import { normalizeOddsMarkets } from '../lib/normalize-odds-markets.js';
+import { normalizeOddsMarkets, flipMarkets } from '../lib/normalize-odds-markets.js';
+import { resolveKnockoutFixtures } from '../lib/link-knockout.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 config({ path: join(__dirname, '..', '..', '.env') });
@@ -40,6 +47,10 @@ const BOOKMAKER_ID = 32;       // Betano
 const BOOKMAKER_NAME = 'Betano';
 const BET_ID = 1;              // Match Winner (1X2)
 
+const argv = process.argv.slice(2);
+const DRY_RUN = argv.includes('--dry-run');
+const KO = argv.includes('--ko');
+
 function assert(cond, msg) {
   if (!cond) { console.error('ERRO:', msg); process.exit(1); }
 }
@@ -51,6 +62,19 @@ assert(SERVICE_KEY, 'SUPABASE_SERVICE_ROLE_KEY ausente em .env');
 const admin = createClient(SUPABASE_URL, SERVICE_KEY, {
   auth: { autoRefreshToken: false, persistSession: false }
 });
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// GET genérico na API-Football com retry pra 429 (usado pelo linkage do mata-mata).
+async function apiGet(path) {
+  for (let a = 0; a < 4; a++) {
+    const r = await fetch(API_BASE + path, { headers: { 'x-apisports-key': API_KEY } });
+    if (r.status === 429) { await sleep(3000); continue; }
+    if (!r.ok) throw new Error(`API HTTP ${r.status} (${path})`);
+    return r.json();
+  }
+  throw new Error('rate limited ' + path);
+}
 
 // ------------------------------------------------------------
 // 1) Populate api_fixture_id
@@ -89,11 +113,13 @@ async function linkFixtureIds() {
       notFound++;
       continue;
     }
-    const { error: updErr } = await admin
-      .from('matches')
-      .update({ api_fixture_id: f.id })
-      .eq('id', m.id);
-    if (updErr) throw updErr;
+    if (!DRY_RUN) {
+      const { error: updErr } = await admin
+        .from('matches')
+        .update({ api_fixture_id: f.id })
+        .eq('id', m.id);
+      if (updErr) throw updErr;
+    }
     linked++;
   }
 
@@ -166,23 +192,25 @@ async function fetchAllOdds() {
         missing++;
         continue;
       }
-      const { error: upErr } = await admin
-        .from('match_odds')
-        .upsert({
-          match_id: m.id,
-          odd_home: odds.odd_home,
-          odd_draw: odds.odd_draw,
-          odd_away: odds.odd_away,
-          markets: odds.markets,
-          bookmaker_id: odds.bookmaker_id,
-          bookmaker_name: odds.bookmaker_name,
-          api_updated_at: odds.api_updated_at,
-          fetched_at: new Date().toISOString(),
-        }, { onConflict: 'match_id' });
-      if (upErr) throw upErr;
+      if (!DRY_RUN) {
+        const { error: upErr } = await admin
+          .from('match_odds')
+          .upsert({
+            match_id: m.id,
+            odd_home: odds.odd_home,
+            odd_draw: odds.odd_draw,
+            odd_away: odds.odd_away,
+            markets: odds.markets,
+            bookmaker_id: odds.bookmaker_id,
+            bookmaker_name: odds.bookmaker_name,
+            api_updated_at: odds.api_updated_at,
+            fetched_at: new Date().toISOString(),
+          }, { onConflict: 'match_id' });
+        if (upErr) throw upErr;
+      }
 
       const mk = odds.markets ? ` +mkt(${Object.keys(odds.markets).join(',')})` : '';
-      console.log(`  [ok] #${m.id} ${m.team_home} ${odds.odd_home} · ${odds.odd_draw} · ${odds.odd_away} ${m.team_away}${mk}`);
+      console.log(`  [ok]${DRY_RUN ? '[dry]' : ''} #${m.id} ${m.team_home} ${odds.odd_home} · ${odds.odd_draw} · ${odds.odd_away} ${m.team_away}${mk}`);
       ok++;
     } catch (e) {
       console.error(`  [erro] #${m.id}:`, e.message);
@@ -192,10 +220,66 @@ async function fetchAllOdds() {
   console.log(`\nResumo: ${ok} com odds · ${missing} sem odds disponíveis ainda`);
 }
 
+// ------------------------------------------------------------
+// 3) Mata-mata: odds dos confrontos já reais (ligação ao vivo)
+// ------------------------------------------------------------
+// Diferente da fase de grupos, a fixture do mata-mata só existe na API quando os
+// dois lados estão definidos, e o MANDO da API pode ser oposto ao nosso
+// team_home — então reorientamos 1X2 e mercados (flipMarkets) pela ótica do nosso
+// mandante, pra casar com o que o Raio-X exibe.
+async function fetchKnockoutOdds() {
+  const koMap = await resolveKnockoutFixtures({
+    admin, apiGet, fixturesPath: FIXTURES_PATH, dryRun: DRY_RUN, log: console.log,
+  });
+  if (!koMap.size) { console.log('\nNenhum confronto de mata-mata com times reais ainda.'); return; }
+
+  console.log(`\nBuscando odds (Betano) para ${koMap.size} confronto(s) de mata-mata…`);
+  let ok = 0, missing = 0;
+  for (const [matchId, info] of koMap) {
+    try {
+      const odds = await fetchFixtureOdds(info.apiFixtureId);
+      if (!odds) {
+        console.log(`  [no-odds] #${matchId} (fixture ${info.apiFixtureId})`);
+        missing++;
+        continue;
+      }
+      // Reorienta pela ótica do NOSSO mandante quando a API tem o mando oposto.
+      const odd_home = info.reversed ? odds.odd_away : odds.odd_home;
+      const odd_away = info.reversed ? odds.odd_home : odds.odd_away;
+      const markets = info.reversed ? flipMarkets(odds.markets) : odds.markets;
+
+      if (!DRY_RUN) {
+        const { error: upErr } = await admin
+          .from('match_odds')
+          .upsert({
+            match_id: matchId,
+            odd_home, odd_draw: odds.odd_draw, odd_away,
+            markets,
+            bookmaker_id: odds.bookmaker_id,
+            bookmaker_name: odds.bookmaker_name,
+            api_updated_at: odds.api_updated_at,
+            fetched_at: new Date().toISOString(),
+          }, { onConflict: 'match_id' });
+        if (upErr) throw upErr;
+      }
+      const mk = markets ? ` +mkt(${Object.keys(markets).join(',')})` : '';
+      console.log(`  [ok]${DRY_RUN ? '[dry]' : ''} #${matchId} ${odd_home} · ${odds.odd_draw} · ${odd_away}${info.reversed ? ' (mando invertido)' : ''}${mk}`);
+      ok++;
+    } catch (e) {
+      console.error(`  [erro] #${matchId}:`, e.message);
+    }
+  }
+  console.log(`\nResumo mata-mata: ${ok} com odds · ${missing} sem odds ainda${DRY_RUN ? '  (DRY-RUN — nada gravado)' : ''}`);
+}
+
 async function main() {
-  console.log('=== SBC 2026 · fetch-odds ===');
-  await linkFixtureIds();
-  await fetchAllOdds();
+  console.log(`=== SBC 2026 · fetch-odds${KO ? ' (mata-mata)' : ''}${DRY_RUN ? ' [DRY-RUN]' : ''} ===`);
+  if (KO) {
+    await fetchKnockoutOdds();
+  } else {
+    await linkFixtureIds();
+    await fetchAllOdds();
+  }
 }
 
 main().catch(err => { console.error(err); process.exit(1); });
