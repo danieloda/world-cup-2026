@@ -100,7 +100,7 @@ for (const [rel, cols] of Object.entries(COLS)) {
 
 // RPCs do estado final
 const EXPECTED_RPCS = {
-  is_admin: '002', cs_deadline: '024', stage_multiplier: '058', score_prediction: '056',
+  is_admin: '002', cs_deadline: '024', stage_multiplier: '058', score_prediction: '074',
   recompute_prediction_points: '039', champion_bonus_for: '039', scorer_bonus_for: '039',
   fifa_rank: '015', resolve_match_slots: '015', try_assign_thirds: '005', _backtrack_thirds: '015',
   qualifier_bonus_pts: '022', _backtrack_thirds_pred: '021', compute_predicted_slots: '021',
@@ -244,9 +244,15 @@ head('[4] Comportamento observável (RPCs imutáveis/stable)');
   // r16: ag=3 (×2 lados) + ave=12 + dg=1 = 19. Engine antiga (022) daria 7.
   const { data, error } = await sr.rpc('score_prediction', { ph: 2, pa: 2, p_pen: 'home', ah: 2, aw: 2, a_pen: 'away', stage: 'r16' });
   if (error) bad(`score_prediction: ${error.message}`);
-  else if (data === 19) ok('score_prediction R16 2x2 pên. errado = 19 → 056 APLICADA');
+  else if (data === 19) ok('score_prediction R16 2x2 pên. errado = 19 → 056/074 APLICADA');
   else if (data === 7) bad('score_prediction R16 2x2 pên. errado = 7 → engine ANTIGA (056 NÃO aplicada)');
   else bad(`score_prediction R16 2x2 = ${data} (esperado 19) — engine divergente`);
+  // 074: acertou o EMPATE sem cravar, pênalti errado (2-2 vs 1-1) → ave+dg = 13.
+  // Engine 056 (sem 074) daria só dg = 1 (o bug Países Baixos×Marrocos).
+  const { data: d74 } = await sr.rpc('score_prediction', { ph: 2, pa: 2, p_pen: 'home', ah: 1, aw: 1, a_pen: 'away', stage: 'r16' });
+  d74 === 13 ? ok('score_prediction R16 2x2 vs 1x1 pên. errado = 13 → 074 APLICADA (empate vale resultado)')
+    : d74 === 1 ? bad('score_prediction R16 2x2 vs 1x1 pên. errado = 1 → engine PRÉ-074 (empate ainda perde o resultado)')
+    : bad(`score_prediction R16 2x2 vs 1x1 = ${d74} (esperado 13) — engine divergente`);
   // 022 sanidade: grupos 2x1 cravado = 1+1+4+1 = 7
   const { data: g } = await sr.rpc('score_prediction', { ph: 2, pa: 1, p_pen: null, ah: 2, aw: 1, a_pen: null, stage: 'group' });
   g === 7 ? ok('score_prediction grupos exato = 7 (modelo aditivo 022)') : bad(`score_prediction grupos exato = ${g} (esperado 7)`);

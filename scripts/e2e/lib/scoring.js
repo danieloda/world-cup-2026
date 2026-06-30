@@ -1,6 +1,6 @@
 // Replica em JS as funcoes SQL de pontuacao. Usado pra calcular a pontuacao
 // ESPERADA antes do E2E rodar e comparar contra o que o trigger SQL calculou.
-// KEEP IN SYNC com 022_additive_scoring.sql e js/scoring.js.
+// KEEP IN SYNC com 022_additive_scoring.sql + 074_pen_empate_vale_resultado.sql e js/scoring.js.
 
 // stage_multiplier (003) — usado SO pelo artilheiro (scorerBonus).
 export const STAGE_MULT = {
@@ -22,8 +22,8 @@ export const CHAMPION_BONUS = 40;
 export const SCORER_PER_GOAL_BASE = 2;
 
 /**
- * Pontos de um palpite vs resultado real (ADITIVO). Replica score_prediction (022).
- *   +ag por LADO certo · +ave vencedor/empate · +dg saldo de gols.
+ * Pontos de um palpite vs resultado real (ADITIVO). Replica score_prediction (074).
+ *   +ag por LADO certo · +ave RESULTADO (vitória/empate, SEM pênalti) · +dg saldo.
  */
 export function scorePrediction(ph, pa, ppen, ah, aw, apen, stage) {
   if (ph == null || pa == null || ah == null || aw == null) return 0;
@@ -33,24 +33,12 @@ export function scorePrediction(ph, pa, ppen, ah, aw, apen, stage) {
   if (ph === ah) pts += v.ag;
   if (pa === aw) pts += v.ag;
 
-  let predWinner;
-  if (ph > pa) predWinner = 'h';
-  else if (pa > ph) predWinner = 'a';
-  else if (stage !== 'group' && ppen) predWinner = ppen;
-  else predWinner = 'd';
-
-  let actualWinner;
-  if (ah > aw) actualWinner = 'h';
-  else if (aw > ah) actualWinner = 'a';
-  else if (stage !== 'group' && apen) actualWinner = apen;
-  else actualWinner = 'd';
-
-  // Cravar o placar do tempo normal (ph=ah E pa=aw) garante o ponto de RESULTADO
-  // mesmo errando o pênalti — regra "cravou = placar exato" (migration 056,
-  // espelha src/js/scoring.js). Sem isto, um empate de mata-mata cravado com
-  // pênalti errado perderia o ave e o E2E divergiria do banco.
-  const isExactScore = ph === ah && pa === aw;
-  if (isExactScore || predWinner === actualWinner) pts += v.ave;
+  // AVE: resultado pelo DESFECHO (mandante/visitante/EMPATE), ignorando o
+  // pênalti (migration 074). Acertar o empate leva o resultado mesmo errando o
+  // pênalti; cravar o placar tem o mesmo sinal de saldo → continua garantindo.
+  // ppen/apen são inertes para a pontuação do jogo.
+  const outcome = (h, a) => (h > a ? 'h' : a > h ? 'a' : 'd');
+  if (outcome(ph, pa) === outcome(ah, aw)) pts += v.ave;
   if ((ph - pa) === (ah - aw)) pts += v.dg;
 
   return pts;

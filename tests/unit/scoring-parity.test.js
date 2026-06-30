@@ -124,7 +124,7 @@ describe('paridade de pontuação: scoring.js ↔ funções SQL', () => {
   });
 
   it('sentinela: cada função foi achada na migration esperada', () => {
-    expect(latestFnBody('score_prediction').num).toBe(56);
+    expect(latestFnBody('score_prediction').num).toBe(74);
     expect(latestFnBody('qualifier_bonus_pts').num).toBe(22);
     expect(latestFnBody('champion_bonus_for').num).toBe(39);
     expect(latestFnBody('scorer_bonus_for').num).toBe(39);

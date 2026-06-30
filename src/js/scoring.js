@@ -54,17 +54,21 @@ export function matchPoints(stage) {
  *
  * Each correct component SUMS:
  *   - +ag  for each side whose goal count is exactly right (0, 1 or 2 sides)
- *   - +ave if the winner/draw is right (KO draw by pen winner) OR the score is
- *          exact — cravar o placar ao final da prorrogação vale o resultado mesmo com pênalti errado
+ *   - +ave if the RESULT (home win / away win / DRAW) is right, IGNORING the
+ *          penalty shootout — acertar o empate vale o resultado mesmo errando o
+ *          pênalti (migration 074); o pênalti decide só a chave/classificado
  *   - +dg  if the goal difference is right (includes 0-diff draws)
  * So a perfect score = 2*ag + ave + dg.
  *
+ * predPen/actualPen são inertes para a pontuação do jogo (mantidos na
+ * assinatura por compatibilidade com os chamadores e o espelho SQL).
+ *
  * @param {number|null} predHome
  * @param {number|null} predAway
- * @param {string|null} predPen - 'h'/'a' (or 'home'/'away') for knockout draws
+ * @param {string|null} predPen - inerte (vale só p/ a chave/classificado)
  * @param {number|null} actualHome
  * @param {number|null} actualAway
- * @param {string|null} actualPen
+ * @param {string|null} actualPen - inerte
  * @param {string} stage
  * @returns {number} Points earned
  */
@@ -79,13 +83,10 @@ export function scorePrediction(predHome, predAway, predPen, actualHome, actualA
   if (predHome === actualHome) pts += ag;
   if (predAway === actualAway) pts += ag;
 
-  // AVE — winner / draw. Cravar o placar ao final da prorrogação (gols dos dois
-  // lados iguais ao real) garante o ponto de RESULTADO mesmo errando o pênalti —
-  // a regra promete "placar exato" a quem crava (ver regras.html#penaltis).
-  const isExactScore = predHome === actualHome && predAway === actualAway;
-  const predWinner = determineWinner(predHome, predAway, predPen, stage);
-  const actualWinner = determineWinner(actualHome, actualAway, actualPen, stage);
-  if (isExactScore || predWinner === actualWinner) pts += ave;
+  // AVE — resultado (vitória mandante / visitante / EMPATE), SEM olhar o pênalti.
+  // Acertar que terminou empatado já leva o resultado (placar exato tem o mesmo
+  // sinal de saldo → subsume "cravou = exato" da 056). Ver regras.html#penaltis.
+  if (outcome(predHome, predAway) === outcome(actualHome, actualAway)) pts += ave;
 
   // DG — goal difference
   if ((predHome - predAway) === (actualHome - actualAway)) pts += dg;
@@ -106,9 +107,8 @@ export function scoreBreakdown(predHome, predAway, predPen, actualHome, actualAw
   const parts = [];
   if (predHome === actualHome) parts.push({ key: 'side', label: 'Gols mandante', pts: ag });
   if (predAway === actualAway) parts.push({ key: 'side', label: 'Gols visitante', pts: ag });
-  // Cravou o placar → o ponto de resultado conta mesmo errando o pênalti.
-  const isExactScore = predHome === actualHome && predAway === actualAway;
-  if (isExactScore || determineWinner(predHome, predAway, predPen, stage) === determineWinner(actualHome, actualAway, actualPen, stage)) {
+  // Resultado (vitória/empate) pelo desfecho, sem o pênalti (migration 074).
+  if (outcome(predHome, predAway) === outcome(actualHome, actualAway)) {
     parts.push({ key: 'winner', label: 'Resultado', pts: ave });
   }
   if ((predHome - predAway) === (actualHome - actualAway)) {
@@ -118,13 +118,14 @@ export function scoreBreakdown(predHome, predAway, predPen, actualHome, actualAw
 }
 
 /**
- * Determine winner from score.
- * @returns {string} 'h', 'a', 'd', or the pen value for knockout draws
+ * Desfecho de um placar para o ponto de RESULTADO: 'h' (mandante vence),
+ * 'a' (visitante vence) ou 'd' (empate). O pênalti NÃO entra — ele decide só a
+ * chave/classificado, não a pontuação do jogo (migration 074).
+ * @returns {'h'|'a'|'d'}
  */
-function determineWinner(home, away, pen, stage) {
+function outcome(home, away) {
   if (home > away) return 'h';
   if (away > home) return 'a';
-  if (stage !== 'group' && pen) return pen; // draw decided by penalties
   return 'd';
 }
 

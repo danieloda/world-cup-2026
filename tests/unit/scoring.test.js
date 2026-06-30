@@ -103,31 +103,37 @@ describe('scorePrediction — escala por fase (vencedor+saldo)', () => {
   });
 });
 
-describe('scorePrediction — mata-mata com pênaltis', () => {
+describe('scorePrediction — mata-mata: acertar o EMPATE vale o resultado (074)', () => {
+  // Regra (migration 074): o ponto de RESULTADO (ave) vale pelo DESFECHO do
+  // tempo normal/prorrogação (vitória/empate), IGNORANDO o pênalti. O pênalti
+  // decide só a chave/classificado. Cravar continua garantindo (mesmo sinal).
   it('1-1(h) vs 1-1(h) oitavas = exato = 19', () => {
     expect(scorePrediction(1, 1, 'h', 1, 1, 'h', 'r16')).toBe(19);
   });
-  it('cravou o empate mas errou o pênalti (1-1 h vs 1-1 a) → placar exato CHEIO = 19', () => {
-    // Regra (regras.html#penaltis): cravar o placar do tempo normal leva o ponto de
-    // RESULTADO mesmo errando quem passou nos pênaltis. r16: 2*ag(3)+ave(12)+dg(1)=19.
+  it('cravou o empate, pênalti "errado" (1-1 h vs 1-1 a) → exato CHEIO = 19', () => {
     expect(scorePrediction(1, 1, 'h', 1, 1, 'a', 'r16')).toBe(19);
   });
-  it('vencedor por pênalti certo, sem lado (2-2 h vs 1-1 h) = ave12 + dg1 = 13', () => {
+  it('acertou o empate sem cravar, pênalti certo (2-2 h vs 1-1 h) = ave12 + dg1 = 13', () => {
     expect(scorePrediction(2, 2, 'h', 1, 1, 'h', 'r16')).toBe(13);
   });
-  it('pênalti errado e nada bate (2-2 h vs 1-1 a) = só dg1 = 1', () => {
-    expect(scorePrediction(2, 2, 'h', 1, 1, 'a', 'r16')).toBe(1);
+  it('acertou o empate sem cravar, pênalti ERRADO (2-2 h vs 1-1 a) = ave12 + dg1 = 13', () => {
+    // O caso do bug Países Baixos×Marrocos: ANTES da 074 dava só dg = 1.
+    expect(scorePrediction(2, 2, 'h', 1, 1, 'a', 'r16')).toBe(13);
+  });
+  it('previu vitória, mas deu empate nos pênaltis (2-1 vs 1-1 a) = só dg? não: saldo errado → 0... ag1', () => {
+    // 2-1 (vitória mandante) vs 1-1 (empate): ag away (1=1) +3; resultado h≠d → 0; saldo 1≠0 → 0. r16 ag=3.
+    expect(scorePrediction(2, 1, null, 1, 1, 'a', 'r16')).toBe(3);
   });
   it('grupos não tem pênalti: empate é empate (1-1 vs 1-1) = 7', () => {
     expect(scorePrediction(1, 1, null, 1, 1, null, 'group')).toBe(7);
   });
 
-  it('aceita o encoding REAL do DB (home/away), não só o atalho h/a', () => {
-    // Em produção pred_pen_winner/pen_winner são 'home'/'away' (não 'h'/'a').
-    // determineWinner compara por igualdade, então o resultado deve ser idêntico
-    // ao dos casos h/a acima — este caso garante fidelidade ao dado de produção.
-    expect(scorePrediction(2, 2, 'home', 1, 1, 'home', 'r16')).toBe(13); // vencedor por pênalti certo
-    expect(scorePrediction(2, 2, 'home', 1, 1, 'away', 'r16')).toBe(1);  // pênalti errado, só dg1
+  it('encoding REAL do DB (home/away): pênalti é inerte p/ a pontuação do jogo', () => {
+    // Em produção pred_pen_winner/pen_winner são 'home'/'away'. Acertar o empate
+    // dá o resultado independente do palpite de pênalti (R32 Países Baixos×Marrocos).
+    expect(scorePrediction(2, 2, 'home', 1, 1, 'away', 'r32')).toBe(7);  // ave6 + dg1 (era 1 antes da 074)
+    expect(scorePrediction(2, 2, 'away', 1, 1, 'away', 'r32')).toBe(7);  // mesmo valor, pênalti "certo"
+    expect(scorePrediction(2, 2, 'home', 1, 1, 'home', 'r16')).toBe(13); // ave12 + dg1
   });
 });
 
@@ -201,14 +207,14 @@ describe('scoreBreakdown — decomposição aditiva', () => {
     expect(scoreBreakdown(3, 0, null, 0, 2, null, 'group')).toEqual({ parts: [], pts: 0 });
   });
 
-  it('pênalti certo no KO conta como Resultado (r16 2-2 h vs 1-1 h) → [Resultado, Saldo] = 13', () => {
-    const b = scoreBreakdown(2, 2, 'h', 1, 1, 'h', 'r16');
+  it('acertou o empate no KO conta como Resultado mesmo errando o pênalti (r16 2-2 h vs 1-1 a) → [Resultado, Saldo] = 13', () => {
+    // 074: o pênalti é inerte p/ a pontuação do jogo; acertar o empate dá o Resultado.
+    const b = scoreBreakdown(2, 2, 'h', 1, 1, 'a', 'r16');
     expect(labels(b)).toEqual(['Resultado', 'Saldo']);
     expect(b.pts).toBe(13); // ave12 + dg1
   });
 
-  it('cravou o empate mas errou o pênalti (r16 1-1 h vs 1-1 a) → exato cheio (lados+resultado+saldo) = 19', () => {
-    // Regra: cravar o placar do tempo normal leva o Resultado mesmo errando o pênalti.
+  it('cravou o empate, pênalti "errado" (r16 1-1 h vs 1-1 a) → exato cheio (lados+resultado+saldo) = 19', () => {
     const b = scoreBreakdown(1, 1, 'h', 1, 1, 'a', 'r16');
     expect(keys(b)).toEqual(['side', 'side', 'winner', 'diff']); // 3+3+12+1
     expect(b.pts).toBe(19);

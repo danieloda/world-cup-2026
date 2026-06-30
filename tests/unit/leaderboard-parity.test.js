@@ -33,11 +33,13 @@ const prizeSrc = readFileSync(join(SRC_DIR, 'prize.js'), 'utf8');
 const rankingSrc = readFileSync(join(SRC_DIR, 'pages', 'ranking.js'), 'utf8');
 
 describe('v_leaderboard — última definição nas migrations', () => {
-  it('sentinela: a definição vigente é a da migration 039 (atualize ao redefinir a view)', () => {
+  it('sentinela: a definição vigente é a da migration 074 (atualize ao redefinir a view)', () => {
     // Se uma migration nova redefinir a view, este teste OBRIGA a revisitar a
     // paridade (critérios de desempate, filtro de pagantes, void).
+    // 074 redefiniu a view: winner_ok passou a ignorar o pênalti (empate acertado
+    // = vencedor/empate ok), pra casar com o ave de score_prediction.
     expect(view).not.toBeNull();
-    expect(view.num).toBe(39);
+    expect(view.num).toBe(74);
   });
 
   it('ORDER BY = total_pts → exact_count → winner_sg_count (os 3 critérios do desempate)', () => {

@@ -79,11 +79,26 @@ begin
     raise warning 'FAIL [r16/pen home==home] got=% exp=%', got, exp; end if;
 
   -- 6b: pred 1-1 pen=home, real 1-1 pen=away → CRAVOU o placar do tempo normal →
-  -- placar exato CHEIO (2ag + ave + dg) MESMO errando o pênalti (regra: cravou = exato)
+  -- placar exato CHEIO (2ag + ave + dg) MESMO errando o pênalti (cravou = exato, subsumido pela 074)
   got := public.score_prediction(1,1,'home', 1,1,'away', 'r16');
   exp := 2*3 + 12 + 1;
   if got = exp then n_ok:=n_ok+1; else n_fail:=n_fail+1;
     raise warning 'FAIL [r16/cravou empate, pênalti errado → exato cheio] got=% exp=%', got, exp; end if;
+
+  -- 6b2 (074): acertou o EMPATE SEM cravar, pênalti errado (pred 2-2 pen=home,
+  -- real 1-1 pen=away) → ave + dg (resultado conta!). ANTES da 074 dava só dg=1.
+  -- É o caso Países Baixos×Marrocos: ninguém perde o resultado por errar o pênalti.
+  got := public.score_prediction(2,2,'home', 1,1,'away', 'r16');
+  exp := 12 + 1;
+  if got = exp then n_ok:=n_ok+1; else n_fail:=n_fail+1;
+    raise warning 'FAIL [r16/empate acertado, pênalti errado → ave+dg (074)] got=% exp=%', got, exp; end if;
+
+  -- 6b3 (074): previu VITÓRIA mas deu empate nos pênaltis (pred 2-1, real 1-1 pen=away)
+  -- → só ag do lado visitante (1=1); resultado (h≠d) e saldo (1≠0) erram. r16 ag=3.
+  got := public.score_prediction(2,1,null, 1,1,'away', 'r16');
+  exp := 3;
+  if got = exp then n_ok:=n_ok+1; else n_fail:=n_fail+1;
+    raise warning 'FAIL [r16/previu vitória, deu empate → só ag visitante] got=% exp=%', got, exp; end if;
 
   -- 6c: GRUPO empate 1-1 vs 1-1 (pen irrelevante) → ave de empate conta
   got := public.score_prediction(1,1,null, 1,1,null, 'group');

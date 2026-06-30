@@ -347,12 +347,19 @@ function renderPenaltis() {
     <p class="rules-p">
       No mata-mata, jogo empatado vai para a <strong>prorrogação</strong> — e o que conta para os seus
       pontos é o <strong>placar ao final da prorrogação</strong> (os gols dos 30 minutos extras
-      <strong>valem</strong>). Se ainda assim o jogo terminar empatado, escolha também
-      <strong>quem passa nos pênaltis</strong>: essa escolha define o "vencedor" do seu palpite.
+      <strong>valem</strong>). Se você acertar que o jogo <strong>terminou empatado</strong>, leva o
+      ponto de <strong>resultado</strong> normalmente — empate é empate, como em qualquer jogo.
+    </p>
+    <p class="rules-p">
+      Se ainda assim terminar empatado, escolha também <strong>quem passa nos pênaltis</strong>. Essa
+      escolha <strong>não mexe nos pontos do jogo</strong>: ela vale para o
+      <a href="#classificado">bônus de classificado</a> — quais seleções os <em>seus</em> palpites
+      fazem avançar na chave.
     </p>
     <ul class="rules-list">
-      <li>Vale o <strong>placar ao final da prorrogação</strong> (já com os gols dos 30 min extras) para os pontos de gols e de diferença.</li>
-      <li>Se você cravar esse placar, leva o <strong>placar exato</strong> — mesmo que erre quem ganhou nos pênaltis.</li>
+      <li>Vale o <strong>placar ao final da prorrogação</strong> (já com os gols dos 30 min extras) para gols, resultado e diferença.</li>
+      <li>Acertar o <strong>empate</strong> já garante o ponto de resultado — errar quem passou nos pênaltis <strong>não tira</strong> esse ponto.</li>
+      <li>Quem você marca nos pênaltis decide só a <strong>chave</strong> (bônus de classificado), não a pontuação daquele jogo.</li>
       <li>Na fase de grupos não há prorrogação nem pênaltis: empate é empate.</li>
     </ul>
   `);
