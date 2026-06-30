@@ -63,7 +63,7 @@ let predsByMatch = new Map();      // match_id -> [{...prediction, profiles}]
 let goalsByMatch = new Map();      // match_id -> [{...goal, players}]
 let scorerPickByUser = new Map();  // user_id -> { playerId, name }  (artilheiro escolhido)
 let posByUser = new Map();         // user_id -> posição atual no ranking do bolão (1-based)
-let activeStage = 'group';         // ABA 1 (fase): 'group' | 'ko'
+let activeStage = 'group';         // ABA 1 (fase): 'group' | 'ko' (default ajustado pós-load)
 let activeDay = null;              // ABA 2 (dia): 'YYYY-MM-DD' (sempre um dia específico)
 let activeStatus = 'finished';     // FILTRO: 'finished' | 'awaiting'
 
@@ -76,6 +76,11 @@ try {
   profile = auth.profile;
 
   await loadData();
+
+  // Abre direto no MATA-MATA quando já há jogo de KO revelado (é a ação do
+  // momento da Copa); cai em grupos só enquanto nenhum KO foi revelado. O dia
+  // (ABA 2) se auto-seleciona pro mais recente da fase (ver ensureValidDay).
+  if (revealedMatches.some(m => m.stage !== 'group')) activeStage = 'ko';
 
   const pageBody = await renderShell({ active: 'historico', profile, stats });
   pageBody.innerHTML = renderPage();
