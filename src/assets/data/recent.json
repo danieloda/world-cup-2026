@@ -1513,6 +1513,13 @@
   ],
   "Ivory Coast": [
     [
+      "2026-06-30",
+      "Norway",
+      true,
+      "1-2",
+      "World Cup"
+    ],
+    [
       "2026-06-25",
       "Curaçao",
       false,
@@ -1573,13 +1580,6 @@
       "Burkina Faso",
       true,
       "3-0",
-      "Copa Africana"
-    ],
-    [
-      "2025-12-31",
-      "Gabon",
-      false,
-      "3-2",
       "Copa Africana"
     ]
   ],
@@ -2017,6 +2017,13 @@
   ],
   "Norway": [
     [
+      "2026-06-30",
+      "Ivory Coast",
+      false,
+      "2-1",
+      "World Cup"
+    ],
+    [
       "2026-06-26",
       "France",
       true,
@@ -2078,13 +2085,6 @@
       true,
       "4-1",
       "Eliminatórias"
-    ],
-    [
-      "2025-10-14",
-      "New Zealand",
-      true,
-      "1-1",
-      "Amistoso"
     ]
   ],
   "Panama": [
