@@ -865,6 +865,13 @@
   ],
   "Ecuador": [
     [
+      "2026-07-01",
+      "Mexico",
+      false,
+      "0-2",
+      "World Cup"
+    ],
+    [
       "2026-06-25",
       "Germany",
       true,
@@ -925,13 +932,6 @@
       "Canada",
       false,
       "0-0",
-      "Amistoso"
-    ],
-    [
-      "2025-10-15",
-      "Mexico",
-      false,
-      "1-1",
       "Amistoso"
     ]
   ],
@@ -1081,6 +1081,13 @@
   ],
   "France": [
     [
+      "2026-06-30",
+      "Sweden",
+      true,
+      "3-0",
+      "World Cup"
+    ],
+    [
       "2026-06-26",
       "Norway",
       false,
@@ -1141,13 +1148,6 @@
       "Ukraine",
       true,
       "4-0",
-      "Eliminatórias"
-    ],
-    [
-      "2025-10-13",
-      "Iceland",
-      false,
-      "2-2",
       "Eliminatórias"
     ]
   ],
@@ -1729,6 +1729,13 @@
   ],
   "Mexico": [
     [
+      "2026-07-01",
+      "Ecuador",
+      true,
+      "2-0",
+      "World Cup"
+    ],
+    [
       "2026-06-25",
       "Czechia",
       false,
@@ -1789,13 +1796,6 @@
       "Iceland",
       true,
       "4-0",
-      "Amistoso"
-    ],
-    [
-      "2026-01-25",
-      "Bolivia",
-      false,
-      "1-0",
       "Amistoso"
     ]
   ],
@@ -2809,6 +2809,13 @@
   ],
   "Sweden": [
     [
+      "2026-06-30",
+      "France",
+      false,
+      "0-3",
+      "World Cup"
+    ],
+    [
       "2026-06-25",
       "Japan",
       false,
@@ -2869,13 +2876,6 @@
       "Switzerland",
       false,
       "1-4",
-      "Eliminatórias"
-    ],
-    [
-      "2025-10-13",
-      "Kosovo",
-      true,
-      "0-1",
       "Eliminatórias"
     ]
   ],
