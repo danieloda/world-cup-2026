@@ -1907,11 +1907,13 @@ body.raiox-modal-open { overflow: hidden; }
 /* Lista vertical agrupada por data no mata-mata */
 .bracket-date-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: var(--space-3);
   margin-top: var(--space-2);
+  align-items: start;   /* cada card na altura natural (não estica p/ o mais alto da linha) */
 }
-.bracket-date-list .bracket-match { width: auto; margin: 0; }
+/* container query: o layout do card é decidido pela largura DELE, não do viewport */
+.bracket-date-list .bracket-match { width: auto; margin: 0; container-type: inline-size; }
 
 /* ===== Team tooltip (hover popover) ===== */
 /* Afordância de tooltip — só nas páginas onde o hover de últimos jogos existe
@@ -4106,18 +4108,20 @@ details.allbets[open] > summary .chev { transform: rotate(180deg); }
   margin-bottom: var(--space-2);
 }
 .bracket-match.locked .bm-lock { color: var(--text-mute); }
+/* Card ABERTO/BLOQUEADO: 2 colunas (bandeira | conteúdo). O placar vive DENTRO
+   da linha do nome (.team-line) → número colado no time (não flutua na direita). */
 .bm-team {
   display: grid;
-  grid-template-columns: 26px 1fr 52px;
-  column-gap: var(--space-3); align-items: start;   /* topo → bandeira/placar alinham com o NOME */
-  padding: var(--space-2h) 0;
+  grid-template-columns: 24px 1fr;
+  column-gap: var(--space-2h); align-items: start;
+  padding: var(--space-2) 0;
   font-size: var(--fs-base);
   font-weight: var(--fw-medium);
 }
 .bm-team + .bm-team { border-top: 1px solid var(--line); }
 /* bandeira em caixa fixa, alinhada à linha do nome */
 .bm-team .flag {
-  width: 26px;
+  width: 24px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -4126,7 +4130,6 @@ details.allbets[open] > summary .chev { transform: rotate(180deg); }
   padding-top: 1px;
 }
 .bm-team .flag .fi, .bm-team .flag .fis { border-radius: 2px; }
-.bm-team .mini-input { align-self: start; }   /* placar na linha do nome */
 .bm-team .nm {
   display: flex;
   flex-direction: column;
@@ -4136,19 +4139,20 @@ details.allbets[open] > summary .chev { transform: rotate(180deg); }
 .bm-team .team-line {
   display: flex;
   align-items: center;
-  gap: var(--space-1);
+  gap: var(--space-2);
   min-width: 0;
 }
 .bm-team .team-name {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  overflow-wrap: break-word;       /* nomes longos quebram na palavra, não truncam */
   font-weight: var(--fw-bold);
   font-size: var(--fs-md);
   line-height: 1.15;
   flex: 1;
   min-width: 0;
 }
+/* placar entra na linha do nome, encostado à direita (alinha entre os dois times) */
+.bm-team .team-line .mini-input { flex: none; margin-left: auto; align-self: center; }
 .bm-team .slot-sublabel {
   font-size: var(--fs-2xs);
   color: var(--text-mute);
@@ -4177,19 +4181,21 @@ details.allbets[open] > summary .chev { transform: rotate(180deg); }
   flex-shrink: 0;
 }
 .bm-team .mini-input {
-  width: 48px; height: 32px;
+  width: 44px; height: 40px;
   background: #0a0a0a;
-  border: 1px solid var(--line-strong);
-  border-radius: 5px;
+  border: 1px solid #6f6f76;            /* borda ~3.2:1 no card → limite do campo perceptível (WCAG 1.4.11) */
+  border-radius: var(--radius-sm);
   text-align: center;
   font-weight: var(--fw-heavy); color: var(--text);
-  font-size: 15px;
+  font-size: var(--fs-lg);
   font-family: var(--font);
   /* remover spinner */
   -webkit-appearance: none;
   -moz-appearance: textfield;
   appearance: textfield;
 }
+/* editável = alvo de toque 44px; travado (só leitura) = compacto */
+.bm-team .mini-input:not(:disabled) { height: 44px; }
 .bm-team .mini-input::-webkit-outer-spin-button,
 .bm-team .mini-input::-webkit-inner-spin-button {
   -webkit-appearance: none;
@@ -4197,6 +4203,8 @@ details.allbets[open] > summary .chev { transform: rotate(180deg); }
 }
 .bm-team .mini-input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
 .bm-team .mini-input:disabled {
+  width: 40px; height: 34px;
+  min-height: 0;                       /* vence o piso de 44px do mobile (só leitura, não é alvo de toque) */
   background: rgba(255, 255, 255, .04);
   border-color: transparent;
   color: var(--text);
@@ -4258,121 +4266,120 @@ input[type="number"].score-input {
   letter-spacing: var(--tracking-wide);
 }
 
-/* Grid por ÁREAS: home alinha com home e away com away entre as faixas, mesmo
-   quando um lado tem o selo "classificado" (linhas do grid esticam à mais alta). */
-.km-lanes {
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-areas:
-    "predcap"
-    "predhome"
-    "predaway"
-    "predpen"
-    "offcap"
-    "offhome"
-    "offaway"
-    "offpen";
-  align-items: start;
-}
-.km-area-predcap  { grid-area: predcap; }
-.km-area-offcap   { grid-area: offcap; }
-.km-area-predhome { grid-area: predhome; }
-.km-area-offhome  { grid-area: offhome; }
-.km-area-predaway { grid-area: predaway; }
-.km-area-offaway  { grid-area: offaway; }
-.km-area-predpen  { grid-area: predpen; }
-.km-area-offpen   { grid-area: offpen; }
-/* divisor antes da faixa oficial quando empilhada (mobile) */
-.km-area-offcap { border-top: 1px dashed var(--line); padding-top: var(--space-1h); margin-top: var(--space-1); }
+/* Placar de linha única por time (o REAL), com dois placares gêmeos à direita:
+   PALPITE | OFICIAL. Cada linha é seu próprio grid → as colunas fixas alinham
+   entre as linhas. Mesmo layout no desktop e no mobile (sem faixas empilhadas). */
+.km-board { display: block; margin-top: var(--space-1h); }
 
-.km-cap {
-  font-size: 9px;
+.km-board-head,
+.km-slot {
+  display: grid;
+  grid-template-columns: 24px 1fr 40px 40px;
+  align-items: center;
+  column-gap: var(--space-2);
+}
+.km-board-head {
+  padding-bottom: var(--space-1);
+  margin-bottom: var(--space-1);
+  border-bottom: 1px solid var(--line);
+}
+.km-bh-team { grid-column: 1 / 3; }
+.km-bh-sc {
+  text-align: center;
+  font-size: var(--fs-2xs);
   font-weight: var(--fw-heavy);
-  letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
+  white-space: nowrap;
   color: var(--text-mute);
-  margin-bottom: 3px;
 }
-.km-cap-off { } /* rótulo neutro (era dourado) — dourado fica reservado ao placar exato */
+/* "Oficial" é a âncora do resultado: ganha a cor do estado do card (nunca dourado a não ser exato) */
+.km-bh-sc.off { color: var(--text-dim); border-left: 1px solid var(--line); }
+.km-finished.partial .km-bh-sc.off { color: var(--positive); }
+.km-finished.miss    .km-bh-sc.off { color: var(--red); }
+.km-finished.exact   .km-bh-sc.off { color: var(--accent); }
 
-.km-row {
-  display: grid;
-  grid-template-columns: 26px 1fr auto;
-  align-items: start;   /* topo → 1ª linha (bandeira/nome/placar) alinha entre faixas */
-  column-gap: var(--space-3);
-  padding: var(--space-1h) 0;
-  font-size: var(--fs-base);
-  font-weight: var(--fw-medium);
-  min-width: 0;
-}
-.km-row .flag, .km-row .km-score { padding-top: 1px; }
-/* bandeira em caixa fixa e centralizada → nunca encosta/sobrepõe o nome */
-.km-row .flag {
-  width: 26px;
+.km-slot { padding: var(--space-1h) 0; min-height: 34px; }
+.km-slot + .km-slot { border-top: 1px solid var(--line); }
+.km-slot .flag {
+  width: 24px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-size: var(--fs-lg);
   line-height: var(--lh-none);
-  flex: none;
 }
-.km-row .flag .fi, .km-row .flag .fis { border-radius: 2px; }
-.km-nm { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 1px; }
-/* vaga de origem como sublinha discreta sob o nome ("vaga: 3º (Primeiro Colocado)") */
-.km-slot-line {
-  font-size: var(--fs-2xs);
-  line-height: var(--lh-snug);
-  font-weight: var(--fw-medium);
-  color: var(--text-mute);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
-}
-/* selo de classificado compacto (não estica a coluna toda) */
-.km-nm .qual-badge {
-  margin-top: var(--space-0);
-  font-size: var(--fs-2xs);
-  font-weight: var(--fw-heavy);
-  padding: 1px var(--space-2);
-  border-radius: var(--radius-pill);
-  letter-spacing: var(--tracking-wide);
-}
-.km-row .km-name {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.km-slot .flag .fi, .km-slot .flag .fis { border-radius: 2px; }
+
+.km-slot-nm { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.km-slot-nm .km-name {
   font-weight: var(--fw-bold);
   font-size: var(--fs-md);
-  min-width: 0;
-  max-width: 100%;
+  color: var(--text);            /* Tier 1 — o time REAL é a identidade da linha */
+  line-height: 1.15;
+  overflow-wrap: break-word;     /* nome longo quebra na palavra, nunca trunca */
 }
-.km-row .km-score {
-  font-family: var(--font);
+/* Tier 3 — metadados (vaga de origem + selos), 10px, discreto */
+.km-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-1h);
+  font-size: var(--fs-2xs);
+  line-height: 1.3;
+}
+.km-meta .km-vaga { color: var(--text-mute); font-weight: var(--fw-medium); }
+.km-meta .qual-badge {
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-heavy);
+  padding: 1px var(--space-1h);
+  border-radius: var(--radius-pill);
+  letter-spacing: 0;
+}
+/* "você simulou X" — o time que você botou nesta vaga e NÃO veio (ícone+cor, não só risco) */
+.km-sim-miss {
+  display: inline-flex; align-items: center; gap: 3px;
+  color: var(--text-mute); font-weight: var(--fw-medium);
+}
+.km-sim-miss .dv-flag { display: inline-flex; }
+.km-sim-miss .dv-flag .fi { width: 1.25em; border-radius: 2px; }
+.km-sim-miss .team { text-decoration: line-through; }
+.km-sim-miss .x { color: var(--red); font-weight: var(--fw-heavy); }
+
+/* placares gêmeos: seu palpite (dim) | oficial (branco, a fonte da verdade) */
+.km-sc {
+  text-align: center;
   font-variant-numeric: tabular-nums;
   font-weight: var(--fw-black);
   font-size: var(--fs-xl);
-  min-width: 20px;
-  text-align: center;
-  color: var(--text);
 }
-/* faixa oficial: nome NEUTRO (fato). O acerto da vaga vive no selo "✓ classificado". */
-/* faixa do palpite: time que você botou que NÃO chegou (divergência) → riscado */
-.km-row.diverged .km-name { color: var(--text-dim); text-decoration: line-through; opacity: .8; }
-.km-row.diverged .flag { opacity: .55; }
-.km-row.km-pred .km-name { color: var(--text-dim); }
-.km-row.km-pred .km-score { color: var(--text-dim); }
-.km-row.km-pred .km-score.hit { color: var(--positive); font-weight: var(--fw-bold); }  /* cravou os gols → verde */
+.km-sc.pred { color: var(--text-dim); font-weight: var(--fw-heavy); }
+.km-sc.pred.hit { color: var(--positive); }        /* cravou este número → verde */
+.km-sc.off { color: var(--text); border-left: 1px solid var(--line); }
 
-.km-pen {
+/* pênaltis: uma linha sob os dois times */
+.km-pens {
+  margin-top: var(--space-1h);
+  padding-top: var(--space-1h);
+  border-top: 1px dashed var(--line);
+  display: flex; flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
   font-size: var(--fs-xs);
   color: var(--text-dim);
-  margin-top: var(--space-1);
 }
-.km-pen { font-weight: var(--fw-medium); }
-/* time do pênalti que NÃO se confirmou (seu palpite) → riscado, como o time divergente */
-.km-pen .pen-x { text-decoration: line-through; opacity: .7; }
+.km-pens .cap { color: var(--text-mute); font-weight: var(--fw-bold); }
+.km-pens .pen-x { text-decoration: line-through; opacity: .7; }
 
+/* Rótulo de coluna/faixa — usado pelo card de RESULTADO de grupo (.gr-card). */
+.km-cap {
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-heavy);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--text-mute);
+  margin-bottom: 3px;
+}
+
+/* Rodapé de pontuação — base compartilhada com o card de grupo. */
 .km-foot {
   border-top: 1px dashed var(--line);
   margin-top: var(--space-1h);
@@ -4388,27 +4395,25 @@ input[type="number"].score-input {
 .km-foot .bm-pts { margin: 0; }
 .km-foot .bm-break { margin: 0; flex: 1; min-width: 0; }
 
-/* Desktop / cards largos (visão "Por data"): faixas lado a lado (2 colunas do grid).
-   home alinha com home e away com away porque dividem a mesma linha do grid. */
-@media (min-width: 600px) {
-  .bracket-date-list .km-lanes {
-    grid-template-columns: 1fr 1fr;
-    grid-template-areas:
-      "predcap  offcap"
-      "predhome offhome"
-      "predaway offaway";
-    column-gap: var(--space-3h);
-  }
-  /* divisor vertical entre as faixas; remove o de cima (empilhado) */
-  .bracket-date-list .km-area-offcap,
-  .bracket-date-list .km-area-offhome,
-  .bracket-date-list .km-area-offaway {
-    border-top: 0;
-    margin-top: 0;
-    border-left: 1px dashed var(--line);
-    padding-left: var(--space-3h);
-  }
+/* Mata encerrado: o TOTAL é o ponto alto — banda sutil + número grande em pílula. */
+.km-finished .km-foot {
+  border-top: 0;
+  margin-top: var(--space-2);
+  padding: var(--space-1h) var(--space-2);
+  background: var(--overlay-02);
+  border-radius: var(--radius-sm);
 }
+.km-finished .km-foot .bm-pts {
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-black);
+  padding: 1px var(--space-2h);
+  border-radius: var(--radius-pill);
+  flex: 0 0 auto;
+  /* Chip NEUTRO escuro (não tint da mesma cor do texto): o número semântico
+     verde/dourado/vermelho passa WCAG AA sobre ele (tint same-hue reprovava). */
+  background: rgba(0, 0, 0, .25);
+}
+.km-finished .km-foot .bm-pts small { font-size: var(--fs-2xs); font-weight: var(--fw-heavy); opacity: .85; margin-left: 2px; }
 
 /* ============================================================
    Card de RESULTADO de grupo (encerrado) — você × oficial em colunas.
@@ -4490,64 +4495,42 @@ input[type="number"].score-input {
 }
 
 /* Vaga de origem como sublinha no card ABERTO (consistente com o encerrado). */
-/* Vaga de origem (referência discreta, tier 2) */
-.bm-slot-line {
-  font-size: var(--fs-xs);
-  line-height: 1.35;
-  font-weight: 500;
-  color: var(--text-mute);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
-}
-
-/* Divergência no card ABERTO — bloco rótulo→valor ("SUA SIMULAÇÃO" / time).
-   Sempre 2 linhas, com respiro e o time em destaque. */
-.bm-diverge {
+/* Meta do card ABERTO/BLOQUEADO em UMA linha: vaga de origem + "sua simulação". */
+.bm-meta {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-0);
-  min-width: 0;
-  max-width: 100%;
-}
-.bm-diverge .dv-label {
-  font-size: 9px;
-  font-weight: var(--fw-heavy);
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
-  color: var(--text-mute);
-}
-/* time previsto — bandeira + nome alinhados, com presença (tier ~1.5) */
-.bm-diverge .dv-team {
-  display: inline-flex;
   align-items: center;
-  gap: var(--space-1h);
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-1h);
+  font-size: var(--fs-2xs);
+  line-height: 1.3;
   min-width: 0;
-  max-width: 100%;
-  font-size: var(--fs-base);
+}
+.bm-meta .bm-vaga { color: var(--text-mute); font-weight: var(--fw-medium); }
+
+/* "sua simulação": quem você previu que ocuparia esta vaga.
+   matched = acertou (verde ✓) · diverged = errou (✗ + time riscado). Ícone+cor
+   redundantes (não depende só de cor — WCAG 1.4.1). */
+.bm-sim {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 1px var(--space-1h);
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-2xs);
   font-weight: var(--fw-bold);
-  color: var(--text-dim);
+  max-width: 100%;
 }
-.bm-diverge .dv-team > :last-child {
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
-}
-.bm-diverge .dv-flag {
-  display: inline-flex;
-  align-items: center;
-  font-size: var(--fs-md);
-  line-height: var(--lh-none);
-  flex-shrink: 0;
-}
-.bm-diverge .dv-flag .fi, .bm-diverge .dv-flag .fis { border-radius: 2px; }
-/* Acerto da vaga: você previu quem realmente chega → verde + ✓ (mesmo token do
-   selo "✓ classificado"). Divergência segue neutra (cinza). */
-.bm-diverge.matched .dv-team { color: var(--positive); }
-.bm-diverge.matched .dv-ok {
-  flex-shrink: 0;
-  font-weight: var(--fw-black);
-  color: var(--positive);
+.bm-sim .ic { font-weight: var(--fw-heavy); }
+.bm-sim .dv-flag { display: inline-flex; }
+.bm-sim .dv-flag .fi, .bm-sim .dv-flag .fis { width: 1.25em; border-radius: 2px; }
+.bm-sim .team { overflow-wrap: anywhere; }        /* nome da simulação quebra, não trunca */
+.bm-sim.matched { background: var(--positive-dim); color: var(--positive); }
+.bm-sim.diverged { background: var(--overlay-06); color: var(--text-dim); }
+.bm-sim.diverged .team { text-decoration: line-through; }
+.bm-sim.diverged .ic { color: var(--red); }
+
+/* Raio-X: em card estreito (mobile/coluna apertada) vira barra cheia de 44px —
+   alvo de toque claro e fecha a base do card. Depende do container-type do card. */
+@container (max-width: 439px) {
+  .bm-raiox button { width: 100%; min-height: 44px; border-radius: var(--radius-md); }
 }
 
 .bm-pen-result {

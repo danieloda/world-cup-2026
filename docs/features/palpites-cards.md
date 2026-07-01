@@ -50,18 +50,26 @@ quartas ×3 · semis ×4 · 3º/final ×... (ver `scoring.js`). Artilheiro = `go
 ## 3. Mata-mata — anatomia do card (`palpites-mata.js`)
 
 - `renderCard(m)` → despacha: `renderFinishedCard(m)` ou `renderOpenCard(m)`.
-- **Encerrado** (`renderFinishedCard`): duas faixas (SEU PALPITE × RESULTADO OFICIAL).
-  - Linhas via `renderFinRow(m, lens, side)` com **classes de área do grid** (`km-area-predhome`,
-    `km-area-offhome`, etc.). O CSS `.km-lanes` usa `grid-template-areas` → home alinha com
-    home e away com away **mesmo quando só o lado oficial tem o selo "classificado"**
-    (foi o bug do "desnivelado"). Desktop largo (`.bracket-date-list`) = 2 colunas; mobile = empilhado.
+- **Encerrado** (`renderFinishedCard`): **placar comparativo** de linha única por time
+  (redesenhado jul/2026 — antes eram duas faixas empilhadas SEU PALPITE × OFICIAL).
+  - `renderKmSlot(m, side)` gera UMA linha por vaga: bandeira + nome do time **REAL** + dois
+    placares gêmeos (`.km-sc.pred` = seu palpite · `.km-sc.off` = oficial), sob o cabeçalho
+    `PALPITE | OFICIAL` (`.km-board-head`). O time REAL é a identidade da linha; quando você
+    **previu outro time** naquela vaga, ele vira "✗ você simulou X" (`.km-sim-miss`) sob o nome —
+    sem duplicar a linha. `.km-sc.pred.hit` fica verde quando o número bate com o oficial.
+  - Mesmo layout no **desktop e no mobile**: `.km-board`/`.km-slot` são grids de colunas fixas
+    (`24px 1fr 40px 40px`) → as colunas alinham entre as linhas por construção (não há mais
+    `grid-template-areas`/`.km-lanes`/`.km-row`, nem o modo lado-a-lado por viewport).
+  - Pênaltis: `renderKmPens(m, pred)` = uma linha (`.km-pens`) com seu palpite + o oficial.
   - `resultClass`: `exact` (placar exato) · `partial` (algum ponto, incl. só bônus) ·
-    `miss` (zero) · `no-pred` (sem palpite **e** sem bônus).
+    `miss` (zero) · `no-pred` (sem palpite **e** sem bônus). Tinge a borda e a pílula do total.
   - `totalPts = pts + qualPts + scorerPts + champPts`. Chips em `renderBmBreak()`.
 - **Aberto** (`renderOpenCard` / `renderOpenTeamRow`):
   - Mostra o **time real** se a vaga já saiu (`team_home/away` resolvido); senão o time da
-    **sua simulação** (`predSlotResolution`, lente só-palpites).
-  - Quando o real diverge do previsto: chip **"na sua simulação: 🏳 X"** (`.bm-diverge`).
+    **sua simulação** (`predSlotResolution`, lente só-palpites). O placar (`.mini-input`) fica
+    DENTRO da linha do nome (`.team-line`) — colado no time, não flutuando na direita.
+  - Meta em UMA linha (`.bm-meta`): vaga de origem + "sua simulação" (`.bm-sim`: `matched` =
+    ✓ vaga certa · `diverged` = ✗ simulou X, com o nome riscado). Antes era `.bm-diverge`.
 - **Resolução de vagas** (slots `W73`/`L101`/`1A`/`3A/B/...`): vem de `bracket.js` (puro, 354 testes).
   - `slotResolution` = real-first (resultado real ou, na falta, palpite).
   - `predSlotResolution` = pred-only (só seus palpites) → usado nos cards abertos e na faixa "seu palpite".
@@ -114,7 +122,9 @@ quartas ×3 · semis ×4 · 3º/final ×... (ver `scoring.js`). Artilheiro = `go
 - O card usa a flag `matches.finished`. Se o admin lançou resultado mas `finished` não virou
   `true`, o card continua aberto. Checar a linha em `matches`.
 
-**"Faixas desalinhadas no mata-mata"** → CSS `.km-lanes` (grid-areas) em `app.css`.
+**"Placar comparativo desalinhado no mata-mata"** → CSS `.km-board`/`.km-slot` (grids de
+colunas fixas `24px 1fr 40px 40px`) em `app.css`. As colunas só alinham se as duas linhas
+(`.km-slot`) e o cabeçalho (`.km-board-head`) usarem o MESMO template.
 
 **"Vaga errada / 'na sua simulação' some"** → resolução em `bracket.js` +
 `predSlotResolution`/`slotResolution` no `loadData`. Vaga só resolve se a cadeia de

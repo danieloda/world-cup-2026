@@ -500,8 +500,8 @@ function renderFinishedCard(m) {
   if (isFinal) classes.push('final-match');
   if (isThird) classes.push('third-place');
 
-  const pointsBadge = hasAny
-    ? renderPointsBadge(totalPts, null, resultClass)
+  const ptsBadge = hasAny
+    ? `<div class="bm-pts ${resultClass}">${totalPts > 0 ? '+' : ''}${totalPts} <small>pts</small></div>`
     : '<div class="bm-pts no-pred">sem palpite</div>';
   const breakdown = hasAny ? renderBmBreak(m, pred, qualPts, scorerPts, champPts) : '';
 
@@ -512,89 +512,77 @@ function renderFinishedCard(m) {
         <span class="when">${dateLabel} · ${timeLabel} · <span class="km-tag-done">encerrado</span></span>
       </div>
 
-      <div class="km-lanes">
-        <div class="km-cap km-area-predcap">Seu palpite</div>
-        <div class="km-cap km-cap-off km-area-offcap">Resultado oficial</div>
-        ${renderFinRow(m, 'pred', 'home')}
-        ${renderFinRow(m, 'official', 'home')}
-        ${renderFinRow(m, 'pred', 'away')}
-        ${renderFinRow(m, 'official', 'away')}
-        ${renderPredPen(m, pred)}
-        ${renderOffPen(m)}
+      <div class="km-board">
+        <div class="km-board-head">
+          <span class="km-bh-team"></span>
+          <span class="km-bh-sc pred">Palpite</span>
+          <span class="km-bh-sc off">Oficial</span>
+        </div>
+        ${renderKmSlot(m, 'home')}
+        ${renderKmSlot(m, 'away')}
+        ${renderKmPens(m, pred)}
       </div>
 
       <div class="km-foot">
-        <div class="km-cap">Pontuação</div>
         <div class="km-foot-row">
-          ${breakdown}
-          ${pointsBadge}
+          ${breakdown || '<span></span>'}
+          ${ptsBadge}
         </div>
       </div>
     </div>
   `;
 }
 
-// Pênalti do SEU palpite — fica DENTRO da faixa "Seu palpite" (sem rótulo, o contexto
-// já diz). Mostra o time que VOCÊ imaginou na vaga; riscado quando seu empate não rolou.
-function renderPredPen(m, pred) {
-  if (!pred || pred.pred_home == null || pred.pred_home !== pred.pred_away || !pred.pred_pen_winner) return '';
-  const side = pred.pred_pen_winner;                        // 'home' | 'away'
-  const penTeam = predTeamForSide(m, side);
-  const who = penTeam ? teamPt(penTeam) : (side === 'home' ? 'mandante' : 'visitante');
-  const realized = m.actual_home === m.actual_away && m.pen_winner === side;  // seu empate+lado se confirmou?
-  return `<div class="km-pen km-area-predpen">pênaltis: <span class="${realized ? '' : 'pen-x'}">${escapeHtml(who)}</span></div>`;
+// Pênaltis — uma linha única sob os dois times: seu palpite (riscado quando o empate
+// não rolou) + o resultado oficial. Some quando não houve pênaltis nem palpite de pênalti.
+function renderKmPens(m, pred) {
+  const parts = [];
+  if (pred && pred.pred_home != null && pred.pred_home === pred.pred_away && pred.pred_pen_winner) {
+    const side = pred.pred_pen_winner;                       // 'home' | 'away'
+    const penTeam = predTeamForSide(m, side);
+    const who = penTeam ? teamPt(penTeam) : (side === 'home' ? 'mandante' : 'visitante');
+    const realized = m.actual_home === m.actual_away && m.pen_winner === side;
+    parts.push(`<span><span class="cap">seu palpite:</span> <span class="${realized ? '' : 'pen-x'}">${escapeHtml(who)}</span></span>`);
+  }
+  if (m.pen_winner) {
+    parts.push(`<span><span class="cap">oficial:</span> ${escapeHtml(teamPt(m.pen_winner === 'home' ? m.team_home : m.team_away))}</span>`);
+  }
+  if (!parts.length) return '';
+  return `<div class="km-pens"><span class="cap">⚽ Pênaltis</span>${parts.join('')}</div>`;
 }
 
-// Pênalti OFICIAL — fica DENTRO da faixa "Resultado oficial". Fato → neutro.
-function renderOffPen(m) {
-  if (!m.pen_winner) return '';
-  return `<div class="km-pen km-area-offpen">pênaltis: ${escapeHtml(teamPt(m.pen_winner === 'home' ? m.team_home : m.team_away))}</div>`;
-}
-
-// Uma linha do card encerrado. lens='pred' (seu palpite) | 'official' (real); side='home'|'away'.
-// Recebe uma classe de área do grid (km-area-*) p/ alinhar home-com-home e away-com-away
-// entre as duas faixas mesmo quando um lado tem o selo "classificado".
-function renderFinRow(m, lens, side) {
+// Uma linha do placar comparativo (encerrado): o time REAL da vaga + dois placares
+// gêmeos (seu palpite | oficial). Quando você previu OUTRO time nesta vaga, ele aparece
+// como "✗ você simulou X" sob o nome (sem perder a informação, mas sem duplicar a linha).
+function renderKmSlot(m, side) {
   const realTeam = side === 'home' ? m.team_home : m.team_away;
   const slotOriginal = side === 'home' ? m.slot_home : m.slot_away;
   const predTeam = predTeamForSide(m, side);
   const pred = predsByMatch.get(m.id);
-  const area = `km-area-${lens === 'official' ? 'off' : 'pred'}${side}`;
 
-  // Vaga de origem (ex.: "2A"). Mesmo spot nas duas faixas → casa palpite × oficial.
-  const slotLine = slotOriginal
-    ? `<span class="km-slot-line" title="${escapeHtml(teamDisplay(slotOriginal))}">vaga: ${escapeHtml(slotLineLabel(slotOriginal))}</span>`
-    : '';
-
-  if (lens === 'official') {
-    const score = side === 'home' ? m.actual_home : m.actual_away;
-    // Nome NEUTRO (fato). O acerto da vaga é comunicado pelo selo "✓ classificado".
-    const qual = renderQualBadge(m.id, side);
-    return `
-      <div class="km-row km-off ${area}">
-        <span class="flag">${flag(realTeam)}</span>
-        <div class="km-nm">
-          <span class="km-name" data-team="${escapeHtml(realTeam || '')}">${escapeHtml(teamPt(realTeam))}</span>
-          ${slotLine}
-          ${qual}
-        </div>
-        <span class="km-score">${score}</span>
-      </div>`;
-  }
-
-  // lens === 'pred' — time que VOCÊ imaginava na vaga + seu placar
   const pscore = pred ? (side === 'home' ? pred.pred_home : pred.pred_away) : null;
-  const actualSide = side === 'home' ? m.actual_home : m.actual_away;
-  const hit = pscore != null && pscore === actualSide;   // cravou os gols deste lado → verde
+  const ascore = side === 'home' ? m.actual_home : m.actual_away;
+  const hit = pscore != null && pscore === ascore;              // cravou os gols deste lado → verde
   const diverged = predTeam && isRealTeam(realTeam) && predTeam !== realTeam;
+
+  const vaga = slotOriginal
+    ? `<span class="km-vaga" title="${escapeHtml(teamDisplay(slotOriginal))}">${escapeHtml(slotLineLabel(slotOriginal))}</span>`
+    : '';
+  const qual = renderQualBadge(m.id, side);                     // "✓ classificado" (bônus da vaga)
+  const simMiss = diverged
+    ? `<span class="km-sim-miss"><span class="x">✗</span> você simulou <span class="dv-flag">${flag(predTeam)}</span><span class="team">${escapeHtml(teamPt(predTeam))}</span></span>`
+    : '';
+  const meta = (vaga || qual || simMiss) ? `<div class="km-meta">${vaga}${qual}${simMiss}</div>` : '';
+
   return `
-    <div class="km-row km-pred ${area} ${diverged ? 'diverged' : ''}">
-      <span class="flag">${predTeam ? flag(predTeam) : ''}</span>
-      <div class="km-nm">
-        <span class="km-name">${predTeam ? escapeHtml(teamPt(predTeam)) : '—'}</span>
-        ${slotLine}
+    <div class="km-slot">
+      <span class="flag">${flag(realTeam)}</span>
+      <div class="km-slot-nm">
+        <span class="km-name" data-team="${escapeHtml(realTeam || '')}">${escapeHtml(teamPt(realTeam))}</span>
+        ${meta}
       </div>
-      <span class="km-score${hit ? ' hit' : ''}">${pscore ?? '–'}</span>
+      <span class="km-sc pred${hit ? ' hit' : ''}">${pscore ?? '–'}</span>
+      <span class="km-sc off">${ascore}</span>
     </div>`;
 }
 
@@ -642,25 +630,6 @@ function renderQualBadge(matchId, side) {
   }
   return `<span class="qual-badge bp" title="Time certo na fase, vaga errada (+${q.pts} na pontuação)">~ vaga errada</span>`;
 }
-
-
-/**
- * Selo de pontos do jogo: "+N pts" e, quando há máximo, "de M".
- * @param {number} pts pontos ganhos
- * @param {number} [max] placar exato da fase (referência)
- */
-function renderPointsBadge(pts, max, extraClass = '') {
-  if (pts == null) return '';
-  // extraClass (exact/partial/miss) define a cor; sem ela, cai no 'win' antigo
-  const cls = `bm-pts ${extraClass || (pts > 0 ? 'win' : '')}`.trim();
-  if (max) {
-    return `<div class="${cls}">
-      <span class="formula">+${pts}<small> de ${max}</small></span>
-    </div>`;
-  }
-  return `<div class="${cls}">${pts > 0 ? '+' : ''}${pts} pts</div>`;
-}
-
 // KPIs unificados: progresso de palpites + desempenho (pontos/exatos) num strip só.
 function renderKpis(counts) {
   const pct = matches.length ? Math.round(counts.totalDone / matches.length * 100) : 0;
@@ -813,42 +782,37 @@ function renderOpenTeamRow(m, side, val, locked) {
   const diverged = simKnown && predTeam !== realTeam;
   const matched = simKnown && predTeam === realTeam;
 
-  // Vaga de origem como sublinha (consistente com o card encerrado).
-  const slotLine = slotOriginal
-    ? `<div class="bm-slot-line" title="${escapeHtml(teamDisplay(slotOriginal))}">vaga: ${escapeHtml(slotLineLabel(slotOriginal))}</div>`
-    : '';
+  // Placar entra DENTRO da linha do nome (colado no time, não flutuando na direita).
+  const input = `<input class="mini-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2"
+             data-match="${m.id}" data-side="${side}"
+             aria-label="Gols ${escapeHtml(shown ? teamPt(shown) : teamDisplay(slot))}"
+             value="${val}" ${locked ? 'disabled' : ''}>`;
 
-  let nameHtml;
-  if (shown) {
-    const sourceBadge = isPredSource
-      ? '<span class="pred-source" title="Baseado nos seus palpites">P</span>'
+  // Meta em UMA linha: vaga de origem + "sua simulação" (acertou a vaga ✓ / errou ✗).
+  const vaga = slotOriginal
+    ? `<span class="bm-vaga" title="${escapeHtml(teamDisplay(slotOriginal))}">${escapeHtml(slotLineLabel(slotOriginal))}</span>`
+    : '';
+  const sim = matched
+    ? `<span class="bm-sim matched" title="Você acertou quem chega nesta vaga"><span class="ic">✓</span> vaga certa</span>`
+    : diverged
+      ? `<span class="bm-sim diverged" title="Quem você previu nesta vaga"><span class="ic">✗</span> simulou <span class="dv-flag">${flag(predTeam)}</span><span class="team">${escapeHtml(teamPt(predTeam))}</span></span>`
       : '';
-    // Chip "sua simulação": quem VOCÊ previu nesta vaga. Verde + ✓ quando você
-    // acertou quem chega; neutro quando imaginou outro time (divergência).
-    const divChip = simKnown
-      ? `<div class="bm-diverge ${matched ? 'matched' : 'diverged'}" title="${matched ? 'Você acertou quem chega nesta vaga' : 'Quem você previu nesta vaga'}"><span class="dv-label">sua simulação</span><span class="dv-team"><span class="dv-flag">${flag(predTeam)}</span>${escapeHtml(teamPt(predTeam))}${matched ? '<span class="dv-ok" aria-hidden="true">✓</span>' : ''}</span></div>`
-      : '';
-    nameHtml = `
-      <div class="nm">
-        <div class="team-line">
-          <span class="team-name" data-team="${escapeHtml(shown)}">${escapeHtml(teamPt(shown))}</span>
-          ${sourceBadge}
-        </div>
-        ${slotLine}
-        ${divChip}
-      </div>`;
-  } else {
-    nameHtml = `<div class="nm slot">${escapeHtml(teamDisplay(slot))}</div>`;
-  }
+  const meta = (vaga || sim) ? `<div class="bm-meta">${vaga}${sim}</div>` : '';
+
+  const sourceBadge = (shown && isPredSource)
+    ? '<span class="pred-source" title="Baseado nos seus palpites">P</span>'
+    : '';
+  const nameHtml = shown
+    ? `<span class="team-name" data-team="${escapeHtml(shown)}">${escapeHtml(teamPt(shown))}</span>${sourceBadge}`
+    : `<span class="team-name slot">${escapeHtml(teamDisplay(slot))}</span>`;
 
   return `
     <div class="bm-team">
-      ${showFlag ? `<span class="flag">${flag(shown)}</span>` : '<span></span>'}
-      ${nameHtml}
-      <input class="mini-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2"
-             data-match="${m.id}" data-side="${side}"
-             aria-label="Gols ${escapeHtml(shown ? teamPt(shown) : teamDisplay(slot))}"
-             value="${val}" ${locked ? 'disabled' : ''}>
+      <span class="flag">${showFlag ? flag(shown) : ''}</span>
+      <div class="nm">
+        <div class="team-line">${nameHtml}${input}</div>
+        ${meta}
+      </div>
     </div>
   `;
 }
