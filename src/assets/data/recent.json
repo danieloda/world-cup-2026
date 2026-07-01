@@ -1009,6 +1009,13 @@
   ],
   "England": [
     [
+      "2026-07-01",
+      "Congo DR",
+      true,
+      "0-1",
+      "World Cup"
+    ],
+    [
       "2026-06-27",
       "Panama",
       false,
@@ -1069,13 +1076,6 @@
       "Serbia",
       true,
       "2-0",
-      "Eliminatórias"
-    ],
-    [
-      "2025-10-14",
-      "Latvia",
-      false,
-      "5-0",
       "Eliminatórias"
     ]
   ],
@@ -3385,6 +3385,13 @@
   ],
   "DR Congo": [
     [
+      "2026-07-01",
+      "England",
+      false,
+      "1-0",
+      "World Cup"
+    ],
+    [
       "2026-06-27",
       "Uzbekistan",
       true,
@@ -3445,13 +3452,6 @@
       "Botswana",
       false,
       "3-0",
-      "Copa Africana"
-    ],
-    [
-      "2025-12-27",
-      "Senegal",
-      false,
-      "1-1",
       "Copa Africana"
     ]
   ]
