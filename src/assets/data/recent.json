@@ -289,6 +289,13 @@
   ],
   "Belgium": [
     [
+      "2026-07-01",
+      "Senegal",
+      true,
+      "0-0",
+      "World Cup"
+    ],
+    [
       "2026-06-27",
       "New Zealand",
       false,
@@ -349,13 +356,6 @@
       "Kazakhstan",
       false,
       "1-1",
-      "Eliminatórias"
-    ],
-    [
-      "2025-10-13",
-      "Wales",
-      false,
-      "4-2",
       "Eliminatórias"
     ]
   ],
@@ -1012,7 +1012,7 @@
       "2026-07-01",
       "Congo DR",
       true,
-      "0-1",
+      "2-1",
       "World Cup"
     ],
     [
@@ -2521,6 +2521,13 @@
   ],
   "Senegal": [
     [
+      "2026-07-01",
+      "Belgium",
+      false,
+      "0-0",
+      "World Cup"
+    ],
+    [
       "2026-06-26",
       "Iraq",
       true,
@@ -2580,13 +2587,6 @@
       "2026-01-14",
       "Egypt",
       true,
-      "1-0",
-      "Copa Africana"
-    ],
-    [
-      "2026-01-09",
-      "Mali",
-      false,
       "1-0",
       "Copa Africana"
     ]
@@ -3388,7 +3388,7 @@
       "2026-07-01",
       "England",
       false,
-      "1-0",
+      "1-2",
       "World Cup"
     ],
     [
