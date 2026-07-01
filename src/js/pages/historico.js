@@ -1,5 +1,5 @@
 import { requireAuth } from '../auth.js';
-import { reportFatal } from '../error-reporter.js';
+import { reportFatal, isNetworkError } from '../error-reporter.js';
 import { renderShell } from '../sidebar.js';
 import { supabase, fetchAllPages } from '../supabase.js';
 import {
@@ -68,9 +68,19 @@ let activeDay = null;              // ABA 2 (dia): 'YYYY-MM-DD' (sempre um dia e
 let activeStatus = 'finished';     // FILTRO: 'finished' | 'awaiting'
 
 // ============================================================
-// Main
+// Main — boot resiliente a blip de rede
 // ============================================================
-try {
+// O load faz ~8 chamadas Supabase; QUALQUER uma que pisque (handoff wifi/4G, DNS,
+// conexão resetada) derrubava a página inteira pra tela vermelha fatal, sem
+// recuperação. Agora: erro de REDE mostra "Sem conexão — Tentar de novo" (overlay
+// sobre o #app, com auto-retry em backoff + retry imediato no evento 'online');
+// só erro REAL cai na tela fatal. Ver memory failed-to-fetch-transient-noise.
+let wired = false;            // attach/auto-refresh são one-shot (sobrevivem ao retry)
+let retryTimer = null;
+let retryDelay = 3000;        // backoff: 3s → 6s → 12s → … (teto 30s)
+const RETRY_MAX = 30000;
+
+async function boot() {
   const auth = await requireAuth();
   if (!auth) throw new Error('not authed');
   profile = auth.profile;
@@ -86,11 +96,87 @@ try {
   pageBody.innerHTML = renderPage();
   pageBody.classList.add('fade-up');
 
-  attachEventListeners();
-  startAutoRefresh();  // lacre publicado / apito / resultado lançado → recarrega
-} catch (err) {
-  console.error('[historico] FATAL:', err);
-  reportFatal('historico', err);
+  // One-shot: o listener é delegado em document e o auto-refresh é um interval —
+  // re-armá-los num retry duplicaria. (No caminho de rede o boot falha ANTES
+  // daqui, então isto só roda no boot que de fato renderiza.)
+  if (!wired) {
+    wired = true;
+    attachEventListeners();
+    startAutoRefresh();  // lacre publicado / apito / resultado lançado → recarrega
+  }
+}
+
+async function attemptBoot() {
+  try {
+    await boot();
+    clearTimeout(retryTimer);
+    window.removeEventListener('online', retryNow);
+    hideOfflineScreen();
+  } catch (err) {
+    if (isNetworkError(err)) {
+      // Transitório: grava como kind='network' (deduped: 1 por load; não pinga o
+      // admin — migration 075) e tenta de novo em vez da tela fatal.
+      reportFatal('historico', err);
+      scheduleRetry();
+    } else {
+      console.error('[historico] FATAL:', err);
+      reportFatal('historico', err);
+      showFatalScreen(err);
+    }
+  }
+}
+
+function retryNow() {
+  clearTimeout(retryTimer);
+  window.removeEventListener('online', retryNow);
+  markOfflineRetrying();
+  attemptBoot();
+}
+
+function scheduleRetry() {
+  showOfflineScreen();
+  clearTimeout(retryTimer);
+  retryTimer = setTimeout(retryNow, retryDelay);
+  retryDelay = Math.min(retryDelay * 2, RETRY_MAX);
+  // Voltou a internet antes do timer? Tenta na hora.
+  window.addEventListener('online', retryNow, { once: true });
+}
+
+await attemptBoot();
+
+// ----- Tela "Sem conexão" (erro de rede): overlay que NÃO destrói o #app, pra
+// que o renderShell do retry ache o #app. Inline styles (igual à tela fatal) pra
+// não depender de classe nova no CSS. -----
+function showOfflineScreen() {
+  let el = document.getElementById('netErr');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'netErr';
+    el.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,.72);';
+    document.body.appendChild(el);
+  }
+  el.innerHTML = `
+    <div style="max-width:420px;width:100%;background:#181818;border:1px solid #2a2a2a;border-radius:16px;padding:28px;text-align:center;color:var(--text);font-family:'Figtree',system-ui,-apple-system,sans-serif;">
+      <div style="width:44px;height:44px;margin:0 auto 14px;color:var(--accent)">${ICON.info}</div>
+      <h2 style="margin:0 0 8px;font-size:20px;">Sem conexão</h2>
+      <p style="margin:0 0 20px;color:#9aa0a6;line-height:1.5;">Não consegui carregar os palpites. Confira sua internet — vou tentar de novo sozinho.</p>
+      <button class="btn btn-green" id="netRetryBtn" type="button" style="width:100%;">Tentar de novo</button>
+      <p id="netAuto" style="margin:12px 0 0;font-size:13px;color:#9aa0a6;min-height:18px;">Tentando de novo automaticamente…</p>
+    </div>`;
+  document.getElementById('netRetryBtn').addEventListener('click', retryNow);
+}
+function markOfflineRetrying() {
+  const btn = document.getElementById('netRetryBtn');
+  const auto = document.getElementById('netAuto');
+  if (btn) { btn.disabled = true; btn.textContent = 'Tentando…'; }
+  if (auto) auto.textContent = '';
+}
+function hideOfflineScreen() {
+  document.getElementById('netErr')?.remove();
+}
+
+// ----- Tela fatal (erro real, não-rede): sem retry; volta pro Início -----
+function showFatalScreen(err) {
   document.body.innerHTML = `
     <div style="padding:40px; max-width:720px; margin:40px auto; background:#181818; border-radius:12px; color:var(--text); font-family:'Figtree',system-ui,-apple-system,sans-serif;">
       <h1 style="color:var(--red)">⚠️ Erro</h1>
@@ -104,6 +190,13 @@ try {
 // Data
 // ============================================================
 async function loadData() {
+  // Idempotente: um retry (blip de rede) re-roda loadData; sem limpar, os loops
+  // abaixo dariam push em cima dos Maps antigos e duplicariam palpites/gols.
+  predsByMatch.clear();
+  goalsByMatch.clear();
+  scorerPickByUser.clear();
+  posByUser.clear();
+
   const [statsRes, matchesRes, leaderRes] = await Promise.all([
     supabase.from('v_pool_stats').select('*').single(),
     // Um jogo entra no Histórico quando os palpites de todos estão REVELADOS:

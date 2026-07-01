@@ -65,12 +65,28 @@ async function report(kind, message, { source = '', line = '', stack = null } = 
   }
 }
 
+// "Failed to fetch" (Chrome/Edge), "Load failed" (Safari) e "NetworkError when
+// attempting to fetch resource." (Firefox) são todos a MESMA coisa: o fetch()
+// falhou na CAMADA DE REDE (DNS/TLS/CORS-preflight/ERR_NETWORK_CHANGED/conexão
+// resetada/ad-blocker) — NÃO um status HTTP, que resolveria normal. Inclui o erro
+// que o supabase-js encapsula. Usado pra (a) degradar pra "Sem conexão" + retry
+// em vez de tela fatal, e (b) gravar o client_error como kind='network' — que o
+// trigger silencia (ruído transitório não-acionável, igual ao Script error.).
+// KEEP IN SYNC: migration 075 (is_client_error_network).
+const NETWORK_RE = /failed to fetch|load failed|networkerror|network request failed|the network connection was lost/i;
+export function isNetworkError(err) {
+  if (!err) return false;
+  const msg = err.message || (typeof err === 'string' ? err : '') || '';
+  return NETWORK_RE.test(msg);
+}
+
 /**
  * Erro FATAL tratado: o catch de página que troca o body pela tela de erro.
  * Os handlers globais NÃO veem erro capturado, então cada página chama isto
  * antes de renderizar a tela. Fire-and-forget: nunca lança, nunca atrasa o
  * render. Reusa report() (dedupe, teto, só autenticado — anon fica de fora
- * por design, igual aos handlers globais).
+ * por design, igual aos handlers globais). Erro de rede entra como kind='network'
+ * (transitório, não-acionável → o trigger 075 não pinga o admin em tempo real).
  * @param {string} page  tag da página (ex.: 'ranking'), igual ao console.error
  * @param {*} err        Error, erro PostgREST ({message, code, ...}) ou string
  */
@@ -81,7 +97,8 @@ export function reportFatal(page, err) {
       // erro PostgREST não tem .stack — preserva code/details/hint no lugar
       try { stack = JSON.stringify(err); } catch { /* circular: segue sem */ }
     }
-    report('fatal', `[${page}] ${err?.message || err || '(sem mensagem)'}`, { stack });
+    const kind = isNetworkError(err) ? 'network' : 'fatal';
+    report(kind, `[${page}] ${err?.message || err || '(sem mensagem)'}`, { stack });
   } catch {
     // espelha report(): o reporter jamais pode gerar erro
   }
@@ -100,7 +117,8 @@ export function installErrorReporter(userId) {
   window.addEventListener('error', (e) => {
     const stack = e.error?.stack;
     if (isNoise(e.message, e.filename, stack)) return;
-    report('error', e.message || 'window.onerror', {
+    const kind = isNetworkError(e.error || e.message) ? 'network' : 'error';
+    report(kind, e.message || 'window.onerror', {
       source: e.filename, line: e.lineno, stack,
     });
   });
@@ -109,6 +127,7 @@ export function installErrorReporter(userId) {
     const r = e.reason;
     const msg = r?.message || String(r);
     if (isNoise(msg, null, r?.stack)) return;
-    report('unhandledrejection', msg, { stack: r?.stack });
+    const kind = isNetworkError(r) ? 'network' : 'unhandledrejection';
+    report(kind, msg, { stack: r?.stack });
   });
 }

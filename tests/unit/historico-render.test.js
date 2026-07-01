@@ -33,7 +33,10 @@ const fx = vi.hoisted(() => ({
 vi.mock('../../src/js/auth.js', () => ({
   requireAuth: async () => ({ profile: { id: 'me', full_name: 'Você Teste' } }),
 }));
-vi.mock('../../src/js/error-reporter.js', () => ({ reportFatal: fx.reportFatal }));
+vi.mock('../../src/js/error-reporter.js', () => ({
+  reportFatal: fx.reportFatal,
+  isNetworkError: (e) => /failed to fetch|load failed|networkerror/i.test(e?.message || ''),
+}));
 vi.mock('../../src/js/auto-refresh.js', () => ({ startAutoRefresh: fx.startAutoRefresh }));
 vi.mock('../../src/js/sidebar.js', () => ({
   renderShell: async () => {
