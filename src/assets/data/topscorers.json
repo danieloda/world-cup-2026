@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-01T20:29:39.211Z",
+  "updated_at": "2026-07-01T22:06:10.407Z",
   "season": 2026,
   "scorers": [
     {
@@ -27,12 +27,28 @@
       "minutes": 270
     },
     {
+      "api_id": 184,
+      "name": "H. Kane",
+      "team": "England",
+      "goals": 5,
+      "assists": 0,
+      "minutes": 354
+    },
+    {
       "api_id": 153,
       "name": "O. Dembélé",
       "team": "France",
       "goals": 4,
       "assists": 2,
       "minutes": 288
+    },
+    {
+      "api_id": 2218,
+      "name": "I. Sarr",
+      "team": "Senegal",
+      "goals": 4,
+      "assists": 1,
+      "minutes": 305
     },
     {
       "api_id": 762,
@@ -57,14 +73,6 @@
       "goals": 3,
       "assists": 1,
       "minutes": 129
-    },
-    {
-      "api_id": 2218,
-      "name": "I. Sarr",
-      "team": "Senegal",
-      "goals": 3,
-      "assists": 1,
-      "minutes": 246
     },
     {
       "api_id": 35532,
@@ -99,28 +107,12 @@
       "minutes": 235
     },
     {
-      "api_id": 184,
-      "name": "H. Kane",
-      "team": "England",
-      "goals": 3,
-      "assists": 0,
-      "minutes": 264
-    },
-    {
       "api_id": 94333,
       "name": "E. Just",
       "team": "New Zealand",
       "goals": 3,
       "assists": 0,
       "minutes": 265
-    },
-    {
-      "api_id": 20649,
-      "name": "Y. Wissa",
-      "team": "DR Congo",
-      "goals": 3,
-      "assists": 0,
-      "minutes": 270
     },
     {
       "api_id": 8489,
@@ -137,6 +129,14 @@
       "goals": 3,
       "assists": 0,
       "minutes": 355
+    },
+    {
+      "api_id": 20649,
+      "name": "Y. Wissa",
+      "team": "DR Congo",
+      "goals": 3,
+      "assists": 0,
+      "minutes": 360
     },
     {
       "api_id": 161897,
