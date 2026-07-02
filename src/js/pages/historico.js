@@ -678,9 +678,9 @@ function outcomeBarHtml(m, bets, finished) {
   return `
     <div class="cons-1x2">
       <div class="rx-1x2-head">
-        <span class="rx-1x2-team home"><span class="flag">${flag(m.team_home)}</span>${escapeHtml(homePt)}</span>
+        <span class="rx-1x2-team home"><span class="flag">${flag(m.team_home)}</span><span class="rx-1x2-tn">${escapeHtml(homePt)}</span></span>
         <span class="rx-1x2-draw">resultado</span>
-        <span class="rx-1x2-team away">${escapeHtml(awayPt)}<span class="flag">${flag(m.team_away)}</span></span>
+        <span class="rx-1x2-team away"><span class="rx-1x2-tn">${escapeHtml(awayPt)}</span><span class="flag">${flag(m.team_away)}</span></span>
       </div>
       <div class="rx-1x2-bar" role="img" aria-label="${pct('home')}% vitória ${escapeHtml(homePt)}, ${pct('draw')}% empate, ${pct('away')}% vitória ${escapeHtml(awayPt)}">
         ${segs}

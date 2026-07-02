@@ -239,9 +239,9 @@ export function renderPredictionsBlock(homeTeam, awayTeam, pred, { label = true 
 
   const bar = hasBar ? `
       <div class="rx-1x2-head">
-        <span class="rx-1x2-team home"><span class="flag">${flag(homeTeam)}</span>${escapeHtml(homePt)}</span>
+        <span class="rx-1x2-team home"><span class="flag">${flag(homeTeam)}</span><span class="rx-1x2-tn">${escapeHtml(homePt)}</span></span>
         <span class="rx-1x2-draw">empate</span>
-        <span class="rx-1x2-team away">${escapeHtml(awayPt)}<span class="flag">${flag(awayTeam)}</span></span>
+        <span class="rx-1x2-team away"><span class="rx-1x2-tn">${escapeHtml(awayPt)}</span><span class="flag">${flag(awayTeam)}</span></span>
       </div>
       <div class="rx-1x2-bar" role="img" aria-label="${Math.round(pH)}% vitória ${escapeHtml(homePt)}, ${Math.round(pD)}% empate, ${Math.round(pA)}% vitória ${escapeHtml(awayPt)}">
         ${seg(pH, 'home')}${seg(pD, 'draw')}${seg(pA, 'away')}

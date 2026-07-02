@@ -1200,6 +1200,9 @@ body.raiox-modal-open { overflow: hidden; }
   width: 24px; height: 17px; border-radius: var(--radius-xs); flex: none;
   box-shadow: 0 1px 3px rgba(0,0,0,.5);
 }
+/* nome numa span própria → trunca em UMA linha (nunca quebra nem colide com o
+   rótulo central "resultado"/"empate"). Compartilhado galera + Raio-X. */
+.rx-1x2-tn { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .rx-1x2-draw {
   font: var(--fw-bold) 9px/var(--lh-none) var(--font); letter-spacing: var(--tracking-caps); text-transform: uppercase;
   color: var(--text-mute); white-space: nowrap;
@@ -1215,7 +1218,7 @@ body.raiox-modal-open { overflow: hidden; }
 }
 .rx-1x2-seg.home { background: linear-gradient(180deg, #25d366, var(--positive)); }
 .rx-1x2-seg.draw { background: linear-gradient(180deg, var(--accent-bright), var(--accent)); }
-.rx-1x2-seg.away { background: linear-gradient(180deg, #f57484, var(--red)); color: #fff; }
+.rx-1x2-seg.away { background: linear-gradient(180deg, #f57484, var(--red)); color: #0c0c0c; }  /* texto escuro: AA no vermelho (branco dava ~3.2:1), e consistente com casa/empate */
 
 .rx-1x2-verdict {
   text-align: center; font: var(--fw-medium) var(--fs-sm)/var(--lh-none) var(--font); color: var(--text-mute);
@@ -3141,11 +3144,25 @@ body.raiox-modal-open { overflow: hidden; }
 .board-meta { display: flex; align-items: center; justify-content: center; gap: var(--space-2); flex-wrap: wrap; margin-bottom: var(--space-3h); }
 .board-meta .m { font-size: var(--fs-xs); font-weight: var(--fw-heavy); letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--text-mute); font-family: var(--font-mono); }
 .board .mult { font-size: var(--fs-2xs); font-weight: var(--fw-heavy); color: var(--positive); background: var(--positive-dim); border-radius: var(--radius-pill); padding: var(--space-0) var(--space-2h); }
-.board-row { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: var(--space-3); }
+/* align-items:start → as duas bandeiras ficam NIVELADAS no topo mesmo quando um nome
+   quebra em 2 linhas e o outro não (o placar continua centrado, ver .bscore). */
+.board-row { display: grid; grid-template-columns: 1fr auto 1fr; align-items: start; gap: var(--space-3); }
 .bteam { display: flex; flex-direction: column; align-items: center; gap: var(--space-2); font-size: var(--fs-md); font-weight: var(--fw-heavy); letter-spacing: var(--tracking-tight); }
 .bteam .fi { width: 38px; height: 28px; border-radius: 5px; box-shadow: 0 5px 14px rgba(0,0,0,.45); }
-.bteam .bt-n { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.bscore { font-size: 56px; font-weight: var(--fw-black); letter-spacing: var(--tracking-tight); line-height: var(--lh-none); font-variant-numeric: tabular-nums; text-shadow: 0 2px 10px rgba(0,0,0,.35); }
+/* Nome do time no placar: QUEBRA em até 2 linhas (centrado) em vez de truncar —
+   o board tem espaço vertical (bandeira em cima) e o nome é o rótulo principal. */
+.bteam .bt-n {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: break-word;
+  text-align: center;
+  line-height: var(--lh-tight);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.bscore { align-self: center; font-size: 56px; font-weight: var(--fw-black); letter-spacing: var(--tracking-tight); line-height: var(--lh-none); font-variant-numeric: tabular-nums; text-shadow: 0 2px 10px rgba(0,0,0,.35); }
 .bscore .x { color: var(--text-mute); margin: 0 var(--space-2h); font-weight: var(--fw-heavy); font-size: .62em; vertical-align: .06em; }
 .bscore.bs-vs { font-size: var(--fs-3xl); color: var(--text-mute); letter-spacing: var(--tracking-caps); }
 .bpen { font-size: var(--fs-2xs); font-weight: var(--fw-bold); color: var(--text-mute); letter-spacing: var(--tracking-wide); margin-top: var(--space-2); }
@@ -7247,8 +7264,9 @@ input[type="number"].score-input {
 .cons2 .crank { font-size: var(--fs-xs); font-weight: var(--fw-black); color: var(--text-mute); text-align: center; font-variant-numeric: tabular-nums; }
 .cons2 .sl { display: inline-flex; align-items: center; justify-content: center; font: var(--fw-heavy) var(--fs-base)/var(--lh-none) var(--font-mono); font-variant-numeric: tabular-nums; background: rgba(255,255,255,.06); border: 1px solid var(--line-strong); border-radius: var(--radius-sm); color: var(--text); padding: var(--space-1h) 0; letter-spacing: var(--tracking-wide); }
 .cons2 .sl .x { color: var(--text-mute); margin: 0 1px; }
-.cons2 .ctrack { position: relative; height: 22px; border-radius: var(--radius-sm); background: rgba(255,255,255,.05); overflow: hidden; }
-.cons2 .cfill { position: absolute; inset: 0 auto 0 0; border-radius: var(--radius-sm); background: rgba(255,255,255,.14); animation: cons2grow .6s cubic-bezier(.22,1,.36,1) both; transform-origin: left; }
+.cons2 .ctrack { position: relative; height: 22px; border-radius: var(--radius-sm); background: rgba(255,255,255,.08); overflow: hidden; }
+/* preenchimento neutro mais visível (era .14 ≈ invisível) → a proporção da galera lê à distância */
+.cons2 .cfill { position: absolute; inset: 0 auto 0 0; border-radius: var(--radius-sm); background: rgba(255,255,255,.24); animation: cons2grow .6s cubic-bezier(.22,1,.36,1) both; transform-origin: left; }
 @keyframes cons2grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 .cons2 .crow.lead .cfill { background: linear-gradient(90deg, rgba(244,196,48,.85), var(--accent)); }
 .cons2 .crow.hit .cfill { background: linear-gradient(90deg, rgba(29,185,84,.85), var(--positive)); }
@@ -7270,7 +7288,16 @@ input[type="number"].score-input {
 /* jogo aberto: o segmento da maioria fica mais encorpado */
 .cons2 .rx-1x2-seg.is-lead { font-weight: var(--fw-black); }
 /* jogo encerrado: palpites que não bateram recuam… */
-.cons2 .rx-1x2-seg.is-dim { opacity: .38; filter: saturate(.45); }
+/* Segmentos 1X2 perdedores (jogo encerrado): recuam pra um cinza neutro, mas o %
+   continua LEGÍVEL (antes o opacity .38 apagava o número junto com o fundo). O
+   vencedor (.is-actual) é quem brilha, com anel. */
+.cons2 .rx-1x2-seg.is-dim {
+  opacity: 1;
+  filter: none;
+  background: rgba(255, 255, 255, .10);
+  color: var(--text-dim);
+  text-shadow: none;
+}
 /* …e o resultado que ACONTECEU brilha (anel claro + halo) e sobe pra frente */
 .cons2 .rx-1x2-seg.is-actual {
   z-index: 1;
@@ -7294,6 +7321,14 @@ input[type="number"].score-input {
 .cons2 .crow.you .sl { background: var(--accent); border-color: transparent; color: #0c0c0c; }
 .cons2 .crow.you .cfill { background: linear-gradient(90deg, rgba(244,196,48,.55), rgba(244,196,48,.85)); }
 @media (prefers-reduced-motion: reduce) { .cons2 .cfill { animation: none; } }
+/* Mobile: no head do 1X2 da galera o nome é redundante (o board acima já nomeia os
+   times grande) e apertava/truncava. Some — sobra bandeira nas pontas + rótulo
+   central: legenda limpa da barra ([🇺🇸] — RESULTADO — [🇧🇦]), robusta pra qualquer
+   nome. (Só na galera; o Raio-X mantém o nome truncado em 1 linha.) */
+@media (max-width: 600px) {
+  .cons2 .rx-1x2-tn { display: none; }
+  .cons2 .rx-1x2-team { gap: 0; }
+}
 
 /* ============================================================
    Tiers — agrupamento por RESULTADO (vitória casa / empate / vitória fora),
