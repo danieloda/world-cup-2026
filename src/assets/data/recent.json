@@ -217,6 +217,13 @@
   ],
   "Austria": [
     [
+      "2026-07-02",
+      "Spain",
+      false,
+      "0-3",
+      "World Cup"
+    ],
+    [
       "2026-06-28",
       "Algeria",
       false,
@@ -277,13 +284,6 @@
       "Romania",
       false,
       "0-1",
-      "Eliminatórias"
-    ],
-    [
-      "2025-10-09",
-      "San Marino",
-      true,
-      "10-0",
       "Eliminatórias"
     ]
   ],
@@ -2737,6 +2737,13 @@
   ],
   "Spain": [
     [
+      "2026-07-02",
+      "Austria",
+      true,
+      "3-0",
+      "World Cup"
+    ],
+    [
       "2026-06-27",
       "Uruguay",
       false,
@@ -2796,13 +2803,6 @@
       "2025-11-15",
       "Georgia",
       false,
-      "4-0",
-      "Eliminatórias"
-    ],
-    [
-      "2025-10-14",
-      "Bulgaria",
-      true,
       "4-0",
       "Eliminatórias"
     ]
