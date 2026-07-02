@@ -361,6 +361,13 @@
   ],
   "Bosnia & Herzegovina": [
     [
+      "2026-07-02",
+      "USA",
+      false,
+      "0-2",
+      "World Cup"
+    ],
+    [
       "2026-06-24",
       "Qatar",
       true,
@@ -422,13 +429,6 @@
       true,
       "3-1",
       "Eliminatórias"
-    ],
-    [
-      "2025-10-12",
-      "Malta",
-      false,
-      "4-1",
-      "Amistoso"
     ]
   ],
   "Brazil": [
@@ -3025,6 +3025,13 @@
   ],
   "USA": [
     [
+      "2026-07-02",
+      "Bosnia & Herzegovina",
+      true,
+      "2-0",
+      "World Cup"
+    ],
+    [
       "2026-06-26",
       "Türkiye",
       false,
@@ -3083,13 +3090,6 @@
     [
       "2025-11-15",
       "Paraguay",
-      true,
-      "2-1",
-      "Amistoso"
-    ],
-    [
-      "2025-10-15",
-      "Australia",
       true,
       "2-1",
       "Amistoso"
