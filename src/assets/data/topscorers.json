@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-02T01:51:44.846Z",
+  "updated_at": "2026-07-02T06:02:48.730Z",
   "season": 2026,
   "scorers": [
     {
@@ -43,20 +43,20 @@
       "minutes": 288
     },
     {
-      "api_id": 2218,
-      "name": "I. Sarr",
-      "team": "Senegal",
-      "goals": 4,
-      "assists": 1,
-      "minutes": 305
-    },
-    {
       "api_id": 762,
       "name": "Vinícius Júnior",
       "team": "Brazil",
       "goals": 4,
       "assists": 1,
       "minutes": 351
+    },
+    {
+      "api_id": 2218,
+      "name": "I. Sarr",
+      "team": "Senegal",
+      "goals": 4,
+      "assists": 1,
+      "minutes": 366
     },
     {
       "api_id": 26475,
@@ -89,6 +89,14 @@
       "goals": 3,
       "assists": 1,
       "minutes": 371
+    },
+    {
+      "api_id": 138835,
+      "name": "F. Balogun",
+      "team": "USA",
+      "goals": 3,
+      "assists": 0,
+      "minutes": 225
     },
     {
       "api_id": 38750,
@@ -153,14 +161,6 @@
       "goals": 2,
       "assists": 2,
       "minutes": 253
-    },
-    {
-      "api_id": 161904,
-      "name": "B. Barcola",
-      "team": "France",
-      "goals": 2,
-      "assists": 1,
-      "minutes": 208
     }
   ]
 }
