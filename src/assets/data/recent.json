@@ -73,6 +73,13 @@
   ],
   "Argentina": [
     [
+      "2026-07-03",
+      "Cape Verde Islands",
+      true,
+      "0-0",
+      "World Cup"
+    ],
+    [
       "2026-06-28",
       "Jordan",
       false,
@@ -133,13 +140,6 @@
       "Puerto Rico",
       false,
       "6-0",
-      "Amistoso"
-    ],
-    [
-      "2025-10-11",
-      "Venezuela",
-      true,
-      "1-0",
       "Amistoso"
     ]
   ],
@@ -3313,6 +3313,13 @@
   ],
   "Cape Verde": [
     [
+      "2026-07-03",
+      "Argentina",
+      false,
+      "0-0",
+      "World Cup"
+    ],
+    [
       "2026-06-27",
       "Saudi Arabia",
       true,
@@ -3374,13 +3381,6 @@
       false,
       "0-0",
       "Amistoso"
-    ],
-    [
-      "2025-10-13",
-      "Eswatini",
-      true,
-      "3-0",
-      "Eliminatórias"
     ]
   ],
   "DR Congo": [
