@@ -145,6 +145,13 @@
   ],
   "Australia": [
     [
+      "2026-07-03",
+      "Egypt",
+      true,
+      "1-1",
+      "World Cup"
+    ],
+    [
       "2026-06-26",
       "Paraguay",
       false,
@@ -205,13 +212,6 @@
       "Venezuela",
       false,
       "0-1",
-      "Amistoso"
-    ],
-    [
-      "2025-10-15",
-      "USA",
-      false,
-      "1-2",
       "Amistoso"
     ]
   ],
@@ -937,6 +937,13 @@
   ],
   "Egypt": [
     [
+      "2026-07-03",
+      "Australia",
+      false,
+      "1-1",
+      "World Cup"
+    ],
+    [
       "2026-06-27",
       "Iran",
       true,
@@ -997,13 +1004,6 @@
       "Senegal",
       false,
       "0-1",
-      "Copa Africana"
-    ],
-    [
-      "2026-01-10",
-      "Ivory Coast",
-      true,
-      "3-2",
       "Copa Africana"
     ]
   ],
