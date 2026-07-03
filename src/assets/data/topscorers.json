@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-03T03:33:05.109Z",
+  "updated_at": "2026-07-03T06:50:57.294Z",
   "season": 2026,
   "scorers": [
     {
@@ -43,6 +43,14 @@
       "minutes": 288
     },
     {
+      "api_id": 47323,
+      "name": "Mikel Oyarzabal",
+      "team": "Spain",
+      "goals": 4,
+      "assists": 1,
+      "minutes": 301
+    },
+    {
       "api_id": 762,
       "name": "Vinícius Júnior",
       "team": "Brazil",
@@ -71,8 +79,8 @@
       "name": "J. Manzambi",
       "team": "Switzerland",
       "goals": 3,
-      "assists": 1,
-      "minutes": 129
+      "assists": 2,
+      "minutes": 200
     },
     {
       "api_id": 35532,
@@ -131,6 +139,14 @@
       "minutes": 338
     },
     {
+      "api_id": 874,
+      "name": "Cristiano Ronaldo",
+      "team": "Portugal",
+      "goals": 3,
+      "assists": 0,
+      "minutes": 351
+    },
+    {
       "api_id": 978,
       "name": "K. Havertz",
       "team": "Germany",
@@ -139,28 +155,12 @@
       "minutes": 355
     },
     {
-      "api_id": 20649,
-      "name": "Y. Wissa",
-      "team": "DR Congo",
-      "goals": 3,
-      "assists": 0,
-      "minutes": 360
-    },
-    {
       "api_id": 161897,
       "name": "I. Saibari",
       "team": "Morocco",
       "goals": 3,
       "assists": 0,
       "minutes": 363
-    },
-    {
-      "api_id": 37724,
-      "name": "C. Summerville",
-      "team": "Netherlands",
-      "goals": 2,
-      "assists": 2,
-      "minutes": 253
     }
   ]
 }
