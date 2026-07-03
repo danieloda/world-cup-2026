@@ -1,6 +1,13 @@
 {
   "Algeria": [
     [
+      "2026-07-03",
+      "Switzerland",
+      false,
+      "0-2",
+      "World Cup"
+    ],
+    [
       "2026-06-28",
       "Austria",
       true,
@@ -61,13 +68,6 @@
       "Congo DR",
       true,
       "1-0",
-      "Copa Africana"
-    ],
-    [
-      "2025-12-31",
-      "Equatorial Guinea",
-      false,
-      "3-1",
       "Copa Africana"
     ]
   ],
@@ -649,6 +649,13 @@
   ],
   "Croatia": [
     [
+      "2026-07-02",
+      "Portugal",
+      false,
+      "1-2",
+      "World Cup"
+    ],
+    [
       "2026-06-27",
       "Ghana",
       true,
@@ -709,13 +716,6 @@
       "Faroe Islands",
       true,
       "3-1",
-      "Eliminatórias"
-    ],
-    [
-      "2025-10-12",
-      "Gibraltar",
-      true,
-      "3-0",
       "Eliminatórias"
     ]
   ],
@@ -2233,6 +2233,13 @@
   ],
   "Portugal": [
     [
+      "2026-07-02",
+      "Croatia",
+      true,
+      "2-1",
+      "World Cup"
+    ],
+    [
       "2026-06-27",
       "Colombia",
       false,
@@ -2293,13 +2300,6 @@
       "Rep. Of Ireland",
       false,
       "0-2",
-      "Eliminatórias"
-    ],
-    [
-      "2025-10-14",
-      "Hungary",
-      true,
-      "2-2",
       "Eliminatórias"
     ]
   ],
@@ -2881,6 +2881,13 @@
   ],
   "Switzerland": [
     [
+      "2026-07-03",
+      "Algeria",
+      true,
+      "2-0",
+      "World Cup"
+    ],
+    [
       "2026-06-24",
       "Canada",
       true,
@@ -2941,13 +2948,6 @@
       "Sweden",
       true,
       "4-1",
-      "Eliminatórias"
-    ],
-    [
-      "2025-10-13",
-      "Slovenia",
-      false,
-      "0-0",
       "Eliminatórias"
     ]
   ],
