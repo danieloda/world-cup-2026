@@ -505,6 +505,13 @@
   ],
   "Canada": [
     [
+      "2026-07-04",
+      "Morocco",
+      true,
+      "0-3",
+      "World Cup"
+    ],
+    [
       "2026-06-28",
       "South Africa",
       false,
@@ -565,13 +572,6 @@
       "Guatemala",
       true,
       "1-0",
-      "Amistoso"
-    ],
-    [
-      "2025-11-19",
-      "Venezuela",
-      true,
-      "2-0",
       "Amistoso"
     ]
   ],
@@ -1801,6 +1801,13 @@
   ],
   "Morocco": [
     [
+      "2026-07-04",
+      "Canada",
+      false,
+      "3-0",
+      "World Cup"
+    ],
+    [
       "2026-06-30",
       "Netherlands",
       false,
@@ -1862,13 +1869,6 @@
       true,
       "1-1",
       "Amistoso"
-    ],
-    [
-      "2026-01-18",
-      "Senegal",
-      false,
-      "3-0",
-      "Copa Africana"
     ]
   ],
   "Netherlands": [
