@@ -1081,6 +1081,13 @@
   ],
   "France": [
     [
+      "2026-07-04",
+      "Paraguay",
+      false,
+      "0-0",
+      "World Cup"
+    ],
+    [
       "2026-06-30",
       "Sweden",
       true,
@@ -1141,13 +1148,6 @@
       "Azerbaijan",
       false,
       "3-1",
-      "Eliminatórias"
-    ],
-    [
-      "2025-11-13",
-      "Ukraine",
-      true,
-      "4-0",
       "Eliminatórias"
     ]
   ],
@@ -2161,6 +2161,13 @@
   ],
   "Paraguay": [
     [
+      "2026-07-04",
+      "France",
+      true,
+      "0-0",
+      "World Cup"
+    ],
+    [
       "2026-06-29",
       "Germany",
       false,
@@ -2221,13 +2228,6 @@
       "USA",
       false,
       "1-2",
-      "Amistoso"
-    ],
-    [
-      "2025-10-14",
-      "South Korea",
-      false,
-      "0-2",
       "Amistoso"
     ]
   ],
