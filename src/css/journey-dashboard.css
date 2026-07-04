@@ -83,33 +83,45 @@
 .jd-swap-names { color: var(--text-dim); min-width: 0; overflow-wrap: anywhere; line-height: 1.35; }
 
 /* --------------------------- funil ---------------------------- */
-/* borda delimita a extensão total — sem ela o tier "Zero" (quase da cor do
-   card) some e a barra parece truncada */
-.jd-funnel { display: flex; height: 30px; border-radius: 8px; overflow: hidden; border: 1px solid var(--line); }
+/* Cores dark-native DE PROPÓSITO (incidente 04/07): dark forçado de celular
+   (Chrome/Samsung "escurecer sites") recolore fundos claros grandes e ignorava
+   até o color-scheme:dark — fundo escuro + NÚMERO carregando o degradê dourado
+   é imune por construção. O pontinho da legenda usa a MESMA cor do número do
+   tier (--t-*), então barra e legenda casam sempre. Borda delimita a extensão
+   total (senão o tier "Zero", quase da cor do card, parece barra truncada). */
+:root {
+  --t-exact: #ffd54a; --t-vs: #ecc95e; --t-v: #cfb060; --t-side: #a89e78; --t-miss: #8a8a8e;
+}
+.jd-funnel {
+  display: flex; gap: 2px; height: 30px;
+  border-radius: 8px; overflow: hidden; border: 1px solid var(--line);
+  background: var(--bg-main);
+}
 .jd-fseg {
   display: flex; align-items: center; justify-content: center;
-  font-size: var(--fs-xs); font-weight: var(--fw-heavy); color: #131313;
+  font-size: var(--fs-xs); font-weight: var(--fw-heavy);
   min-width: 18px;
 }
-.jd-fseg.t-exact { background: var(--accent-bright); }
-.jd-fseg.t-vs { background: #d9a921; }
-.jd-fseg.t-v { background: #a0801f; }
-.jd-fseg.t-side { background: #5c512a; color: #d7d7d7; }
-.jd-fseg.t-miss { background: #2c2c2f; color: #8a8a8e; }
+.jd-fseg.t-exact { background: #46390e; color: var(--t-exact); }
+.jd-fseg.t-vs { background: #3c3110; color: var(--t-vs); }
+.jd-fseg.t-v { background: #322a12; color: var(--t-v); }
+.jd-fseg.t-side { background: #2a2718; color: var(--t-side); }
+.jd-fseg.t-miss { background: #202023; color: var(--t-miss); }
 .jd-flegs { display: flex; flex-wrap: wrap; gap: 2px 14px; font-size: var(--fs-xs); color: var(--text-dim); }
 .jd-fleg i { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 5px; }
-.jd-fleg i.t-exact { background: var(--accent-bright); }
-.jd-fleg i.t-vs { background: #d9a921; }
-.jd-fleg i.t-v { background: #a0801f; }
-.jd-fleg i.t-side { background: #5c512a; }
-.jd-fleg i.t-miss { background: #2c2c2f; }
+.jd-fleg i.t-exact { background: var(--t-exact); }
+.jd-fleg i.t-vs { background: var(--t-vs); }
+.jd-fleg i.t-v { background: var(--t-v); }
+.jd-fleg i.t-side { background: var(--t-side); }
+.jd-fleg i.t-miss { background: var(--t-miss); }
 
 /* --------------------- você vs a média ------------------------ */
 .jd-pair { display: grid; grid-template-columns: 68px 1fr 44px; align-items: center; gap: var(--space-2); font-size: var(--fs-sm); }
 .jd-pair-l { color: var(--text-dim); }
 .jd-pair-v { text-align: right; font-variant-numeric: tabular-nums; font-weight: var(--fw-bold); }
 .jd-bar { position: relative; height: 9px; border-radius: 5px; background: var(--card-elev); overflow: visible; }
-.jd-bar .fill { position: absolute; inset: 0 auto 0 0; border-radius: 5px; background: var(--accent); }
+/* dourado escuro (não var(--accent)): mesma imunidade a dark forçado do funil */
+.jd-bar .fill { position: absolute; inset: 0 auto 0 0; border-radius: 5px; background: linear-gradient(90deg, #6a5412, #a3821e); }
 .jd-bar .tick { position: absolute; top: -3px; bottom: -3px; width: 2px; background: #8a8a8e; border-radius: 1px; }
 
 /* ------------------- o que te separa do líder ------------------ */
