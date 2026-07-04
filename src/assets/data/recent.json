@@ -76,7 +76,7 @@
       "2026-07-03",
       "Cape Verde Islands",
       true,
-      "0-0",
+      "3-2",
       "World Cup"
     ],
     [
@@ -577,6 +577,13 @@
   ],
   "Colombia": [
     [
+      "2026-07-04",
+      "Ghana",
+      true,
+      "1-0",
+      "World Cup"
+    ],
+    [
       "2026-06-27",
       "Portugal",
       true,
@@ -637,13 +644,6 @@
       "New Zealand",
       true,
       "2-1",
-      "Amistoso"
-    ],
-    [
-      "2025-10-15",
-      "Canada",
-      false,
-      "0-0",
       "Amistoso"
     ]
   ],
@@ -1225,6 +1225,13 @@
   ],
   "Ghana": [
     [
+      "2026-07-04",
+      "Colombia",
+      false,
+      "0-1",
+      "World Cup"
+    ],
+    [
       "2026-06-27",
       "Croatia",
       false,
@@ -1286,13 +1293,6 @@
       false,
       "0-2",
       "Amistoso"
-    ],
-    [
-      "2025-10-12",
-      "Comoros",
-      true,
-      "1-0",
-      "Eliminatórias"
     ]
   ],
   "Haiti": [
@@ -3316,7 +3316,7 @@
       "2026-07-03",
       "Argentina",
       false,
-      "0-0",
+      "2-3",
       "World Cup"
     ],
     [
