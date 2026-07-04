@@ -23,6 +23,11 @@
    referencia estes tokens via var(). Trocar um degrau = uma linha aqui.
    ============================================================ */
 :root {
+  /* Declara o tema escuro pro navegador: sem isto, o "escurecer sites" do
+     Chrome Android (Auto Dark Theme) recolore superfícies claras grandes —
+     visto no funil do dashboard (dourado virou marrom no celular, 04/07). */
+  color-scheme: dark;
+
   /* ---- Superfícies / neutros ---- */
   --bg-page: #0c0c0c;            /* fundo do app / 'preto' canônico */
   --bg-sidebar: #0c0c0c;

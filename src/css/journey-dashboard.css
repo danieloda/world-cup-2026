@@ -71,14 +71,16 @@
 }
 
 /* ----------------------- ultrapassagens ----------------------- */
-.jd-swap { display: flex; align-items: center; gap: var(--space-2); font-size: var(--fs-sm); min-width: 0; }
+.jd-swap { display: flex; align-items: flex-start; gap: var(--space-2); font-size: var(--fs-sm); min-width: 0; }
 .jd-swap-dir { font-weight: var(--fw-bold); flex: 0 0 auto; }
 .jd-swap-dir.up { color: var(--positive); }
 .jd-swap-dir.dn { color: var(--red); }
 .jd-swap-avs { display: flex; flex: 0 0 auto; }
 .jd-swap-avs .jd-av { width: 22px; height: 22px; margin-left: -6px; }
 .jd-swap-avs .jd-av:first-child { margin-left: 0; }
-.jd-swap-names { color: var(--text-dim); min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* quebra de linha, não reticências: "você fez +40 no dia" cortado é
+   informação perdida — no mobile a linha só cresce em altura */
+.jd-swap-names { color: var(--text-dim); min-width: 0; overflow-wrap: anywhere; line-height: 1.35; }
 
 /* --------------------------- funil ---------------------------- */
 /* borda delimita a extensão total — sem ela o tier "Zero" (quase da cor do
