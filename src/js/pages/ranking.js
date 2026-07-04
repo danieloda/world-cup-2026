@@ -49,11 +49,16 @@ try {
     loadProgression()
       .then(prog => {
         if (prog) renderRankChart(chartMount, { ...prog, meId: profile.id });
-        else chartMount.innerHTML = '';
+        else {
+          // sem dados ainda — diz o porquê em vez de deixar um card mudo
+          chartMount.classList.add('empty');
+          chartMount.innerHTML = '<p>Ainda sem jogos pontuados — a evolução aparece com o primeiro resultado.</p>';
+        }
       })
       .catch(err => {
         console.error('[ranking] gráfico de evolução:', err);
-        chartMount.innerHTML = '';
+        chartMount.classList.add('empty');
+        chartMount.innerHTML = '<p>Não deu pra carregar a evolução agora — recarregue a página pra tentar de novo.</p>';
       });
   }
 

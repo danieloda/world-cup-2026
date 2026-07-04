@@ -30,7 +30,7 @@
 import { escapeHtml, avatarHtml } from './util.js';
 import {
   computePositions, buildTimeline, stageBands, buildColorMap,
-  matchHeader, pointXY, clamp,
+  matchHeader, pointXY, clamp, firstMeaningfulGame,
 } from './chart-utils.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
@@ -40,6 +40,7 @@ const PAN_ROW = 34;          // altura de uma linha do painel (desktop)
 const IC = {
   trophy: '<svg class="rc-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4z"/><path d="M7 6H4a3 3 0 0 0 3 3M17 6h3a3 3 0 0 1-3 3"/></svg>',
   list: '<svg class="rc-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>',
+  star: '<svg class="rc-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>',
 };
 
 /**
@@ -49,7 +50,12 @@ const IC = {
 export function renderRankChart(mount, { series, matches, meId }) {
   const N = series.length;
   const GAMES = matches.length;
-  if (N === 0 || GAMES === 0) { mount.innerHTML = ''; return; }
+  mount.classList.remove('empty');   // o auto-refresh re-renderiza no MESMO mount
+  if (N === 0 || GAMES === 0) {
+    mount.classList.add('empty');
+    mount.innerHTML = '<p>Ainda sem jogos pontuados — a evolução aparece com o primeiro resultado.</p>';
+    return;
+  }
 
   const pos = computePositions(series);
   const tl = buildTimeline(matches);
@@ -62,9 +68,16 @@ export function renderRankChart(mount, { series, matches, meId }) {
 
   const canWeek = tl.weekEnds.length >= 2;
   const lastWeek = tl.weekEnds.length - 1;
-  const curWeekStart = lastWeek === 0 ? 0 : tl.weekEnds[lastWeek - 1] + 1;
-  const curWeekSteps = [];
-  for (let g = curWeekStart; g < GAMES; g++) curWeekSteps.push(g);
+  // Semanas COM jogo (weekEnds pode ter buraco se houver 7+ dias sem jogos);
+  // a navegação ‹ › do zoom por jogo só anda pelas válidas.
+  const validWeeks = tl.weekEnds.map((g, w) => g == null ? null : w).filter(w => w != null);
+  const stepsOfWeek = (w) => {
+    const iv = validWeeks.indexOf(w);
+    const prev = iv > 0 ? tl.weekEnds[validWeeks[iv - 1]] : -1;
+    const steps = [];
+    for (let g = prev + 1; g <= tl.weekEnds[w]; g++) steps.push(g);
+    return steps;
+  };
 
   const presetSet = (p) => {
     const f = new Set(series.slice(0, p === 'podio' ? 3 : 10).map(s => s.userId));
@@ -73,9 +86,39 @@ export function renderRankChart(mount, { series, matches, meId }) {
   };
   const setsEq = (a, b) => a.size === b.size && [...a].every(x => b.has(x));
 
-  let granKey = canWeek ? 'semana' : 'jogo';
-  let selected = presetSet('podio');
+  // ===== Favoritos: o grupo de amigos, salvo POR USUÁRIO =====
+  // O usuário monta o próprio recorte (a competição paralela dentro do bolão) e
+  // ele sobrevive entre visitas. Chave por meId: multi-conta no mesmo navegador
+  // não se mistura e o preview demo (meId='demo-me') cai em chave própria.
+  // try/catch em tudo: localStorage pode estar indisponível (Safari privado,
+  // storage cheio) — aí o preset funciona só na sessão, sem quebrar o resto.
+  const FAV_KEY = `rc:favs:${meId}`;
+  const MODE_KEY = `rc:mode:${meId}`;
+  const loadFavs = () => {
+    try {
+      const arr = JSON.parse(localStorage.getItem(FAV_KEY) || '[]');
+      // ids que saíram do bolão (ou de outra época do ranking) são descartados
+      return new Set((Array.isArray(arr) ? arr : []).filter(uid => byId.has(uid)));
+    } catch { return new Set(); }
+  };
+  const saveFavs = () => { try { localStorage.setItem(FAV_KEY, JSON.stringify([...favs])); } catch {} };
+  const saveMode = (m) => { try { m === 'fav' ? localStorage.setItem(MODE_KEY, 'fav') : localStorage.removeItem(MODE_KEY); } catch {} };
+  const loadMode = () => { try { return localStorage.getItem(MODE_KEY); } catch { return null; } };
+
+  let favs = loadFavs();
+  // Se a última visita ficou nos Favoritos, reabre neles — é o "meu grupo" que
+  // a pessoa quer acompanhar todo dia; senão, o padrão de sempre (Pódio + Você).
+  let favMode = loadMode() === 'fav' && favs.size > 0;
+  // Zoom de tempo sobrevive ao auto-refresh (que dá reload a cada resultado
+  // lançado): sessionStorage — morre com a aba, não gruda entre visitas.
+  const GRAN_KEY = 'rc:gran';
+  const loadGran = () => { try { return sessionStorage.getItem(GRAN_KEY); } catch { return null; } };
+  const saveGran = (g) => { try { sessionStorage.setItem(GRAN_KEY, g); } catch {} };
+  let granKey = canWeek ? (loadGran() === 'jogo' ? 'jogo' : 'semana') : 'jogo';
+  let weekView = lastWeek;   // semana aberta no zoom "Jogos da semana" (‹ › navega)
+  let selected = favMode ? new Set(favs) : presetSet('podio');
   let showAllLeg = false;
+  const activeSteps = () => granKey === 'jogo' ? stepsOfWeek(weekView) : tl.weekEnds.filter(g => g != null);
 
   function avatarChip(s, extra = '') {
     return `<span class="rc-av ${extra}" style="border-color:${colorMap.get(s.userId)}">${avatarHtml({ full_name: s.name, avatar_url: s.avatar_url })}</span>`;
@@ -86,10 +129,18 @@ export function renderRankChart(mount, { series, matches, meId }) {
       <div class="rc-presets" role="group" aria-label="Seleção rápida de jogadores">
         <button class="rc-chip" data-p="podio">${IC.trophy}Pódio + Você</button>
         <button class="rc-chip" data-p="top10">${IC.list}Top 10</button>
+        <button class="rc-chip" data-p="fav" title="Seu grupo de amigos — a seleção fica salva">${IC.star}Favoritos<span class="rc-chip-ct" hidden></span></button>
       </div>
-      <div class="rc-seg" role="group" aria-label="Visão do tempo">
-        <button data-g="semana">Por semana</button>
-        <button data-g="jogo">Jogos da semana</button>
+      <div class="rc-tempo">
+        <div class="rc-seg" role="group" aria-label="Visão do tempo">
+          <button data-g="semana">Por semana</button>
+          <button data-g="jogo">Jogos da semana</button>
+        </div>
+        <div class="rc-weeknav" role="group" aria-label="Trocar a semana exibida" style="display:none">
+          <button class="rc-wk" data-wk="-1" aria-label="Semana anterior">‹</button>
+          <span class="rc-wk-lbl"></span>
+          <button class="rc-wk" data-wk="1" aria-label="Semana seguinte">›</button>
+        </div>
       </div>
     </div>
     <div class="rc-body"></div>
@@ -124,20 +175,38 @@ export function renderRankChart(mount, { series, matches, meId }) {
     const seg = mount.querySelector('.rc-seg');
     if (!seg) return;
     seg.style.display = canWeek ? '' : 'none';
+    // no mobile o toggle é a BASE do ▲/▼, não zoom — o aria-label acompanha
+    seg.setAttribute('aria-label', narrow ? 'Base da variação de posições' : 'Visão do tempo');
     const bJogo = seg.querySelector('[data-g="jogo"]');
     if (bJogo) bJogo.textContent = narrow ? 'Último jogo' : 'Jogos da semana';
+    // ‹ Semana N › — só no desktop, no zoom por jogo, com 2+ semanas
+    const nav = mount.querySelector('.rc-weeknav');
+    if (nav) {
+      const on = !narrow && canWeek && granKey === 'jogo';
+      nav.style.display = on ? '' : 'none';
+      if (on) {
+        nav.querySelector('.rc-wk-lbl').textContent = `Semana ${weekView + 1} · ${tl.weekRange(weekView)}`;
+        const iv = validWeeks.indexOf(weekView);
+        nav.querySelector('[data-wk="-1"]').disabled = iv <= 0;
+        nav.querySelector('[data-wk="1"]').disabled = iv >= validWeeks.length - 1;
+      }
+    }
   }
 
   // ===== DESKTOP: gráfico enxuto + painel vivo (= rótulos = hover) =====
   function drawDesktop(body, width) {
     const ids = [...selected].map(uid => byId.get(uid)).filter(i => i != null).sort((a, b) => finalPos(a) - finalPos(b));
-    const steps = granKey === 'jogo' ? curWeekSteps : tl.weekEnds;
+    const steps = activeSteps();
     const K = steps.length;
     const n = ids.length;
     const lastStep = steps[steps.length - 1];
 
-    const panW = width < 720 ? 250 : 296;   // mais largo: cabe Δ posição + Δ pontos no hover
-    const chartW = Math.max(200, width - panW - 16);
+    // <720px (tablet / landscape estreito): painel EMBAIXO, full-width — lado a
+    // lado sobravam ~294px pro plot. As rows do painel são absolute com altura
+    // fixa, então esticar não muda nada no CSS.
+    const stack = width < 720;
+    const panW = 296;
+    const chartW = Math.max(200, stack ? width - 8 : width - panW - 16);
     const PADl = 32, PADr = 12, PADt = 32, PADb = 22;  // PADt folgado: o rótulo de fase ("GRUPOS") respira acima das linhas
 
     // ===== Eixo Y: domínio ENXUTO + altura por posição =====
@@ -204,7 +273,11 @@ export function renderRankChart(mount, { series, matches, meId }) {
       if (bi % 2 === 1) g += `<rect class="rc-band" x="${b.x.toFixed(1)}" y="4" width="${b.w.toFixed(1)}" height="${(plotH + PADt - 4).toFixed(1)}"/>`;
       if (b.w > 64) g += `<text class="rc-band-lbl" x="${(b.x + b.w / 2).toFixed(1)}" y="15" text-anchor="middle">${escapeHtml(b.label)}</text>`;
     });
-    if (hasDeep) g += `<rect class="rc-deepband" x="${x0}" y="${yCore.toFixed(1)}" width="${(x1 - x0).toFixed(1)}" height="${(PADt + plotH - yCore).toFixed(1)}"/>`;
+    if (hasDeep) {
+      g += `<rect class="rc-deepband" x="${x0}" y="${yCore.toFixed(1)}" width="${(x1 - x0).toFixed(1)}" height="${(PADt + plotH - yCore).toFixed(1)}"/>`;
+      // sinaliza a QUEBRA DE ESCALA (o rodapé não é linear como o núcleo)
+      if (x1 - x0 > 230) g += `<text class="rc-band-lbl rc-deep-lbl" x="${(x0 + 8).toFixed(1)}" y="${(yCore + 13).toFixed(1)}">INÍCIO DA COPA · ESCALA COMPRIMIDA</text>`;
+    }
     // divisórias verticais ALINHADAS ÀS PARTIDAS: uma tracejada por jogo, passando
     // pelo MEIO do patamar daquele jogo (onde o rótulo "Jogo N" e o hover caem). As
     // transições (degraus) ficam ENTRE as tracejadas; dá pra ler a classificação de
@@ -237,7 +310,9 @@ export function renderRankChart(mount, { series, matches, meId }) {
     const nx = granKey === 'semana' ? K : Math.min(tight ? 4 : 6, K);
     for (let k0 = 0; k0 < nx; k0++) {
       const k = nx <= 1 ? K - 1 : Math.round(k0 * (K - 1) / (nx - 1));
-      const anchor = k0 === 0 ? 'start' : k0 === nx - 1 ? 'end' : 'middle';
+      // nx===1 (semana com 1 jogo): o único rótulo cai na borda DIREITA — testa
+      // o caso 'end' primeiro, senão sairia com anchor 'start' e seria clipado.
+      const anchor = k0 === nx - 1 ? 'end' : k0 === 0 ? 'start' : 'middle';
       const lbl = granKey === 'jogo'
         ? (tight ? `J${steps[k] + 1}` : `Jogo ${steps[k] + 1}`)
         : (tight ? `S${k + 1}` : `Semana ${k + 1}`);
@@ -267,11 +342,11 @@ export function renderRankChart(mount, { series, matches, meId }) {
     });
 
     body.className = 'rc-body rc-main';
-    body.style.gridTemplateColumns = `1fr ${panW}px`;
+    body.style.gridTemplateColumns = stack ? '1fr' : `1fr ${panW}px`;
     body.innerHTML = `
       <div class="rc-chartwrap">
-        <svg class="rc-svg" width="${chartW}" height="${H}" viewBox="0 0 ${chartW} ${H}" role="img"
-             aria-label="Evolução da posição no ranking ao longo da Copa">
+        <svg class="rc-svg" width="${chartW}" height="${H}" viewBox="0 0 ${chartW} ${H}" role="img" tabindex="0"
+             aria-label="Evolução da posição no ranking ao longo da Copa — use as setas esquerda e direita pra percorrer os jogos">
           ${g}
           <g>${foc}</g>
           <g class="rc-enddots">${endDots}</g>
@@ -281,7 +356,7 @@ export function renderRankChart(mount, { series, matches, meId }) {
         </svg>
       </div>
       <div class="rc-panel">
-        <div class="rc-pan-h"></div>
+        <div class="rc-pan-h" aria-live="polite"></div>
         <div class="rc-pan-list" style="height:${n * PAN_ROW}px"></div>
       </div>
     `;
@@ -298,6 +373,7 @@ export function renderRankChart(mount, { series, matches, meId }) {
     ids.forEach(i => {
       const el = document.createElement('div');
       el.className = 'rc-pan-row';
+      if (series[i].userId === meId) el.classList.add('me');   // mesma âncora visual do mobile
       el.dataset.i = i;
       list.appendChild(el);
       rows.set(i, el);
@@ -306,11 +382,13 @@ export function renderRankChart(mount, { series, matches, meId }) {
   }
 
   function updatePanel(rows, ids, gi, hotI, hovering) {
-    const steps = granKey === 'jogo' ? curWeekSteps : tl.weekEnds;
+    const steps = activeSteps();
     const k = steps.indexOf(gi);
     // ponto ANTERIOR no gráfico → base do "ganhou X pts / subiu N posições".
     // No 1º ponto da semana (jogo) caímos no jogo anterior (gi-1) p/ ainda mostrar.
-    const prevGi = k > 0 ? steps[k - 1] : (granKey === 'jogo' && gi > 0 ? gi - 1 : -1);
+    // Em repouso (gi = último jogo) o k pode nem estar nos steps (semana passada
+    // aberta no ‹ ›) — aí a base também é o jogo anterior.
+    const prevGi = k > 0 ? steps[k - 1] : (gi > 0 && (granKey === 'jogo' || k === -1) ? gi - 1 : -1);
     const order = [...ids].sort((a, b) => pos[a][gi] - pos[b][gi]);
     order.forEach((idx, r) => {
       const i = idx;
@@ -320,14 +398,19 @@ export function renderRankChart(mount, { series, matches, meId }) {
       el.style.borderColor = colorOf(i);
       el.classList.toggle('hot', hovering && i === hotI);
       const nm = series[i].userId === meId ? 'Você' : series[i].name;
-      // movimento desde o último ponto (só no hover): Δ posição (▲/▼) + Δ pontos
+      // movimento desde o último ponto: Δ posição (▲/▼) + Δ pontos. Também em
+      // REPOUSO (era só no hover): a pergunta nº 1 — "o que mudou?" — ganha
+      // resposta de cara, sem exigir descobrir o hover.
       let mv = '';
-      if (hovering && prevGi >= 0) {
+      if (prevGi >= 0) {
         const dPts = (series[i].values[gi + 1] ?? 0) - (series[i].values[prevGi + 1] ?? 0);
         const dPos = pos[i][prevGi] - pos[i][gi];   // + = subiu
         const mc = dPos > 0 ? 'var(--positive)' : dPos < 0 ? 'var(--red)' : 'var(--text-mute)';
         const pt = dPos > 0 ? `▲${dPos}` : dPos < 0 ? `▼${-dPos}` : '–';
-        mv = `<span style="display:inline-flex;flex-direction:column;align-items:flex-end;line-height:1.04">
+        const aria = dPos > 0 ? `subiu ${dPos} posiç${dPos === 1 ? 'ão' : 'ões'}, ganhou ${dPts} pontos`
+          : dPos < 0 ? `caiu ${-dPos} posiç${dPos === -1 ? 'ão' : 'ões'}, ganhou ${dPts} pontos`
+          : `manteve a posição, ganhou ${dPts} pontos`;
+        mv = `<span role="img" aria-label="${aria}" style="display:inline-flex;flex-direction:column;align-items:flex-end;line-height:1.04">
           <span style="font-size:11px;font-weight:800;color:${mc};font-variant-numeric:tabular-nums">${pt}</span>
           <span style="font-size:10px;font-weight:700;color:var(--text-mute);font-variant-numeric:tabular-nums">+${dPts}</span>
         </span>`;
@@ -346,7 +429,7 @@ export function renderRankChart(mount, { series, matches, meId }) {
         ? (granKey === 'jogo'
             ? `<span class="rc-pan-k">Jogo ${gi + 1}</span>${matchHeader(matches[gi])}`
             : `<span class="rc-pan-k">Semana ${k + 1} · ${tl.weekRange(k)}</span>`)
-        : `<span class="rc-pan-k">Classificação atual</span><span class="rc-pan-hint">passe o mouse no gráfico →</span>`;
+        : `<span class="rc-pan-k">Classificação atual</span><span class="rc-pan-hint">← passe o mouse ou use as setas</span>`;
     }
   }
 
@@ -364,15 +447,14 @@ export function renderRankChart(mount, { series, matches, meId }) {
       pl.classList.toggle('dim', i >= 0 && !on);
     });
 
-    function move(e) {
-      const box = svg.getBoundingClientRect();
-      if (!box.width) return;
-      const { x: cx, y: cy } = pointXY(e);
-      const vw = svg.viewBox.baseVal.width || box.width;
-      const vh = svg.viewBox.baseVal.height || box.height;
-      const xv = (cx - box.left) / box.width * vw;
-      const yv = (cy - box.top) / box.height * vh;
-      const k = geo.gap ? clamp(Math.round((xv - geo.x0) / geo.gap), 0, geo.K - 1) : 0;
+    // Memo do último (jogo, linha): mousemove chega a dezenas de eventos/s e o
+    // rebuild do painel (innerHTML + <img> de avatar por linha) a cada pixel
+    // engasgava máquinas fracas — só refaz DOM quando o alvo de fato muda.
+    let lastK = -1, lastHot = -2;
+
+    function showStep(k, hotI) {
+      if (k === lastK && hotI === lastHot) return;
+      lastK = k; lastHot = hotI;
       const gi = geo.steps[k];
       const xpx = geo.xAt(k);
 
@@ -380,10 +462,6 @@ export function renderRankChart(mount, { series, matches, meId }) {
       cross.removeAttribute('hidden');
       cross.setAttribute('x1', xpx.toFixed(1));
       cross.setAttribute('x2', xpx.toFixed(1));
-
-      let hotI = -1, hotD = Infinity;
-      geo.ids.forEach(i => { const d = Math.abs(geo.yAt(pos[i][gi]) - yv); if (d < hotD) { hotD = d; hotI = i; } });
-      if (hotD > geo.rowH * 1.1 + 6) hotI = -1;
       setHot(hotI);
 
       while (hover.firstChild) hover.removeChild(hover.firstChild);
@@ -401,7 +479,24 @@ export function renderRankChart(mount, { series, matches, meId }) {
       updatePanel(geo.panRows, geo.ids, gi, hotI, true);
     }
 
+    function move(e) {
+      const box = svg.getBoundingClientRect();
+      if (!box.width) return;
+      const { x: cx, y: cy } = pointXY(e);
+      const vw = svg.viewBox.baseVal.width || box.width;
+      const vh = svg.viewBox.baseVal.height || box.height;
+      const xv = (cx - box.left) / box.width * vw;
+      const yv = (cy - box.top) / box.height * vh;
+      const k = geo.gap ? clamp(Math.round((xv - geo.x0) / geo.gap), 0, geo.K - 1) : 0;
+      const gi = geo.steps[k];
+      let hotI = -1, hotD = Infinity;
+      geo.ids.forEach(i => { const d = Math.abs(geo.yAt(pos[i][gi]) - yv); if (d < hotD) { hotD = d; hotI = i; } });
+      if (hotD > geo.rowH * 1.1 + 6) hotI = -1;
+      showStep(k, hotI);
+    }
+
     function leave() {
+      lastK = -1; lastHot = -2;
       if (endg) endg.style.display = '';
       cross.setAttribute('hidden', '');
       while (hover.firstChild) hover.removeChild(hover.firstChild);
@@ -411,9 +506,40 @@ export function renderRankChart(mount, { series, matches, meId }) {
 
     hit.addEventListener('mousemove', move);
     hit.addEventListener('mouseleave', leave);
+    // Touch: arrastar explora; SOLTAR mantém o jogo "pinado" no painel (só as
+    // bolinhas de ponta e o realce voltam) — antes o leave() no touchend fazia
+    // a info sumir junto com o dedo. touchcancel (gesto do SO, notificação)
+    // restaura tudo — sem ele o gráfico ficava preso no estado de hover.
     hit.addEventListener('touchstart', move, { passive: true });
     hit.addEventListener('touchmove', move, { passive: true });
-    hit.addEventListener('touchend', leave);
+    hit.addEventListener('touchend', () => {
+      if (endg) endg.style.display = '';
+      setHot(-1);
+      lastHot = -2;
+    }, { passive: true });
+    hit.addEventListener('touchcancel', leave, { passive: true });
+
+    // Teclado: ← → percorrem os jogos, Home/End vão às pontas, Esc solta.
+    svg.addEventListener('keydown', (e) => {
+      const cur = lastK >= 0 ? lastK : geo.K;   // 1º ← já cai no último jogo
+      let k = null;
+      if (e.key === 'ArrowLeft') k = Math.max(0, cur - 1);
+      else if (e.key === 'ArrowRight') k = Math.min(geo.K - 1, lastK >= 0 ? cur + 1 : geo.K - 1);
+      else if (e.key === 'Home') k = 0;
+      else if (e.key === 'End') k = geo.K - 1;
+      else if (e.key === 'Escape') { leave(); return; }
+      if (k == null) return;
+      e.preventDefault();
+      showStep(k, -1);
+    });
+    svg.addEventListener('blur', leave);
+
+    // Ponte painel → gráfico (antes só existia na direção oposta): pousar numa
+    // linha do painel acende a polyline correspondente.
+    geo.panRows.forEach((el, i) => {
+      el.addEventListener('mouseenter', () => { setHot(i); el.classList.add('hot'); });
+      el.addEventListener('mouseleave', () => { setHot(-1); el.classList.remove('hot'); });
+    });
   }
 
   // ===== MOBILE: lista de sparklines (uma trajetória por jogador) =====
@@ -422,30 +548,44 @@ export function renderRankChart(mount, { series, matches, meId }) {
     // A sparkline mostra a JORNADA INTEIRA (todos os jogos). O toggle só muda a
     // base da EVOLUÇÃO (▲/▼): "Por semana" = vs o fim da semana passada;
     // "Último jogo" = vs o jogo anterior. (Decisão 2026-06-15.)
-    const allSteps = Array.from({ length: GAMES }, (_, g) => g);
-    const K = allSteps.length;
-    const dFrom = granKey === 'semana' && lastWeek >= 1
-      ? tl.weekEnds[lastWeek - 1]
+    const weekBase = granKey === 'semana' && validWeeks.length >= 2;
+    const dFrom = weekBase
+      ? tl.weekEnds[validWeeks[validWeeks.length - 2]]   // fim da semana passada COM jogo
       : Math.max(0, GAMES - 2);
+    const baseTxt = weekBase ? 'vs semana passada' : 'vs jogo anterior';
 
     body.className = 'rc-body rc-sparks';
     body.style.gridTemplateColumns = '';
     if (ids.length === 0) { body.innerHTML = ''; return; }
 
-    body.innerHTML = ids.map(i => {
+    // A base do ▲/▼ fica COLADA na coluna dos deltas (a explicação no rodapé,
+    // depois da legenda, ficava longe demais de quem ela explica).
+    body.innerHTML = `<div class="rc-spark-cap" aria-hidden="true">▲▼ ${baseTxt}</div>` + ids.map(i => {
       const c = colorOf(i);
       const nm = series[i].userId === meId ? 'Você' : series[i].name;
-      const ps = allSteps.map(gi => pos[i][gi]);
+      // Corta o "ruído de empate" do começo da Copa (mesma razão do eixo enxuto
+      // do desktop): a sparkline começa onde o jogador já saiu do pelotão —
+      // senão o domínio Y era dominado por posições que eram só desempate.
+      const from = firstMeaningfulGame(series, i);
+      const ps = [];
+      for (let g = from; g < GAMES; g++) ps.push(pos[i][g]);
+      const Kp = ps.length;
       const lo = Math.min(...ps), hi = Math.max(...ps);
       const W = 92, Hs = 30, pad = 3;
-      const xA = (k) => K <= 1 ? W / 2 : pad + (W - 2 * pad) * k / (K - 1);
+      const xA = (k) => Kp <= 1 ? W / 2 : pad + (W - 2 * pad) * k / (Kp - 1);
       const yA = (p) => hi === lo ? Hs / 2 : pad + (Hs - 2 * pad) * (p - lo) / (hi - lo);  // 1º no topo
       const pts = ps.map((p, k) => `${xA(k).toFixed(1)},${yA(p).toFixed(1)}`).join(' ');
       const now = pos[i][GAMES - 1], then = pos[i][dFrom];
       const d = then - now;                       // subiu = positivo
-      const sparkC = series[i].userId === meId ? c : d > 0 ? 'var(--positive)' : d < 0 ? 'var(--red)' : '#8a8a8e';
+      // A linha fica na COR DO JOGADOR (igual desktop/legenda) — pintar a
+      // jornada inteira de verde/vermelho pelo delta do último jogo mentia
+      // sobre o trajeto. O sinal de subiu/caiu mora só no chip ▲/▼.
+      const sparkC = c;
       const dCls = d > 0 ? 'up' : d < 0 ? 'dn' : 'eq';
       const dTxt = d > 0 ? `▲ ${d}` : d < 0 ? `▼ ${-d}` : '–';
+      const dAria = d > 0 ? `subiu ${d} posiç${d === 1 ? 'ão' : 'ões'} ${baseTxt}`
+        : d < 0 ? `caiu ${-d} posiç${d === -1 ? 'ão' : 'ões'} ${baseTxt}`
+        : 'manteve a posição';
       return `
         <div class="rc-spark-row${series[i].userId === meId ? ' me' : ''}">
           <span class="rc-spark-pos" style="color:${c}">${pos[i][GAMES - 1]}º</span>
@@ -453,9 +593,9 @@ export function renderRankChart(mount, { series, matches, meId }) {
           <div class="rc-spark-nm">${escapeHtml(nm)}<small>${finalPts(i)} pts</small></div>
           <svg class="rc-spark-svg" width="${W}" height="${Hs}" viewBox="0 0 ${W} ${Hs}" aria-hidden="true">
             <polyline fill="none" stroke="${sparkC}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="${pts}"/>
-            <circle cx="${xA(K - 1).toFixed(1)}" cy="${yA(now).toFixed(1)}" r="2.6" fill="${sparkC}"/>
+            <circle cx="${xA(Kp - 1).toFixed(1)}" cy="${yA(now).toFixed(1)}" r="2.6" fill="${sparkC}"/>
           </svg>
-          <span class="rc-spark-d ${dCls}">${dTxt}</span>
+          <span class="rc-spark-d ${dCls}" role="img" aria-label="${dAria}">${dTxt}</span>
         </div>`;
     }).join('');
   }
@@ -485,8 +625,16 @@ export function renderRankChart(mount, { series, matches, meId }) {
         ${showAllLeg ? '− mostrar menos' : `+ todos (${N})`}
       </button>`;
 
-    mount.querySelectorAll('.rc-presets .rc-chip').forEach(b =>
-      b.classList.toggle('active', setsEq(selected, presetSet(b.dataset.p))));
+    // Chip ativo: Favoritos é por MODO (a seleção pode até coincidir com um
+    // preset); Pódio/Top 10 seguem por igualdade de conjunto — mas nunca junto
+    // com o modo Favoritos ativo.
+    mount.querySelectorAll('.rc-presets .rc-chip').forEach(b => {
+      const on = b.dataset.p === 'fav' ? favMode : !favMode && setsEq(selected, presetSet(b.dataset.p));
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-pressed', on);
+    });
+    const favCt = mount.querySelector('.rc-chip[data-p="fav"] .rc-chip-ct');
+    if (favCt) { favCt.hidden = favs.size === 0; favCt.textContent = favs.size; }
     mount.querySelectorAll('.rc-seg button').forEach(b => {
       const on = b.dataset.g === granKey;
       b.classList.toggle('on', on);
@@ -495,7 +643,15 @@ export function renderRankChart(mount, { series, matches, meId }) {
 
     mount.querySelectorAll('.rc-leg[data-user]').forEach(btn => btn.addEventListener('click', () => {
       const uid = btn.dataset.user;
-      if (selected.has(uid)) selected.delete(uid); else selected.add(uid);
+      if (favMode) {
+        // Com Favoritos ativo, a legenda EDITA o grupo (e já persiste) — sem
+        // tela de edição à parte: ligar/desligar um nome é adicionar/remover.
+        if (favs.has(uid)) favs.delete(uid); else favs.add(uid);
+        saveFavs();
+        selected = new Set(favs);
+      } else {
+        if (selected.has(uid)) selected.delete(uid); else selected.add(uid);
+      }
       draw();
     }));
     mount.querySelector('[data-action="toggle-all"]').addEventListener('click', () => {
@@ -506,26 +662,53 @@ export function renderRankChart(mount, { series, matches, meId }) {
 
   function renderNote() {
     const narrow = (mount.querySelector('.rc-body')?.clientWidth || 999) < NARROW;
+    const tap = narrow ? 'Toque' : 'Clique';
     mount.querySelector('.rc-note').textContent =
-      selected.size === 0
+      favMode
+        ? (favs.size <= 1
+            ? `Monte seu grupo: ${tap.toLowerCase()} nos nomes abaixo pra adicionar aos Favoritos — a seleção fica salva pra próxima visita (neste navegador).`
+            : `Seus Favoritos (${favs.size}) — ${tap.toLowerCase()} nos nomes pra adicionar ou remover; fica salvo pra próxima visita.`)
+        : selected.size === 0
         ? 'Ninguém selecionado — clique num nome abaixo ou use Pódio + Você / Top 10 pra recomeçar.'
         : narrow
         ? (granKey === 'semana'
             ? 'Trajetória de cada um na Copa. ▲/▼ = posições ganhas/perdidas desde a semana passada. Toque num nome pra ligar/desligar.'
             : 'Trajetória de cada um na Copa. ▲/▼ = o que mexeu no último jogo. Toque num nome pra ligar/desligar.')
         : granKey === 'semana'
-        ? 'Uma etapa por semana. Passe o mouse: o painel à direita vira o jogo apontado. Clique num nome pra ligar/desligar.'
-        : `Jogo a jogo da semana atual (${tl.weekRange(lastWeek)}) — passe o mouse pra ver cada partida no painel.`;
+        ? 'Uma etapa por semana. Passe o mouse (ou use as setas ← →): o painel vira o jogo apontado. Clique num nome pra ligar/desligar.'
+        : `Jogo a jogo da semana ${weekView + 1} (${tl.weekRange(weekView)}) — ‹ › troca a semana; passe o mouse ou use ← → pra ver cada partida.`;
   }
 
   function attachStatic() {
     mount.querySelectorAll('.rc-presets .rc-chip').forEach(b => b.addEventListener('click', () => {
-      selected = presetSet(b.dataset.p);
+      if (b.dataset.p === 'fav') {
+        favMode = true;
+        if (favs.size === 0) {
+          // Primeira vez: semente = você, e abre o elenco inteiro pra montar o
+          // grupo na hora (senão a legenda colapsada só mostraria 1 nome).
+          if (meIdx >= 0) favs.add(meId);
+          saveFavs();
+          showAllLeg = true;
+        }
+        selected = new Set(favs);
+      } else {
+        favMode = false;
+        selected = presetSet(b.dataset.p);
+      }
+      saveMode(favMode ? 'fav' : null);
       draw();
     }));
     mount.querySelectorAll('.rc-seg button').forEach(b => b.addEventListener('click', () => {
       if (b.disabled || b.dataset.g === granKey) return;
       granKey = b.dataset.g;
+      if (granKey === 'jogo') weekView = lastWeek;   // reabre na semana corrente
+      saveGran(granKey);
+      draw();
+    }));
+    mount.querySelectorAll('.rc-weeknav .rc-wk').forEach(b => b.addEventListener('click', () => {
+      const iv = validWeeks.indexOf(weekView) + Number(b.dataset.wk);
+      if (iv < 0 || iv >= validWeeks.length) return;
+      weekView = validWeeks[iv];
       draw();
     }));
   }
