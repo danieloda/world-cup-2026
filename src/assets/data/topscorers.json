@@ -1,7 +1,15 @@
 {
-  "updated_at": "2026-07-04T22:40:27.257Z",
+  "updated_at": "2026-07-04T23:44:43.869Z",
   "season": 2026,
   "scorers": [
+    {
+      "api_id": 278,
+      "name": "Kylian Mbappé",
+      "team": "France",
+      "goals": 7,
+      "assists": 2,
+      "minutes": 449
+    },
     {
       "api_id": 154,
       "name": "L. Messi",
@@ -9,14 +17,6 @@
       "goals": 7,
       "assists": 0,
       "minutes": 320
-    },
-    {
-      "api_id": 278,
-      "name": "Kylian Mbappé",
-      "team": "France",
-      "goals": 6,
-      "assists": 2,
-      "minutes": 351
     },
     {
       "api_id": 1100,
@@ -40,7 +40,7 @@
       "team": "France",
       "goals": 4,
       "assists": 2,
-      "minutes": 288
+      "minutes": 372
     },
     {
       "api_id": 47323,
@@ -131,14 +131,6 @@
       "minutes": 265
     },
     {
-      "api_id": 8489,
-      "name": "J. David",
-      "team": "Canada",
-      "goals": 3,
-      "assists": 0,
-      "minutes": 338
-    },
-    {
       "api_id": 874,
       "name": "Cristiano Ronaldo",
       "team": "Portugal",
@@ -160,7 +152,15 @@
       "team": "Morocco",
       "goals": 3,
       "assists": 0,
-      "minutes": 363
+      "minutes": 385
+    },
+    {
+      "api_id": 8489,
+      "name": "J. David",
+      "team": "Canada",
+      "goals": 3,
+      "assists": 0,
+      "minutes": 428
     }
   ]
 }
