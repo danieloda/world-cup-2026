@@ -9,6 +9,7 @@ import {
   buildVsAverage, buildLeaderGap, renderJourneyDashboard,
   computeKoStatus, buildChampionCard, buildScorerCard, buildPrizeCard,
   renderJourneyBets,
+  buildStakeCard, buildCeiling, buildSurvivors, renderJourneyProjection,
 } from '../../src/js/journey-dashboard.js';
 
 // ------------------------------------------------------------
@@ -426,6 +427,132 @@ describe('renderJourneyBets (smoke jsdom)', () => {
     expect(mount.innerHTML).not.toContain('Seu campeão');
     expect(mount.innerHTML).not.toContain('Seu artilheiro');
     expect(mount.innerHTML).toContain('Zona de prêmio');
+  });
+});
+
+// ------------------------------------------------------------
+// F3 — o que vem por aí
+// ------------------------------------------------------------
+describe('buildStakeCard', () => {
+  const next = { id: 300, stage: 'r16', match_date: '2026-07-06T19:00:00.000Z', team_home: 'Brazil', team_away: 'France' };
+  it('teto de placar da fase + artilheiro em campo', () => {
+    const sk = buildStakeCard({ nextMatch: next, myPred: { pred_home: 2, pred_away: 1 }, scorerTeam: 'Brazil' });
+    expect(sk.placarMax).toBe(19);   // r16: 2×3 + 12 + 1
+    expect(sk.hasPred).toBe(true);
+    expect(sk.scorerPlays).toBe(true);
+    expect(sk.perGoal).toBe(4);      // r16: 2 × 2.0
+  });
+  it('artilheiro de fora não joga; sem palpite marca hasPred false', () => {
+    const sk = buildStakeCard({ nextMatch: next, myPred: null, scorerTeam: 'Spain' });
+    expect(sk.hasScorer).toBe(true);
+    expect(sk.scorerPlays).toBe(false);
+    expect(sk.perGoal).toBe(0);
+    expect(sk.hasPred).toBe(false);
+  });
+  it('sem pick de artilheiro → hasScorer false (não afirma "não joga")', () => {
+    const sk = buildStakeCard({ nextMatch: next, myPred: { pred_home: 1, pred_away: 0 }, scorerTeam: null });
+    expect(sk.hasScorer).toBe(false);
+    expect(sk.scorerPlays).toBe(false);
+  });
+  it('sem próximo jogo (copa encerrada) → null', () => {
+    expect(buildStakeCard({ nextMatch: null, myPred: null, scorerTeam: null })).toBeNull();
+  });
+});
+
+describe('buildCeiling', () => {
+  const all = [
+    { stage: 'group', finished: true },
+    { stage: 'r32', finished: true, team_home: 'Brazil', team_away: 'Mexico' },
+    { stage: 'r32', finished: false, team_home: 'Spain', team_away: 'Japan' },  // semeado real → placar 9, vaga 0
+    { stage: 'r16', finished: false, team_home: 'W301', team_away: 'W302' },     // slots → placar 19, vaga 2×2=4
+    { stage: 'final', finished: false, team_home: 'W401', team_away: 'W402' },   // slots → placar 76, vaga 2×8=16
+  ];
+  it('teto = garantidos + placar restante + vagas de lados NÃO preenchidos + campeão', () => {
+    const c = buildCeiling({ guaranteed: 100, allMatches: all, championAlive: true });
+    expect(c.placarMax).toBe(9 + 19 + 76);   // só não finalizados
+    expect(c.qualMax).toBe(4 + 16);          // r16/final em slot; r32 semeado não conta (já no guaranteed)
+    expect(c.champMax).toBe(40);
+    expect(c.ceiling).toBe(100 + 104 + 20 + 40);
+  });
+  it('lado de KO ainda em slot (fase de grupos) conta a vaga — não subestima', () => {
+    // r32 com times ainda em slot de grupo ('2A'): BPE ainda ganhável (não creditado)
+    const groupStage = [{ stage: 'r32', finished: false, team_home: '2A', team_away: '1B' }];
+    const c = buildCeiling({ guaranteed: 50, allMatches: groupStage, championAlive: false });
+    expect(c.placarMax).toBe(9);
+    expect(c.qualMax).toBe(2);   // 2 lados × qualifierBonus('r32', true)=1
+  });
+  it('campeão eliminado (ou final já decidida) zera o +40', () => {
+    const c = buildCeiling({ guaranteed: 100, allMatches: all, championAlive: false });
+    expect(c.champMax).toBe(0);
+  });
+  it('NÃO inclui o artilheiro (ilimitado) — é teto só de placar/vagas/campeão', () => {
+    const c = buildCeiling({ guaranteed: 500, allMatches: [{ stage: 'final', finished: true }], championAlive: false });
+    expect(c.ceiling).toBe(500);
+    expect(c.remaining).toBe(0);
+  });
+});
+
+describe('buildSurvivors', () => {
+  // dois 32-avos com times reais; eu mando Brasil e França pras oitavas
+  const allMatches = [
+    { id: 201, stage: 'r32', match_date: '2026-06-29T16:00:00Z', team_home: 'Brazil', team_away: 'Mexico', slot_home: null, slot_away: null, actual_home: null, actual_away: null, pen_winner: null, finished: false },
+    { id: 202, stage: 'r32', match_date: '2026-06-29T19:00:00Z', team_home: 'France', team_away: 'USA', slot_home: null, slot_away: null, actual_home: 0, actual_away: 1, pen_winner: null, finished: true },
+  ];
+  const preds = new Map([
+    [201, { match_id: 201, pred_home: 2, pred_away: 0 }],  // Brasil avança
+    [202, { match_id: 202, pred_home: 1, pred_away: 0 }],  // França avança (mas caiu de verdade)
+  ]);
+  it('conta vivos do bracket previsto vs eliminados reais', () => {
+    const koStatus = computeKoStatus(allMatches.filter(m => m.stage !== 'group'));
+    const sv = buildSurvivors({ allMatches, predsByMatch: preds, koStatus });
+    expect(sv.total).toBe(2);
+    expect(sv.alive).toBe(1);           // Brasil vivo, França eliminada
+    const byTeam = Object.fromEntries(sv.teams.map(t => [t.team, t.alive]));
+    expect(byTeam.Brazil).toBe(true);
+    expect(byTeam.France).toBe(false);
+  });
+  it('sem koStatus ou sem 32-avos → null', () => {
+    expect(buildSurvivors({ allMatches, predsByMatch: preds, koStatus: null })).toBeNull();
+    expect(buildSurvivors({ allMatches: [], predsByMatch: preds, koStatus: computeKoStatus([]) })).toBeNull();
+  });
+});
+
+describe('renderJourneyProjection (smoke jsdom)', () => {
+  const allMatches = [
+    { id: 201, stage: 'r32', match_date: '2026-06-29T16:00:00Z', team_home: 'Brazil', team_away: 'Mexico', slot_home: null, slot_away: null, actual_home: 2, actual_away: 0, pen_winner: null, finished: true },
+    { id: 300, stage: 'r16', match_date: '2026-07-06T19:00:00Z', team_home: 'Brazil', team_away: 'France', slot_home: 'W201', slot_away: 'W202', actual_home: null, actual_away: null, pen_winner: null, finished: false },
+  ];
+  it('renderiza os 3 cards e revela o container', () => {
+    const mount = document.createElement('div');
+    mount.hidden = true;
+    document.body.appendChild(mount);
+    const ok = renderJourneyProjection({
+      mount,
+      nextMatch: allMatches[1],
+      myPred: { pred_home: 2, pred_away: 1 },
+      scorerTeam: 'Brazil',
+      allMatches,
+      predsByMatch: new Map([[201, { pred_home: 2, pred_away: 0 }]]),
+      guaranteed: 118,
+      myChampionTeam: 'Brazil',
+    });
+    expect(ok).toBe(true);
+    expect(mount.hidden).toBe(false);
+    expect(mount.innerHTML).toContain('Em jogo pra você');
+    expect(mount.innerHTML).toContain('Teto matemático');
+    expect(mount.innerHTML).toContain('Sobreviventes');
+  });
+  it('allMatches null (fetch falhou) → só "em jogo", sem teto/sobreviventes', () => {
+    const mount = document.createElement('div');
+    mount.hidden = true;
+    document.body.appendChild(mount);
+    renderJourneyProjection({
+      mount, nextMatch: allMatches[1], myPred: null, scorerTeam: null,
+      allMatches: null, predsByMatch: new Map(), guaranteed: 0, myChampionTeam: null,
+    });
+    expect(mount.innerHTML).toContain('Em jogo pra você');
+    expect(mount.innerHTML).not.toContain('Teto matemático');
+    expect(mount.innerHTML).not.toContain('Sobreviventes');
   });
 });
 

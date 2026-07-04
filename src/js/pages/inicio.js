@@ -11,7 +11,7 @@ import {
 } from '../util.js';
 import { isRealTeam } from '../bracket.js';
 import { renderJourneyChart } from '../journey-chart.js';
-import { renderJourneyDashboard, renderJourneyBets } from '../journey-dashboard.js';
+import { renderJourneyDashboard, renderJourneyBets, renderJourneyProjection } from '../journey-dashboard.js';
 import { loadProgression, demoProgression } from '../progression.js';
 import { startAutoRefresh } from '../auto-refresh.js';
 
@@ -338,6 +338,7 @@ function renderJourneySection() {
           <aside class="jd-rail" id="jdRail" hidden></aside>
         </div>
         <div class="jd-bets" id="jdBets" hidden></div>
+        <div class="jd-bets" id="jdProj" hidden></div>
         <div class="jd-dna" id="jdDna" hidden></div>`
         : `
         <div class="preview-wrap">
@@ -376,19 +377,21 @@ function mountJourney() {
   const mount = document.getElementById('journeyChart');
   if (!mount) return;
 
-  // Apostas vivas (F2): fetches leves em paralelo com a progressão. O .catch
-  // garante que qualquer falha aqui degrada pra "fileira não aparece" — nunca
-  // derruba o gráfico nem os outros widgets.
+  // Apostas vivas (F2) + o que vem por aí (F3): fetches leves em paralelo com a
+  // progressão. Busca TODOS os jogos (F3 resolve o bracket) e os meus palpites.
+  // O .catch garante que qualquer falha aqui degrada pra "fileira não aparece" —
+  // nunca derruba o gráfico nem os outros widgets.
   const betsPromise = Promise.all([
     supabase.from('champion_picks').select('user_id, team'),
     supabase.from('top_scorer_picks')
       .select('player_id, players(full_name, team, api_player_id)')
       .eq('user_id', profile.id).maybeSingle(),
-    supabase.from('matches')
-      .select('id, stage, match_date, team_home, team_away, actual_home, actual_away, pen_winner, finished')
-      .neq('stage', 'group').order('match_date'),
+    supabase.from('matches').select('*').order('match_date'),
     supabase.from('settings').select('key, value'),
     loadTopScorers(),
+    supabase.from('predictions')
+      .select('match_id, pred_home, pred_away, pred_pen_winner')
+      .eq('user_id', profile.id),
   ]).catch(err => { console.error('[inicio] apostas vivas:', err); return null; });
 
   loadProgression()
@@ -415,28 +418,47 @@ function mountJourney() {
       if (!ok) { section.remove(); return; }
 
       betsPromise.then(bets => {
-        const betsMount = document.getElementById('jdBets');
-        if (!bets || !betsMount) return;
-        const [champRes, myScorerRes, koRes, settingsRes, feed] = bets;
+        if (!bets) return;
+        const [champRes, myScorerRes, matchesRes, settingsRes, feed, predsRes] = bets;
         const settings = Object.fromEntries((settingsRes.data ?? [])
           .map(r => [r.key, typeof r.value === 'string' ? tryParse(r.value) : r.value]));
         const sp = myScorerRes.data;
-        renderJourneyBets({
+        const scorerPick = sp?.players ? {
+          apiId: sp.players.api_player_id ?? null,
+          name: sp.players.full_name ?? null,
+          team: sp.players.team ?? null,
+        } : null;
+        const myChampionPick = (champRes.data ?? []).find(p => p.user_id === profile.id) ?? null;
+        // matches falho → null p/ suprimir (não chutar "vivo" sem os jogos)
+        const allMatches = matchesRes.error ? null : matchesRes.data ?? [];
+        const koMatches = allMatches ? allMatches.filter(m => m.stage !== 'group') : null;
+        const leaderboard = prog.leaderboard ?? leaderboardRows;
+        const myStanding = leaderboard.find(u => u.user_id === profile.id);
+
+        const betsMount = document.getElementById('jdBets');
+        if (betsMount) renderJourneyBets({
           mount: betsMount,
-          myChampionPick: (champRes.data ?? []).find(p => p.user_id === profile.id) ?? null,
-          allChampionPicks: champRes.data ?? [],
-          scorerPick: sp?.players ? {
-            apiId: sp.players.api_player_id ?? null,
-            name: sp.players.full_name ?? null,
-            team: sp.players.team ?? null,
-          } : null,
+          myChampionPick, allChampionPicks: champRes.data ?? [], scorerPick,
           scorers: feed.scorers,
-          koMatches: koRes.error ? null : koRes.data ?? [],
-          leaderboard: prog.leaderboard ?? leaderboardRows,
-          meId: profile.id,
-          settings,
+          koMatches,
+          leaderboard, meId: profile.id, settings,
           paidUsers: stats.paid_users,
           nextStage: upcomingMatches[0]?.stage ?? null,
+        });
+
+        // F3 — o que vem por aí
+        const projMount = document.getElementById('jdProj');
+        const nextMatch = upcomingMatches[0] ?? null;
+        const predsByMatch = new Map((predsRes.data ?? []).map(p => [p.match_id, p]));
+        if (projMount) renderJourneyProjection({
+          mount: projMount,
+          nextMatch,
+          myPred: nextMatch ? predsByMatch.get(nextMatch.id) ?? null : null,
+          scorerTeam: scorerPick?.team ?? null,
+          allMatches,
+          predsByMatch,
+          guaranteed: myStanding?.total_pts ?? 0,
+          myChampionTeam: myChampionPick?.team ?? null,
         });
       });
     })

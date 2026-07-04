@@ -15,13 +15,18 @@
 //  • Seu artilheiro      — gols vs o líder da Chuteira + multiplicador da fase
 //  • Zona de prêmio      — R$ se acabasse hoje / distância da última vaga paga
 //
+// F3 — "o que vem por aí", com a engine do bracket.js portada pra home:
+//  • Em jogo pra você    — pontos em disputa no próximo jogo
+//  • Teto matemático     — quanto ainda dá pra somar (ninguém está fora)
+//  • Sobreviventes       — quantos do seu bracket previsto seguem vivos
+//
 // Módulo em duas camadas: funções de CÁLCULO puras (exportadas, testáveis) e
 // render por template string, no padrão das outras páginas. O caller decide
 // onde montar; falha aqui não pode derrubar o gráfico (try/catch no caller).
 
 import { escapeHtml, avatarHtml, flag, teamPt, formatBrShort, formatTime } from './util.js';
 import { sortLeaderboard, assignRanksAndPrizes, tiedPair } from './prize.js';
-import { matchPoints, championBonus, stageMultiplier } from './scoring.js';
+import { matchPoints, championBonus, stageMultiplier, qualifierBonus } from './scoring.js';
 import { buildTimeline } from './chart-utils.js';
 import { isRealTeam } from './bracket.js';
 
@@ -673,6 +678,191 @@ export function renderJourneyBets({
     return Boolean(html.trim());
   } catch (err) {
     console.error('[journey-bets]', err);
+    return false;
+  }
+}
+
+// ============================================================
+// F3 — O que vem por aí: cálculo (puro)
+// ============================================================
+
+/**
+ * Pontos em disputa PRA VOCÊ no próximo jogo: o teto do placar (cravar rende
+ * matchPoints(stage).exact) e se o seu artilheiro entra em campo. O bônus de
+ * vaga não entra aqui — ele não é atribuível a um jogo isolado de forma limpa.
+ * @returns null sem jogo (copa encerrada)
+ */
+export function buildStakeCard({ nextMatch, myPred, scorerTeam }) {
+  if (!nextMatch) return null;
+  const placarMax = matchPoints(nextMatch.stage).exact;
+  const hasScorer = scorerTeam != null;
+  const scorerPlays = hasScorer
+    && (nextMatch.team_home === scorerTeam || nextMatch.team_away === scorerTeam);
+  return {
+    match: nextMatch,
+    placarMax,
+    hasPred: Boolean(myPred && myPred.pred_home != null && myPred.pred_away != null),
+    hasScorer,
+    scorerPlays,
+    perGoal: scorerPlays ? 2 * stageMultiplier(nextMatch.stage) : 0,
+  };
+}
+
+/**
+ * Teto das categorias COM teto fixo — quanto ainda dá pra somar em:
+ *   placar  = Σ matchPoints(stage).exact dos jogos não finalizados
+ *   vagas   = qualifierBonus(stage, BPE) por LADO de KO ainda não preenchido
+ *             (lado já com time real teve seu BPE creditado no guaranteed →
+ *              não conta, senão dobraria; lado ainda em slot ainda é ganhável)
+ *   campeão = 40 se o pick segue vivo E a final ainda não saiu (senão o +40 já
+ *             está no guaranteed)
+ * O ARTILHEIRO fica de fora de propósito: cada gol soma sem teto (2×gols×mult),
+ * então não é um limite superior — é mostrado como "por cima" no card.
+ */
+export function buildCeiling({ guaranteed, allMatches, championAlive }) {
+  let placarMax = 0, qualMax = 0;
+  for (const m of allMatches ?? []) {
+    if (m.finished) continue;
+    placarMax += matchPoints(m.stage).exact;
+    if (m.stage === 'group') continue;   // grupo não dá vaga de KO
+    // team_home/away = valor RESOLVIDO (o DB semeia o time real quando a vaga
+    // enche); se ainda é slot ('W73','2A'), o BPE dessa vaga é ganhável
+    for (const side of [m.team_home, m.team_away]) {
+      if (!isRealTeam(side)) qualMax += qualifierBonus(m.stage, true);
+    }
+  }
+  const champMax = championAlive ? championBonus(true) : 0;
+  const remaining = placarMax + qualMax + champMax;
+  return {
+    guaranteed, placarMax, qualMax, champMax, remaining,
+    ceiling: guaranteed + remaining,
+  };
+}
+
+/**
+ * Sobreviventes do seu bracket previsto: dos times que você apostou pra vencer
+ * cada 32-avo, quantos seguem vivos de verdade. Os participantes dos 32-avos
+ * vêm da REALIDADE (r32 já semeado), então NÃO depende de você ter palpitado os
+ * grupos — só do seu palpite de quem vence cada 32-avo. Vivo = aliveForTitle
+ * (cobre quem caiu no KO E quem nem chegou ao r32 semeado).
+ */
+export function buildSurvivors({ allMatches, predsByMatch, koStatus }) {
+  if (!koStatus || !koStatus.r32Seeded) return null;   // só faz sentido com r32 semeado
+  const r32 = (allMatches ?? []).filter(m => m.stage === 'r32');
+  const seen = new Set();
+  const teams = [];
+  for (const m of [...r32].sort((a, b) => a.id - b.id)) {
+    const home = m.team_home, away = m.team_away;
+    if (!isRealTeam(home) || !isRealTeam(away)) continue;
+    const p = predsByMatch?.get(m.id);
+    let w = null;
+    if (p && p.pred_home != null && p.pred_away != null) {
+      if (p.pred_home > p.pred_away) w = home;
+      else if (p.pred_away > p.pred_home) w = away;
+      else if (p.pred_pen_winner === 'home') w = home;
+      else if (p.pred_pen_winner === 'away') w = away;
+    }
+    if (!w || seen.has(w)) continue;
+    seen.add(w);
+    teams.push({ team: w, alive: koStatus.aliveForTitle(w) });
+  }
+  if (teams.length === 0) return null;
+  const alive = teams.filter(t => t.alive).length;
+  return { teams, alive, total: teams.length };
+}
+
+// ============================================================
+// F3 — O que vem por aí: render
+// ============================================================
+
+function renderStakeCard(sk) {
+  if (!sk) return '';
+  const m = sk.match;
+  const where = m.group_name ? `Grupo ${escapeHtml(m.group_name)}` : escapeHtml(stageLabelOf(m.stage));
+  const homeReal = isRealTeam(m.team_home), awayReal = isRealTeam(m.team_away);
+  const matchup = homeReal && awayReal
+    ? `${escapeHtml(teamPt(m.team_home))} × ${escapeHtml(teamPt(m.team_away))}`
+    : where;
+  const chips = [
+    `<span>placar exato · ${sk.placarMax}</span>`,
+    // sem pick de artilheiro não afirma nada; com pick, joga ou não joga
+    !sk.hasScorer ? ''
+      : sk.scorerPlays
+        ? `<span class="on">seu artilheiro joga · +${sk.perGoal}/gol</span>`
+        : '<span>artilheiro não joga</span>',
+  ].join('');
+  const when = `${escapeHtml(formatBrShort(m.match_date))} · ${escapeHtml(formatTime(m.match_date))}`;
+  return `
+    <div class="jd-card">
+      <h4 class="jd-h">Em jogo pra você</h4>
+      <div class="jd-bet-who"><b>${matchup}</b></div>
+      <div class="jd-big gold">até ${sk.placarMax} <small>pts no placar</small></div>
+      <div class="jd-chips">${chips}</div>
+      <div class="jd-hint">${when} · ${where}${sk.hasPred ? '' : ' · você ainda não palpitou'}</div>
+    </div>`;
+}
+
+function renderCeilingCard(ce) {
+  if (!ce) return '';
+  const total = Math.max(1, ce.ceiling);
+  const gPct = Math.round((ce.guaranteed / total) * 100);
+  return `
+    <div class="jd-card">
+      <h4 class="jd-h">Teto matemático</h4>
+      <div class="jd-big gold">${ce.ceiling} <small>pts + o artilheiro</small></div>
+      <div class="jd-ceil"><span class="got" style="width:${gPct}%"></span></div>
+      <div class="jd-hint"><b>${ce.guaranteed} garantidos</b> + até ${ce.remaining} em disputa
+        <span class="jd-mute">(placar ${ce.placarMax} · vagas ${ce.qualMax}${ce.champMax ? ` · campeão ${ce.champMax}` : ''})</span></div>
+      <div class="jd-hint">e os gols do seu artilheiro somam por cima, sem teto fixo</div>
+    </div>`;
+}
+
+function renderSurvivorsCard(sv) {
+  if (!sv) return '';
+  const flags = sv.teams.map(t =>
+    `<span class="jd-mini ${t.alive ? '' : 'dead'}">${flag(t.team)}</span>`
+  ).join('');
+  return `
+    <div class="jd-card">
+      <h4 class="jd-h">Sobreviventes do seu bracket</h4>
+      <div class="jd-big">${sv.alive}<small>/${sv.total} seguem vivos</small></div>
+      <div class="jd-flags">${flags}</div>
+      <div class="jd-hint">os times que você mandou pras oitavas e ainda estão de pé — riscados já caíram</div>
+    </div>`;
+}
+
+// rótulo curto de fase sem depender de import extra (stageLabel do util é longo)
+function stageLabelOf(stage) {
+  return { r32: '32-avos', r16: 'Oitavas', qf: 'Quartas', sf: 'Semis', third: '3º lugar', final: 'Final' }[stage] ?? stage;
+}
+
+/**
+ * Monta a fileira "o que vem por aí" (F3). Auto-contida: deriva o koStatus dos
+ * jogos de mata dentro de allMatches. Mesmo contrato dos outros — captura as
+ * próprias falhas; no pior caso o container segue escondido.
+ * allMatches null (fetch falhou) suprime teto/sobreviventes — sem chute.
+ * @returns {boolean} true se renderizou algo
+ */
+export function renderJourneyProjection({
+  mount, nextMatch, myPred, scorerTeam, allMatches, predsByMatch,
+  guaranteed = 0, myChampionTeam = null,
+}) {
+  try {
+    const koStatus = allMatches
+      ? computeKoStatus(allMatches.filter(m => m.stage !== 'group'))
+      : null;
+    // +40 só é "em disputa" enquanto a final não sai; depois o bônus (se acertou)
+    // já entrou no guaranteed — contá-lo de novo dobraria o teto
+    const championAlive = Boolean(myChampionTeam)
+      && Boolean(koStatus?.aliveForTitle(myChampionTeam))
+      && !koStatus?.champion;
+    const html = renderStakeCard(buildStakeCard({ nextMatch, myPred, scorerTeam }))
+      + (koStatus ? renderCeilingCard(buildCeiling({ guaranteed, allMatches, championAlive })) : '')
+      + (koStatus ? renderSurvivorsCard(buildSurvivors({ allMatches, predsByMatch, koStatus })) : '');
+    if (mount && html.trim()) { mount.innerHTML = html; mount.hidden = false; }
+    return Boolean(html.trim());
+  } catch (err) {
+    console.error('[journey-projection]', err);
     return false;
   }
 }

@@ -142,6 +142,36 @@
 .jd-badge.live { background: var(--positive-dim); color: var(--positive); }
 .jd-badge.dead { background: rgba(255, 255, 255, .07); color: var(--text-mute); }
 
+/* chips do "em jogo pra você" */
+.jd-chips { display: flex; flex-wrap: wrap; gap: var(--space-1h); }
+.jd-chips span {
+  font-size: var(--fs-xs); color: var(--text-dim);
+  background: var(--bg-main); border: 1px solid var(--line);
+  border-radius: 20px; padding: 2px 9px;
+}
+.jd-chips span.on { color: var(--accent-bright); border-color: rgba(244, 196, 48, .35); }
+
+/* barra do teto matemático — sólido = garantido, hachurado = ainda em disputa */
+.jd-ceil {
+  position: relative; height: 20px; border-radius: 7px; overflow: hidden;
+  border: 1px solid var(--line);
+  background: repeating-linear-gradient(135deg, rgba(244,196,48,.22) 0 6px, rgba(244,196,48,.07) 6px 12px);
+}
+.jd-ceil .got { position: absolute; inset: 0 auto 0 0; background: var(--accent); border-radius: 6px 0 0 6px; }
+.jd-mute { color: var(--text-mute); }
+
+/* strip de bandeiras dos sobreviventes; eliminados esmaecidos + riscados */
+.jd-flags { display: flex; flex-wrap: wrap; gap: var(--space-1h); }
+.jd-mini { position: relative; display: inline-flex; }
+.jd-mini .fi { width: 22px; height: 16px; border-radius: 3px; }
+/* só a BANDEIRA esmaece; o risco (::after) fica fora do grupo com opacity pra
+   compor em alpha cheio — senão o traço vermelho sairia lavado (~35%) */
+.jd-mini.dead .fi { opacity: .35; }
+.jd-mini.dead::after {
+  content: ''; position: absolute; left: -1px; right: -1px; top: 50%;
+  height: 2px; background: var(--red); transform: rotate(-12deg);
+}
+
 /* ------------------- o que te separa do líder ------------------ */
 .jd-divg { display: grid; grid-template-columns: 68px 1fr 44px; align-items: center; gap: var(--space-2); font-size: var(--fs-sm); }
 .jd-track { display: flex; height: 9px; }
