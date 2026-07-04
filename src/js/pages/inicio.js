@@ -7,11 +7,11 @@ import { loadLockAlerts } from '../lock-alerts.js';
 import {
   flag, escapeHtml, greeting, firstName, daysToKickoffLabel, brDayWindowUtc,
   formatBrDate, formatTime, lockCountdownLabel, stageLabel, isLive,
-  teamPt, groundShort, heroMeta, slotShortLabel,
+  teamPt, groundShort, heroMeta, slotShortLabel, loadTopScorers,
 } from '../util.js';
 import { isRealTeam } from '../bracket.js';
 import { renderJourneyChart } from '../journey-chart.js';
-import { renderJourneyDashboard } from '../journey-dashboard.js';
+import { renderJourneyDashboard, renderJourneyBets } from '../journey-dashboard.js';
 import { loadProgression, demoProgression } from '../progression.js';
 import { startAutoRefresh } from '../auto-refresh.js';
 
@@ -187,6 +187,9 @@ function renderLockBanner() {
   `;
 }
 
+// settings.value pode vir como string JSON (mesmo tryParse de ranking.js)
+function tryParse(s) { try { return JSON.parse(s); } catch { return s; } }
+
 function iconClockAlert() {
   return `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
     stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -334,6 +337,7 @@ function renderJourneySection() {
           <div class="journey-card" id="journeyChart"><div class="rc-loading">Carregando sua jornada…</div></div>
           <aside class="jd-rail" id="jdRail" hidden></aside>
         </div>
+        <div class="jd-bets" id="jdBets" hidden></div>
         <div class="jd-dna" id="jdDna" hidden></div>`
         : `
         <div class="preview-wrap">
@@ -371,6 +375,22 @@ function mountJourney() {
 
   const mount = document.getElementById('journeyChart');
   if (!mount) return;
+
+  // Apostas vivas (F2): fetches leves em paralelo com a progressão. O .catch
+  // garante que qualquer falha aqui degrada pra "fileira não aparece" — nunca
+  // derruba o gráfico nem os outros widgets.
+  const betsPromise = Promise.all([
+    supabase.from('champion_picks').select('user_id, team'),
+    supabase.from('top_scorer_picks')
+      .select('player_id, players(full_name, team, api_player_id)')
+      .eq('user_id', profile.id).maybeSingle(),
+    supabase.from('matches')
+      .select('id, stage, match_date, team_home, team_away, actual_home, actual_away, pen_winner, finished')
+      .neq('stage', 'group').order('match_date'),
+    supabase.from('settings').select('key, value'),
+    loadTopScorers(),
+  ]).catch(err => { console.error('[inicio] apostas vivas:', err); return null; });
+
   loadProgression()
     .then(prog => {
       if (!prog) { section.remove(); return; }
@@ -392,7 +412,33 @@ function mountJourney() {
         finishedMatches: stats.finished_matches ?? 0,
       });
       const ok = renderJourneyChart(mount, { ...prog, meId: profile.id });
-      if (!ok) section.remove();
+      if (!ok) { section.remove(); return; }
+
+      betsPromise.then(bets => {
+        const betsMount = document.getElementById('jdBets');
+        if (!bets || !betsMount) return;
+        const [champRes, myScorerRes, koRes, settingsRes, feed] = bets;
+        const settings = Object.fromEntries((settingsRes.data ?? [])
+          .map(r => [r.key, typeof r.value === 'string' ? tryParse(r.value) : r.value]));
+        const sp = myScorerRes.data;
+        renderJourneyBets({
+          mount: betsMount,
+          myChampionPick: (champRes.data ?? []).find(p => p.user_id === profile.id) ?? null,
+          allChampionPicks: champRes.data ?? [],
+          scorerPick: sp?.players ? {
+            apiId: sp.players.api_player_id ?? null,
+            name: sp.players.full_name ?? null,
+            team: sp.players.team ?? null,
+          } : null,
+          scorers: feed.scorers,
+          koMatches: koRes.error ? null : koRes.data ?? [],
+          leaderboard: prog.leaderboard ?? leaderboardRows,
+          meId: profile.id,
+          settings,
+          paidUsers: stats.paid_users,
+          nextStage: upcomingMatches[0]?.stage ?? null,
+        });
+      });
     })
     .catch(err => {
       console.error('[inicio] jornada:', err);

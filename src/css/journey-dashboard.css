@@ -14,9 +14,9 @@
 .jd-rail { display: flex; flex-direction: column; gap: var(--space-3h); min-width: 0; }
 /* auto-fit: se um card não renderiza (ex.: 0 palpites avaliados), os outros
    redistribuem — template fixo deixaria buraco */
-.jd-dna { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--space-3h); margin-top: var(--space-3h); }
+.jd-dna, .jd-bets { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--space-3h); margin-top: var(--space-3h); }
 /* display das classes acima vence o [hidden] do UA stylesheet — reforça */
-.jd-rail[hidden], .jd-dna[hidden] { display: none !important; }
+.jd-rail[hidden], .jd-dna[hidden], .jd-bets[hidden] { display: none !important; }
 
 @media (max-width: 1080px) {
   .jd-layout.jd-on { grid-template-columns: 1fr; }
@@ -123,6 +123,24 @@
 /* dourado escuro (não var(--accent)): mesma imunidade a dark forçado do funil */
 .jd-bar .fill { position: absolute; inset: 0 auto 0 0; border-radius: 5px; background: linear-gradient(90deg, #6a5412, #a3821e); }
 .jd-bar .tick { position: absolute; top: -3px; bottom: -3px; width: 2px; background: #8a8a8e; border-radius: 1px; }
+
+/* --------------------- apostas vivas (F2) ---------------------- */
+/* números grandes são TEXTO dourado sobre fundo escuro — imune ao dark
+   forçado de celular (nunca background claro grande; ver incidente 04/07) */
+.jd-bet-who { display: flex; align-items: center; gap: var(--space-2); font-size: var(--fs-md); min-width: 0; }
+.jd-bet-who b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.jd-bet-who .flag .fi { width: 22px; height: 16px; border-radius: 3px; }
+.jd-big { font-size: 26px; font-weight: var(--fw-heavy); letter-spacing: -.01em; line-height: 1.15; font-variant-numeric: tabular-nums; }
+.jd-big small { font-size: var(--fs-sm); font-weight: var(--fw-medium); color: var(--text-dim); letter-spacing: 0; }
+.jd-big.gold { color: var(--accent-bright); }
+.jd-big.mute { color: var(--text-mute); }
+.jd-card .gold { color: var(--accent-bright); }
+.jd-badge {
+  font-size: 10px; font-weight: var(--fw-heavy); letter-spacing: .08em;
+  text-transform: uppercase; padding: 2px 8px; border-radius: 20px; flex: 0 0 auto;
+}
+.jd-badge.live { background: var(--positive-dim); color: var(--positive); }
+.jd-badge.dead { background: rgba(255, 255, 255, .07); color: var(--text-mute); }
 
 /* ------------------- o que te separa do líder ------------------ */
 .jd-divg { display: grid; grid-template-columns: 68px 1fr 44px; align-items: center; gap: var(--space-2); font-size: var(--fs-sm); }

@@ -1,24 +1,29 @@
 // ============================================================
 // Dashboard da jornada — widgets ao redor do gráfico (tela Início)
 // ============================================================
-// Fase 1 da proposta (docs: memória jornada-dashboard-proposal): 5 widgets que
-// são só aritmética sobre dados que a home JÁ carrega — v_leaderboard,
-// v_pool_stats e as séries do replay (progression.js). Nenhum fetch novo.
+// Fases 1 e 2 da proposta (docs: memória jornada-dashboard-proposal).
 //
+// F1 — aritmética sobre dados que a home JÁ carrega (zero fetch novo):
 //  • Escada do ranking   — vizinhos de cima/baixo com gap e cenário concreto
 //  • Ultrapassagens      — quem cruzou com você desde o dia anterior
 //  • Funil de acertos    — cravada → venc.+saldo → vencedor → parcial → zero
 //  • Você vs a média     — pts/jogo, cravadas e total contra o bolão
 //  • O que te separa do líder — gap decomposto por pilar de pontuação
 //
+// F2 — "apostas vivas", com fetches leves já usados em outras páginas:
+//  • Seu campeão         — vivo/eliminado + os 40 pts pendurados
+//  • Seu artilheiro      — gols vs o líder da Chuteira + multiplicador da fase
+//  • Zona de prêmio      — R$ se acabasse hoje / distância da última vaga paga
+//
 // Módulo em duas camadas: funções de CÁLCULO puras (exportadas, testáveis) e
 // render por template string, no padrão das outras páginas. O caller decide
 // onde montar; falha aqui não pode derrubar o gráfico (try/catch no caller).
 
-import { escapeHtml, avatarHtml } from './util.js';
+import { escapeHtml, avatarHtml, flag, teamPt, formatBrShort, formatTime } from './util.js';
 import { sortLeaderboard, assignRanksAndPrizes, tiedPair } from './prize.js';
-import { matchPoints } from './scoring.js';
+import { matchPoints, championBonus, stageMultiplier } from './scoring.js';
 import { buildTimeline } from './chart-utils.js';
+import { isRealTeam } from './bracket.js';
 
 // Tiers do funil, na ordem do modelo aditivo (melhor → pior). As colunas são
 // os contadores mutuamente exclusivos do v_leaderboard.
@@ -406,6 +411,268 @@ export function renderJourneyDashboard({
     return Boolean(rail.trim() || dna.trim());
   } catch (err) {
     console.error('[journey-dashboard]', err);
+    return false;
+  }
+}
+
+// ============================================================
+// F2 — Apostas vivas: cálculo (puro)
+// ============================================================
+
+/**
+ * Estado do mata-mata a partir dos jogos de KO (todas as fases, incl. 3º):
+ *  - eliminated: perdeu QUALQUER jogo de KO finalizado — perder a semi já
+ *    tira o título (a disputa de 3º não ressuscita ninguém pro caneco);
+ *  - r32Teams/r32Seeded: os 32 classificados — elimina quem caiu nos grupos,
+ *    mas SÓ quando o R32 está todo semeado com times reais (antes disso não
+ *    dá pra afirmar que um time ficou fora);
+ *  - upcoming: primeiro jogo NÃO finalizado de cada time real — o artilheiro
+ *    de um time na disputa de 3º ainda joga (e gol lá pontua).
+ * Derivação de perdedor espelha championOf (card-results.js): gols, senão
+ * pen_winner; empate sem pênalti registrado não afirma eliminação.
+ */
+export function computeKoStatus(koMatches) {
+  const sorted = [...koMatches].sort((a, b) => new Date(a.match_date) - new Date(b.match_date));
+  const eliminated = new Set();
+  const upcoming = new Map();
+  const r32Sides = [];
+  let champion = null;
+  for (const m of sorted) {
+    if (m.stage === 'r32') r32Sides.push(m.team_home, m.team_away);
+    if (m.finished) {
+      const { actual_home: h, actual_away: a, pen_winner: pen } = m;
+      let loser = null, winner = null;
+      if (h != null && a != null) {
+        if (h > a) { winner = m.team_home; loser = m.team_away; }
+        else if (a > h) { winner = m.team_away; loser = m.team_home; }
+        else if (pen === 'home') { winner = m.team_home; loser = m.team_away; }
+        else if (pen === 'away') { winner = m.team_away; loser = m.team_home; }
+      }
+      if (loser && isRealTeam(loser)) eliminated.add(loser);
+      if (m.stage === 'final' && winner && isRealTeam(winner)) champion = winner;
+    } else {
+      for (const t of [m.team_home, m.team_away]) {
+        if (isRealTeam(t) && !upcoming.has(t)) upcoming.set(t, m);
+      }
+    }
+  }
+  const r32Seeded = r32Sides.length > 0 && r32Sides.every(isRealTeam);
+  const r32Teams = new Set(r32Sides.filter(isRealTeam));
+  return {
+    eliminated, upcoming, r32Seeded, r32Teams, champion,
+    aliveForTitle: (team) => !eliminated.has(team) && (!r32Seeded || r32Teams.has(team)),
+  };
+}
+
+/**
+ * Card do campeão: status do MEU pick + quantos rivais PAGOS torcem junto.
+ * @returns null sem pick (deadline já passou — não há o que exibir)
+ */
+export function buildChampionCard({ myPick, allPicks, koStatus, meId, paidIds }) {
+  // sem koStatus (fetch de KO falhou) não dá pra afirmar vivo/morto — sem card
+  if (!myPick?.team || !koStatus) return null;
+  const team = myPick.team;
+  const alive = koStatus.aliveForTitle(team);
+  const others = (allPicks ?? []).filter(p =>
+    p.team === team && p.user_id !== meId && (!paidIds || paidIds.has(p.user_id))
+  ).length;
+  return {
+    team, alive, others,
+    won: koStatus.champion === team,
+    next: alive ? koStatus.upcoming.get(team) ?? null : null,
+    bonus: championBonus(true),
+  };
+}
+
+/**
+ * Card do artilheiro: meu pick vs o topo da Chuteira de Ouro.
+ *  - pick fora do feed (ainda sem gol) → 0 gols, sem rank;
+ *  - stillPlays cobre a disputa de 3º via upcoming (título morto, gol vale);
+ *  - perGoal usa a fase do PRÓXIMO jogo do time dele; sem jogo semeado ainda,
+ *    cai na fase corrente do torneio (fallbackStage).
+ */
+export function buildScorerCard({ pick, scorers, koStatus, fallbackStage = null }) {
+  // sem koStatus ou sem feed não dá pra afirmar nada da corrida — sem card
+  if (!pick?.name || !koStatus) return null;
+  const feed = scorers ?? [];
+  if (feed.length === 0) return null;
+  const inFeed = pick.apiId != null ? feed.find(s => s.api_id === pick.apiId) ?? null : null;
+  const goals = inFeed?.goals ?? 0;
+  // rank de COMPETIÇÃO (empatados dividem posição), não posição no JSON —
+  // indexOf diria "2º" pra quem está empatado na ponta
+  const rank = inFeed ? feed.filter(s => (s.goals ?? 0) > goals).length + 1 : null;
+  const leader = feed[0] ?? null;
+  const tiedWith = inFeed && rank === 1
+    ? feed.find(s => s !== inFeed && (s.goals ?? 0) === goals)?.name ?? null
+    : null;
+  const isLeader = rank === 1 && !tiedWith;
+  const gap = inFeed ? (rank === 1 ? 0 : (leader.goals ?? 0) - goals) : null;
+  const nextStage = koStatus.upcoming.get(pick.team)?.stage ?? fallbackStage;
+  return {
+    name: pick.name, team: pick.team, goals, rank, leader, isLeader, tiedWith, gap,
+    // fora do feed ≠ 0 gols: o JSON é um top-N — não dá pra afirmar contagem
+    outsideFeed: !inFeed,
+    feedSize: feed.length,
+    stillPlays: koStatus.aliveForTitle(pick.team) || koStatus.upcoming.has(pick.team),
+    perGoal: nextStage ? 2 * stageMultiplier(nextStage) : null,
+    finalPerGoal: 2 * stageMultiplier('final'),
+  };
+}
+
+/**
+ * Card do prêmio: minha fatia HOJE (rateio de empate incluso, prize.js) ou a
+ * distância até a última vaga paga e quem a segura. Pote = pagantes × taxa
+ * (mesma conta do computeTotalPot de ranking.js); split em % por posição.
+ */
+export function buildPrizeCard({ rows, meId, split, feeAmount, paidUsers }) {
+  const inRanking = (rows ?? []).some(r => r.user_id === meId);
+  if (!inRanking) return null;
+  // || (não ??): v_pool_stats indisponível chega como 0 e viraria "pote R$ 0";
+  // o leaderboard só tem pagantes, então length é o mesmo denominador
+  const totalPot = (paidUsers || rows.length) * (feeAmount ?? 100);
+  const s = split ?? { first: 70, second: 20, third: 10 };
+  const prizeByPos = [
+    Math.round(totalPot * (s.first ?? 0) / 100),
+    Math.round(totalPot * (s.second ?? 0) / 100),
+    Math.round(totalPot * (s.third ?? 0) / 100),
+  ];
+  const ranked = assignRanksAndPrizes(sortLeaderboard(rows).map(r => ({ ...r })), prizeByPos);
+  const me = ranked.find(r => r.user_id === meId);
+  const winners = ranked.filter(r => (r.prizeShare ?? 0) > 0);
+  const holder = winners[winners.length - 1] ?? null;
+  return {
+    totalPot,
+    myShare: me.prizeShare ?? 0,
+    myPos: me.pos,
+    inZone: (me.prizeShare ?? 0) > 0,
+    holder: holder && holder.user_id !== meId
+      ? {
+          name: holder.full_name, pos: holder.pos, pts: holder.total_pts ?? 0,
+          gap: (holder.total_pts ?? 0) - (me.total_pts ?? 0),
+        }
+      : null,
+  };
+}
+
+// ============================================================
+// F2 — Apostas vivas: render
+// ============================================================
+
+const fmtBRL = (v) => `R$ ${Number(v).toLocaleString('pt-BR', { maximumFractionDigits: 0 })}`;
+
+function renderChampionCard(c) {
+  if (!c) return '';
+  const badge = c.won
+    ? '<span class="jd-badge live">Campeão</span>'
+    : c.alive
+      ? '<span class="jd-badge live">Vivo</span>'
+      : '<span class="jd-badge dead">Eliminado</span>';
+  const bonus = c.won
+    ? `<div class="jd-big gold">+${c.bonus} <small>garantidos</small></div>`
+    : c.alive
+      ? `<div class="jd-big gold">+${c.bonus} <small>em jogo</small></div>`
+      : `<div class="jd-big mute">+0 <small>· sem bônus de campeão</small></div>`;
+  let when = '';
+  if (c.won) {
+    when = 'você cravou o campeão do mundo — bônus creditado';
+  } else if (c.alive && c.next) {
+    const opp = c.next.team_home === c.team ? c.next.team_away : c.next.team_home;
+    const oppLabel = isRealTeam(opp) ? teamPt(opp) : 'adversário a definir';
+    when = `joga ${escapeHtml(formatBrShort(c.next.match_date))} · ${escapeHtml(formatTime(c.next.match_date))} vs ${escapeHtml(oppLabel)}`;
+  } else if (c.alive) {
+    when = 'aguarda o adversário da próxima fase';
+  } else {
+    when = 'seu palpite caiu na Copa';
+  }
+  const tribe = c.others > 0
+    ? `+${c.others} ${c.others === 1 ? 'rival' : 'rivais'} na mesma torcida`
+    : 'só você apostou nele';
+  return `
+    <div class="jd-card">
+      <h4 class="jd-h">Seu campeão</h4>
+      <div class="jd-bet-who"><span class="flag">${flag(c.team)}</span><b>${escapeHtml(teamPt(c.team))}</b>${badge}</div>
+      ${bonus}
+      <div class="jd-hint">${when} · ${tribe}</div>
+    </div>`;
+}
+
+function renderScorerCard(sc) {
+  if (!sc) return '';
+  const badge = sc.stillPlays ? '' : '<span class="jd-badge dead">fora da Copa</span>';
+  // fora do feed (top-N) não é "0 gols" — só não dá pra afirmar a contagem
+  const big = sc.outsideFeed
+    ? `<div class="jd-big mute">fora do top ${sc.feedSize} <small>da corrida</small></div>`
+    : `<div class="jd-big">${sc.goals} <small>gol${sc.goals === 1 ? '' : 's'}${sc.rank ? ` · ${sc.rank}º na corrida` : ''}</small></div>`;
+  const race = sc.outsideFeed
+    ? sc.leader ? `líder: ${escapeHtml(sc.leader.name)}, com ${sc.leader.goals}` : ''
+    : sc.isLeader
+      ? '<b class="gold">líder da Chuteira de Ouro</b>'
+      : sc.tiedWith
+        ? `empatado na ponta com ${escapeHtml(sc.tiedWith)}`
+        : sc.leader
+          ? `<b class="dn">−${sc.gap}</b> pro líder (${escapeHtml(sc.leader.name)}, ${sc.leader.goals})`
+          : '';
+  const mult = sc.stillPlays && sc.perGoal
+    ? `<div class="jd-hint">cada gol dele agora vale <b class="gold">${sc.perGoal} pts</b> · na final vale ${sc.finalPerGoal}</div>`
+    : '<div class="jd-hint">os gols dele param por aqui</div>';
+  return `
+    <div class="jd-card">
+      <h4 class="jd-h">Seu artilheiro</h4>
+      <div class="jd-bet-who"><span class="flag">${flag(sc.team)}</span><b>${escapeHtml(sc.name)}</b>${badge}</div>
+      ${big}
+      ${race ? `<div class="jd-hint">${race}</div>` : ''}
+      ${mult}
+    </div>`;
+}
+
+function renderPrizeCard(pz) {
+  if (!pz) return '';
+  const big = pz.inZone
+    ? `<div class="jd-big gold">${fmtBRL(Math.round(pz.myShare))} <small>se acabasse hoje</small></div>`
+    : `<div class="jd-big mute">R$ 0 <small>hoje</small></div>`;
+  const line = pz.inZone
+    ? `${pz.myPos}º lugar — na zona de prêmio`
+    : pz.holder
+      ? pz.holder.gap === 0
+        // empate em pontos perdido no desempate: "a 0 pts" leria como alcançado
+        ? `empatado em pontos com ${escapeHtml(pz.holder.name)} (${pz.holder.pos}º) — a vaga é dele no desempate`
+        : `a <b>${pz.holder.gap} pts</b> da última vaga paga — ${escapeHtml(pz.holder.name)} (${pz.holder.pos}º) segura`
+      : 'zona de prêmio em disputa';
+  return `
+    <div class="jd-card">
+      <h4 class="jd-h">Zona de prêmio</h4>
+      ${big}
+      <div class="jd-hint">${line}</div>
+      <div class="jd-hint">pote atual: <b class="gold">${fmtBRL(pz.totalPot)}</b></div>
+    </div>`;
+}
+
+/**
+ * Monta a fileira "apostas vivas". Mesmo contrato do renderJourneyDashboard:
+ * captura as próprias falhas; no pior caso o container segue escondido.
+ * @returns {boolean} true se renderizou algo
+ */
+export function renderJourneyBets({
+  mount, myChampionPick, allChampionPicks, scorerPick, scorers, koMatches,
+  leaderboard, meId, settings = {}, paidUsers, nextStage = null,
+}) {
+  try {
+    // koMatches null = fetch de KO falhou → cards de campeão/artilheiro não
+    // renderizam (afirmar "vivo" sem os jogos seria chute); [] = ok, sem KO
+    const koStatus = koMatches ? computeKoStatus(koMatches) : null;
+    const paidIds = new Set((leaderboard ?? []).map(r => r.user_id));
+    const html = renderChampionCard(buildChampionCard({
+      myPick: myChampionPick, allPicks: allChampionPicks, koStatus, meId, paidIds,
+    })) + renderScorerCard(buildScorerCard({
+      pick: scorerPick, scorers, koStatus, fallbackStage: nextStage,
+    })) + renderPrizeCard(buildPrizeCard({
+      rows: leaderboard ?? [], meId,
+      split: settings.prize_split, feeAmount: settings.fee_amount, paidUsers,
+    }));
+    if (mount && html.trim()) { mount.innerHTML = html; mount.hidden = false; }
+    return Boolean(html.trim());
+  } catch (err) {
+    console.error('[journey-bets]', err);
     return false;
   }
 }

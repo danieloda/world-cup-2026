@@ -7,6 +7,8 @@ import { describe, it, expect } from 'vitest';
 import {
   ladderScenario, buildLadder, computeOvertakes, buildFunnel,
   buildVsAverage, buildLeaderGap, renderJourneyDashboard,
+  computeKoStatus, buildChampionCard, buildScorerCard, buildPrizeCard,
+  renderJourneyBets,
 } from '../../src/js/journey-dashboard.js';
 
 // ------------------------------------------------------------
@@ -203,6 +205,227 @@ describe('buildLeaderGap', () => {
     const lg = buildLeaderGap([lbRow('me', 'Eu', { total_pts: 5 })], 'me');
     expect(lg.isLeader).toBe(true);
     expect(lg.other).toBeNull();
+  });
+});
+
+// ------------------------------------------------------------
+// F2 — apostas vivas
+// ------------------------------------------------------------
+const ko = (over) => ({
+  id: 0, stage: 'r32', match_date: '2026-06-29T16:00:00.000Z',
+  team_home: 'Brazil', team_away: 'Mexico',
+  actual_home: null, actual_away: null, pen_winner: null, finished: false, ...over,
+});
+
+const KO = [
+  ko({ id: 101, actual_home: 2, actual_away: 0, finished: true }),               // Brasil elimina México
+  ko({ id: 102, team_home: 'France', team_away: 'USA', match_date: '2026-06-29T19:00:00.000Z', actual_home: 1, actual_away: 1, pen_winner: 'away', finished: true }), // EUA nos pênaltis
+  ko({ id: 103, stage: 'r16', match_date: '2026-07-06T16:00:00.000Z', team_home: 'Brazil', team_away: 'USA' }),
+];
+
+describe('computeKoStatus', () => {
+  it('perdedor por gols e por pênalti; vivos têm próximo jogo', () => {
+    const st = computeKoStatus(KO);
+    expect(st.eliminated.has('Mexico')).toBe(true);
+    expect(st.eliminated.has('France')).toBe(true);   // 1-1, pen 'away'
+    expect(st.aliveForTitle('Brazil')).toBe(true);
+    expect(st.upcoming.get('USA')?.id).toBe(103);
+  });
+  it('R32 todo semeado → quem não está nos 32 caiu nos grupos', () => {
+    const st = computeKoStatus(KO);
+    expect(st.r32Seeded).toBe(true);
+    expect(st.aliveForTitle('Germany')).toBe(false);
+  });
+  it('R32 com vaga ainda em slot → NÃO afirma eliminação de grupo', () => {
+    const st = computeKoStatus([...KO, ko({ id: 105, team_home: 'W12', team_away: 'Spain' })]);
+    expect(st.r32Seeded).toBe(false);
+    expect(st.aliveForTitle('Germany')).toBe(true);
+  });
+  it('empate finalizado sem pênalti registrado não elimina ninguém', () => {
+    const st = computeKoStatus([ko({ id: 106, actual_home: 1, actual_away: 1, finished: true })]);
+    expect(st.eliminated.size).toBe(0);
+  });
+  it('disputa de 3º: título morto, mas o time ainda joga (upcoming)', () => {
+    const st = computeKoStatus([
+      ko({ id: 107, stage: 'sf', actual_home: 0, actual_away: 3, finished: true }),   // Brasil perde a semi
+      ko({ id: 108, stage: 'third', team_home: 'Brazil', team_away: 'France', match_date: '2026-07-17T16:00:00.000Z' }),
+    ]);
+    expect(st.aliveForTitle('Brazil')).toBe(false);
+    expect(st.upcoming.has('Brazil')).toBe(true);
+  });
+});
+
+describe('buildChampionCard', () => {
+  const picks = [
+    { user_id: 'me', team: 'Brazil' },
+    { user_id: 'a', team: 'Brazil' },
+    { user_id: 'ghost-nao-pago', team: 'Brazil' },
+    { user_id: 'b', team: 'Mexico' },
+  ];
+  const paidIds = new Set(['me', 'a', 'b']);
+  it('vivo com próximo jogo, contando só rivais pagos na torcida', () => {
+    const c = buildChampionCard({ myPick: picks[0], allPicks: picks, koStatus: computeKoStatus(KO), meId: 'me', paidIds });
+    expect(c.alive).toBe(true);
+    expect(c.next?.id).toBe(103);
+    expect(c.others).toBe(1);      // só 'a' (ghost não pagou)
+    expect(c.bonus).toBe(40);
+  });
+  it('eliminado não tem próximo jogo', () => {
+    const c = buildChampionCard({ myPick: { user_id: 'b', team: 'Mexico' }, allPicks: picks, koStatus: computeKoStatus(KO), meId: 'b', paidIds });
+    expect(c.alive).toBe(false);
+    expect(c.next).toBeNull();
+  });
+  it('sem pick ou sem koStatus (fetch falhou) → null', () => {
+    expect(buildChampionCard({ myPick: null, allPicks: picks, koStatus: computeKoStatus(KO), meId: 'me', paidIds })).toBeNull();
+    expect(buildChampionCard({ myPick: picks[0], allPicks: picks, koStatus: null, meId: 'me', paidIds })).toBeNull();
+  });
+  it('final finalizada com meu time vencedor → estado Campeão (won)', () => {
+    const done = [...KO, ko({ id: 110, stage: 'final', match_date: '2026-07-19T19:00:00.000Z', team_home: 'Brazil', team_away: 'USA', actual_home: 1, actual_away: 1, pen_winner: 'home', finished: true })];
+    const st = computeKoStatus(done);
+    expect(st.champion).toBe('Brazil');
+    const c = buildChampionCard({ myPick: picks[0], allPicks: picks, koStatus: st, meId: 'me', paidIds });
+    expect(c.won).toBe(true);
+    expect(c.alive).toBe(true); // venceu — nunca entrou em eliminated
+  });
+});
+
+describe('buildScorerCard', () => {
+  const feed = [
+    { api_id: 9, name: 'Mbappé', team: 'France', goals: 6 },
+    { api_id: 7, name: 'Vini Jr.', team: 'Brazil', goals: 4 },
+  ];
+  it('gap pro líder + multiplicador da fase do PRÓXIMO jogo do time', () => {
+    const sc = buildScorerCard({ pick: { apiId: 7, name: 'Vini Jr.', team: 'Brazil' }, scorers: feed, koStatus: computeKoStatus(KO) });
+    expect(sc.goals).toBe(4);
+    expect(sc.rank).toBe(2);
+    expect(sc.gap).toBe(2);
+    expect(sc.stillPlays).toBe(true);
+    expect(sc.perGoal).toBe(4);        // r16: 2 × 2.0
+    expect(sc.finalPerGoal).toBe(10);  // final: 2 × 5.0
+  });
+  it('líder da corrida; pick fora do feed NÃO afirma contagem (top-N)', () => {
+    const lead = buildScorerCard({ pick: { apiId: 9, name: 'Mbappé', team: 'France' }, scorers: feed, koStatus: computeKoStatus(KO) });
+    expect(lead.isLeader).toBe(true);
+    const out = buildScorerCard({ pick: { apiId: 999, name: 'Zagueiro', team: 'Brazil' }, scorers: feed, koStatus: computeKoStatus(KO) });
+    expect(out.outsideFeed).toBe(true);
+    expect(out.rank).toBeNull();
+    expect(out.gap).toBeNull();
+  });
+  it('empate na ponta: rank de competição 1º + nome do empatado (sem "2º na corrida")', () => {
+    const tied = [
+      { api_id: 9, name: 'Mbappé', team: 'France', goals: 6 },
+      { api_id: 7, name: 'Vini Jr.', team: 'Brazil', goals: 6 },
+    ];
+    const sc = buildScorerCard({ pick: { apiId: 7, name: 'Vini Jr.', team: 'Brazil' }, scorers: tied, koStatus: computeKoStatus(KO) });
+    expect(sc.rank).toBe(1);
+    expect(sc.isLeader).toBe(false);
+    expect(sc.tiedWith).toBe('Mbappé');
+    expect(sc.gap).toBe(0);
+  });
+  it('feed vazio ou koStatus null → null (nada a afirmar)', () => {
+    expect(buildScorerCard({ pick: { apiId: 7, name: 'Vini Jr.', team: 'Brazil' }, scorers: [], koStatus: computeKoStatus(KO) })).toBeNull();
+    expect(buildScorerCard({ pick: { apiId: 7, name: 'Vini Jr.', team: 'Brazil' }, scorers: feed, koStatus: null })).toBeNull();
+  });
+  it('time eliminado e sem jogo → os gols param; fallbackStage cobre vaga não semeada', () => {
+    const sc = buildScorerCard({ pick: { apiId: 9, name: 'Mbappé', team: 'France' }, scorers: feed, koStatus: computeKoStatus(KO), fallbackStage: 'r32' });
+    expect(sc.stillPlays).toBe(false);
+    expect(sc.perGoal).toBe(3);        // fallback r32: 2 × 1.5
+  });
+});
+
+describe('buildPrizeCard', () => {
+  const row = (id, pts, exact = 0) => lbRow(id, id.toUpperCase(), { total_pts: pts, exact_count: exact });
+  it('na zona: minha fatia com split padrão 70/20/10', () => {
+    const pz = buildPrizeCard({ rows: [row('a', 100), row('b', 90), row('me', 85), row('c', 80)], meId: 'me', feeAmount: 50, paidUsers: 4 });
+    expect(pz.totalPot).toBe(200);
+    expect(pz.inZone).toBe(true);
+    expect(pz.myPos).toBe(3);
+    expect(pz.myShare).toBe(20);       // 10% de 200
+  });
+  it('fora da zona: aponta quem segura a última vaga paga e o gap', () => {
+    const pz = buildPrizeCard({ rows: [row('a', 100), row('b', 90), row('d', 88), row('me', 85)], meId: 'me', feeAmount: 50, paidUsers: 4 });
+    expect(pz.inZone).toBe(false);
+    expect(pz.holder).toMatchObject({ pos: 3, gap: 3 });
+  });
+  it('empate no topo rateia (regra do prize.js) e desloca a zona', () => {
+    const rows = [row('a', 100, 2), row('b', 100, 2), row('me', 80)];
+    const pz = buildPrizeCard({ rows, meId: 'me', feeAmount: 100, paidUsers: 3 }); // pote 300 → [210,60,30]
+    expect(pz.inZone).toBe(true);
+    expect(pz.myPos).toBe(3);
+    expect(pz.myShare).toBe(30);
+  });
+  it('fora do ranking → null', () => {
+    expect(buildPrizeCard({ rows: [row('a', 10)], meId: 'ghost' })).toBeNull();
+  });
+  it('empate em pontos com o dono da vaga → gap 0 (copy trata como desempate)', () => {
+    const rows = [row('a', 100), row('b', 90), row('d', 85, 5), row('me', 85, 2)];
+    const pz = buildPrizeCard({ rows, meId: 'me', feeAmount: 50, paidUsers: 4 });
+    expect(pz.inZone).toBe(false);
+    expect(pz.holder.gap).toBe(0);
+  });
+  it('paid_users indisponível (0) cai no tamanho do leaderboard, não em pote R$ 0', () => {
+    const pz = buildPrizeCard({ rows: [row('a', 100), row('me', 85)], meId: 'me', feeAmount: 50, paidUsers: 0 });
+    expect(pz.totalPot).toBe(100);
+  });
+});
+
+describe('renderJourneyBets (smoke jsdom)', () => {
+  it('renderiza os 3 cards, revela o container e usa o plural certo', () => {
+    const mount = document.createElement('div');
+    mount.hidden = true;
+    document.body.appendChild(mount);
+    const ok = renderJourneyBets({
+      mount,
+      myChampionPick: { user_id: 'me', team: 'Brazil' },
+      allChampionPicks: [
+        { user_id: 'me', team: 'Brazil' },
+        { user_id: 'a', team: 'Brazil' },
+        { user_id: 'b', team: 'Brazil' },
+      ],
+      scorerPick: { apiId: 7, name: 'Vini Jr.', team: 'Brazil' },
+      scorers: [{ api_id: 7, name: 'Vini Jr.', team: 'Brazil', goals: 4 }],
+      koMatches: KO,
+      leaderboard: LB,
+      meId: 'me',
+      settings: { prize_split: { first: 70, second: 20, third: 10 }, fee_amount: 50 },
+      paidUsers: 6,
+      nextStage: 'r32',
+    });
+    expect(ok).toBe(true);
+    expect(mount.hidden).toBe(false);
+    expect(mount.innerHTML).toContain('Seu campeão');
+    expect(mount.innerHTML).toContain('Seu artilheiro');
+    expect(mount.innerHTML).toContain('Zona de prêmio');
+    expect(mount.innerHTML).toContain('+2 rivais na mesma torcida');
+  });
+  it('sem picks (usuário não escolheu) → só o card de prêmio', () => {
+    const mount = document.createElement('div');
+    mount.hidden = true;
+    document.body.appendChild(mount);
+    renderJourneyBets({
+      mount, myChampionPick: null, allChampionPicks: [], scorerPick: null,
+      scorers: [], koMatches: KO, leaderboard: LB, meId: 'me', paidUsers: 6,
+    });
+    expect(mount.hidden).toBe(false);
+    expect(mount.innerHTML).not.toContain('Seu campeão');
+    expect(mount.innerHTML).toContain('Zona de prêmio');
+  });
+  it('fetch de KO falhou (koMatches null) → sem afirmações de campeão/artilheiro', () => {
+    const mount = document.createElement('div');
+    mount.hidden = true;
+    document.body.appendChild(mount);
+    renderJourneyBets({
+      mount,
+      myChampionPick: { user_id: 'me', team: 'Brazil' },
+      allChampionPicks: [{ user_id: 'me', team: 'Brazil' }],
+      scorerPick: { apiId: 7, name: 'Vini Jr.', team: 'Brazil' },
+      scorers: [{ api_id: 7, name: 'Vini Jr.', team: 'Brazil', goals: 4 }],
+      koMatches: null,
+      leaderboard: LB, meId: 'me', paidUsers: 6,
+    });
+    expect(mount.innerHTML).not.toContain('Seu campeão');
+    expect(mount.innerHTML).not.toContain('Seu artilheiro');
+    expect(mount.innerHTML).toContain('Zona de prêmio');
   });
 });
 
