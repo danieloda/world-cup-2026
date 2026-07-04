@@ -256,7 +256,9 @@ export function avatarHtml(profileLike) {
     const name = profileLike?.full_name || profileLike?.email || '';
     return `<img src="${escapeAttr(url)}" alt="${escapeAttr(name)}">`;
   }
-  return getInitials(profileLike?.full_name || profileLike?.email || '?');
+  // escapa: o retorno vai pra innerHTML e um nome começando com '<' viraria
+  // abertura de tag, corrompendo o markup do chip (full_name é do usuário).
+  return escapeHtml(getInitials(profileLike?.full_name || profileLike?.email || '?'));
 }
 
 export function getInitials(s) {

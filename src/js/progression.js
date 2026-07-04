@@ -19,11 +19,15 @@ import { indexQualifierBreakdown, buildSeries } from './progression-core.js';
 import { championOf } from './card-results.js';
 
 /**
- * Carrega tudo e devolve `{ series, matches }` — ou null se ainda não há
- * jogos finalizados ou jogadores no ranking.
+ * Carrega tudo e devolve `{ series, matches, leaderboard }` — ou null se ainda
+ * não há jogos finalizados ou jogadores no ranking.
  *  - series: [{ userId, name, avatar_url, values }] na ordem do ranking final,
  *    onde values[0] = 0 e values[i+1] = pontos acumulados após o jogo i.
  *  - matches: jogos finalizados, asc por data (com placar/fase/grupo).
+ *  - leaderboard: as linhas do v_leaderboard DESTA carga (já ordenadas) — quem
+ *    renderiza widgets junto do gráfico deve usar estas, não um fetch anterior
+ *    da página: um scoring entre as duas cargas deixaria os widgets contando
+ *    uma história e as séries outra.
  */
 export async function loadProgression() {
   // Palpites pontuados de TODO o bolão: cresce com (usuários × jogos), então
@@ -85,7 +89,7 @@ export async function loadProgression() {
     champPick, realChampion, finalMatchId,
   });
 
-  return { series, matches };
+  return { series, matches, leaderboard };
 }
 
 // Demo dos previews (pré-Copa): vive no núcleo puro (testável); re-exporta

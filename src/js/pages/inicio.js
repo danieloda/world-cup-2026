@@ -11,6 +11,7 @@ import {
 } from '../util.js';
 import { isRealTeam } from '../bracket.js';
 import { renderJourneyChart } from '../journey-chart.js';
+import { renderJourneyDashboard } from '../journey-dashboard.js';
 import { loadProgression, demoProgression } from '../progression.js';
 import { startAutoRefresh } from '../auto-refresh.js';
 
@@ -18,6 +19,7 @@ import { startAutoRefresh } from '../auto-refresh.js';
 let profile, stats, todayMatches, upcomingMatches, myStanding, lockAlerts;
 let myPosition = null;   // posição no ranking (1-based); null antes de haver jogos
 let totalPlayers = 0;    // jogadores no ranking (denominador da posição)
+let leaderboardRows = []; // v_leaderboard completo (dashboard da jornada)
 
 // ============================================================
 // Queries
@@ -327,7 +329,12 @@ function renderJourneySection() {
         <a class="see-all" href="ranking.html">Ver ranking completo →</a>
       </div>
       ${hasData
-        ? `<div class="journey-card" id="journeyChart"><div class="rc-loading">Carregando sua jornada…</div></div>`
+        ? `
+        <div class="jd-layout">
+          <div class="journey-card" id="journeyChart"><div class="rc-loading">Carregando sua jornada…</div></div>
+          <aside class="jd-rail" id="jdRail" hidden></aside>
+        </div>
+        <div class="jd-dna" id="jdDna" hidden></div>`
         : `
         <div class="preview-wrap">
           <div class="preview-blurred" aria-hidden="true">
@@ -366,7 +373,25 @@ function mountJourney() {
   if (!mount) return;
   loadProgression()
     .then(prog => {
-      const ok = prog && renderJourneyChart(mount, { ...prog, meId: profile.id });
+      if (!prog) { section.remove(); return; }
+      // Dashboard ANTES do gráfico: ele liga o .jd-on que estreita a coluna,
+      // e o gráfico mede host.clientWidth no draw() — na ordem inversa o SVG
+      // nasceria na largura cheia e ficaria reescalado até um resize. Falha
+      // aqui não derruba nada (renderJourneyDashboard captura as próprias
+      // exceções; no pior caso os containers só continuam escondidos).
+      renderJourneyDashboard({
+        railMount: document.getElementById('jdRail'),
+        dnaMount: document.getElementById('jdDna'),
+        series: prog.series,
+        matches: prog.matches,
+        // leaderboard da MESMA carga das séries — o fetch do load da página
+        // pode estar defasado se um scoring rodou entre os dois
+        leaderboard: prog.leaderboard ?? leaderboardRows,
+        meId: profile.id,
+        nextStage: upcomingMatches[0]?.stage ?? null,
+        finishedMatches: stats.finished_matches ?? 0,
+      });
+      const ok = renderJourneyChart(mount, { ...prog, meId: profile.id });
       if (!ok) section.remove();
     })
     .catch(err => {
@@ -423,6 +448,7 @@ try {
 
   // Posição derivada do ranking completo (mesma ordenação da página Ranking).
   const leaderboard = leaderRes.data ?? [];
+  leaderboardRows = leaderboard;
   totalPlayers = leaderboard.length;
   myStanding = leaderboard.find(u => u.user_id === profile.id) ?? null;
   if (myStanding && stats.finished_matches > 0) {

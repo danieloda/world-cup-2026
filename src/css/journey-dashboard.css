@@ -1,0 +1,121 @@
+/* ============================================================
+   Dashboard da jornada (Início) — widgets ao redor do gráfico
+   ------------------------------------------------------------
+   Arquivo separado do app.css apenas por logística de trabalho
+   paralelo na working tree (jul/2026); candidato a ser fundido
+   no app.css quando a poeira baixar. Usa os mesmos tokens.
+   ============================================================ */
+
+/* layout: gráfico + trilho lateral; empilha no mobile.
+   Vira 2 colunas só com .jd-on (posta pelo JS quando o trilho tem conteúdo) —
+   grid incondicional reservaria a coluna de 300px com o trilho vazio. */
+.jd-layout { display: block; }
+.jd-layout.jd-on { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: var(--space-3h); align-items: start; }
+.jd-rail { display: flex; flex-direction: column; gap: var(--space-3h); min-width: 0; }
+/* auto-fit: se um card não renderiza (ex.: 0 palpites avaliados), os outros
+   redistribuem — template fixo deixaria buraco */
+.jd-dna { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--space-3h); margin-top: var(--space-3h); }
+/* display das classes acima vence o [hidden] do UA stylesheet — reforça */
+.jd-rail[hidden], .jd-dna[hidden] { display: none !important; }
+
+@media (max-width: 1080px) {
+  .jd-layout.jd-on { grid-template-columns: 1fr; }
+}
+
+.jd-card {
+  background: var(--surface-1); border: 1px solid var(--line);
+  border-radius: var(--radius-lg); padding: var(--space-3) var(--space-3h);
+  display: flex; flex-direction: column; gap: var(--space-2);
+  min-width: 0;
+}
+.jd-h {
+  margin: 0; font-size: var(--fs-xs); font-weight: var(--fw-bold);
+  letter-spacing: var(--tracking-wide); text-transform: uppercase;
+  color: var(--text-mute);
+}
+.jd-hint { font-size: var(--fs-xs); color: var(--text-mute); }
+.jd-card .up { color: var(--positive); }
+.jd-card .dn { color: var(--red); }
+
+/* avatar circular pequeno (foto ou iniciais), anel na cor da linha padrão */
+.jd-av {
+  width: 26px; height: 26px; border-radius: 50%; flex: 0 0 auto;
+  background: var(--card-elev); border: 1.5px solid var(--line-strong);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: var(--fw-heavy); color: var(--text-dim);
+  overflow: hidden;
+}
+.jd-av img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+
+/* --------------------------- escada --------------------------- */
+.jd-ladder { display: flex; flex-direction: column; gap: 2px; }
+.jd-rung {
+  display: flex; align-items: center; gap: var(--space-2);
+  padding: 6px 8px; border-radius: 9px; font-size: var(--fs-base);
+}
+.jd-rung.me { background: var(--accent-dim); border: 1px solid rgba(244, 196, 48, .38); font-weight: var(--fw-bold); }
+.jd-rung.me .jd-rank { color: var(--accent-bright); }
+.jd-rank { width: 32px; color: var(--text-mute); font-variant-numeric: tabular-nums; flex: 0 0 auto; }
+.jd-who { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.jd-gap { font-variant-numeric: tabular-nums; color: var(--text-dim); font-size: var(--fs-sm); flex: 0 0 auto; }
+.jd-tied { color: var(--text-mute); font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: .04em; }
+.jd-scenario { font-size: var(--fs-xs); color: var(--text-mute); padding: 0 8px 4px 44px; }
+.jd-threat {
+  background: var(--red-dim); color: var(--red);
+  font-size: 10px; font-weight: var(--fw-heavy); letter-spacing: .04em;
+  padding: 2px 7px; border-radius: 20px; flex: 0 0 auto;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .jd-threat { animation: jd-pulse 2.4s ease-in-out infinite; }
+  @keyframes jd-pulse { 50% { opacity: .5; } }
+}
+
+/* ----------------------- ultrapassagens ----------------------- */
+.jd-swap { display: flex; align-items: center; gap: var(--space-2); font-size: var(--fs-sm); min-width: 0; }
+.jd-swap-dir { font-weight: var(--fw-bold); flex: 0 0 auto; }
+.jd-swap-dir.up { color: var(--positive); }
+.jd-swap-dir.dn { color: var(--red); }
+.jd-swap-avs { display: flex; flex: 0 0 auto; }
+.jd-swap-avs .jd-av { width: 22px; height: 22px; margin-left: -6px; }
+.jd-swap-avs .jd-av:first-child { margin-left: 0; }
+.jd-swap-names { color: var(--text-dim); min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* --------------------------- funil ---------------------------- */
+/* borda delimita a extensão total — sem ela o tier "Zero" (quase da cor do
+   card) some e a barra parece truncada */
+.jd-funnel { display: flex; height: 30px; border-radius: 8px; overflow: hidden; border: 1px solid var(--line); }
+.jd-fseg {
+  display: flex; align-items: center; justify-content: center;
+  font-size: var(--fs-xs); font-weight: var(--fw-heavy); color: #131313;
+  min-width: 18px;
+}
+.jd-fseg.t-exact { background: var(--accent-bright); }
+.jd-fseg.t-vs { background: #d9a921; }
+.jd-fseg.t-v { background: #a0801f; }
+.jd-fseg.t-side { background: #5c512a; color: #d7d7d7; }
+.jd-fseg.t-miss { background: #2c2c2f; color: #8a8a8e; }
+.jd-flegs { display: flex; flex-wrap: wrap; gap: 2px 14px; font-size: var(--fs-xs); color: var(--text-dim); }
+.jd-fleg i { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 5px; }
+.jd-fleg i.t-exact { background: var(--accent-bright); }
+.jd-fleg i.t-vs { background: #d9a921; }
+.jd-fleg i.t-v { background: #a0801f; }
+.jd-fleg i.t-side { background: #5c512a; }
+.jd-fleg i.t-miss { background: #2c2c2f; }
+
+/* --------------------- você vs a média ------------------------ */
+.jd-pair { display: grid; grid-template-columns: 68px 1fr 44px; align-items: center; gap: var(--space-2); font-size: var(--fs-sm); }
+.jd-pair-l { color: var(--text-dim); }
+.jd-pair-v { text-align: right; font-variant-numeric: tabular-nums; font-weight: var(--fw-bold); }
+.jd-bar { position: relative; height: 9px; border-radius: 5px; background: var(--card-elev); overflow: visible; }
+.jd-bar .fill { position: absolute; inset: 0 auto 0 0; border-radius: 5px; background: var(--accent); }
+.jd-bar .tick { position: absolute; top: -3px; bottom: -3px; width: 2px; background: #8a8a8e; border-radius: 1px; }
+
+/* ------------------- o que te separa do líder ------------------ */
+.jd-divg { display: grid; grid-template-columns: 68px 1fr 44px; align-items: center; gap: var(--space-2); font-size: var(--fs-sm); }
+.jd-track { display: flex; height: 9px; }
+.jd-track .half { flex: 1; position: relative; background: var(--card-elev); overflow: hidden; }
+.jd-track .half.l { border-radius: 5px 0 0 5px; }
+.jd-track .half.r { border-radius: 0 5px 5px 0; border-left: 1px solid var(--line-strong); }
+.jd-track .half i { position: absolute; top: 0; bottom: 0; }
+.jd-track .half.l i { right: 0; background: var(--positive); border-radius: 5px 0 0 5px; }
+.jd-track .half.r i { left: 0; background: var(--red); border-radius: 0 5px 5px 0; }
