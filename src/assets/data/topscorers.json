@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-05T10:52:43.448Z",
+  "updated_at": "2026-07-05T12:18:29.127Z",
   "season": 2026,
   "scorers": [
     {
@@ -8,7 +8,7 @@
       "team": "France",
       "goals": 7,
       "assists": 2,
-      "minutes": 449
+      "minutes": 452
     },
     {
       "api_id": 154,
