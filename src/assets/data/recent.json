@@ -433,6 +433,13 @@
   ],
   "Brazil": [
     [
+      "2026-07-05",
+      "Norway",
+      true,
+      "1-2",
+      "World Cup"
+    ],
+    [
       "2026-06-29",
       "Japan",
       true,
@@ -493,13 +500,6 @@
       "Tunisia",
       true,
       "1-1",
-      "Amistoso"
-    ],
-    [
-      "2025-11-15",
-      "Senegal",
-      true,
-      "2-0",
       "Amistoso"
     ]
   ],
@@ -1009,6 +1009,13 @@
   ],
   "England": [
     [
+      "2026-07-06",
+      "Mexico",
+      false,
+      "3-2",
+      "World Cup"
+    ],
+    [
       "2026-07-01",
       "Congo DR",
       true,
@@ -1068,13 +1075,6 @@
       "2025-11-16",
       "Albania",
       false,
-      "2-0",
-      "Eliminatórias"
-    ],
-    [
-      "2025-11-13",
-      "Serbia",
-      true,
       "2-0",
       "Eliminatórias"
     ]
@@ -1729,6 +1729,13 @@
   ],
   "Mexico": [
     [
+      "2026-07-06",
+      "England",
+      true,
+      "2-3",
+      "World Cup"
+    ],
+    [
       "2026-07-01",
       "Ecuador",
       true,
@@ -1789,13 +1796,6 @@
       "Portugal",
       true,
       "0-0",
-      "Amistoso"
-    ],
-    [
-      "2026-02-26",
-      "Iceland",
-      true,
-      "4-0",
       "Amistoso"
     ]
   ],
@@ -2017,6 +2017,13 @@
   ],
   "Norway": [
     [
+      "2026-07-05",
+      "Brazil",
+      false,
+      "2-1",
+      "World Cup"
+    ],
+    [
       "2026-06-30",
       "Ivory Coast",
       false,
@@ -2076,13 +2083,6 @@
       "2025-11-16",
       "Italy",
       false,
-      "4-1",
-      "Eliminatórias"
-    ],
-    [
-      "2025-11-13",
-      "Estonia",
-      true,
       "4-1",
       "Eliminatórias"
     ]
