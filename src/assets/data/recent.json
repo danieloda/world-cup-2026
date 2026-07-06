@@ -2233,6 +2233,13 @@
   ],
   "Portugal": [
     [
+      "2026-07-06",
+      "Spain",
+      true,
+      "0-0",
+      "World Cup"
+    ],
+    [
       "2026-07-02",
       "Croatia",
       true,
@@ -2293,13 +2300,6 @@
       "Armenia",
       true,
       "9-1",
-      "Eliminatórias"
-    ],
-    [
-      "2025-11-13",
-      "Rep. Of Ireland",
-      false,
-      "0-2",
       "Eliminatórias"
     ]
   ],
@@ -2737,6 +2737,13 @@
   ],
   "Spain": [
     [
+      "2026-07-06",
+      "Portugal",
+      false,
+      "0-0",
+      "World Cup"
+    ],
+    [
       "2026-07-02",
       "Austria",
       true,
@@ -2797,13 +2804,6 @@
       "Türkiye",
       true,
       "2-2",
-      "Eliminatórias"
-    ],
-    [
-      "2025-11-15",
-      "Georgia",
-      false,
-      "4-0",
       "Eliminatórias"
     ]
   ],
