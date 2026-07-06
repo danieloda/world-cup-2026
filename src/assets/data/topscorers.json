@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-06T10:57:32.174Z",
+  "updated_at": "2026-07-06T14:32:15.851Z",
   "season": 2026,
   "scorers": [
     {
@@ -8,7 +8,7 @@
       "team": "France",
       "goals": 7,
       "assists": 2,
-      "minutes": 452
+      "minutes": 441
     },
     {
       "api_id": 154,
@@ -22,17 +22,17 @@
       "api_id": 1100,
       "name": "E. Haaland",
       "team": "Norway",
-      "goals": 5,
+      "goals": 7,
       "assists": 0,
-      "minutes": 332
+      "minutes": 360
     },
     {
       "api_id": 184,
       "name": "H. Kane",
       "team": "England",
-      "goals": 5,
-      "assists": 0,
-      "minutes": 354
+      "goals": 6,
+      "assists": 1,
+      "minutes": 444
     },
     {
       "api_id": 153,
@@ -59,12 +59,28 @@
       "minutes": 366
     },
     {
+      "api_id": 35532,
+      "name": "J. Quiñones",
+      "team": "Mexico",
+      "goals": 4,
+      "assists": 1,
+      "minutes": 414
+    },
+    {
+      "api_id": 129718,
+      "name": "J. Bellingham",
+      "team": "England",
+      "goals": 4,
+      "assists": 1,
+      "minutes": 417
+    },
+    {
       "api_id": 762,
       "name": "Vinícius Júnior",
       "team": "Brazil",
       "goals": 4,
       "assists": 1,
-      "minutes": 413
+      "minutes": 441
     },
     {
       "api_id": 26475,
@@ -81,14 +97,6 @@
       "goals": 3,
       "assists": 2,
       "minutes": 200
-    },
-    {
-      "api_id": 35532,
-      "name": "J. Quiñones",
-      "team": "Mexico",
-      "goals": 3,
-      "assists": 1,
-      "minutes": 333
     },
     {
       "api_id": 247,
@@ -131,20 +139,12 @@
       "minutes": 293
     },
     {
-      "api_id": 874,
-      "name": "Cristiano Ronaldo",
-      "team": "Portugal",
+      "api_id": 2887,
+      "name": "R. Jiménez",
+      "team": "Mexico",
       "goals": 3,
       "assists": 0,
-      "minutes": 351
-    },
-    {
-      "api_id": 978,
-      "name": "K. Havertz",
-      "team": "Germany",
-      "goals": 3,
-      "assists": 0,
-      "minutes": 355
+      "minutes": 333
     },
     {
       "api_id": 161897,
