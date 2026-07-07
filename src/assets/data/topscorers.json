@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-07T10:32:57.282Z",
+  "updated_at": "2026-07-07T13:06:13.421Z",
   "season": 2026,
   "scorers": [
     {
@@ -43,20 +43,20 @@
       "minutes": 372
     },
     {
-      "api_id": 47323,
-      "name": "Mikel Oyarzabal",
-      "team": "Spain",
-      "goals": 4,
-      "assists": 1,
-      "minutes": 301
-    },
-    {
       "api_id": 2218,
       "name": "I. Sarr",
       "team": "Senegal",
       "goals": 4,
       "assists": 1,
       "minutes": 366
+    },
+    {
+      "api_id": 47323,
+      "name": "Mikel Oyarzabal",
+      "team": "Spain",
+      "goals": 4,
+      "assists": 1,
+      "minutes": 390
     },
     {
       "api_id": 35532,
@@ -99,20 +99,20 @@
       "minutes": 200
     },
     {
+      "api_id": 907,
+      "name": "R. Lukaku",
+      "team": "Belgium",
+      "goals": 3,
+      "assists": 1,
+      "minutes": 206
+    },
+    {
       "api_id": 247,
       "name": "C. Gakpo",
       "team": "Netherlands",
       "goals": 3,
       "assists": 1,
       "minutes": 371
-    },
-    {
-      "api_id": 138835,
-      "name": "F. Balogun",
-      "team": "USA",
-      "goals": 3,
-      "assists": 0,
-      "minutes": 225
     },
     {
       "api_id": 38750,
@@ -139,12 +139,12 @@
       "minutes": 293
     },
     {
-      "api_id": 2887,
-      "name": "R. Jiménez",
-      "team": "Mexico",
+      "api_id": 138835,
+      "name": "F. Balogun",
+      "team": "USA",
       "goals": 3,
       "assists": 0,
-      "minutes": 333
+      "minutes": 314
     },
     {
       "api_id": 161897,
