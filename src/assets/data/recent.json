@@ -73,6 +73,13 @@
   ],
   "Argentina": [
     [
+      "2026-07-07",
+      "Egypt",
+      true,
+      "3-2",
+      "World Cup"
+    ],
+    [
       "2026-07-03",
       "Cape Verde Islands",
       true,
@@ -133,13 +140,6 @@
       "Angola",
       false,
       "2-0",
-      "Amistoso"
-    ],
-    [
-      "2025-10-15",
-      "Puerto Rico",
-      false,
-      "6-0",
       "Amistoso"
     ]
   ],
@@ -577,6 +577,13 @@
   ],
   "Colombia": [
     [
+      "2026-07-07",
+      "Switzerland",
+      false,
+      "0-0",
+      "World Cup"
+    ],
+    [
       "2026-07-04",
       "Ghana",
       true,
@@ -637,13 +644,6 @@
       "Australia",
       true,
       "3-0",
-      "Amistoso"
-    ],
-    [
-      "2025-11-16",
-      "New Zealand",
-      true,
-      "2-1",
       "Amistoso"
     ]
   ],
@@ -937,6 +937,13 @@
   ],
   "Egypt": [
     [
+      "2026-07-07",
+      "Argentina",
+      false,
+      "2-3",
+      "World Cup"
+    ],
+    [
       "2026-07-03",
       "Australia",
       false,
@@ -997,13 +1004,6 @@
       "Nigeria",
       true,
       "0-0",
-      "Copa Africana"
-    ],
-    [
-      "2026-01-14",
-      "Senegal",
-      false,
-      "0-1",
       "Copa Africana"
     ]
   ],
@@ -2881,6 +2881,13 @@
   ],
   "Switzerland": [
     [
+      "2026-07-07",
+      "Colombia",
+      true,
+      "0-0",
+      "World Cup"
+    ],
+    [
       "2026-07-03",
       "Algeria",
       true,
@@ -2941,13 +2948,6 @@
       "Kosovo",
       false,
       "1-1",
-      "Eliminatórias"
-    ],
-    [
-      "2025-11-15",
-      "Sweden",
-      true,
-      "4-1",
       "Eliminatórias"
     ]
   ],
