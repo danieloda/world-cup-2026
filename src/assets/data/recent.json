@@ -1081,6 +1081,13 @@
   ],
   "France": [
     [
+      "2026-07-09",
+      "Morocco",
+      true,
+      "0-0",
+      "World Cup"
+    ],
+    [
       "2026-07-04",
       "Paraguay",
       false,
@@ -1142,13 +1149,6 @@
       false,
       "2-1",
       "Amistoso"
-    ],
-    [
-      "2025-11-16",
-      "Azerbaijan",
-      false,
-      "3-1",
-      "Eliminatórias"
     ]
   ],
   "Germany": [
@@ -1801,6 +1801,13 @@
   ],
   "Morocco": [
     [
+      "2026-07-09",
+      "France",
+      false,
+      "0-0",
+      "World Cup"
+    ],
+    [
       "2026-07-04",
       "Canada",
       false,
@@ -1861,13 +1868,6 @@
       "Paraguay",
       true,
       "2-1",
-      "Amistoso"
-    ],
-    [
-      "2026-03-27",
-      "Ecuador",
-      true,
-      "1-1",
       "Amistoso"
     ]
   ],
