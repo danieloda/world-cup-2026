@@ -1,22 +1,22 @@
 {
-  "updated_at": "2026-07-09T21:59:29.195Z",
+  "updated_at": "2026-07-09T23:22:09.332Z",
   "season": 2026,
   "scorers": [
+    {
+      "api_id": 278,
+      "name": "Kylian Mbappé",
+      "team": "France",
+      "goals": 8,
+      "assists": 3,
+      "minutes": 518
+    },
     {
       "api_id": 154,
       "name": "L. Messi",
       "team": "Argentina",
       "goals": 8,
       "assists": 1,
-      "minutes": 422
-    },
-    {
-      "api_id": 278,
-      "name": "Kylian Mbappé",
-      "team": "France",
-      "goals": 7,
-      "assists": 2,
-      "minutes": 441
+      "minutes": 410
     },
     {
       "api_id": 1100,
@@ -38,9 +38,9 @@
       "api_id": 153,
       "name": "O. Dembélé",
       "team": "France",
-      "goals": 4,
+      "goals": 5,
       "assists": 2,
-      "minutes": 372
+      "minutes": 462
     },
     {
       "api_id": 2218,
