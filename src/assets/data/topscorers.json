@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-10T22:16:53.312Z",
+  "updated_at": "2026-07-10T23:30:46.303Z",
   "season": 2026,
   "scorers": [
     {
@@ -51,14 +51,6 @@
       "minutes": 366
     },
     {
-      "api_id": 47323,
-      "name": "Mikel Oyarzabal",
-      "team": "Spain",
-      "goals": 4,
-      "assists": 1,
-      "minutes": 390
-    },
-    {
       "api_id": 35532,
       "name": "J. Quiñones",
       "team": "Mexico",
@@ -83,6 +75,14 @@
       "minutes": 441
     },
     {
+      "api_id": 47323,
+      "name": "Mikel Oyarzabal",
+      "team": "Spain",
+      "goals": 4,
+      "assists": 1,
+      "minutes": 469
+    },
+    {
       "api_id": 26475,
       "name": "D. Undav",
       "team": "Germany",
@@ -104,7 +104,15 @@
       "team": "Belgium",
       "goals": 3,
       "assists": 1,
-      "minutes": 206
+      "minutes": 240
+    },
+    {
+      "api_id": 147859,
+      "name": "C. De Ketelaere",
+      "team": "Belgium",
+      "goals": 3,
+      "assists": 1,
+      "minutes": 357
     },
     {
       "api_id": 247,
@@ -121,14 +129,6 @@
       "goals": 3,
       "assists": 0,
       "minutes": 232
-    },
-    {
-      "api_id": 94333,
-      "name": "E. Just",
-      "team": "New Zealand",
-      "goals": 3,
-      "assists": 0,
-      "minutes": 265
     },
     {
       "api_id": 1165,
