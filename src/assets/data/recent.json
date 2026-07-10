@@ -289,6 +289,13 @@
   ],
   "Belgium": [
     [
+      "2026-07-10",
+      "Spain",
+      false,
+      "1-1",
+      "World Cup"
+    ],
+    [
       "2026-07-07",
       "USA",
       false,
@@ -350,13 +357,6 @@
       false,
       "5-2",
       "Amistoso"
-    ],
-    [
-      "2025-11-18",
-      "Liechtenstein",
-      true,
-      "7-0",
-      "Eliminatórias"
     ]
   ],
   "Bosnia & Herzegovina": [
@@ -2737,6 +2737,13 @@
   ],
   "Spain": [
     [
+      "2026-07-10",
+      "Belgium",
+      true,
+      "1-1",
+      "World Cup"
+    ],
+    [
       "2026-07-06",
       "Portugal",
       false,
@@ -2798,13 +2805,6 @@
       true,
       "3-0",
       "Amistoso"
-    ],
-    [
-      "2025-11-18",
-      "Türkiye",
-      true,
-      "2-2",
-      "Eliminatórias"
     ]
   ],
   "Sweden": [
