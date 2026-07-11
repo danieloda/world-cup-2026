@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-11T10:03:38.714Z",
+  "updated_at": "2026-07-11T11:19:37.394Z",
   "season": 2026,
   "scorers": [
     {
@@ -104,7 +104,7 @@
       "team": "Belgium",
       "goals": 3,
       "assists": 1,
-      "minutes": 240
+      "minutes": 236
     },
     {
       "api_id": 147859,
@@ -112,7 +112,7 @@
       "team": "Belgium",
       "goals": 3,
       "assists": 1,
-      "minutes": 357
+      "minutes": 353
     },
     {
       "api_id": 247,
