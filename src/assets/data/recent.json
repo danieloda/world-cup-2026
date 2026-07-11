@@ -1009,6 +1009,13 @@
   ],
   "England": [
     [
+      "2026-07-11",
+      "Norway",
+      false,
+      "1-1",
+      "World Cup"
+    ],
+    [
       "2026-07-06",
       "Mexico",
       false,
@@ -1070,13 +1077,6 @@
       true,
       "1-1",
       "Amistoso"
-    ],
-    [
-      "2025-11-16",
-      "Albania",
-      false,
-      "2-0",
-      "Eliminatórias"
     ]
   ],
   "France": [
@@ -2017,6 +2017,13 @@
   ],
   "Norway": [
     [
+      "2026-07-11",
+      "England",
+      true,
+      "1-1",
+      "World Cup"
+    ],
+    [
       "2026-07-05",
       "Brazil",
       false,
@@ -2078,13 +2085,6 @@
       false,
       "1-2",
       "Amistoso"
-    ],
-    [
-      "2025-11-16",
-      "Italy",
-      false,
-      "4-1",
-      "Eliminatórias"
     ]
   ],
   "Panama": [
