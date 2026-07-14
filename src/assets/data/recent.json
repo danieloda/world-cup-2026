@@ -1081,6 +1081,13 @@
   ],
   "France": [
     [
+      "2026-07-14",
+      "Spain",
+      true,
+      "0-1",
+      "World Cup"
+    ],
+    [
       "2026-07-09",
       "Morocco",
       true,
@@ -1141,13 +1148,6 @@
       "Colombia",
       false,
       "3-1",
-      "Amistoso"
-    ],
-    [
-      "2026-03-26",
-      "Brazil",
-      false,
-      "2-1",
       "Amistoso"
     ]
   ],
@@ -2737,6 +2737,13 @@
   ],
   "Spain": [
     [
+      "2026-07-14",
+      "France",
+      false,
+      "1-0",
+      "World Cup"
+    ],
+    [
       "2026-07-10",
       "Belgium",
       true,
@@ -2797,13 +2804,6 @@
       "Egypt",
       true,
       "0-0",
-      "Amistoso"
-    ],
-    [
-      "2026-03-27",
-      "Serbia",
-      true,
-      "3-0",
       "Amistoso"
     ]
   ],
