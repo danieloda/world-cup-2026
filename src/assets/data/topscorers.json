@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-15T09:00:41.544Z",
+  "updated_at": "2026-07-15T11:02:13.028Z",
   "season": 2026,
   "scorers": [
     {
@@ -8,7 +8,7 @@
       "team": "France",
       "goals": 8,
       "assists": 3,
-      "minutes": 518
+      "minutes": 608
     },
     {
       "api_id": 154,
@@ -48,7 +48,15 @@
       "team": "France",
       "goals": 5,
       "assists": 2,
-      "minutes": 462
+      "minutes": 552
+    },
+    {
+      "api_id": 47323,
+      "name": "Mikel Oyarzabal",
+      "team": "Spain",
+      "goals": 5,
+      "assists": 1,
+      "minutes": 543
     },
     {
       "api_id": 2218,
@@ -73,14 +81,6 @@
       "goals": 4,
       "assists": 1,
       "minutes": 441
-    },
-    {
-      "api_id": 47323,
-      "name": "Mikel Oyarzabal",
-      "team": "Spain",
-      "goals": 4,
-      "assists": 1,
-      "minutes": 469
     },
     {
       "api_id": 26475,
