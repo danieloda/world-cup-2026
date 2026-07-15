@@ -73,6 +73,13 @@
   ],
   "Argentina": [
     [
+      "2026-07-15",
+      "England",
+      false,
+      "0-0",
+      "World Cup"
+    ],
+    [
       "2026-07-12",
       "Switzerland",
       true,
@@ -133,13 +140,6 @@
       "Zambia",
       true,
       "5-0",
-      "Amistoso"
-    ],
-    [
-      "2026-03-27",
-      "Mauritania",
-      true,
-      "2-1",
       "Amistoso"
     ]
   ],
@@ -1009,6 +1009,13 @@
   ],
   "England": [
     [
+      "2026-07-15",
+      "Argentina",
+      true,
+      "0-0",
+      "World Cup"
+    ],
+    [
       "2026-07-11",
       "Norway",
       false,
@@ -1069,13 +1076,6 @@
       "Japan",
       true,
       "0-1",
-      "Amistoso"
-    ],
-    [
-      "2026-03-27",
-      "Uruguay",
-      true,
-      "1-1",
       "Amistoso"
     ]
   ],
