@@ -1,7 +1,15 @@
 {
-  "updated_at": "2026-07-19T07:16:12.788Z",
+  "updated_at": "2026-07-19T09:27:25.204Z",
   "season": 2026,
   "scorers": [
+    {
+      "api_id": 278,
+      "name": "Kylian Mbappé",
+      "team": "France",
+      "goals": 10,
+      "assists": 4,
+      "minutes": 698
+    },
     {
       "api_id": 154,
       "name": "L. Messi",
@@ -11,12 +19,12 @@
       "minutes": 620
     },
     {
-      "api_id": 278,
-      "name": "Kylian Mbappé",
-      "team": "France",
-      "goals": 8,
-      "assists": 3,
-      "minutes": 608
+      "api_id": 129718,
+      "name": "J. Bellingham",
+      "team": "England",
+      "goals": 7,
+      "assists": 1,
+      "minutes": 629
     },
     {
       "api_id": 1100,
@@ -27,12 +35,12 @@
       "minutes": 465
     },
     {
-      "api_id": 129718,
-      "name": "J. Bellingham",
-      "team": "England",
+      "api_id": 153,
+      "name": "O. Dembélé",
+      "team": "France",
       "goals": 6,
-      "assists": 1,
-      "minutes": 618
+      "assists": 2,
+      "minutes": 597
     },
     {
       "api_id": 184,
@@ -41,14 +49,6 @@
       "goals": 6,
       "assists": 1,
       "minutes": 654
-    },
-    {
-      "api_id": 153,
-      "name": "O. Dembélé",
-      "team": "France",
-      "goals": 5,
-      "assists": 2,
-      "minutes": 552
     },
     {
       "api_id": 47323,
@@ -123,6 +123,14 @@
       "minutes": 371
     },
     {
+      "api_id": 161904,
+      "name": "B. Barcola",
+      "team": "France",
+      "goals": 3,
+      "assists": 1,
+      "minutes": 384
+    },
+    {
       "api_id": 38750,
       "name": "B. Brobbey",
       "team": "Netherlands",
@@ -137,14 +145,6 @@
       "goals": 3,
       "assists": 0,
       "minutes": 293
-    },
-    {
-      "api_id": 138835,
-      "name": "F. Balogun",
-      "team": "USA",
-      "goals": 3,
-      "assists": 0,
-      "minutes": 314
     },
     {
       "api_id": 161897,
