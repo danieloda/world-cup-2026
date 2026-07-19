@@ -73,6 +73,13 @@
   ],
   "Argentina": [
     [
+      "2026-07-19",
+      "Spain",
+      false,
+      "0-1",
+      "World Cup"
+    ],
+    [
       "2026-07-15",
       "England",
       false,
@@ -133,13 +140,6 @@
       "Honduras",
       true,
       "2-0",
-      "Amistoso"
-    ],
-    [
-      "2026-03-31",
-      "Zambia",
-      true,
-      "5-0",
       "Amistoso"
     ]
   ],
@@ -2737,6 +2737,13 @@
   ],
   "Spain": [
     [
+      "2026-07-19",
+      "Argentina",
+      true,
+      "1-0",
+      "World Cup"
+    ],
+    [
       "2026-07-14",
       "France",
       false,
@@ -2797,13 +2804,6 @@
       "Iraq",
       true,
       "1-1",
-      "Amistoso"
-    ],
-    [
-      "2026-03-31",
-      "Egypt",
-      true,
-      "0-0",
       "Amistoso"
     ]
   ],
