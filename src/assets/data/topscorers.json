@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-20T23:02:48.374Z",
+  "updated_at": "2026-07-21T00:09:59.944Z",
   "season": 2026,
   "scorers": [
     {
@@ -13,14 +13,6 @@
     {
       "api_id": 154,
       "name": "L. Messi",
-      "team": "Argentina",
-      "goals": 8,
-      "assists": 4,
-      "minutes": 740
-    },
-    {
-      "api_id": 217,
-      "name": "Lautaro Martínez",
       "team": "Argentina",
       "goals": 8,
       "assists": 4,
@@ -137,6 +129,14 @@
       "goals": 3,
       "assists": 1,
       "minutes": 384
+    },
+    {
+      "api_id": 38750,
+      "name": "B. Brobbey",
+      "team": "Netherlands",
+      "goals": 3,
+      "assists": 0,
+      "minutes": 232
     },
     {
       "api_id": 1165,
